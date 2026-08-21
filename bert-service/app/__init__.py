@@ -1,0 +1,1 @@
+"""IndoBERT inference service."""

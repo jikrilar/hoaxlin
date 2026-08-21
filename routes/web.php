@@ -1,0 +1,66 @@
+<?php
+
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
+use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\DeteksiController;
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RiwayatController;
+use App\Http\Controllers\SubmissionController;
+use Illuminate\Support\Facades\Route;
+
+Route::view('/', 'welcome')->name('home');
+Route::view('/cara-kerja', 'cara-kerja')->name('cara-kerja');
+Route::view('/tentang', 'tentang')->name('tentang');
+Route::view('/kebijakan-privasi', 'kebijakan-privasi')->name('kebijakan-privasi');
+
+Route::post('/deteksi', [SubmissionController::class, 'store'])
+    ->middleware('throttle:20,1')
+    ->name('deteksi');
+Route::get('/hasil/{id}', [DeteksiController::class, 'hasil'])
+    ->middleware('throttle:60,1')
+    ->name('hasil');
+
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register.store');
+
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+
+    Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('password.email');
+
+    Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+    Route::get('/verify-email', EmailVerificationPromptController::class)->name('verification.notice');
+    Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+
+    Route::get('/profil', [ProfileController::class, 'show'])->name('profile');
+    Route::patch('/profil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::delete('/profil', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::middleware('verified')->group(function () {
+        Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat');
+        Route::get('/riwayat/{id}', [RiwayatController::class, 'show'])->name('riwayat.show');
+        Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback');
+    });
+});
