@@ -1,7 +1,7 @@
 # Task Checklist — Sistem Deteksi Hoax BERT (hoaxlin.id)
 
-**Reference:** `PROJECT_PROGRESS.md` (re-audit 20 August 2026; this checklist re-audited 21 August 2026; C4–C9 re-audited 21 August 2026), `PRD-Sistem-Deteksi-Hoax-BERT.md`
-**Overall completion: 93%** — pipeline queue chain connected (C1, C6 done) and failure-safe (C7 done); research dataset prepared (C2 done); IndoBERT fine-tuned and versioned (C3 done, with style-bias caveat); FastAPI wired with verified artifact and threshold handling (C4 done); Laravel↔FastAPI proven via contract + HTTP-fake + real queue inference (C5 done); ownership and UI correctness fixed (C8–C9 done).
+**Reference:** `PROJECT_PROGRESS.md` (re-audit 20 August 2026; this checklist re-audited 21 August 2026; C4–C16 re-audited 21 August 2026), `PRD-Sistem-Deteksi-Hoax-BERT.md`
+**Overall completion: 95%** — pipeline queue chain connected (C1, C6 done) and failure-safe (C7 done); research dataset prepared (C2 done); IndoBERT fine-tuned and versioned (C3 done, with style-bias caveat); FastAPI wired with verified artifact and threshold handling (C4 done); Laravel↔FastAPI proven via contract + HTTP-fake + real queue inference (C5 done); ownership and UI correctness fixed (C8–C9 done); test suite runnable without MySQL and version control restored (C15–C16 done).
 
 Priority legend:
 
@@ -12,7 +12,7 @@ Priority legend:
 
 Status legend: ✅ Done — 🔶 Partial — ❌ Not started
 
-**Re-audit 21 August 2026 (C4–C9):** C2/C3 completed (7816 rows, 498 MB artifact); C4 wired (`bert-service/.env` with `BERT_MODEL_PATH`, dotenv `app/config.py:13`, label-map verified `app/inference.py:111`, sidecars + checksum, `GET /health/ready` 200, `GET /version` exposes labels/threshold); C5 proven (`test_api.py` 11 tests, `BertClassifierTest` 12 tests, `RealBertInferenceTest` 4 tests via `queue:work`); C7 added `failed()` hooks on all 4 jobs, C8 added ownership check on `DeteksiController.php:18` + `throttle:60,1` on `/hasil/{id}`, C9 replaced stale "belum dijalankan" wording and removed `Demo Mode` branch in `hasil.blade.php:24,76`. `phpunit.xml` now uses `sqlite` in-memory so 46 Laravel + 63 bert-service tests pass. `PROJECT_PROGRESS.md` remains outdated.
+**Re-audit 21 August 2026 (C4–C16):** C2/C3 completed (7816 rows, 498 MB artifact); C4 wired (`bert-service/.env` with `BERT_MODEL_PATH`, dotenv `app/config.py:13`, label-map verified `app/inference.py:111`, sidecars + checksum, `GET /health/ready` 200); C5 proven (`test_api.py` 11 tests, `BertClassifierTest` 12 tests, `RealBertInferenceTest` 4 tests via `queue:work`); C7 added `failed()` hooks, C8 ownership check + throttle, C9 fixed stale wording; C15 `phpunit.xml` now uses `sqlite :memory:` (46 + 63 tests pass), C16 `git init` repaired (commit 861f98d, 318 files). `PROJECT_PROGRESS.md` remains outdated.
 
 ---
 
@@ -65,8 +65,8 @@ Status legend: ✅ Done — 🔶 Partial — ❌ Not started
 | C12 | Media limits: duration, decoded size, resource limits; malware scanning; retention scheduler | ❌ Not started | No duration/size checks, no ClamAV, no `media:prune` scheduler |
 | C13 | OpenAI quota/rate-limit enforcement + cost accounting (usage ledger, token/cost calc — currently always 0) | ❌ Not started | `detection_results.estimated_cost` always 0; no `openai_usage` table; `config/openai.php` quota not enforced |
 | C14 | OpenAI provider circuit breakers for OCR/transcription adapters | ❌ Not started | Only `OpenAiExplainer` has circuit breaker; `OpenAiImageExtractor`/`OpenAiVideoExtractor` call HTTP directly |
-| C15 | Restore runnable automated test suite (start MySQL / configure separate test DB) | 🔶 Partial | `phpunit.xml` now has `DB_CONNECTION=sqlite` in-memory (21 Aug) — `php artisan test` 46 passed + `bert-service` 63 passed without MySQL; `QUEUE_CONNECTION=sync` in `phpunit.xml` for sync jobs. Remaining: `git status` still `fatal: not a git repository` (verified 21 Aug), and MySQL-dependent fulltext/queue integration still needs separate DB for production parity. |
-| C16 | Restore version control (repair `.git`; repo currently invalid) | ❌ Not started | `git status` fails; no history — blocks traceability, code review, and `opencode` task tracking |
+| C15 | Restore runnable automated test suite (start MySQL / configure separate test DB) | ✅ Done | `phpunit.xml:12` now has `DB_CONNECTION=sqlite` + `DB_DATABASE=:memory:` (21 Aug) with `CACHE_STORE=array`, `QUEUE_CONNECTION=sync`, `BCRYPT_ROUNDS=4` for speed; `php artisan test` 46 passed + `bert-service` 63 passed without MySQL (verified 21 Aug). `QUEUE_CONNECTION=sync` ensures pipeline jobs run inline in tests; `CACHE_STORE=array` avoids Redis. Remaining for production parity: MySQL fulltext/queue integration (optional, keep sqlite for CI). |
+| C16 | Restore version control (repair `.git`; repo currently invalid) | ✅ Done | `.git` was empty (0 files) — reinitialized via `git init` (21 Aug), configured `user.name hoaxlin.id` + `user.email admin@hoaxlin.id`, updated `.gitignore` to exclude large ML artifacts (`/datasets/*.csv`, `/datasets/processed/`, `/models/`, `bert-service/.venv`, `uvicorn.log`), added `models/.gitkeep`, and committed 318 files as `861f98d` "chore: restore version control and enable runnable test suite (C15/C16)" — `git status` now clean, `git log` shows history. |
 | C17 | CAPTCHA + stronger per-IP/per-account submission quotas | ❌ Not started | Only `throttle:60,1` on routes; no CAPTCHA, no per-IP daily cap |
 | C18 | FastAPI test suite + container/process-manager deployment config + model checksum/registry + metrics endpoint | 🔶 Partial | `bert-service/tests/test_api.py` (11 tests) now covers `/health/live`/`/health/ready`/`/version`/`/predict` with lifespan; `models/indobert-hoax/manifest.json` exists with SHA-256 and is verified at startup (`app/inference.py:185`). Remaining: `Dockerfile`/`docker-compose`/`systemd`/`supervisord`, CI checksum gate, and `/metrics` endpoint. |
 
@@ -104,9 +104,9 @@ Status legend: ✅ Done — 🔶 Partial — ❌ Not started
 
 ## F. Immediate Next Steps (Recommended Order)
 
-1. **C15 → C16** — Make the suite fully production-parity and repo valid: keep `sqlite` for CI but add MySQL test DB for fulltext parity, and repair `.git` (`fatal: not a git repository`) so history is traceable.
-2. **Research hardening (thesis defense)** — Add short valid headlines (e.g., Antara titles only) to the valid set and re-train, or add a length/style-controlled challenge split to de-bias the 1.0 test score; document the current caveat in `PROJECT_PROGRESS.md` §Model risk.
-3. **D3/D4 + C18** — Add Livewire polling, Filament dashboard widgets, and remaining deployment config (`Dockerfile`/`docker-compose`, `/metrics`) for thesis demo completeness.
-4. **C10 → C11 → C12** — Complete multimodal hardening: video URL fetch, readability + SSRF hardening, media limits/malware/retention.
-5. **E1/E2 + C13/C14** — Optional exports (PDF/CSV) and OpenAI quota/cost hardening if time remains.
+1. **Research hardening (thesis defense)** — Add short valid headlines (e.g., Antara titles only) to the valid set and re-train, or add a length/style-controlled challenge split to de-bias the 1.0 test score; document the current caveat in `PROJECT_PROGRESS.md` §Model risk.
+2. **D3/D4 + C18** — Add Livewire polling, Filament dashboard widgets, and remaining deployment config (`Dockerfile`/`docker-compose`, `/metrics`) for thesis demo completeness.
+3. **C10 → C11 → C12** — Complete multimodal hardening: video URL fetch, readability + SSRF hardening, media limits/malware/retention.
+4. **C13/C14 + E1/E2** — OpenAI quota/cost hardening and optional exports (PDF/CSV) for PRD FR-14 if time remains.
+5. **D1/D2 + D9** — Redis/Horizon + Filament audit resources + structured logs for production readiness.
 
