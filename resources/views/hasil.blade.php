@@ -31,8 +31,9 @@
                 <script>
                     (() => {
                         const wrapper = document.getElementById('submission-progress-wrapper');
-                        if (! wrapper || wrapper.querySelector('[wire\\:poll]')) return; // Livewire is handling it
-                        const id = wrapper.dataset.submissionId;
+                        // Correctly detect Livewire: check for wire:id (Livewire 3/4) or Livewire global
+                        const hasLivewire = wrapper && (wrapper.querySelector('[wire\\:id]') || wrapper.querySelector('[wire\\:poll], [wire\\:poll\\.2s], [wire\\:poll\\.2s\\.visible]') || typeof window.Livewire !== 'undefined');
+                        if (! wrapper || hasLivewire) return;
                         const url = `{{ route('hasil.status', $submission->id) }}`;
                         let interval = setInterval(async () => {
                             try {
@@ -41,19 +42,23 @@
                                 const data = await res.json();
                                 const bar = wrapper.querySelector('[role="progressbar"]');
                                 const pctEl = wrapper.querySelector('[aria-live="polite"]');
+                                const stageEl = wrapper.querySelector('[data-stage-label]');
                                 if (bar && typeof data.progress === 'number') {
                                     bar.setAttribute('aria-valuenow', data.progress);
                                     const fill = bar.firstElementChild;
-                                    if (fill) fill.style.width = data.progress + '%';
+                                    if (fill) {
+                                        fill.style.width = data.progress + '%';
+                                        fill.style.willChange = 'width';
+                                    }
                                 }
                                 if (pctEl && typeof data.progress === 'number') pctEl.textContent = data.progress + '%';
+                                if (stageEl && data.stage_label) stageEl.textContent = data.stage_label;
                                 if (data.is_completed || data.is_failed || data.has_result) {
                                     clearInterval(interval);
                                     setTimeout(() => window.location.reload(), 800);
                                 }
                             } catch (_) {}
                         }, 2000);
-                        // Stop polling if user leaves
                         document.addEventListener('visibilitychange', () => {
                             if (document.hidden) clearInterval(interval);
                         });

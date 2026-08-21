@@ -1,11 +1,13 @@
 <div
-    @if(! $isCompleted && ! $isFailed)
-        wire:poll.2s.visible="refreshProgress"
-    @endif
+    wire:key="submission-progress-{{ $submission->id }}"
     role="region"
     aria-label="Progress pemrosesan"
-    aria-live="polite"
 >
+    <div
+        @if(! $isCompleted && ! $isFailed)
+            wire:poll.2s.visible="refreshProgress"
+        @endif
+    >
     {{-- Progress Bar --}}
     <div style="width:4rem; height:4rem; margin:0 auto 1.25rem; border-radius:1rem; background:rgba(99,102,241,0.12); display:flex; align-items:center; justify-content:center; font-size:1.75rem;" aria-hidden="true">
         @if($isFailed)
@@ -18,7 +20,7 @@
     </div>
 
     <p style="color:var(--color-primary-light); font-size:0.8125rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.75rem;">
-        Status: {{ $isFailed ? 'Gagal' : ($isCompleted ? 'Selesai' : $stageLabel) }}
+        Status: <span data-stage-label>{{ $isFailed ? 'Gagal' : ($isCompleted ? 'Selesai' : $stageLabel) }}</span>
     </p>
 
     <h1 style="font-size:1.5rem; font-weight:700; margin-bottom:0.75rem;">
@@ -31,7 +33,7 @@
         @elseif($isCompleted)
             Analisis telah selesai. Hasil deteksi akan ditampilkan di bawah.
         @else
-            Input kamu sedang diproses oleh sistem AI. Tahapan saat ini: <strong style="color:var(--color-text-secondary);">{{ $stageLabel }}</strong> — halaman ini akan diperbarui otomatis.
+            Input kamu sedang diproses oleh sistem AI. Tahapan saat ini: <strong style="color:var(--color-text-secondary);" data-stage-label>{{ $stageLabel }}</strong> — halaman ini akan diperbarui otomatis.
         @endif
     </p>
 
@@ -50,12 +52,7 @@
             style="width:100%; height:0.75rem; background:rgba(99,102,241,0.15); border-radius:9999px; overflow:hidden; border:1px solid rgba(99,102,241,0.15);"
         >
             <div
-                style="height:100%; width:{{ $progress }}%; background:linear-gradient(90deg, #818cf8, #06b6d4); border-radius:9999px; transition:width 0.6s ease, background 0.3s ease;"
-                @if($isFailed)
-                    style="height:100%; width:{{ $progress }}%; background:linear-gradient(90deg, #f87171, #ef4444); border-radius:9999px;"
-                @elseif($isCompleted)
-                    style="height:100%; width:100%; background:linear-gradient(90deg, #34d399, #10b981); border-radius:9999px;"
-                @endif
+                style="height:100%; width:{{ $progress }}%; background:linear-gradient(90deg, {{ $isFailed ? '#f87171, #ef4444' : ($isCompleted ? '#34d399, #10b981' : '#818cf8, #06b6d4') }}); border-radius:9999px; transition:width 0.6s ease; will-change:width;"
             ></div>
         </div>
         <div style="display:flex; justify-content:space-between; margin-top:0.5rem; gap:0.25rem;">
@@ -90,4 +87,5 @@
             }
         </script>
     @endif
+    </div>
 </div>
