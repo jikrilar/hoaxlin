@@ -23,6 +23,15 @@ class CreateSubmission
 
         try {
             if ($media !== null) {
+                // C12: malware scan before storing
+                $scanner = app(\App\Services\Media\MalwareScanner::class);
+                if (! $scanner->isClean($media)) {
+                    throw new \Illuminate\Validation\ValidationException(
+                        validator: validator([], []),
+                        response: response()->json(['message' => 'File terdeteksi mengandung konten mencurigakan.'], 422)
+                    );
+                }
+
                 $directory = $validated['input_type'] === 'image'
                     ? 'submissions/images'
                     : 'submissions/videos';
