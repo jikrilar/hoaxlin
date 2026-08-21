@@ -167,6 +167,29 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             temperature=runtime.temperature,
         )
 
+    @application.get("/metrics", tags=["monitoring"])
+    async def metrics():
+        # Simple Prometheus-style metrics for C18
+        # In production, this would be replaced by a proper Prometheus registry
+        status_value = 1 if runtime.ready else 0
+        lines = [
+            "# HELP bert_model_ready Whether the model is ready (1) or not (0)",
+            "# TYPE bert_model_ready gauge",
+            f"bert_model_ready {status_value}",
+            "# HELP bert_model_info Model version info",
+            "# TYPE bert_model_info gauge",
+            f'bert_model_info{{version="{runtime.model_version or "unknown"}",status="{runtime.status}"}} 1',
+            "# HELP bert_threshold Confidence threshold for meragukan",
+            "# TYPE bert_threshold gauge",
+            f"bert_threshold {runtime.threshold if runtime.threshold is not None else 0}",
+            "# HELP bert_temperature Temperature scaling factor",
+            "# TYPE bert_temperature gauge",
+            f"bert_temperature {runtime.temperature if runtime.temperature is not None else 1}",
+        ]
+        from fastapi.responses import PlainTextResponse
+
+        return PlainTextResponse("\n".join(lines) + "\n", media_type="text/plain; version=0.0.4")
+
     @application.post(
         "/predict",
         response_model=PredictionResponse,

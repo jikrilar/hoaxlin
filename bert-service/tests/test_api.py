@@ -202,3 +202,19 @@ def test_request_id_propagation() -> None:
         assert resp.status_code == 200
         assert resp.headers["X-Request-ID"] == "test-req-123"
         assert resp.json()["request_id"] == "test-req-123"
+
+
+def test_metrics_exposes_model_status() -> None:
+    app = create_app(_settings_with_model())
+    with TestClient(app) as client:
+        resp = client.get("/metrics")
+        assert resp.status_code == 200
+        assert "bert_model_ready" in resp.text
+        assert "bert_threshold" in resp.text
+        assert 'version="v1.0.0"' in resp.text
+
+    app2 = create_app(_settings_without_model())
+    with TestClient(app2) as client:
+        resp = client.get("/metrics")
+        assert resp.status_code == 200
+        assert "bert_model_ready 0" in resp.text

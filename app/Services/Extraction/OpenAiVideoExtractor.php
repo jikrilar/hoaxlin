@@ -11,9 +11,16 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use App\Services\OpenAI\OpenAiQuota;
+use App\Services\Resilience\CircuitBreaker;
 
 class OpenAiVideoExtractor implements TextExtractor
 {
+    public function __construct(
+        private readonly CircuitBreaker $breaker = new CircuitBreaker('openai'),
+        private readonly OpenAiQuota $quota = new OpenAiQuota,
+    ) {}
+
     public function supports(Submission $submission): bool
     {
         return $submission->input_type === InputType::Video->value
@@ -52,8 +59,10 @@ class OpenAiVideoExtractor implements TextExtractor
         }
 
         $config = config('services.openai');
+        $this->quota->ensureAvailable();
 
         try {
+            $this->breaker->check();
             $response = Http::withToken($config['key'])
                 ->connectTimeout($config['connect_timeout'])
                 ->timeout(max(120, $config['timeout']))
@@ -64,20 +73,30 @@ class OpenAiVideoExtractor implements TextExtractor
                     'response_format' => 'json',
                 ]);
         } catch (ConnectionException $exception) {
+            $this->breaker->recordFailure();
             throw AiServiceException::transient('openai', 'Layanan transkripsi tidak dapat dihubungi.', previous: $exception);
         }
 
         if ($response->failed()) {
+            if ($response->serverError() || $response->status() === 429) {
+                $this->breaker->recordFailure();
+            }
             throw $response->serverError() || $response->status() === 429
                 ? AiServiceException::transient('openai', 'Layanan transkripsi sementara tidak tersedia.', $response->status())
                 : AiServiceException::permanent('openai', 'Layanan transkripsi menolak media.', $response->status());
         }
 
-        $text = $response->json('text');
+        $this->breaker->recordSuccess();
+        $payload = $response->json();
+        $text = $payload['text'] ?? null;
         if (! is_string($text) || trim($text) === '') {
             throw AiServiceException::permanent('openai', 'Transkripsi tidak menghasilkan teks.');
         }
 
+        // Whisper cost is per minute of audio; estimate from bytes (approx 1MB ~ 1 minute)
+        $minutes = max(1, strlen($bytes) / (1024 * 1024));
+        $cost = $this->quota->estimateCost($config['transcribe_model'], (int) $minutes * 100, (int) $minutes * 100);
+        $this->quota->recordUsage((int) $minutes * 100, (int) $minutes * 100, $cost);
         Cache::put($key, trim($text), $config['cache_ttl']);
 
         return new ExtractedText(trim($text), InputType::Video, 'openai');

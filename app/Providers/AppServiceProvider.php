@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(CircuitBreaker::class, fn ($app, array $parameters) => new CircuitBreaker($parameters['service'] ?? 'bert'));
+        $this->app->singleton(\App\Services\OpenAI\OpenAiQuota::class, fn () => new \App\Services\OpenAI\OpenAiQuota);
 
         $this->app->singleton(Classifier::class, function ($app): Classifier {
             $http = new BertClassifier;
@@ -33,14 +34,21 @@ class AppServiceProvider extends ServiceProvider
             return new CachedBertClassifier($protected);
         });
 
-        $this->app->singleton(Explainer::class, fn (): Explainer => new OpenAiExplainer(new CircuitBreaker('openai')));
-        $this->app->singleton(TextExtractorResolver::class, fn (): TextExtractorResolver => new TextExtractorResolver([
-            new StoredTextExtractor,
-            new TextInputExtractor,
-            new ArticleExtractor,
-            new OpenAiImageExtractor,
-            new OpenAiVideoExtractor,
-        ]));
+        $this->app->singleton(Explainer::class, function ($app): Explainer {
+            $quota = $app->make(\App\Services\OpenAI\OpenAiQuota::class);
+            return new OpenAiExplainer(new CircuitBreaker('openai'), $quota);
+        });
+        $this->app->singleton(TextExtractorResolver::class, function ($app): TextExtractorResolver {
+            $quota = $app->make(\App\Services\OpenAI\OpenAiQuota::class);
+            $openaiBreaker = new CircuitBreaker('openai');
+            return new TextExtractorResolver([
+                new StoredTextExtractor,
+                new TextInputExtractor,
+                new ArticleExtractor,
+                new OpenAiImageExtractor($openaiBreaker, $quota),
+                new OpenAiVideoExtractor($openaiBreaker, $quota),
+            ]);
+        });
     }
 
     /**

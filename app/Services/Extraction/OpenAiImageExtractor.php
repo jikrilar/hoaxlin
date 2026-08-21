@@ -11,9 +11,16 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use App\Services\OpenAI\OpenAiQuota;
+use App\Services\Resilience\CircuitBreaker;
 
 class OpenAiImageExtractor implements TextExtractor
 {
+    public function __construct(
+        private readonly CircuitBreaker $breaker = new CircuitBreaker('openai'),
+        private readonly OpenAiQuota $quota = new OpenAiQuota,
+    ) {}
+
     public function supports(Submission $submission): bool
     {
         return $submission->input_type === InputType::Image->value && filled($submission->media_path);
@@ -30,8 +37,10 @@ class OpenAiImageExtractor implements TextExtractor
         }
 
         $config = config('services.openai');
+        $this->quota->ensureAvailable();
 
         try {
+            $this->breaker->check();
             $response = Http::withToken($config['key'])
                 ->connectTimeout($config['connect_timeout'])
                 ->timeout($config['timeout'])
@@ -47,20 +56,29 @@ class OpenAiImageExtractor implements TextExtractor
                     ]],
                 ]);
         } catch (ConnectionException $exception) {
+            $this->breaker->recordFailure();
             throw AiServiceException::transient('openai', 'Layanan OCR tidak dapat dihubungi.', previous: $exception);
         }
 
         if ($response->failed()) {
+            if ($response->serverError() || $response->status() === 429) {
+                $this->breaker->recordFailure();
+            }
             throw $response->serverError() || $response->status() === 429
                 ? AiServiceException::transient('openai', 'Layanan OCR sementara tidak tersedia.', $response->status())
                 : AiServiceException::permanent('openai', 'Layanan OCR menolak gambar.', $response->status());
         }
 
-        $text = data_get($response->json(), 'choices.0.message.content');
+        $this->breaker->recordSuccess();
+        $payload = $response->json();
+        $text = data_get($payload, 'choices.0.message.content');
         if (! is_string($text) || trim($text) === '') {
             throw AiServiceException::permanent('openai', 'OCR tidak menemukan teks yang dapat dianalisis.');
         }
 
+        $usage = $payload['usage'] ?? [];
+        $cost = $this->quota->estimateCost($config['vision_model'], (int) ($usage['prompt_tokens'] ?? 0), (int) ($usage['completion_tokens'] ?? 0));
+        $this->quota->recordUsage((int) ($usage['prompt_tokens'] ?? 0), (int) ($usage['completion_tokens'] ?? 0), $cost);
         Cache::put($key, trim($text), $config['cache_ttl']);
 
         return new ExtractedText(trim($text), InputType::Image, 'openai');

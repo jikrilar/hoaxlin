@@ -13,11 +13,15 @@ use Illuminate\Support\Facades\Http;
 
 class OpenAiExplainer implements Explainer
 {
-    public function __construct(private readonly CircuitBreaker $breaker) {}
+    public function __construct(
+        private readonly CircuitBreaker $breaker,
+        private readonly OpenAiQuota $quota = new OpenAiQuota,
+    ) {}
 
     public function explain(Classification $classification, string $excerpt): Explanation
     {
         $config = config('services.openai');
+        $this->quota->ensureAvailable();
         $key = 'explanation:'.sha1(implode('|', [
             config('app.ai_prompt_version', '1.0'),
             $config['chat_model'],
@@ -85,12 +89,16 @@ class OpenAiExplainer implements Explainer
         }
 
         $usage = $payload['usage'] ?? [];
+        $promptTokens = (int) ($usage['prompt_tokens'] ?? 0);
+        $completionTokens = (int) ($usage['completion_tokens'] ?? 0);
+        $cost = $this->quota->estimateCost($config['chat_model'], $promptTokens, $completionTokens);
+        $this->quota->recordUsage($promptTokens, $completionTokens, $cost);
         $result = Explanation::ready(
             narrative: trim($narrative),
             model: $config['chat_model'],
-            promptTokens: (int) ($usage['prompt_tokens'] ?? 0),
-            completionTokens: (int) ($usage['completion_tokens'] ?? 0),
-            estimatedCostUsd: 0,
+            promptTokens: $promptTokens,
+            completionTokens: $completionTokens,
+            estimatedCostUsd: $cost,
         );
 
         Cache::put($key, [
