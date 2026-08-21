@@ -25,6 +25,9 @@ Route::post('/deteksi', [SubmissionController::class, 'store'])
 Route::get('/hasil/{id}', [DeteksiController::class, 'hasil'])
     ->middleware('throttle:60,1')
     ->name('hasil');
+Route::get('/hasil/{id}/status', [DeteksiController::class, 'status'])
+    ->middleware('throttle:60,1')
+    ->name('hasil.status');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');

@@ -16,25 +16,49 @@
         <!-- Result Header -->
         <div class="glass-card animate-fade-in-up" style="padding:2.5rem; margin-bottom:1.5rem;" role="main" aria-label="Hasil deteksi berita">
             @if(! $result)
-                @if($submission->status === 'failed')
-                    <div style="text-align:center; padding:2rem 0;">
-                        <div style="width:4rem; height:4rem; margin:0 auto 1.25rem; border-radius:1rem; background:rgba(239,68,68,0.12); display:flex; align-items:center; justify-content:center; font-size:1.75rem;" aria-hidden="true">❌</div>
-                        <p style="color:#f87171; font-size:0.8125rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.75rem;">Status: Gagal</p>
-                        <h1 style="font-size:1.5rem; font-weight:700; margin-bottom:0.75rem;">Pemrosesan Gagal</h1>
-                        <p style="color:var(--color-text-muted); line-height:1.7; max-width:560px; margin:0 auto;">
-                            Terjadi kendala saat memproses input. Silakan coba kirim ulang atau hubungi administrator jika masalah berlanjut.
-                        </p>
-                    </div>
-                @else
-                    <div style="text-align:center; padding:2rem 0;">
-                        <div style="width:4rem; height:4rem; margin:0 auto 1.25rem; border-radius:1rem; background:rgba(99,102,241,0.12); display:flex; align-items:center; justify-content:center; font-size:1.75rem;" aria-hidden="true">⏳</div>
-                        <p style="color:var(--color-primary-light); font-size:0.8125rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.75rem;">Status: {{ $submission->processing_stage ? ucfirst(str_replace('_',' ', $submission->processing_stage)) : ucfirst($submission->status) }}</p>
-                        <h1 style="font-size:1.5rem; font-weight:700; margin-bottom:0.75rem;">Sedang Menganalisis</h1>
-                        <p style="color:var(--color-text-muted); line-height:1.7; max-width:560px; margin:0 auto;">
-                            Input kamu sedang diproses oleh sistem AI. Halaman ini akan menampilkan hasil setelah klasifikasi BERT dan penyusunan penjelasan selesai.
-                        </p>
-                    </div>
-                @endif
+                {{-- Livewire polling progress bar (wire:poll.2s.visible) with JS fallback via /hasil/{id}/status --}}
+                <div id="submission-progress-wrapper" data-submission-id="{{ $submission->id }}">
+                    <livewire:submission-progress :submission="$submission" />
+                    {{-- Fallback for no-JS / Livewire failure: static bar + meta refresh --}}
+                    <noscript>
+                        <div style="text-align:center; padding:1rem; color:var(--color-text-muted); font-size:0.875rem;">
+                            JavaScript dinonaktifkan — <a href="{{ route('hasil', $submission->id) }}" style="color:var(--color-primary-light);">muat ulang</a> untuk melihat progress terbaru.
+                        </div>
+                        <meta http-equiv="refresh" content="5;url={{ route('hasil', $submission->id) }}">
+                    </noscript>
+                </div>
+                {{-- Vanilla JS polling fallback (if Livewire not loaded, polls /hasil/{id}/status) --}}
+                <script>
+                    (() => {
+                        const wrapper = document.getElementById('submission-progress-wrapper');
+                        if (! wrapper || wrapper.querySelector('[wire\\:poll]')) return; // Livewire is handling it
+                        const id = wrapper.dataset.submissionId;
+                        const url = `{{ route('hasil.status', $submission->id) }}`;
+                        let interval = setInterval(async () => {
+                            try {
+                                const res = await fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
+                                if (! res.ok) return;
+                                const data = await res.json();
+                                const bar = wrapper.querySelector('[role="progressbar"]');
+                                const pctEl = wrapper.querySelector('[aria-live="polite"]');
+                                if (bar && typeof data.progress === 'number') {
+                                    bar.setAttribute('aria-valuenow', data.progress);
+                                    const fill = bar.firstElementChild;
+                                    if (fill) fill.style.width = data.progress + '%';
+                                }
+                                if (pctEl && typeof data.progress === 'number') pctEl.textContent = data.progress + '%';
+                                if (data.is_completed || data.is_failed || data.has_result) {
+                                    clearInterval(interval);
+                                    setTimeout(() => window.location.reload(), 800);
+                                }
+                            } catch (_) {}
+                        }, 2000);
+                        // Stop polling if user leaves
+                        document.addEventListener('visibilitychange', () => {
+                            if (document.hidden) clearInterval(interval);
+                        });
+                    })();
+                </script>
                 <div class="divider" style="margin:1.5rem 0;"></div>
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:1.5rem;">
                     <div>

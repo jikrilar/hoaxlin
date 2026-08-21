@@ -29,4 +29,40 @@ class DeteksiController extends Controller
 
         return view('hasil', compact('submission', 'result', 'feedback'));
     }
+
+    // ── Polling endpoint for progress bar (Livewire fallback + JS) ───────────
+    public function status(string $id)
+    {
+        $submission = Submission::with('detectionResult')->findOrFail($id);
+
+        if ($submission->user_id !== null) {
+            $user = auth()->user();
+            if (! $user || ($user->getKey() !== $submission->user_id && ! $user->is_admin)) {
+                abort(403);
+            }
+        }
+
+        $stage = \App\Enums\ProcessingStage::tryFrom($submission->processing_stage ?? '');
+        $progress = $stage?->progressPercentage() ?? match ($submission->status) {
+            'pending' => 5,
+            'processing' => 30,
+            'completed' => 100,
+            'failed' => $stage?->progressPercentage() ?? 0,
+            default => 0,
+        };
+
+        return response()->json([
+            'id' => $submission->id,
+            'status' => $submission->status,
+            'processing_stage' => $submission->processing_stage,
+            'stage_label' => $stage?->label() ?? ucfirst(str_replace('_', ' ', $submission->processing_stage ?? $submission->status)),
+            'progress' => $progress,
+            'has_result' => $submission->detectionResult !== null,
+            'is_completed' => $submission->status === 'completed',
+            'is_failed' => $submission->status === 'failed',
+            'failure_reason' => $submission->failure_reason,
+            'label' => $submission->detectionResult?->label,
+            'confidence_score' => $submission->detectionResult?->confidence_score,
+        ]);
+    }
 }
