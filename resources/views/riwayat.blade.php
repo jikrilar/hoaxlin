@@ -119,6 +119,9 @@
                             <span class="result-badge {{ $label }}" style="font-size:0.75rem; padding:0.25rem 0.75rem;">
                                 {{ $icons[$label] ?? '❓' }} {{ $labelMap[$label] ?? $label }}
                             </span>
+                            @if($result?->model_version)
+                                <div style="font-size:0.625rem; color:var(--color-text-muted); margin-top:0.25rem;">v{{ $result->model_version }} · p{{ config('services.openai.prompt_version', '1.0') }}</div>
+                            @endif
                         @else
                             <span style="font-size:0.75rem; color:{{ $submission->status === 'failed' ? '#f87171' : '#fbbf24' }};">
                                 {{ $statusMap[$submission->status] ?? ucfirst($submission->status) }}

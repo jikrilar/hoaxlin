@@ -159,10 +159,13 @@
                     {{ $inputInfo['icon'] }} {{ $inputInfo['label'] }}
                 </span>
                 @if(isset($result->model_version))
-                <span style="padding:0.25rem 0.75rem; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2); border-radius:2rem; color:#22d3ee; font-size:0.8125rem;">
+                <span style="padding:0.25rem 0.75rem; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2); border-radius:2rem; color:#22d3ee; font-size:0.8125rem;" title="Model version">
                     Model v{{ $result->model_version }}
                 </span>
                 @endif
+                <span style="padding:0.25rem 0.75rem; background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.2); border-radius:2rem; color:#c4b5fd; font-size:0.8125rem;" title="Prompt version">
+                    Prompt v{{ config('services.openai.prompt_version', '1.0') }}
+                </span>
                 <span style="color:var(--color-text-muted); font-size:0.8125rem; margin-left:auto;">
                     {{ now()->format('d M Y, H:i') }} WIB
                 </span>

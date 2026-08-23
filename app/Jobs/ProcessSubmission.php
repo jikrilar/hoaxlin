@@ -17,6 +17,11 @@ class ProcessSubmission implements ShouldQueue
 
     public int $timeout = 30;
 
+    public function retryUntil(): \DateTime
+    {
+        return now()->addMinutes(10);
+    }
+
     public function __construct(public Submission $submission) {}
 
     public function handle(): void

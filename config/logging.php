@@ -127,6 +127,16 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'json' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            'with' => [
+                'stream' => storage_path('logs/laravel-json.log'),
+            ],
+            'processors' => [PsrLogMessageProcessor::class],
+        ],
+
     ],
 
 ];
