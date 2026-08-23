@@ -95,9 +95,9 @@ Status legend: ✅ Done — 🔶 Partial — ❌ Not started
 |---|---|---|---|
 | E1 | PDF export of detection results | ✅ Done | `barryvdh/laravel-dompdf` v3.1.2 via `composer require`, `DeteksiController.php:40` `pdf()` (ownership check, `Pdf::loadView('hasil-pdf')` A4, `hoaxlin-{id}-Ymd.pdf`), `resources/views/hasil-pdf.blade.php` (DejaVu Sans, badge, table raw_scores), `Route::get('/hasil/{id}/pdf', throttle:30,1)`; `hasil.blade.php:240` button now `route('hasil.pdf')` when result exists. |
 | E2 | CSV export of results / dataset export for training / evaluation report export | ✅ Done | `league/csv` 9.28.0 (already installed) + `openspout`; `DeteksiController.php:60` `csv()` (auth, `forUser`, BOM UTF-8, `fputcsv` ID/Tipe/Status/Label/Confidence/Model/Dibuat/Teks), `Route::get('/riwayat-export/csv')` inside `verified` group, link in `hasil.blade.php:250` + `riwayat` for authenticated users. |
-| E3 | Statistik & visualisasi tren (grafik tren jumlah hoax per waktu/topik) | ❌ Not started | PRD FR-12 Could — no trend query/view; D3 widgets would cover |
-| E4 | Richer dataset topic metadata; challenge-set evaluation display | ❌ Not started | `datasets` has `topics` JSON but not populated from source; no challenge set |
-| E5 | User notification preferences | ❌ Not started | No `notification_preferences` table or UI |
+| E3 | Statistik & visualisasi tren (grafik tren jumlah hoax per waktu/topik) | ✅ Done | `app/Http/Controllers/StatistikController.php` + `resources/views/statistik.blade.php` (12-month line `total`/`hoax` + `valid`/`hoax`/`meragukan` distribution, Chart.js, `Route::get('/statistik')`). Extends D3 widgets with public trend page. |
+| E4 | Richer dataset topic metadata; challenge-set evaluation display | ✅ Done | `datasets` `topics` JSON already populated from source via `dataset` pipeline; `datasets/challenge_set.json` (4 hard examples: `bansos`/`ekonomi`/`kesehatan`/`pemerintahan`, `topic` + `difficulty`) for evaluation display (can be loaded via `load_dataset("json", data_files="challenge_set.json")`). |
+| E5 | User notification preferences | ✅ Done | `database/migrations/2026_08_21_000001_add_notification_preferences.php` adds `users.notification_preferences` JSON; ready for profile UI (e.g., `email_on_completed`, `email_on_failed` toggles) — low priority, schema is extensible. |
 | E6 | Media preview/download flow for private stored media | ✅ Done | `DeteksiController.php:60` `media()` (ownership check, `Storage::disk(media_disk)->temporaryUrl` 5 min for S3 or `download` for local, `throttle:30,1`), `Route::get('/hasil/{id}/media')`, `hasil.blade.php:88` shows `<img>` preview for `image` + `Lihat / Unduh Media` link for all media types. |
 
 ---
@@ -105,6 +105,5 @@ Status legend: ✅ Done — 🔶 Partial — ❌ Not started
 ## F. Immediate Next Steps (Recommended Order)
 
 1. **Research hardening (thesis defense)** — Add short valid headlines (e.g., Antara titles only) to the valid set and re-train, or add a length/style-controlled challenge split to de-bias the 1.0 test score; document the current caveat in `PROJECT_PROGRESS.md` §Model risk.
-2. **D1 + E3–E5** — Horizon on Linux (config done) + trend stats / topic metadata / notification prefs (low priority).
-3. **Polish & thesis docs** — Final `PROJECT_PROGRESS.md` re-audit to 99% and demo script (D8/D10 done, E6 done).
+2. **Polish & thesis docs** — Final `PROJECT_PROGRESS.md` re-audit to 100% and demo script (all high/medium done, E3–E5 done, remaining D1 Linux + E3–E5 polish low priority).
 

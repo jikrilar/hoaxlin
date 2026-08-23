@@ -18,6 +18,7 @@ Route::view('/', 'welcome')->name('home');
 Route::view('/cara-kerja', 'cara-kerja')->name('cara-kerja');
 Route::view('/tentang', 'tentang')->name('tentang');
 Route::view('/kebijakan-privasi', 'kebijakan-privasi')->name('kebijakan-privasi');
+Route::get('/statistik', [\App\Http\Controllers\StatistikController::class, 'index'])->name('statistik');
 
 Route::post('/deteksi', [SubmissionController::class, 'store'])
     ->middleware('throttle:20,1')

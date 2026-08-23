@@ -1,0 +1,6 @@
+[
+  {"text": "Beredar unggahan di media sosial yang mengklaim pemerintah akan membagikan bantuan langsung tunai sebesar 50 juta rupiah kepada setiap warga negara Indonesia tanpa syarat. Cek kebenaran informasi ini.", "label": "hoax", "topic": "bansos", "difficulty": "easy"},
+  {"text": "Jakarta (ANTARA) - Bank Indonesia mencatat pertumbuhan ekonomi triwulan kedua mencapai 5,2 persen didorong konsumsi rumah tangga.", "label": "valid", "topic": "ekonomi", "difficulty": "hard"},
+  {"text": "Viral video yang memperlihatkan Presiden mengumumkan lockdown total selama 30 hari di seluruh Indonesia beredar di WhatsApp. Video tersebut diklaim asli tanpa rekayasa.", "label": "hoax", "topic": "kesehatan", "difficulty": "easy"},
+  {"text": "Bandung (ANTARA) - Pemerintah Kota Bandung meresmikan taman kota baru di kawasan Dago seluas dua hektare untuk ruang terbuka hijau.", "label": "valid", "topic": "pemerintahan", "difficulty": "hard"}
+]
