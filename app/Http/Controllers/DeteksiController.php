@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Submission;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DeteksiController extends Controller
 {
@@ -64,5 +67,72 @@ class DeteksiController extends Controller
             'label' => $submission->detectionResult?->label,
             'confidence_score' => $submission->detectionResult?->confidence_score,
         ]);
+    }
+
+    // ── PDF Export (E1) ───────────────────────────────────────────────────────
+    public function pdf(string $id)
+    {
+        $submission = Submission::with('detectionResult')->findOrFail($id);
+
+        if ($submission->user_id !== null) {
+            $user = auth()->user();
+            if (! $user || ($user->getKey() !== $submission->user_id && ! $user->is_admin)) {
+                abort(403);
+            }
+        }
+
+        if (! $submission->detectionResult) {
+            abort(404, 'Hasil belum tersedia.');
+        }
+
+        $pdf = Pdf::loadView('hasil-pdf', [
+            'submission' => $submission,
+            'result' => $submission->detectionResult,
+        ])->setPaper('a4', 'portrait');
+
+        $filename = 'hoaxlin-'.$submission->id.'-'.now()->format('Ymd').'.pdf';
+
+        return $pdf->download($filename);
+    }
+
+    // ── CSV Export (E2) ───────────────────────────────────────────────────────
+    public function csv(Request $request): StreamedResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            abort(401);
+        }
+
+        $submissions = Submission::with('detectionResult')
+            ->forUser($user)
+            ->latest()
+            ->get();
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="hoaxlin-riwayat-'.now()->format('Ymd').'.csv"',
+        ];
+
+        $callback = function () use ($submissions) {
+            $out = fopen('php://output', 'w');
+            // BOM for Excel
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, ['ID', 'Tipe', 'Status', 'Label', 'Confidence', 'Model', 'Dibuat', 'Teks/URL']);
+            foreach ($submissions as $s) {
+                fputcsv($out, [
+                    $s->id,
+                    $s->input_type,
+                    $s->status,
+                    $s->detectionResult?->label ?? '-',
+                    $s->detectionResult?->confidence_score ?? '-',
+                    $s->detectionResult?->model_version ?? '-',
+                    $s->created_at?->format('Y-m-d H:i'),
+                    mb_substr($s->raw_input ?? $s->source_url ?? '', 0, 200),
+                ]);
+            }
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

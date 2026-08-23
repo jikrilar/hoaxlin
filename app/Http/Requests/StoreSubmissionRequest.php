@@ -40,6 +40,32 @@ class StoreSubmissionRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            // Honeypot (C17)
+            if (filled($this->input('website'))) {
+                $validator->errors()->add('website', 'Spam terdeteksi.');
+            }
+
+            // Simple math CAPTCHA (C17) — session key set in welcome.blade.php
+            $expected = session('captcha_answer');
+            $given = $this->input('captcha_answer');
+            if ($expected !== null && (string) $given !== (string) $expected) {
+                $validator->errors()->add('captcha_answer', 'Jawaban CAPTCHA salah.');
+            }
+
+            // Per-IP quota: 30 per day (C17)
+            $ipKey = 'quota:ip:'.request()->ip().':'.now()->format('Ymd');
+            if ((int) cache()->get($ipKey, 0) >= 30) {
+                $validator->errors()->add('input_type', 'Batas harian untuk IP ini tercapai (30/hari). Coba lagi besok.');
+            }
+
+            // Per-account quota: 100 per day
+            if ($this->user()) {
+                $userKey = 'quota:user:'.$this->user()->getKey().':'.now()->format('Ymd');
+                if ((int) cache()->get($userKey, 0) >= 100) {
+                    $validator->errors()->add('input_type', 'Batas harian akun tercapai (100/hari).');
+                }
+            }
+
             $file = $this->file('media_file');
             if (! $file) {
                 return;

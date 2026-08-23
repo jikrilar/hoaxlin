@@ -28,6 +28,9 @@ Route::get('/hasil/{id}', [DeteksiController::class, 'hasil'])
 Route::get('/hasil/{id}/status', [DeteksiController::class, 'status'])
     ->middleware('throttle:60,1')
     ->name('hasil.status');
+Route::get('/hasil/{id}/pdf', [DeteksiController::class, 'pdf'])
+    ->middleware('throttle:30,1')
+    ->name('hasil.pdf');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
@@ -64,6 +67,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('verified')->group(function () {
         Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat');
         Route::get('/riwayat/{id}', [RiwayatController::class, 'show'])->name('riwayat.show');
+        Route::get('/riwayat-export/csv', [DeteksiController::class, 'csv'])->name('riwayat.csv');
         Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback');
     });
 });

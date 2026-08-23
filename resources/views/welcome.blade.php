@@ -3,6 +3,14 @@
 @section('title', 'hoaxlin.id — Deteksi Berita Hoax dengan AI BERT')
 @section('description', 'Periksa kebenaran berita dengan teknologi AI BERT. Deteksi hoax dari teks, gambar, video, atau tautan berita secara instan dan akurat.')
 
+@php
+  // Simple math CAPTCHA for C17 — stored in session, validated in StoreSubmissionRequest
+  $captchaA = random_int(1, 9);
+  $captchaB = random_int(1, 9);
+  session(['captcha_answer' => $captchaA + $captchaB]);
+  $captchaQuestion = "$captchaA + $captchaB = ?";
+@endphp
+
 @section('content')
 
 <!-- ═══════════════════════════════════════════════
@@ -133,6 +141,16 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                         <span id="teks-count" style="color:var(--color-text-muted); font-size:0.8125rem;" aria-live="polite">0 karakter</span>
                     </div>
 
+                    <!-- Honeypot + CAPTCHA (C17) -->
+                    <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.12); border-radius:0.75rem;">
+                        <div>
+                            <label for="captcha-teks" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:#f87171;">*</span></label>
+                            <input type="number" id="captcha-teks" name="captcha_answer" class="form-input" style="max-width:140px;" placeholder="?" required inputmode="numeric" autocomplete="off">
+                        </div>
+                        <span style="color:var(--color-text-muted); font-size:0.75rem; padding-bottom:0.625rem;">Batas: 30/hari (IP), 100/hari (akun)</span>
+                    </div>
+
                     <div style="margin-top:1.5rem;">
                         <button type="submit" class="btn-primary" id="submit-teks" style="width:100%;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -171,6 +189,15 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                     <div class="info-box" style="margin-top:1rem;" role="note">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:1px;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         <span>Teks akan diekstraksi otomatis dari gambar menggunakan teknologi OCR (Optical Character Recognition) berbasis AI, lalu dianalisis oleh model BERT.</span>
+                    </div>
+
+                    <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.12); border-radius:0.75rem;">
+                        <div>
+                            <label for="captcha-gambar" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:#f87171;">*</span></label>
+                            <input type="number" id="captcha-gambar" name="captcha_answer" class="form-input" style="max-width:140px;" placeholder="?" required inputmode="numeric" autocomplete="off">
+                        </div>
+                        <span style="color:var(--color-text-muted); font-size:0.75rem; padding-bottom:0.625rem;">Batas: 30/hari (IP)</span>
                     </div>
 
                     <div style="margin-top:1.5rem;">
@@ -233,6 +260,15 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                         <span>Proses video memerlukan waktu lebih lama (ekstraksi audio + transkripsi). Kamu akan menerima notifikasi saat hasil siap. Disarankan masuk ke akun untuk melihat riwayat.</span>
                     </div>
 
+                    <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.12); border-radius:0.75rem;">
+                        <div>
+                            <label for="captcha-video" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:#f87171;">*</span></label>
+                            <input type="number" id="captcha-video" name="captcha_answer" class="form-input" style="max-width:140px;" placeholder="?" required inputmode="numeric" autocomplete="off">
+                        </div>
+                        <span style="color:var(--color-text-muted); font-size:0.75rem; padding-bottom:0.625rem;">Batas: 30/hari (IP)</span>
+                    </div>
+
                     <div style="margin-top:1.5rem;">
                         <button type="submit" class="btn-primary" id="submit-video" style="width:100%;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -275,6 +311,15 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                                 <div id="url-full" style="color:var(--color-text-muted); font-size:0.8125rem; word-break:break-all; margin-top:0.25rem;"></div>
                             </div>
                         </div>
+                    </div>
+
+                    <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.12); border-radius:0.75rem;">
+                        <div>
+                            <label for="captcha-url" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:#f87171;">*</span></label>
+                            <input type="number" id="captcha-url" name="captcha_answer" class="form-input" style="max-width:140px;" placeholder="?" required inputmode="numeric" autocomplete="off">
+                        </div>
+                        <span style="color:var(--color-text-muted); font-size:0.75rem; padding-bottom:0.625rem;">Batas: 30/hari (IP)</span>
                     </div>
 
                     <div style="margin-top:1.5rem;">

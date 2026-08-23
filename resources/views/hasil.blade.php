@@ -269,11 +269,23 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 Cek Berita Lain
             </a>
-            <button onclick="window.print()" class="btn-ghost" style="border:1px solid var(--color-border-light); justify-content:center;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                Cetak / Simpan PDF
-            </button>
+            @if($result)
+                <a href="{{ route('hasil.pdf', $submission->id) }}" class="btn-ghost" style="border:1px solid var(--color-border-light); justify-content:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Unduh PDF
+                </a>
+            @else
+                <button onclick="window.print()" class="btn-ghost" style="border:1px solid var(--color-border-light); justify-content:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    Cetak / Simpan PDF
+                </button>
+            @endif
         </div>
+        @auth
+            <div style="text-align:center; margin-top:1rem;">
+                <a href="{{ route('riwayat.csv') }}" style="color:var(--color-text-muted); font-size:0.8125rem; text-decoration:underline;">Unduh Riwayat CSV</a>
+            </div>
+        @endauth
 
         <!-- Disclaimer -->
         <div class="warning-box" style="margin-top:1.5rem;" role="note">
