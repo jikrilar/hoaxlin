@@ -88,7 +88,13 @@
                 @elseif($submission->media_path)
                     <div style="padding:1.25rem; background:rgba(8,11,20,0.6); border:1px solid var(--color-border-light); border-radius:0.875rem;">
                         <p style="color:var(--color-text-muted); font-size:0.75rem; text-transform:uppercase; margin-bottom:0.625rem;">Media Tersimpan</p>
-                        <p style="color:var(--color-text-secondary);">File {{ $submission->input_type }} berhasil disimpan secara privat.</p>
+                        <p style="color:var(--color-text-secondary); margin-bottom:0.75rem;">File {{ $submission->input_type }} berhasil disimpan secara privat.</p>
+                        @if($submission->input_type === 'image')
+                            <img src="{{ route('hasil.media', $submission->id) }}" alt="Preview media" style="max-width:100%; max-height:320px; border-radius:0.5rem; border:1px solid var(--color-border-light);">
+                        @endif
+                        <div style="margin-top:0.75rem;">
+                            <a href="{{ route('hasil.media', $submission->id) }}" target="_blank" style="color:var(--color-primary-light); font-size:0.8125rem; text-decoration:underline;">Lihat / Unduh Media (tautan privat 5 menit)</a>
+                        </div>
                     </div>
                 @endif
                 @if($submission->failure_reason)

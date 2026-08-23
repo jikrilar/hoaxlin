@@ -135,4 +135,40 @@ class DeteksiController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    // ── Media Preview (E6) ────────────────────────────────────────────────────
+    public function media(string $id)
+    {
+        $submission = Submission::findOrFail($id);
+
+        if ($submission->user_id !== null) {
+            $user = auth()->user();
+            if (! $user || ($user->getKey() !== $submission->user_id && ! $user->is_admin)) {
+                abort(403);
+            }
+        }
+
+        if (! $submission->media_path) {
+            abort(404);
+        }
+
+        $disk = config('filesystems.media_disk', config('filesystems.default', 'local'));
+        $storage = \Illuminate\Support\Facades\Storage::disk($disk);
+
+        if (! $storage->exists($submission->media_path)) {
+            abort(404, 'File tidak ditemukan.');
+        }
+
+        // For S3, use temporaryUrl; for local, use temporaryUrl if supported or download
+        if (method_exists($storage, 'temporaryUrl')) {
+            try {
+                $url = $storage->temporaryUrl($submission->media_path, now()->addMinutes(5));
+                return redirect()->away($url);
+            } catch (\Throwable) {
+                // Fallback to download for local
+            }
+        }
+
+        return $storage->download($submission->media_path);
+    }
 }

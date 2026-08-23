@@ -28,7 +28,8 @@ class OpenAiImageExtractor implements TextExtractor
 
     public function extract(Submission $submission): ExtractedText
     {
-        $bytes = Storage::get($submission->media_path);
+        $disk = config('filesystems.media_disk', config('filesystems.default', 'local'));
+        $bytes = Storage::disk($disk)->get($submission->media_path);
         $hash = hash('sha256', $bytes);
         $key = 'ocr:'.config('services.openai.vision_model').':'.$hash;
 
@@ -51,7 +52,7 @@ class OpenAiImageExtractor implements TextExtractor
                         'role' => 'user',
                         'content' => [
                             ['type' => 'text', 'text' => 'Ekstrak seluruh teks berita berbahasa Indonesia dari gambar ini. Kembalikan teks saja.'],
-                            ['type' => 'image_url', 'image_url' => ['url' => 'data:'.(Storage::mimeType($submission->media_path) ?: 'image/jpeg').';base64,'.base64_encode($bytes)]],
+                            ['type' => 'image_url', 'image_url' => ['url' => 'data:'.(Storage::disk($disk)->mimeType($submission->media_path) ?: 'image/jpeg').';base64,'.base64_encode($bytes)]],
                         ],
                     ]],
                 ]);

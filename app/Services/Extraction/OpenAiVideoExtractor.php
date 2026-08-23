@@ -32,8 +32,9 @@ class OpenAiVideoExtractor implements TextExtractor
         $bytes = null;
         $filename = null;
 
+        $disk = config('filesystems.media_disk', config('filesystems.default', 'local'));
         if (filled($submission->media_path)) {
-            $bytes = Storage::get($submission->media_path);
+            $bytes = Storage::disk($disk)->get($submission->media_path);
             $filename = basename($submission->media_path);
         } elseif (filled($submission->source_url)) {
             $download = $this->downloadVideoSafely((string) $submission->source_url);
@@ -42,7 +43,7 @@ class OpenAiVideoExtractor implements TextExtractor
             // Optionally store the downloaded video for retention/audit (private disk)
             try {
                 $storedPath = 'videos/'.uniqid('url_', true).'_'.preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
-                Storage::put($storedPath, $bytes);
+                Storage::disk($disk)->put($storedPath, $bytes);
                 $submission->update(['media_path' => $storedPath]);
             } catch (\Throwable) {
                 // Non-critical if storing fails — still transcribe from memory

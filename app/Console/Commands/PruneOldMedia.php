@@ -29,12 +29,13 @@ class PruneOldMedia extends Command
             return self::SUCCESS;
         }
 
+        $disk = config('filesystems.media_disk', config('filesystems.default', 'local'));
         $deleted = 0;
-        $query->chunkById(100, function ($submissions) use (&$deleted) {
+        $query->chunkById(100, function ($submissions) use (&$deleted, $disk) {
             foreach ($submissions as $submission) {
                 $path = $submission->media_path;
-                if ($path && Storage::exists($path)) {
-                    Storage::delete($path);
+                if ($path && Storage::disk($disk)->exists($path)) {
+                    Storage::disk($disk)->delete($path);
                     $deleted++;
                 }
                 // Keep the submission record but clear the path for audit

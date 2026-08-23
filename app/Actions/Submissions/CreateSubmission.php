@@ -35,7 +35,9 @@ class CreateSubmission
                 $directory = $validated['input_type'] === 'image'
                     ? 'submissions/images'
                     : 'submissions/videos';
-                $mediaPath = $media->store($directory);
+                $disk = config('filesystems.media_disk', config('filesystems.default', 'local'));
+                // D5: use dedicated submissions disk (local or S3) for multi-instance
+                $mediaPath = $media->store($directory, $disk);
             }
 
             return DB::transaction(function () use ($validated, $user, $mediaPath): Submission {
@@ -56,7 +58,8 @@ class CreateSubmission
             });
         } catch (Throwable $exception) {
             if ($mediaPath !== null) {
-                Storage::delete($mediaPath);
+                $disk = config('filesystems.media_disk', config('filesystems.default', 'local'));
+                Storage::disk($disk)->delete($mediaPath);
             }
 
             throw $exception;

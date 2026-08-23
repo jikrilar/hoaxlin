@@ -56,6 +56,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \App\Models\User::observe(\App\Observers\FilamentAuditObserver::class);
+        \App\Models\Dataset::observe(\App\Observers\FilamentAuditObserver::class);
+        \App\Models\Submission::observe(\App\Observers\FilamentAuditObserver::class);
     }
 }

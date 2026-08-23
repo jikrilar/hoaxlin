@@ -31,6 +31,9 @@ Route::get('/hasil/{id}/status', [DeteksiController::class, 'status'])
 Route::get('/hasil/{id}/pdf', [DeteksiController::class, 'pdf'])
     ->middleware('throttle:30,1')
     ->name('hasil.pdf');
+Route::get('/hasil/{id}/media', [DeteksiController::class, 'media'])
+    ->middleware('throttle:30,1')
+    ->name('hasil.media');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
