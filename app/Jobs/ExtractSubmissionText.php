@@ -31,9 +31,9 @@ class ExtractSubmissionText implements ShouldQueue
         return [10, 60, 180];
     }
 
-    public function handle(TextExtractorResolver $resolver, ProcessingEventRecorder $events): void
+    public function handle(TextExtractorResolver $resolver, ProcessingEventRecorder $events, \App\Services\Pipeline\SubmissionStateMachine $state): void
     {
-        Cache::lock("submission:{$this->submissionId}:extract", 90)->block(5, function () use ($resolver, $events): void {
+        Cache::lock("submission:{$this->submissionId}:extract", 90)->block(5, function () use ($resolver, $events, $state): void {
             $submission = Submission::findOrFail($this->submissionId);
 
             if (filled($submission->content_hash)) {
@@ -43,26 +43,14 @@ class ExtractSubmissionText implements ShouldQueue
             }
 
             $started = hrtime(true);
-            $submission->update([
-                'status' => 'processing',
-                'processing_stage' => ProcessingStage::Extracting->value,
-                'processing_started_at' => $submission->processing_started_at ?? now(),
-            ]);
-            $events->record($submission, ProcessingStage::Extracting, EventOutcome::Started, attempt: $this->attempts());
+            $state->markProcessing($submission, ProcessingStage::Extracting, $this->attempts());
 
             try {
                 $extracted = $resolver->resolve($submission)->extract($submission);
-                $submission->update([
-                    'extracted_text' => $extracted->normalized(),
-                    'content_hash' => $extracted->contentHash(),
-                    'failure_reason' => null,
-                    'last_error_service' => null,
-                    'last_error_code' => null,
-                ]);
-                $events->record($submission, ProcessingStage::Extracting, EventOutcome::Succeeded, $extracted->provider, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000), metadata: ['cached' => $extracted->cached]);
+                $state->markExtracted($submission, $extracted->contentHash(), $extracted->provider, $extracted->cached, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000), $extracted->normalized());
                 $this->continueToClassification($submission->id);
             } catch (Throwable $exception) {
-                $this->handlePipelineFailure($submission, ProcessingStage::Extracting, $exception, $events);
+                $state->markFailed($submission, ProcessingStage::Extracting, $exception, $this->attempts());
                 throw $exception;
             }
         });
@@ -84,32 +72,14 @@ class ExtractSubmissionText implements ShouldQueue
             return;
         }
 
-        $service = $exception instanceof \App\Exceptions\AiServiceException ? $exception->service : 'pipeline';
-        $code = $exception instanceof \App\Exceptions\AiServiceException
-            ? ($exception->statusCode ? "HTTP_{$exception->statusCode}" : 'SERVICE_UNAVAILABLE')
-            : class_basename($exception);
-
-        $submission->update([
-            'status' => 'failed',
-            'processing_stage' => ProcessingStage::Extracting->value,
-            'processing_completed_at' => now(),
-            'failure_reason' => $exception->getMessage(),
-            'last_error_service' => $service,
-            'last_error_code' => $code,
-            'attempt_count' => $this->attempts(),
-        ]);
-
         try {
-            app(\App\Services\Pipeline\ProcessingEventRecorder::class)->record(
+            app(\App\Services\Pipeline\SubmissionStateMachine::class)->markFailedFinal(
                 $submission,
                 ProcessingStage::Extracting,
-                \App\Enums\EventOutcome::Failed,
-                $service,
+                $exception,
                 $this->attempts(),
-                errorCode: $code,
             );
         } catch (\Throwable) {
-            // Recording must not mask the original failure
         }
     }
 }

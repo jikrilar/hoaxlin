@@ -32,24 +32,12 @@ class ProcessSubmission implements ShouldQueue
             return;
         }
 
-        $submission->update([
-            'status' => 'failed',
-            'processing_stage' => \App\Enums\ProcessingStage::Queued->value,
-            'processing_completed_at' => now(),
-            'failure_reason' => $exception->getMessage(),
-            'last_error_service' => 'pipeline',
-            'last_error_code' => class_basename($exception),
-            'attempt_count' => $this->attempts(),
-        ]);
-
         try {
-            app(\App\Services\Pipeline\ProcessingEventRecorder::class)->record(
+            app(\App\Services\Pipeline\SubmissionStateMachine::class)->markFailedFinal(
                 $submission,
                 \App\Enums\ProcessingStage::Queued,
-                \App\Enums\EventOutcome::Failed,
-                'pipeline',
+                $exception,
                 $this->attempts(),
-                errorCode: class_basename($exception),
             );
         } catch (\Throwable) {
         }

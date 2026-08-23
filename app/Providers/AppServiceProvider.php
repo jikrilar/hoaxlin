@@ -38,16 +38,34 @@ class AppServiceProvider extends ServiceProvider
             $quota = $app->make(\App\Services\OpenAI\OpenAiQuota::class);
             return new OpenAiExplainer(new CircuitBreaker('openai'), $quota);
         });
-        $this->app->singleton(TextExtractorResolver::class, function ($app): TextExtractorResolver {
+        // D6: Tagged bindings for extractors — each extractor is bound and tagged, then
+        // the resolver receives the whole collection via $app->tagged('extractors').
+        // This makes the extractor pipeline extensible without editing the resolver wiring.
+        $this->app->singleton(StoredTextExtractor::class, fn () => new StoredTextExtractor);
+        $this->app->singleton(TextInputExtractor::class, fn () => new TextInputExtractor);
+        $this->app->singleton(ArticleExtractor::class, fn () => new ArticleExtractor);
+        $this->app->singleton(OpenAiImageExtractor::class, function ($app) {
             $quota = $app->make(\App\Services\OpenAI\OpenAiQuota::class);
-            $openaiBreaker = new CircuitBreaker('openai');
-            return new TextExtractorResolver([
-                new StoredTextExtractor,
-                new TextInputExtractor,
-                new ArticleExtractor,
-                new OpenAiImageExtractor($openaiBreaker, $quota),
-                new OpenAiVideoExtractor($openaiBreaker, $quota),
-            ]);
+            return new OpenAiImageExtractor(new CircuitBreaker('openai'), $quota);
+        });
+        $this->app->singleton(OpenAiVideoExtractor::class, function ($app) {
+            $quota = $app->make(\App\Services\OpenAI\OpenAiQuota::class);
+            return new OpenAiVideoExtractor(new CircuitBreaker('openai'), $quota);
+        });
+        $this->app->tag([
+            StoredTextExtractor::class,
+            TextInputExtractor::class,
+            ArticleExtractor::class,
+            OpenAiImageExtractor::class,
+            OpenAiVideoExtractor::class,
+        ], 'extractors');
+
+        $this->app->singleton(TextExtractorResolver::class, function ($app): TextExtractorResolver {
+            return new TextExtractorResolver($app->tagged('extractors'));
+        });
+
+        $this->app->singleton(\App\Services\Pipeline\SubmissionStateMachine::class, function ($app) {
+            return new \App\Services\Pipeline\SubmissionStateMachine($app->make(\App\Services\Pipeline\ProcessingEventRecorder::class));
         });
     }
 
