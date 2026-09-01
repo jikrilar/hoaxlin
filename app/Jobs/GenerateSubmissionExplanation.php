@@ -5,11 +5,11 @@ namespace App\Jobs;
 use App\Contracts\Explainer;
 use App\DataObjects\Classification;
 use App\Enums\DetectionLabel;
-use App\Enums\EventOutcome;
 use App\Enums\ExplanationStatus;
 use App\Enums\ProcessingStage;
 use App\Models\Submission;
 use App\Services\Pipeline\ProcessingEventRecorder;
+use App\Services\Pipeline\SubmissionStateMachine;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -32,9 +32,9 @@ class GenerateSubmissionExplanation implements ShouldQueue
         return config('services.openai.backoff', [10, 60, 180]);
     }
 
-    public function handle(Explainer $explainer, ProcessingEventRecorder $events, \App\Services\Pipeline\SubmissionStateMachine $state): void
+    public function handle(Explainer $explainer, ProcessingEventRecorder $events, SubmissionStateMachine $state): void
     {
-        Cache::lock("submission:{$this->submissionId}:explain", 75)->block(5, function () use ($explainer, $events, $state): void {
+        Cache::lock("submission:{$this->submissionId}:explain", 75)->block(5, function () use ($explainer, $state): void {
             $submission = Submission::with('detectionResult')->findOrFail($this->submissionId);
             $result = $submission->detectionResult;
 
@@ -57,7 +57,7 @@ class GenerateSubmissionExplanation implements ShouldQueue
                 $result->inference_ms,
                 $result->classifier_cached,
             );
-            $explanation = $explainer->explain($classification, mb_substr((string) $submission->extracted_text, 0, 1500));
+            $explanation = $explainer->explain($classification, mb_substr((string) $submission->analysis_text, 0, 1500));
             $state->markExplained($submission, $explanation, $this->attempts());
             $state->markCompleted($submission, $this->attempts());
         });
@@ -71,7 +71,7 @@ class GenerateSubmissionExplanation implements ShouldQueue
         }
 
         try {
-            app(\App\Services\Pipeline\SubmissionStateMachine::class)->markFailedFinal(
+            app(SubmissionStateMachine::class)->markFailedFinal(
                 $submission,
                 ProcessingStage::Explaining,
                 $exception,

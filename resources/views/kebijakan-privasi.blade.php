@@ -67,7 +67,7 @@
 
                 <section aria-labelledby="third-party-heading">
                     <h2 id="third-party-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:700; margin-bottom:0.75rem;">4. Layanan Pihak Ketiga</h2>
-                    <p>Sistem kami menggunakan layanan OpenAI API untuk keperluan OCR gambar, transkripsi video, dan penyusunan narasi penjelasan. Konten yang Anda kirimkan mungkin diproses oleh layanan ini sesuai dengan <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary-light); text-decoration:none;">Kebijakan Privasi OpenAI</a>.</p>
+                    <p>Sistem kami menggunakan layanan OpenAI API untuk menerjemahkan berita berbahasa Inggris ke Bahasa Indonesia, OCR gambar, transkripsi video, dan penyusunan narasi penjelasan. Konten yang memerlukan fungsi tersebut mungkin diproses oleh layanan ini sesuai dengan <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary-light); text-decoration:none;">Kebijakan Privasi OpenAI</a>.</p>
                 </section>
 
                 <div class="divider"></div>

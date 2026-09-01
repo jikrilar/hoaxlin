@@ -3,12 +3,12 @@
 namespace App\Jobs;
 
 use App\Contracts\Classifier;
-use App\Enums\EventOutcome;
 use App\Enums\ProcessingStage;
 use App\Jobs\Concerns\HandlesPipelineFailures;
 use App\Models\DetectionResult;
 use App\Models\Submission;
 use App\Services\Pipeline\ProcessingEventRecorder;
+use App\Services\Pipeline\SubmissionStateMachine;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -32,9 +32,9 @@ class ClassifySubmission implements ShouldQueue
         return config('services.bert.backoff', [5, 15, 45, 120, 300]);
     }
 
-    public function handle(Classifier $classifier, ProcessingEventRecorder $events, \App\Services\Pipeline\SubmissionStateMachine $state): void
+    public function handle(Classifier $classifier, ProcessingEventRecorder $events, SubmissionStateMachine $state): void
     {
-        Cache::lock("submission:{$this->submissionId}:classify", 60)->block(5, function () use ($classifier, $events, $state): void {
+        Cache::lock("submission:{$this->submissionId}:classify", 60)->block(5, function () use ($classifier, $state): void {
             $submission = Submission::findOrFail($this->submissionId);
             $existing = DetectionResult::where('submission_id', $submission->id)->first();
 
@@ -48,7 +48,7 @@ class ClassifySubmission implements ShouldQueue
             $state->markProcessing($submission, ProcessingStage::Classifying, $this->attempts());
 
             try {
-                $classification = $classifier->classify((string) $submission->extracted_text);
+                $classification = $classifier->classify((string) $submission->analysis_text);
                 $state->markClassified($submission, $classification, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000));
                 GenerateSubmissionExplanation::dispatch($submission->id)->onQueue('explanation');
             } catch (Throwable $exception) {
@@ -70,7 +70,7 @@ class ClassifySubmission implements ShouldQueue
         }
 
         try {
-            app(\App\Services\Pipeline\SubmissionStateMachine::class)->markFailedFinal(
+            app(SubmissionStateMachine::class)->markFailedFinal(
                 $submission,
                 ProcessingStage::Classifying,
                 $exception,

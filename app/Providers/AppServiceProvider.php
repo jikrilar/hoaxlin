@@ -4,6 +4,11 @@ namespace App\Providers;
 
 use App\Contracts\Classifier;
 use App\Contracts\Explainer;
+use App\Contracts\Translator;
+use App\Models\Dataset;
+use App\Models\Submission;
+use App\Models\User;
+use App\Observers\FilamentAuditObserver;
 use App\Services\Bert\BertClassifier;
 use App\Services\Bert\CachedBertClassifier;
 use App\Services\Bert\CircuitBreakingClassifier;
@@ -14,7 +19,12 @@ use App\Services\Extraction\StoredTextExtractor;
 use App\Services\Extraction\TextExtractorResolver;
 use App\Services\Extraction\TextInputExtractor;
 use App\Services\OpenAI\OpenAiExplainer;
+use App\Services\OpenAI\OpenAiQuota;
+use App\Services\Pipeline\ProcessingEventRecorder;
+use App\Services\Pipeline\SubmissionStateMachine;
 use App\Services\Resilience\CircuitBreaker;
+use App\Support\OpenAiTranslator;
+use App\Support\TextLanguageDetector;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(CircuitBreaker::class, fn ($app, array $parameters) => new CircuitBreaker($parameters['service'] ?? 'bert'));
-        $this->app->singleton(\App\Services\OpenAI\OpenAiQuota::class, fn () => new \App\Services\OpenAI\OpenAiQuota);
+        $this->app->singleton(OpenAiQuota::class, fn () => new OpenAiQuota);
 
         $this->app->singleton(Classifier::class, function ($app): Classifier {
             $http = new BertClassifier;
@@ -35,8 +45,17 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Explainer::class, function ($app): Explainer {
-            $quota = $app->make(\App\Services\OpenAI\OpenAiQuota::class);
+            $quota = $app->make(OpenAiQuota::class);
+
             return new OpenAiExplainer(new CircuitBreaker('openai'), $quota);
+        });
+        $this->app->singleton(TextLanguageDetector::class);
+        $this->app->singleton(Translator::class, function ($app): Translator {
+            return new OpenAiTranslator(
+                $app->make(TextLanguageDetector::class),
+                new CircuitBreaker('openai'),
+                $app->make(OpenAiQuota::class),
+            );
         });
         // D6: Tagged bindings for extractors — each extractor is bound and tagged, then
         // the resolver receives the whole collection via $app->tagged('extractors').
@@ -45,11 +64,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(TextInputExtractor::class, fn () => new TextInputExtractor);
         $this->app->singleton(ArticleExtractor::class, fn () => new ArticleExtractor);
         $this->app->singleton(OpenAiImageExtractor::class, function ($app) {
-            $quota = $app->make(\App\Services\OpenAI\OpenAiQuota::class);
+            $quota = $app->make(OpenAiQuota::class);
+
             return new OpenAiImageExtractor(new CircuitBreaker('openai'), $quota);
         });
         $this->app->singleton(OpenAiVideoExtractor::class, function ($app) {
-            $quota = $app->make(\App\Services\OpenAI\OpenAiQuota::class);
+            $quota = $app->make(OpenAiQuota::class);
+
             return new OpenAiVideoExtractor(new CircuitBreaker('openai'), $quota);
         });
         $this->app->tag([
@@ -64,8 +85,8 @@ class AppServiceProvider extends ServiceProvider
             return new TextExtractorResolver($app->tagged('extractors'));
         });
 
-        $this->app->singleton(\App\Services\Pipeline\SubmissionStateMachine::class, function ($app) {
-            return new \App\Services\Pipeline\SubmissionStateMachine($app->make(\App\Services\Pipeline\ProcessingEventRecorder::class));
+        $this->app->singleton(SubmissionStateMachine::class, function ($app) {
+            return new SubmissionStateMachine($app->make(ProcessingEventRecorder::class));
         });
     }
 
@@ -74,8 +95,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \App\Models\User::observe(\App\Observers\FilamentAuditObserver::class);
-        \App\Models\Dataset::observe(\App\Observers\FilamentAuditObserver::class);
-        \App\Models\Submission::observe(\App\Observers\FilamentAuditObserver::class);
+        User::observe(FilamentAuditObserver::class);
+        Dataset::observe(FilamentAuditObserver::class);
+        Submission::observe(FilamentAuditObserver::class);
     }
 }

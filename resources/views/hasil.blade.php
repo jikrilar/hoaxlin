@@ -163,6 +163,11 @@
                     Model v{{ $result->model_version }}
                 </span>
                 @endif
+                @if($submission->source_language === 'en' && filled($submission->translated_text))
+                <span style="padding:0.25rem 0.75rem; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:2rem; color:#34d399; font-size:0.8125rem;" title="Teks Inggris diterjemahkan sebelum klasifikasi">
+                    EN → ID · {{ $submission->translation_model }}
+                </span>
+                @endif
                 <span style="padding:0.25rem 0.75rem; background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.2); border-radius:2rem; color:#c4b5fd; font-size:0.8125rem;" title="Prompt version">
                     Prompt v{{ config('services.openai.prompt_version', '1.0') }}
                 </span>
@@ -195,6 +200,16 @@
                 <div id="extracted-text-panel" style="display:none; margin-top:1rem; padding:1.25rem; background:rgba(8,11,20,0.6); border:1px solid var(--color-border-light); border-radius:0.875rem; max-height:200px; overflow-y:auto;">
                     <p style="color:var(--color-text-secondary); font-size:0.875rem; line-height:1.7; white-space:pre-wrap;">{{ $submission->extracted_text }}</p>
                 </div>
+            </div>
+            @endif
+
+            @if(filled($submission->translated_text))
+            <div style="margin-bottom:1.5rem; padding:1.25rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:0.875rem;">
+                <div style="display:flex; justify-content:space-between; gap:1rem; margin-bottom:0.75rem;">
+                    <p style="color:#34d399; font-size:0.875rem; font-weight:600;">Terjemahan Bahasa Indonesia untuk IndoBERT</p>
+                    <span style="color:var(--color-text-muted); font-size:0.75rem;">{{ $submission->translation_model }}{{ $submission->translation_cached ? ' · cache' : '' }}</span>
+                </div>
+                <p style="color:var(--color-text-secondary); font-size:0.875rem; line-height:1.7; white-space:pre-wrap; max-height:240px; overflow-y:auto;">{{ $submission->translated_text }}</p>
             </div>
             @endif
 

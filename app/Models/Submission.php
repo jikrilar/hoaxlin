@@ -22,6 +22,14 @@ class Submission extends Model
         'input_type',
         'raw_input',
         'extracted_text',
+        'source_language',
+        'translated_text',
+        'translation_provider',
+        'translation_model',
+        'translation_cached',
+        'translation_input_tokens',
+        'translation_output_tokens',
+        'translation_estimated_cost_usd',
         'media_path',
         'source_url',
         'status',
@@ -41,12 +49,23 @@ class Submission extends Model
         return [
             'processing_started_at' => 'datetime',
             'processing_completed_at' => 'datetime',
+            'translation_cached' => 'boolean',
+            'translation_input_tokens' => 'integer',
+            'translation_output_tokens' => 'integer',
+            'translation_estimated_cost_usd' => 'decimal:6',
         ];
     }
 
     protected function content(): Attribute
     {
         return Attribute::get(fn (): ?string => $this->extracted_text ?? $this->raw_input);
+    }
+
+    protected function analysisText(): Attribute
+    {
+        return Attribute::get(fn (): ?string => filled($this->translated_text)
+            ? $this->translated_text
+            : $this->extracted_text);
     }
 
     protected function sourceUrl(): Attribute

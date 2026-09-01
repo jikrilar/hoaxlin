@@ -23,6 +23,7 @@ class SubmissionForm
                         TextInput::make('media_path')->label('Path media')->maxLength(255)->columnSpanFull(),
                         Textarea::make('raw_input')->label('Input asli')->columnSpanFull(),
                         Textarea::make('extracted_text')->label('Teks ekstraksi')->columnSpanFull(),
+                        Textarea::make('translated_text')->label('Teks terjemahan untuk IndoBERT')->disabled()->columnSpanFull(),
                         Textarea::make('failure_reason')->label('Alasan gagal')->columnSpanFull(),
                     ])
                     ->columns(2),
