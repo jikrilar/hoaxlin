@@ -131,24 +131,21 @@ class SubmissionStateMachine
         // Only mark the submission as failed if it's a permanent error or this is the final attempt
         $shouldFail = ! $retryable || $isFinal;
 
+        $isRetrying = $retryable && ! $shouldFail;
+
         $submission->update([
             'attempt_count' => $attempt,
             'last_error_service' => $service,
             'last_error_code' => $code,
-            'failure_reason' => $exception->getMessage(),
+            // Don't expose "mode pemulihan" to the user while still retrying — keep UI on "Sedang Menganalisis"
+            'failure_reason' => $shouldFail ? $exception->getMessage() : null,
             'status' => $shouldFail ? 'failed' : 'processing',
             'processing_stage' => $stage->value,
             'processing_completed_at' => $shouldFail ? now() : null,
         ]);
 
-        if ($shouldFail && ! $isFinal) {
-            // For permanent errors, fail the job immediately so we don't burn retries
-            throw $exception;
-        }
-
-        if (! $shouldFail) {
-            throw $exception;
-        }
+        // Always throw to let the queue handle retry/backoff, but the UI won't show the raw message while retrying
+        throw $exception;
     }
 
     public function markFailedFinal(Submission $submission, ProcessingStage $stage, Throwable $exception, int $attempt): void

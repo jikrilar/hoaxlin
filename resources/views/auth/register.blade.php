@@ -4,12 +4,12 @@
 @section('description', 'Buat akun gratis di hoaxlin.id untuk menyimpan riwayat pengecekan berita.')
 
 @section('content')
-<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem; width:100%; max-width:100vw; overflow-x:hidden; box-sizing:border-box;">
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem; width:100%; box-sizing:border-box;">
 
     <div class="glow-orb glow-orb-1" style="opacity:0.5;" aria-hidden="true"></div>
     <div class="glow-orb glow-orb-2" style="opacity:0.4;" aria-hidden="true"></div>
 
-    <div style="width:100%; max-width:480px; position:relative;" class="animate-scale-in">
+    <div style="width:100%; max-width:480px; margin:0 auto; position:relative; transform-origin:center;" class="animate-scale-in">
 
         <div class="glass-card-solid" style="padding:2.75rem;" role="main">
 

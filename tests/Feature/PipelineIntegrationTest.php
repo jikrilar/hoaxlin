@@ -29,11 +29,12 @@ class PipelineIntegrationTest extends TestCase
     {
         parent::setUp();
         Cache::flush();
-        // Ensure circuit breaker is clean
         Cache::forget('breaker:bert:failures');
         Cache::forget('breaker:bert:open');
+        Cache::forget('breaker:bert:half-open');
         Cache::forget('breaker:openai:failures');
         Cache::forget('breaker:openai:open');
+        Cache::forget('breaker:openai:half-open');
     }
 
     public function test_bert_cache_hit_reuses_previous_result(): void
