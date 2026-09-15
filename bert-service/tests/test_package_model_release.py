@@ -12,6 +12,8 @@ from scripts.package_model_release import (
     package_model,
     validate_release,
 )
+from app.config import Settings
+from app.inference import ModelRuntime
 
 
 def _sha256(path: Path) -> str:
@@ -88,3 +90,41 @@ def test_package_is_self_contained_and_detects_corruption(tmp_path: Path):
     )
     with pytest.raises(PackagingError, match="Checksum mismatch"):
         validate_release(output)
+
+
+def test_release_manifest_is_required_and_version_is_exact(tmp_path: Path):
+    source = _write_source(tmp_path / "source")
+    output = tmp_path / "release" / "v9.9.9"
+    package_model(source, output, "v9.9.9")
+
+    with pytest.raises(PackagingError, match="version must be 'v1.0.0'"):
+        validate_release(output, expected_version="v1.0.0")
+
+    (output / "manifest.json").unlink()
+    with pytest.raises(PackagingError, match="manifest.json"):
+        validate_release(output)
+
+
+def test_runtime_strict_mode_rejects_source_without_internal_manifest(
+    tmp_path: Path,
+):
+    source = _write_source(tmp_path / "source")
+    settings = Settings(
+        service_name="test",
+        service_version="0.1.0",
+        model_path=str(source),
+        model_version="v9.9.9",
+        internal_api_token="temporary-test-token",
+        max_concurrency=1,
+        max_text_length=1_000,
+        max_sequence_length=512,
+        local_files_only=True,
+        require_release_manifest=True,
+    )
+
+    runtime = ModelRuntime(settings)
+    runtime.load()
+
+    assert runtime.status == "failed"
+    assert runtime.load_error is not None
+    assert "manifest.json" in runtime.load_error

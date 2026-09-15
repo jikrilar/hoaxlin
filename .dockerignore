@@ -1,0 +1,26 @@
+# D2 uses a repository-root build context with an explicit allowlist. This keeps
+# Git metadata, .env files, dependencies, datasets, checkpoints, logs, and other
+# application sources out of the BERT build context.
+**
+!.dockerignore
+
+!bert-service/
+bert-service/**
+!bert-service/Dockerfile
+!bert-service/requirements-runtime.txt
+!bert-service/app/
+!bert-service/app/**
+!bert-service/scripts/
+bert-service/scripts/**
+!bert-service/scripts/runtime_smoke_test.py
+
+!artifacts/
+artifacts/**
+!artifacts/indobert-hoax/
+artifacts/indobert-hoax/**
+!artifacts/indobert-hoax/v1.0.0/
+!artifacts/indobert-hoax/v1.0.0/**
+
+# Never carry host interpreter bytecode into the Python 3.12 image.
+**/__pycache__/
+**/*.py[cod]

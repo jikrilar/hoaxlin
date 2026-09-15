@@ -10,8 +10,9 @@ from pathlib import Path
 from typing import Any
 
 from .config import Settings
+from .model_release import validate_release
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 
 # Canonical labels for hoaxlin.id — binary model with meragukan derived via
 # confidence threshold (see threshold.json sidecar).
@@ -54,10 +55,23 @@ class ModelRuntime:
         self.status = "loading"
         try:
             self._verify_model_directory()
+            if self.settings.require_release_manifest:
+                release = validate_release(
+                    Path(self.settings.model_path),
+                    expected_version=self.settings.model_version,
+                )
+                self.model_version = release["version"]
+                logger.info(
+                    "Release manifest verified: version=%s files=%s model_sha256=%s",
+                    release["version"],
+                    release["files"],
+                    release["model_sha256"],
+                )
             self._load_model_and_tokenizer()
             self._verify_label_map()
             self._load_sidecars()
-            self._verify_checksum_if_available()
+            if not self.settings.require_release_manifest:
+                self._verify_checksum_if_available()
             self.status = "ready"
             logger.info(
                 "Model ready: %s (version %s, labels %s, threshold %s, temp %s)",
@@ -95,6 +109,7 @@ class ModelRuntime:
 
     def _load_model_and_tokenizer(self) -> None:
         import torch
+        import transformers
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
         source = self.settings.model_path
@@ -107,6 +122,12 @@ class ModelRuntime:
         self._model.eval()
         self._torch = torch
         self.model_version = self.model_version or self._derive_model_version(source)
+        logger.info(
+            "Inference runtime: device=cpu torch=%s transformers=%s cuda_available=%s",
+            torch.__version__,
+            transformers.__version__,
+            torch.cuda.is_available(),
+        )
 
     def _verify_label_map(self) -> None:
         config = self._model.config

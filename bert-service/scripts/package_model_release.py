@@ -9,7 +9,6 @@ not require importing or re-serializing the model.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import re
@@ -19,130 +18,26 @@ import tempfile
 from pathlib import Path, PureWindowsPath
 from typing import Any
 
-MODEL_IDENTIFIER = "indobert-hoax"
-TASK = "text-classification"
-ARCHITECTURE = "BertForSequenceClassification"
-EXPECTED_ID2LABEL = {0: "valid", 1: "hoax"}
-EXPECTED_LABEL2ID = {"valid": 0, "hoax": 1}
-EXPECTED_LABELS = ["valid", "hoax"]
-EXPECTED_NUM_LABELS = 2
-EXPECTED_THRESHOLD = 0.99
-EXPECTED_TEMPERATURE = 0.8706620666110391
+SERVICE_ROOT = Path(__file__).resolve().parents[1]
+if str(SERVICE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SERVICE_ROOT))
 
-CRITICAL_FILES = (
-    "model.safetensors",
-    "config.json",
-    "tokenizer.json",
-    "tokenizer_config.json",
-    "threshold.json",
-    "calibration.json",
+from app.model_release import (  # noqa: E402
+    CRITICAL_FILES,
+    EXPECTED_LABELS,
+    EXPECTED_TEMPERATURE,
+    EXPECTED_THRESHOLD,
+    EXPORT_FILES,
+    KNOWN_MODEL_HASHES,
+    MODEL_IDENTIFIER,
+    TASK,
+    PackagingError,
+    load_json,
+    require_regular_file,
+    sha256,
+    validate_model_contract,
+    validate_release,
 )
-EXPORT_FILES = CRITICAL_FILES + ("evaluation.json", "MODEL_CARD.md")
-
-# Canonical hashes independently frozen for known releases. New versions must
-# be reviewed before being added rather than silently trusting a new source.
-KNOWN_MODEL_HASHES = {
-    "v1.0.0": "0fea71d7d5fd18c61f4e854d1059bb19ce62e3ec3f573718166417e18f2a1e40",
-}
-
-
-class PackagingError(RuntimeError):
-    """Raised when a source or packaged release violates the contract."""
-
-
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1 << 20), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def load_json(path: Path) -> Any:
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-        raise PackagingError(f"Invalid JSON file {path}: {exc}") from exc
-
-
-def require_regular_file(directory: Path, name: str) -> Path:
-    path = directory / name
-    if not path.is_file() or path.is_symlink():
-        raise PackagingError(f"Required regular file is missing: {path}")
-    return path
-
-
-def validate_model_contract(directory: Path) -> dict[str, Any]:
-    for name in CRITICAL_FILES:
-        require_regular_file(directory, name)
-
-    config = load_json(directory / "config.json")
-    if not isinstance(config, dict):
-        raise PackagingError("config.json must contain an object")
-    architectures = config.get("architectures")
-    if not isinstance(architectures, list) or ARCHITECTURE not in architectures:
-        raise PackagingError(
-            f"Expected architecture {ARCHITECTURE}, got {architectures!r}"
-        )
-    if config.get("num_labels") != EXPECTED_NUM_LABELS:
-        raise PackagingError(
-            f"Expected num_labels={EXPECTED_NUM_LABELS}, got {config.get('num_labels')!r}"
-        )
-
-    raw_id2label = config.get("id2label")
-    if not isinstance(raw_id2label, dict):
-        raise PackagingError("config.json id2label must be an object")
-    try:
-        id2label = {int(key): str(value) for key, value in raw_id2label.items()}
-    except (TypeError, ValueError) as exc:
-        raise PackagingError("config.json id2label has invalid entries") from exc
-    if id2label != EXPECTED_ID2LABEL:
-        raise PackagingError(
-            f"Expected id2label={EXPECTED_ID2LABEL}, got {id2label}"
-        )
-
-    raw_label2id = config.get("label2id")
-    if not isinstance(raw_label2id, dict):
-        raise PackagingError("config.json label2id must be an object")
-    try:
-        label2id = {str(key): int(value) for key, value in raw_label2id.items()}
-    except (TypeError, ValueError) as exc:
-        raise PackagingError("config.json label2id has invalid entries") from exc
-    if label2id != EXPECTED_LABEL2ID:
-        raise PackagingError(
-            f"Expected label2id={EXPECTED_LABEL2ID}, got {label2id}"
-        )
-
-    threshold_data = load_json(directory / "threshold.json")
-    threshold = threshold_data.get("threshold") if isinstance(threshold_data, dict) else None
-    if not isinstance(threshold, (int, float)) or not math.isclose(
-        float(threshold), EXPECTED_THRESHOLD, rel_tol=0.0, abs_tol=1e-15
-    ):
-        raise PackagingError(
-            f"Expected threshold={EXPECTED_THRESHOLD}, got {threshold!r}"
-        )
-
-    calibration_data = load_json(directory / "calibration.json")
-    temperature = (
-        calibration_data.get("temperature")
-        if isinstance(calibration_data, dict)
-        else None
-    )
-    if not isinstance(temperature, (int, float)) or not math.isclose(
-        float(temperature), EXPECTED_TEMPERATURE, rel_tol=0.0, abs_tol=1e-15
-    ):
-        raise PackagingError(
-            f"Expected temperature={EXPECTED_TEMPERATURE}, got {temperature!r}"
-        )
-
-    return {
-        "architecture": ARCHITECTURE,
-        "num_labels": EXPECTED_NUM_LABELS,
-        "id2label": id2label,
-        "label2id": label2id,
-        "threshold": float(threshold),
-        "temperature": float(temperature),
-    }
 
 
 def source_manifest_entry(source: Path, version: str) -> tuple[Path, dict[str, Any]]:
@@ -274,98 +169,6 @@ def build_manifest(
     }
 
 
-def contains_absolute_path(value: Any) -> bool:
-    if isinstance(value, dict):
-        return any(contains_absolute_path(item) for item in value.values())
-    if isinstance(value, list):
-        return any(contains_absolute_path(item) for item in value)
-    if not isinstance(value, str):
-        return False
-    return bool(re.match(r"^[A-Za-z]:[\\/]", value)) or value.startswith("/")
-
-
-def validate_release(release: Path) -> dict[str, Any]:
-    if not release.is_dir():
-        raise PackagingError(f"Release directory does not exist: {release}")
-    manifest_path = require_regular_file(release, "manifest.json")
-    manifest = load_json(manifest_path)
-    if not isinstance(manifest, dict):
-        raise PackagingError("Release manifest must contain an object")
-    if contains_absolute_path(manifest):
-        raise PackagingError("Release manifest must not contain absolute paths")
-
-    expected_top_level = {
-        "model": MODEL_IDENTIFIER,
-        "task": TASK,
-        "architecture": ARCHITECTURE,
-        "labels": EXPECTED_LABELS,
-        "num_labels": EXPECTED_NUM_LABELS,
-        "threshold": EXPECTED_THRESHOLD,
-        "local_files_only": True,
-    }
-    for key, expected in expected_top_level.items():
-        if manifest.get(key) != expected:
-            raise PackagingError(
-                f"Release manifest {key} must be {expected!r}, got {manifest.get(key)!r}"
-            )
-    version = manifest.get("version")
-    if not isinstance(version, str) or not version.startswith("v"):
-        raise PackagingError("Release manifest version must be a v-prefixed string")
-
-    calibration = manifest.get("calibration")
-    if not isinstance(calibration, dict) or not math.isclose(
-        float(calibration.get("temperature", -1)),
-        EXPECTED_TEMPERATURE,
-        rel_tol=0.0,
-        abs_tol=1e-15,
-    ):
-        raise PackagingError("Release manifest calibration temperature is invalid")
-    if calibration.get("method") != "temperature_scaling":
-        raise PackagingError("Release manifest calibration method is invalid")
-
-    if manifest.get("critical_files") != list(CRITICAL_FILES):
-        raise PackagingError("Release manifest critical_files contract is invalid")
-    file_entries = manifest.get("files")
-    if not isinstance(file_entries, dict) or set(file_entries) != set(EXPORT_FILES):
-        raise PackagingError("Release manifest file list is incomplete or unexpected")
-
-    actual_names = {path.name for path in release.iterdir() if path.is_file()}
-    expected_names = set(EXPORT_FILES) | {"manifest.json"}
-    if actual_names != expected_names:
-        raise PackagingError(
-            f"Release files must be exactly {sorted(expected_names)}, got {sorted(actual_names)}"
-        )
-    if any(path.is_dir() or path.is_symlink() for path in release.iterdir()):
-        raise PackagingError("Release directory must not contain directories or symlinks")
-
-    for name in EXPORT_FILES:
-        path = require_regular_file(release, name)
-        metadata = file_entries[name]
-        if not isinstance(metadata, dict):
-            raise PackagingError(f"Release manifest metadata for {name} is invalid")
-        if metadata.get("size") != path.stat().st_size:
-            raise PackagingError(f"Size mismatch for {name}")
-        expected_hash = metadata.get("sha256")
-        actual_hash = sha256(path)
-        if not isinstance(expected_hash, str) or actual_hash != expected_hash.lower():
-            raise PackagingError(
-                f"Checksum mismatch for {name}: expected {expected_hash}, got {actual_hash}"
-            )
-
-    known_hash = KNOWN_MODEL_HASHES.get(version)
-    if known_hash is not None and file_entries["model.safetensors"]["sha256"] != known_hash:
-        raise PackagingError("Release model hash does not match the frozen known hash")
-
-    contract = validate_model_contract(release)
-    return {
-        "path": str(release.resolve()),
-        "version": version,
-        "files": len(file_entries),
-        "payload_size": sum((release / name).stat().st_size for name in EXPORT_FILES),
-        **contract,
-    }
-
-
 def package_model(source: Path, output: Path, version: str) -> dict[str, Any]:
     source = source.resolve()
     output = output.resolve()
@@ -389,7 +192,7 @@ def package_model(source: Path, output: Path, version: str) -> dict[str, Any]:
             encoding="utf-8",
             newline="\n",
         )
-        result = validate_release(staging)
+        result = validate_release(staging, expected_version=version)
         staging.replace(output)
 
     return {**result, "path": str(output)}

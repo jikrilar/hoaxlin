@@ -23,7 +23,7 @@ from .contracts import (
 )
 from .inference import ModelRuntime
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 bearer = HTTPBearer(auto_error=False)
 
 
@@ -55,6 +55,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+        logger.info(
+            "Service startup: model_path=%s model_version=%s local_files_only=%s "
+            "manifest_required=%s",
+            configured_settings.model_path,
+            configured_settings.model_version,
+            configured_settings.local_files_only,
+            configured_settings.require_release_manifest,
+        )
         await asyncio.to_thread(runtime.load)
         application.state.runtime = runtime
         if runtime.status == "failed":
