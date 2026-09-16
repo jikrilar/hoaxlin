@@ -76,6 +76,11 @@ COPY resources/ ./resources/
 COPY routes/ ./routes/
 COPY storage/ ./storage/
 
+# Host runtime data (logs, uploads, cached views, and sessions) is never part
+# of the application image. The runtime stage creates the writable directory
+# skeleton explicitly below, so retain only directory marker files here.
+RUN find storage -type f ! -name .gitignore -delete
+
 RUN set -eux; \
     composer dump-autoload \
         --no-dev \
