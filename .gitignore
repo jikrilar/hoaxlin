@@ -31,6 +31,9 @@ yarn-error.log
 /models/
 !/models/.gitkeep
 
+# D1: generated self-contained BERT release artifacts stay outside normal Git.
+/artifacts/
+
 # bert-service logs
 /bert-service/uvicorn.log
 /bert-service/uvicorn.err

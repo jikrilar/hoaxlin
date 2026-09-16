@@ -1,59 +1,179 @@
 services:
   app:
-    build: .
-    container_name: hoaxlin-app
+    image: hoaxlin-app:local
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "8000:8000"
-    env_file: .env
+      - "127.0.0.1:${APP_HOST_PORT:-8000}:8000"
+    environment: &laravel-environment
+      APP_NAME: "${APP_NAME:-hoaxlin.id}"
+      APP_ENV: "${APP_ENV:-local}"
+      APP_KEY: "${APP_KEY:?APP_KEY must be set}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_URL: "${APP_URL:-http://localhost:8000}"
+      APP_TIMEZONE: "${APP_TIMEZONE:-Asia/Jakarta}"
+      APP_LOCALE: "${APP_LOCALE:-id}"
+      APP_FALLBACK_LOCALE: "${APP_FALLBACK_LOCALE:-id}"
+      LOG_CHANNEL: "stderr"
+      DB_CONNECTION: "mysql"
+      DB_HOST: "mysql"
+      DB_PORT: "3306"
+      DB_DATABASE: "${DB_DATABASE:-hoax_detector}"
+      # Keep Docker's application account independent from a host .env that
+      # may still contain the legacy root username.
+      DB_USERNAME: "${MYSQL_APP_USER:-hoaxlin}"
+      DB_PASSWORD: "${DB_PASSWORD:?DB_PASSWORD must be set}"
+      REDIS_CLIENT: "phpredis"
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_DB: "${REDIS_DB:-0}"
+      REDIS_CACHE_DB: "${REDIS_CACHE_DB:-1}"
+      # Keep Redis visibility longer than the worker timeout for long media jobs.
+      REDIS_QUEUE_RETRY_AFTER: "${REDIS_QUEUE_RETRY_AFTER:-240}"
+      REDIS_MEDIA_RETRY_AFTER: "${REDIS_MEDIA_RETRY_AFTER:-1800}"
+      QUEUE_CONNECTION: "redis"
+      CACHE_STORE: "redis"
+      SESSION_DRIVER: "redis"
+      SESSION_LIFETIME: "${SESSION_LIFETIME:-120}"
+      FILESYSTEM_DISK: "${FILESYSTEM_DISK:-local}"
+      MEDIA_DISK: "${MEDIA_DISK:-local}"
+      BERT_SERVICE_URL: "http://bert:8001"
+      BERT_SERVICE_TOKEN: "${BERT_SERVICE_TOKEN:?BERT_SERVICE_TOKEN must be set}"
+      BERT_MODEL_VERSION: "v1.0.0"
+      BERT_SERVICE_CONNECT_TIMEOUT: "${BERT_SERVICE_CONNECT_TIMEOUT:-3}"
+      BERT_SERVICE_TIMEOUT: "${BERT_SERVICE_TIMEOUT:-30}"
+      BERT_SERVICE_TRIES: "${BERT_SERVICE_TRIES:-5}"
+      BERT_BREAKER_FAILURES: "${BERT_BREAKER_FAILURES:-5}"
+      BERT_BREAKER_WINDOW: "${BERT_BREAKER_WINDOW:-60}"
+      BERT_BREAKER_COOLDOWN: "${BERT_BREAKER_COOLDOWN:-30}"
+      BERT_CACHE_TTL: "${BERT_CACHE_TTL:-604800}"
+      BERT_CONFIDENCE_THRESHOLD: "${BERT_CONFIDENCE_THRESHOLD:-0.99}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      OPENAI_ORGANIZATION: "${OPENAI_ORGANIZATION:-}"
+      OPENAI_CHAT_MODEL: "${OPENAI_CHAT_MODEL:-gpt-4o-mini}"
+      OPENAI_TRANSLATION_MODEL: "${OPENAI_TRANSLATION_MODEL:-gpt-4o-mini}"
+      OPENAI_TRANSLATION_PROMPT_VERSION: "${OPENAI_TRANSLATION_PROMPT_VERSION:-1.0}"
+      OPENAI_TRANSLATION_MAX_OUTPUT_TOKENS: "${OPENAI_TRANSLATION_MAX_OUTPUT_TOKENS:-4096}"
+      OPENAI_VISION_MODEL: "${OPENAI_VISION_MODEL:-gpt-4o-mini}"
+      OPENAI_TRANSCRIBE_MODEL: "${OPENAI_TRANSCRIBE_MODEL:-whisper-1}"
+      OPENAI_CONNECT_TIMEOUT: "${OPENAI_CONNECT_TIMEOUT:-5}"
+      OPENAI_TIMEOUT: "${OPENAI_TIMEOUT:-45}"
+      OPENAI_TRIES: "${OPENAI_TRIES:-3}"
+      OPENAI_BREAKER_FAILURES: "${OPENAI_BREAKER_FAILURES:-5}"
+      OPENAI_BREAKER_WINDOW: "${OPENAI_BREAKER_WINDOW:-60}"
+      OPENAI_BREAKER_COOLDOWN: "${OPENAI_BREAKER_COOLDOWN:-60}"
+      OPENAI_CACHE_TTL: "${OPENAI_CACHE_TTL:-2592000}"
+      OPENAI_RATE_LIMIT_PER_MINUTE: "${OPENAI_RATE_LIMIT_PER_MINUTE:-60}"
+      OPENAI_MONTHLY_QUOTA_USD: "${OPENAI_MONTHLY_QUOTA_USD:-25.0}"
+      OPENAI_PROMPT_VERSION: "${OPENAI_PROMPT_VERSION:-1.0}"
+      MAIL_MAILER: "${MAIL_MAILER:-log}"
+      MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:-hello@example.com}"
+      MAIL_FROM_NAME: "${MAIL_FROM_NAME:-hoaxlin.id}"
+    volumes:
+      - laravel_storage:/var/www/html/storage
     depends_on:
       mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
-    volumes:
-      - ./storage:/var/www/html/storage
-    command: ["php", "artisan", "horizon"]
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
     healthcheck:
-      test: ["CMD", "php", "artisan", "horizon:status"]
-      interval: 30s
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 5
+    networks:
+      - hoaxlin
+
+  queue:
+    image: hoaxlin-app:local
+    restart: unless-stopped
+    environment: *laravel-environment
+    volumes:
+      - laravel_storage:/var/www/html/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      bert:
+        condition: service_healthy
+    command:
+      - php
+      - artisan
+      - queue:work
+      - redis
+      - --queue=default,extract-text,extract-media,inference,explanation
+      - --tries=3
+      - --timeout=180
+      - --sleep=1
+    healthcheck:
+      test: ["CMD-SHELL", "kill -0 1"]
+      interval: 10s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+    networks:
+      - hoaxlin
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.44
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: hoax_detector
-      MYSQL_ROOT_PASSWORD: secret
-    ports:
-      - "3306:3306"
+      MYSQL_DATABASE: "${DB_DATABASE:-hoax_detector}"
+      MYSQL_USER: "${MYSQL_APP_USER:-hoaxlin}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:?DB_PASSWORD must be set}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
-      interval: 10s
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 5s
+      start_period: 30s
+      retries: 20
+    networks:
+      - hoaxlin
 
   redis:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
     restart: unless-stopped
-    ports:
-      - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - hoaxlin
 
   bert:
+    image: hoaxlin-bert:v1.0.0
     build:
-      context: ./bert-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: bert-service/Dockerfile
+      args:
+        MODEL_RELEASE_PATH: artifacts/indobert-hoax/v1.0.0
+        MODEL_VERSION: v1.0.0
     restart: unless-stopped
-    ports:
-      - "8001:8001"
-    volumes:
-      - ./models/indobert-hoax/v1.0.0:/app/models/indobert-hoax/v1.0.0:ro
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/health/live"]
-      interval: 30s
-      start_period: 60s
+    environment:
+      BERT_INTERNAL_API_TOKEN: "${BERT_SERVICE_TOKEN:?BERT_SERVICE_TOKEN must be set}"
+      BERT_MODEL_PATH: "/app/models/indobert-hoax/v1.0.0"
+      BERT_MODEL_VERSION: "v1.0.0"
+      BERT_LOCAL_FILES_ONLY: "true"
+      BERT_REQUIRE_RELEASE_MANIFEST: "true"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+    networks:
+      - hoaxlin
 
 volumes:
   mysql_data:
+  laravel_storage:
+
+networks:
+  hoaxlin:
+    driver: bridge

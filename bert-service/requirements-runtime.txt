@@ -1,0 +1,9 @@
+# Inference-only direct dependencies. Training/data tooling stays in requirements.txt.
+fastapi==0.136.3
+uvicorn==0.52.0
+pydantic==2.13.4
+transformers==5.14.1
+numpy==2.5.1
+
+# torch==2.13.0 is installed separately from PyTorch's CPU wheel index by the
+# Dockerfile so the image cannot resolve to a CUDA-enabled PyPI distribution.

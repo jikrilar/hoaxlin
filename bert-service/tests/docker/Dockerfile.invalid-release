@@ -1,0 +1,18 @@
+# Reproducible D2-only negative test image. Never use this as a runtime image.
+ARG BASE_IMAGE=hoaxlin-bert:v1.0.0
+FROM ${BASE_IMAGE}
+
+ARG RELEASE_FAULT
+USER root
+RUN case "${RELEASE_FAULT}" in \
+        missing-manifest) \
+            rm /app/models/indobert-hoax/v1.0.0/manifest.json \
+            ;; \
+        checksum) \
+            python -c "import json; from pathlib import Path; p=Path('/app/models/indobert-hoax/v1.0.0/manifest.json'); data=json.loads(p.read_text()); data['files']['threshold.json']['sha256']='0'*64; p.write_text(json.dumps(data))" \
+            ;; \
+        *) \
+            echo "Unsupported RELEASE_FAULT: ${RELEASE_FAULT}" >&2; exit 2 \
+            ;; \
+    esac
+USER 10001:10001

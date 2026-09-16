@@ -74,6 +74,7 @@ class Settings:
     max_text_length: int
     max_sequence_length: int
     local_files_only: bool
+    require_release_manifest: bool = False
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -94,4 +95,7 @@ class Settings:
             max_text_length=_positive_int("BERT_MAX_TEXT_LENGTH", 20_000),
             max_sequence_length=_positive_int("BERT_MAX_SEQUENCE_LENGTH", 512),
             local_files_only=_boolean("BERT_LOCAL_FILES_ONLY", True),
+            require_release_manifest=_boolean(
+                "BERT_REQUIRE_RELEASE_MANIFEST", False
+            ),
         )

@@ -1,0 +1,65 @@
+# D2 and D3 use a repository-root build context with an explicit allowlist.
+# Git metadata, .env files, host dependencies, datasets, checkpoints, logs, and
+# local runtime data stay outside both image builds.
+**
+!.dockerignore
+
+# D3 Laravel application image and its isolated test target.
+!Dockerfile
+!artisan
+!composer.json
+!composer.lock
+!package.json
+!package-lock.json
+!phpunit.xml
+!vite.config.js
+
+!app/
+!app/**
+!bootstrap/
+!bootstrap/**
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+!config/
+!config/**
+!database/
+!database/**
+!public/
+!public/**
+public/build/
+public/storage
+!resources/
+!resources/**
+!routes/
+!routes/**
+!tests/
+!tests/**
+
+# Preserve only Laravel's directory skeleton. Never send uploads, logs, cached
+# views, sessions, or test artifacts from the host into the build context.
+!storage/
+storage/**
+!storage/**/
+!storage/**/.gitignore
+
+# D2 BERT inference image inputs. Keep this allowlist intact.
+!bert-service/
+bert-service/**
+!bert-service/Dockerfile
+!bert-service/requirements-runtime.txt
+!bert-service/app/
+!bert-service/app/**
+!bert-service/scripts/
+bert-service/scripts/**
+!bert-service/scripts/runtime_smoke_test.py
+
+!artifacts/
+artifacts/**
+!artifacts/indobert-hoax/
+artifacts/indobert-hoax/**
+!artifacts/indobert-hoax/v1.0.0/
+!artifacts/indobert-hoax/v1.0.0/**
+
+# Never carry host interpreter bytecode into the Python 3.12 image.
+**/__pycache__/
+**/*.py[cod]
