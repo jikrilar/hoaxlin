@@ -15,7 +15,7 @@
 
         <!-- Result Header -->
         <div class="glass-card animate-fade-in-up" style="padding:2.5rem; margin-bottom:1.5rem;" role="main" aria-label="Hasil deteksi berita">
-            @if(! $result)
+            @if(! $submission->isCompleted())
                 {{-- Livewire polling progress bar (wire:poll.2s.visible) with JS fallback via /hasil/{id}/status --}}
                 <div id="submission-progress-wrapper" data-submission-id="{{ $submission->id }}">
                     <livewire:submission-progress :submission="$submission" />
@@ -24,10 +24,13 @@
                         <div style="text-align:center; padding:1rem; color:var(--color-text-muted); font-size:0.875rem;">
                             JavaScript dinonaktifkan — <a href="{{ route('hasil', $submission->id) }}" style="color:var(--color-primary-light);">muat ulang</a> untuk melihat progress terbaru.
                         </div>
-                        <meta http-equiv="refresh" content="5;url={{ route('hasil', $submission->id) }}">
+                        @if(! $submission->isTerminal())
+                            <meta http-equiv="refresh" content="5;url={{ route('hasil', $submission->id) }}">
+                        @endif
                     </noscript>
                 </div>
                 {{-- Vanilla JS polling fallback (if Livewire not loaded, polls /hasil/{id}/status) --}}
+                @if(! $submission->isTerminal())
                 <script>
                     (() => {
                         const wrapper = document.getElementById('submission-progress-wrapper');
@@ -53,7 +56,7 @@
                                 }
                                 if (pctEl && typeof data.progress === 'number') pctEl.textContent = data.progress + '%';
                                 if (stageEl && data.stage_label) stageEl.textContent = data.stage_label;
-                                if (data.is_completed || data.is_failed || data.has_result) {
+                                if (data.is_completed || data.is_failed) {
                                     clearInterval(interval);
                                     setTimeout(() => window.location.reload(), 800);
                                 }
@@ -64,6 +67,7 @@
                         });
                     })();
                 </script>
+                @endif
                 <div class="divider" style="margin:1.5rem 0;"></div>
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:1.5rem;">
                     <div>
@@ -100,6 +104,10 @@
                 @if($submission->failure_reason)
                     <div class="warning-box" style="margin-top:1rem;">{{ $submission->failure_reason }}</div>
                 @endif
+            @elseif(! $result)
+                <div class="warning-box" role="alert">
+                    Hasil final tidak tersedia. Silakan coba lagi atau hubungi administrator jika masalah berlanjut.
+                </div>
             @else
 
             <!-- Label Badge & Score -->
@@ -176,17 +184,28 @@
                 </span>
             </div>
 
+            @php $explanationStatus = $result->explanation_status ?? 'pending'; @endphp
             <!-- AI Explanation -->
             <div style="padding:1.5rem; background:rgba(13,17,23,0.8); border:1px solid var(--color-border); border-radius:1rem; margin-bottom:1.5rem;" role="region" aria-label="Penjelasan AI">
                 <div style="display:flex; gap:0.75rem; align-items:flex-start; margin-bottom:1rem;">
                     <div style="width:2rem; height:2rem; background:rgba(99,102,241,0.12); border-radius:0.5rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;" aria-hidden="true">🤖</div>
                     <div>
-                        <p style="color:var(--color-text-primary); font-size:0.875rem; font-weight:600;">Penjelasan AI</p>
-                        <p style="color:var(--color-text-muted); font-size:0.75rem;">Disusun berdasarkan hasil klasifikasi BERT</p>
+                        <p style="color:var(--color-text-primary); font-size:0.875rem; font-weight:600;">
+                            {{ $explanationStatus === 'ready' ? 'Penjelasan AI' : ($explanationStatus === 'unavailable' ? 'Penjelasan AI Tidak Tersedia' : 'Penjelasan Belum Tersedia') }}
+                        </p>
+                        <p style="color:var(--color-text-muted); font-size:0.75rem;">
+                            {{ $explanationStatus === 'ready' ? 'Disusun berdasarkan hasil klasifikasi BERT' : 'Status penjelasan: '.ucfirst($explanationStatus) }}
+                        </p>
                     </div>
                 </div>
                 <p style="color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.75;">
-                    {{ $result->explanation ?? 'Berdasarkan analisis mendalam menggunakan model BERT yang telah dilatih pada korpus berita Indonesia, teks yang dimasukkan menunjukkan karakteristik yang konsisten dengan kategori yang terdeteksi. Indikator linguistik seperti gaya penulisan, pilihan kata, dan struktur kalimat telah dipertimbangkan dalam proses klasifikasi ini.' }}
+                    @if($explanationStatus === 'ready' && filled($result->explanation))
+                        {{ $result->explanation }}
+                    @elseif($explanationStatus === 'unavailable')
+                        {{ $result->explanation ?: 'Penjelasan AI tidak tersedia. Hasil klasifikasi BERT tetap dapat digunakan.' }}
+                    @else
+                        Penjelasan AI belum tersedia untuk hasil ini.
+                    @endif
                 </p>
             </div>
 

@@ -33,8 +33,8 @@ class SubmissionProgress extends Component
         $this->submission->refresh();
 
         $this->status = $this->submission->status;
-        $this->isCompleted = $this->submission->status === 'completed';
-        $this->isFailed = $this->submission->status === 'failed';
+        $this->isCompleted = $this->submission->isCompleted();
+        $this->isFailed = $this->submission->isFailed();
 
         if ($this->isCompleted) {
             $this->progress = 100;

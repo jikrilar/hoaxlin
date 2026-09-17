@@ -61,7 +61,7 @@ class RiwayatController extends Controller
 
         return view('hasil', [
             'submission' => $submission,
-            'result' => $submission->detectionResult,
+            'result' => $submission->isCompleted() ? $submission->detectionResult : null,
             'feedback' => $submission->feedbacks->firstWhere('user_id', request()->user()->getKey()),
         ]);
     }

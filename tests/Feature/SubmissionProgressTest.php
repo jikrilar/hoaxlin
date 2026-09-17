@@ -36,7 +36,8 @@ class SubmissionProgressTest extends TestCase
                 'status' => 'processing',
                 'processing_stage' => 'classifying',
                 'progress' => 60,
-                'has_result' => false,
+                'is_completed' => false,
+                'is_failed' => false,
             ]);
     }
 
@@ -73,7 +74,7 @@ class SubmissionProgressTest extends TestCase
             'processing_stage' => ProcessingStage::Done->value,
         ]);
 
-        // Create a fake result so has_result is true
+        // A completed submission exposes its persisted result as final.
         $submission->detectionResult()->create([
             'label' => 'hoax',
             'confidence_score' => 0.95,
@@ -86,7 +87,8 @@ class SubmissionProgressTest extends TestCase
             SubmissionAccess::sessionKey($submission) => $token,
         ])->getJson(route('hasil.status', $submission->id))
             ->assertOk()
-            ->assertJson(['progress' => 100, 'is_completed' => true, 'has_result' => true]);
+            ->assertJson(['progress' => 100, 'is_completed' => true, 'is_failed' => false])
+            ->assertJsonMissingPath('has_result');
     }
 
     public function test_livewire_component_shows_progress_and_polls(): void
