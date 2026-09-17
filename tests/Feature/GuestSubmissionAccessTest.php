@@ -22,8 +22,18 @@ class GuestSubmissionAccessTest extends TestCase
 
         $this->withSession([SubmissionAccess::sessionKey($submission) => $token]);
 
-        $this->get(route('hasil', $submission))->assertOk();
-        $this->getJson(route('hasil.status', $submission))->assertOk();
+        $this->get(route('hasil', $submission))
+            ->assertOk()
+            ->assertSee('wire:poll.2s.visible', false)
+            ->assertDontSee('class="result-badge', false);
+        $this->getJson(route('hasil.status', $submission))
+            ->assertOk()
+            ->assertJson([
+                'is_completed' => false,
+                'is_failed' => false,
+                'label' => null,
+                'confidence_score' => null,
+            ]);
         $mediaResponse = $this->get(route('hasil.media', $submission));
         $this->assertContains($mediaResponse->getStatusCode(), [200, 302]);
     }

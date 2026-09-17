@@ -87,7 +87,7 @@
             <div id="history-list" role="list">
                 @foreach($submissions as $submission)
                 @php
-                    $result = $submission->detectionResult;
+                    $result = $submission->isCompleted() ? $submission->detectionResult : null;
                     $label = $result ? strtolower($result->label) : null;
                     $labelMap = ['valid'=>'Valid','hoax'=>'Hoax','meragukan'=>'Meragukan'];
                     $icons = ['valid'=>'✅','hoax'=>'🚨','meragukan'=>'⚠️'];

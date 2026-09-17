@@ -27,7 +27,7 @@ Verifikasi:
 
 Test khusus submission/result lulus 23 test dan full Laravel suite lulus 78 test, 280 assertions, 4 skipped, 0 failed pada implementasi P0.1.
 
-### [ ] P0.2 Hasil parsial tidak dianggap final
+### [x] P0.2 Hasil parsial tidak dianggap final
 
 Masalah:
 
@@ -39,14 +39,14 @@ Gunakan status terminal submission sebagai sumber kebenaran hasil final. Tampilk
 
 Acceptance criteria:
 
-- [ ] Result final hanya ditampilkan saat submission `completed`.
-- [ ] Polling tidak berhenti hanya karena detection result sudah tersedia.
-- [ ] Explanation pending/unavailable tidak ditampilkan sebagai narasi hasil AI.
-- [ ] PDF tidak menyajikan result parsial sebagai hasil final.
+- [x] Result final hanya ditampilkan saat submission `completed`.
+- [x] Polling tidak berhenti hanya karena detection result sudah tersedia.
+- [x] Explanation pending/unavailable tidak ditampilkan sebagai narasi hasil AI.
+- [x] PDF tidak menyajikan result parsial sebagai hasil final.
 
 Verifikasi:
 
-Jalankan test result page, status polling, explanation unavailable, PDF, completed, dan failed state.
+Targeted tests lulus 28 test dengan 125 assertions. Full suite pada image Docker target `test` lulus 87 test dengan 341 assertions, 4 real-BERT test skipped karena service tidak tersedia, dan 0 failed.
 
 ### [ ] P0.3 Stale-processing watchdog dan recovery untuk kasus stuck 60%
 

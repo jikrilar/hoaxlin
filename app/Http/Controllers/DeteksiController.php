@@ -21,7 +21,7 @@ class DeteksiController extends Controller
         $submission = Submission::with(['detectionResult', 'feedbacks'])->findOrFail($id);
         $this->access->authorize($request, $submission);
 
-        $result = $submission->detectionResult;
+        $result = $submission->isCompleted() ? $submission->detectionResult : null;
         $feedback = auth()->check()
             ? $submission->feedbacks->firstWhere('user_id', auth()->id())
             : null;
@@ -36,26 +36,30 @@ class DeteksiController extends Controller
         $this->access->authorize($request, $submission);
 
         $stage = ProcessingStage::tryFrom($submission->processing_stage ?? '');
-        $progress = $stage?->progressPercentage() ?? match ($submission->status) {
-            'pending' => 5,
-            'processing' => 30,
-            'completed' => 100,
-            'failed' => $stage?->progressPercentage() ?? 0,
+        $progress = match (true) {
+            $submission->isCompleted() => 100,
+            $stage !== null => $stage->progressPercentage(),
+            $submission->status === 'pending' => 5,
+            $submission->status === 'processing' => 30,
             default => 0,
         };
+        $result = $submission->isCompleted() ? $submission->detectionResult : null;
 
         return response()->json([
             'id' => $submission->id,
             'status' => $submission->status,
             'processing_stage' => $submission->processing_stage,
-            'stage_label' => $stage?->label() ?? ucfirst(str_replace('_', ' ', $submission->processing_stage ?? $submission->status)),
+            'stage_label' => match (true) {
+                $submission->isCompleted() => 'Selesai',
+                $submission->isFailed() => 'Gagal',
+                default => $stage?->label() ?? ucfirst(str_replace('_', ' ', $submission->processing_stage ?? $submission->status)),
+            },
             'progress' => $progress,
-            'has_result' => $submission->detectionResult !== null,
-            'is_completed' => $submission->status === 'completed',
-            'is_failed' => $submission->status === 'failed',
+            'is_completed' => $submission->isCompleted(),
+            'is_failed' => $submission->isFailed(),
             'failure_reason' => $submission->failure_reason,
-            'label' => $submission->detectionResult?->label,
-            'confidence_score' => $submission->detectionResult?->confidence_score,
+            'label' => $result?->label,
+            'confidence_score' => $result?->confidence_score,
         ]);
     }
 
@@ -65,7 +69,7 @@ class DeteksiController extends Controller
         $submission = Submission::with('detectionResult')->findOrFail($id);
         $this->access->authorize($request, $submission);
 
-        if (! $submission->detectionResult) {
+        if (! $submission->isCompleted() || ! $submission->detectionResult) {
             abort(404, 'Hasil belum tersedia.');
         }
 

@@ -81,6 +81,21 @@ class Submission extends Model
         return Attribute::set(fn (?string $value): ?string => $value === null ? null : trim($value));
     }
 
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isFailed(): bool
+    {
+        return $this->status === 'failed';
+    }
+
+    public function isTerminal(): bool
+    {
+        return $this->isCompleted() || $this->isFailed();
+    }
+
     public function scopeForUser(Builder $query, User|int $user): void
     {
         $query->where('user_id', $user instanceof User ? $user->getKey() : $user);
