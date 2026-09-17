@@ -2,16 +2,20 @@
 
 namespace App\Jobs;
 
+use App\Enums\ProcessingStage;
+use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\Submission;
+use App\Services\Pipeline\SubmissionStateMachine;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ProcessSubmission implements ShouldQueue
+class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UniqueSubmissionStage;
 
     public int $tries = 3;
 
@@ -38,9 +42,9 @@ class ProcessSubmission implements ShouldQueue
         }
 
         try {
-            app(\App\Services\Pipeline\SubmissionStateMachine::class)->markFailedFinal(
+            app(SubmissionStateMachine::class)->markFailedFinal(
                 $submission,
-                \App\Enums\ProcessingStage::Queued,
+                ProcessingStage::Queued,
                 $exception,
                 $this->attempts(),
             );

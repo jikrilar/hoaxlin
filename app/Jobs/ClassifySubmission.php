@@ -5,11 +5,13 @@ namespace App\Jobs;
 use App\Contracts\Classifier;
 use App\Enums\ProcessingStage;
 use App\Jobs\Concerns\HandlesPipelineFailures;
+use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\DetectionResult;
 use App\Models\Submission;
 use App\Services\Pipeline\ProcessingEventRecorder;
 use App\Services\Pipeline\SubmissionStateMachine;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -17,9 +19,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Throwable;
 
-class ClassifySubmission implements ShouldQueue
+class ClassifySubmission implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, HandlesPipelineFailures, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, HandlesPipelineFailures, InteractsWithQueue, Queueable, SerializesModels, UniqueSubmissionStage;
 
     public int $tries = 5;
 

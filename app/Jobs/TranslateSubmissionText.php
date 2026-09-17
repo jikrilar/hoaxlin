@@ -5,10 +5,12 @@ namespace App\Jobs;
 use App\Contracts\Translator;
 use App\Enums\EventOutcome;
 use App\Enums\ProcessingStage;
+use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\Submission;
 use App\Services\Pipeline\ProcessingEventRecorder;
 use App\Services\Pipeline\SubmissionStateMachine;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -16,9 +18,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Throwable;
 
-class TranslateSubmissionText implements ShouldQueue
+class TranslateSubmissionText implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UniqueSubmissionStage;
 
     public int $tries = 3;
 
