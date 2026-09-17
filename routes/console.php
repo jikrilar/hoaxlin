@@ -10,3 +10,7 @@ Artisan::command('inspire', function () {
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('media:prune --days=30')->dailyAt('03:00')->onOneServer();
+Schedule::command('submissions:recover-stale')
+    ->everyFiveMinutes()
+    ->onOneServer()
+    ->withoutOverlapping();

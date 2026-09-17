@@ -48,7 +48,7 @@ Verifikasi:
 
 Targeted tests lulus 28 test dengan 125 assertions. Full suite pada image Docker target `test` lulus 87 test dengan 341 assertions, 4 real-BERT test skipped karena service tidak tersedia, dan 0 failed.
 
-### [ ] P0.3 Stale-processing watchdog dan recovery untuk kasus stuck 60%
+### [x] P0.3 Stale-processing watchdog dan recovery untuk kasus stuck 60%
 
 Masalah:
 
@@ -60,14 +60,14 @@ Pastikan seluruh named queue dikonsumsi, deteksi submission pending/processing y
 
 Acceptance criteria:
 
-- [ ] Worker mengonsumsi `default`, `extract-text`, `extract-media`, `inference`, dan `explanation`.
-- [ ] Submission stale tidak bertahan selamanya dalam status pending/processing.
-- [ ] Recovery tidak menggandakan result atau pekerjaan pipeline.
-- [ ] Diagnostic command melaporkan backlog/queue yang bermasalah.
+- [x] Worker mengonsumsi `default`, `extract-text`, `extract-media`, `inference`, dan `explanation`.
+- [x] Submission stale tidak bertahan selamanya dalam status pending/processing.
+- [x] Recovery tidak menggandakan result atau pekerjaan pipeline.
+- [x] Diagnostic command melaporkan backlog/queue yang bermasalah.
 
 Verifikasi:
 
-Jalankan test named queue, stale timeout, recovery idempoten, dan simulasi queue explanation tidak berjalan setelah klasifikasi.
+Targeted tests lulus 37 test dengan 184 assertions. Full suite pada image Docker target `test` lulus 100 test dengan 409 assertions, 4 real-BERT test skipped karena service tidak tersedia, dan 0 failed.
 
 ### [ ] P0.4 SSRF redirect hardening pada artikel dan direct media URL
 
