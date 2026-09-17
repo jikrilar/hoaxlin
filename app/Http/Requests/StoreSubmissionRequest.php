@@ -9,7 +9,7 @@ class StoreSubmissionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null || $this->input('input_type') === 'text';
     }
 
     public function rules(): array

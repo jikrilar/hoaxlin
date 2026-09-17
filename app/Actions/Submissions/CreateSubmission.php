@@ -5,11 +5,13 @@ namespace App\Actions\Submissions;
 use App\Enums\InputType;
 use App\Jobs\ProcessSubmission;
 use App\Models\Submission;
+use App\Services\Media\MalwareScanner;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class CreateSubmission
@@ -17,16 +19,20 @@ class CreateSubmission
     /**
      * @param  array<string, mixed>  $validated
      */
-    public function handle(array $validated, ?Authenticatable $user, ?UploadedFile $media): Submission
-    {
+    public function handle(
+        array $validated,
+        ?Authenticatable $user,
+        ?UploadedFile $media,
+        ?string $guestAccessTokenHash = null,
+    ): Submission {
         $mediaPath = null;
 
         try {
             if ($media !== null) {
                 // C12: malware scan before storing
-                $scanner = app(\App\Services\Media\MalwareScanner::class);
+                $scanner = app(MalwareScanner::class);
                 if (! $scanner->isClean($media)) {
-                    throw new \Illuminate\Validation\ValidationException(
+                    throw new ValidationException(
                         validator: validator([], []),
                         response: response()->json(['message' => 'File terdeteksi mengandung konten mencurigakan.'], 422)
                     );
@@ -40,11 +46,12 @@ class CreateSubmission
                 $mediaPath = $media->store($directory, $disk);
             }
 
-            return DB::transaction(function () use ($validated, $user, $mediaPath): Submission {
+            return DB::transaction(function () use ($validated, $user, $mediaPath, $guestAccessTokenHash): Submission {
                 $inputType = InputType::fromRequest($validated['input_type'])->value;
 
                 $submission = Submission::create([
                     'user_id' => $user?->getAuthIdentifier(),
+                    'guest_access_token_hash' => $user === null ? $guestAccessTokenHash : null,
                     'input_type' => $inputType,
                     'raw_input' => Arr::get($validated, 'raw_input'),
                     'media_path' => $mediaPath,
