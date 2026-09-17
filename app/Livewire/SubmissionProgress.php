@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Enums\ProcessingStage;
 use App\Models\Submission;
+use App\Services\SubmissionAccess;
 use Livewire\Component;
 
 class SubmissionProgress extends Component
@@ -28,6 +29,7 @@ class SubmissionProgress extends Component
 
     public function refreshProgress(): void
     {
+        app(SubmissionAccess::class)->authorize(request(), $this->submission);
         $this->submission->refresh();
 
         $this->status = $this->submission->status;
@@ -37,6 +39,7 @@ class SubmissionProgress extends Component
         if ($this->isCompleted) {
             $this->progress = 100;
             $this->stageLabel = 'Selesai';
+
             return;
         }
 
@@ -44,6 +47,7 @@ class SubmissionProgress extends Component
             $stage = ProcessingStage::tryFrom($this->submission->processing_stage ?? '');
             $this->progress = $stage?->progressPercentage() ?? 0;
             $this->stageLabel = $stage?->label() ?? 'Gagal';
+
             return;
         }
 

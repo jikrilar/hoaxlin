@@ -2,28 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProcessingStage;
 use App\Models\Submission;
+use App\Services\SubmissionAccess;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DeteksiController extends Controller
 {
+    public function __construct(private readonly SubmissionAccess $access) {}
+
     // ── Show Results Page ─────────────────────────────────────────────────────
-    public function hasil(string $id): View
+    public function hasil(Request $request, string $id): View
     {
         $submission = Submission::with(['detectionResult', 'feedbacks'])->findOrFail($id);
-
-        // Ownership protection (C8): user-owned submissions are only viewable
-        // by their owner or an admin. Guest submissions (user_id null) remain
-        // shareable via the link, but enumeration is rate-limited at the route.
-        if ($submission->user_id !== null) {
-            $user = auth()->user();
-            if (! $user || ($user->getKey() !== $submission->user_id && ! $user->is_admin)) {
-                abort(403, 'Akses ditolak. Hasil ini bukan milik Anda.');
-            }
-        }
+        $this->access->authorize($request, $submission);
 
         $result = $submission->detectionResult;
         $feedback = auth()->check()
@@ -34,18 +30,12 @@ class DeteksiController extends Controller
     }
 
     // ── Polling endpoint for progress bar (Livewire fallback + JS) ───────────
-    public function status(string $id)
+    public function status(Request $request, string $id)
     {
         $submission = Submission::with('detectionResult')->findOrFail($id);
+        $this->access->authorize($request, $submission);
 
-        if ($submission->user_id !== null) {
-            $user = auth()->user();
-            if (! $user || ($user->getKey() !== $submission->user_id && ! $user->is_admin)) {
-                abort(403);
-            }
-        }
-
-        $stage = \App\Enums\ProcessingStage::tryFrom($submission->processing_stage ?? '');
+        $stage = ProcessingStage::tryFrom($submission->processing_stage ?? '');
         $progress = $stage?->progressPercentage() ?? match ($submission->status) {
             'pending' => 5,
             'processing' => 30,
@@ -70,16 +60,10 @@ class DeteksiController extends Controller
     }
 
     // ── PDF Export (E1) ───────────────────────────────────────────────────────
-    public function pdf(string $id)
+    public function pdf(Request $request, string $id)
     {
         $submission = Submission::with('detectionResult')->findOrFail($id);
-
-        if ($submission->user_id !== null) {
-            $user = auth()->user();
-            if (! $user || ($user->getKey() !== $submission->user_id && ! $user->is_admin)) {
-                abort(403);
-            }
-        }
+        $this->access->authorize($request, $submission);
 
         if (! $submission->detectionResult) {
             abort(404, 'Hasil belum tersedia.');
@@ -137,23 +121,17 @@ class DeteksiController extends Controller
     }
 
     // ── Media Preview (E6) ────────────────────────────────────────────────────
-    public function media(string $id)
+    public function media(Request $request, string $id)
     {
         $submission = Submission::findOrFail($id);
-
-        if ($submission->user_id !== null) {
-            $user = auth()->user();
-            if (! $user || ($user->getKey() !== $submission->user_id && ! $user->is_admin)) {
-                abort(403);
-            }
-        }
+        $this->access->authorize($request, $submission);
 
         if (! $submission->media_path) {
             abort(404);
         }
 
         $disk = config('filesystems.media_disk', config('filesystems.default', 'local'));
-        $storage = \Illuminate\Support\Facades\Storage::disk($disk);
+        $storage = Storage::disk($disk);
 
         if (! $storage->exists($submission->media_path)) {
             abort(404, 'File tidak ditemukan.');
@@ -163,6 +141,7 @@ class DeteksiController extends Controller
         if (method_exists($storage, 'temporaryUrl')) {
             try {
                 $url = $storage->temporaryUrl($submission->media_path, now()->addMinutes(5));
+
                 return redirect()->away($url);
             } catch (\Throwable) {
                 // Fallback to download for local

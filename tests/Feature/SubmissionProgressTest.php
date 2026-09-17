@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Enums\ProcessingStage;
+use App\Livewire\SubmissionProgress;
 use App\Models\Submission;
 use App\Models\User;
+use App\Services\SubmissionAccess;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -15,14 +17,18 @@ class SubmissionProgressTest extends TestCase
 
     public function test_guest_can_view_own_guest_submission_status(): void
     {
+        $token = bin2hex(random_bytes(32));
         $submission = Submission::create([
+            'guest_access_token_hash' => hash('sha256', $token),
             'input_type' => 'text',
             'raw_input' => str_repeat('Berita untuk status. ', 10),
             'status' => 'processing',
             'processing_stage' => ProcessingStage::Classifying->value,
         ]);
 
-        $response = $this->getJson(route('hasil.status', $submission->id));
+        $response = $this->withSession([
+            SubmissionAccess::sessionKey($submission) => $token,
+        ])->getJson(route('hasil.status', $submission->id));
 
         $response->assertOk()
             ->assertJson([
@@ -58,7 +64,9 @@ class SubmissionProgressTest extends TestCase
 
     public function test_status_returns_100_when_completed(): void
     {
+        $token = bin2hex(random_bytes(32));
         $submission = Submission::create([
+            'guest_access_token_hash' => hash('sha256', $token),
             'input_type' => 'text',
             'raw_input' => str_repeat('Selesai. ', 10),
             'status' => 'completed',
@@ -74,21 +82,26 @@ class SubmissionProgressTest extends TestCase
             'inference_ms' => 10,
         ]);
 
-        $this->getJson(route('hasil.status', $submission->id))
+        $this->withSession([
+            SubmissionAccess::sessionKey($submission) => $token,
+        ])->getJson(route('hasil.status', $submission->id))
             ->assertOk()
             ->assertJson(['progress' => 100, 'is_completed' => true, 'has_result' => true]);
     }
 
     public function test_livewire_component_shows_progress_and_polls(): void
     {
+        $user = User::factory()->create();
         $submission = Submission::create([
+            'user_id' => $user->id,
             'input_type' => 'text',
             'raw_input' => str_repeat('Polling. ', 10),
             'status' => 'processing',
             'processing_stage' => ProcessingStage::Classifying->value,
         ]);
 
-        $component = Livewire::test(\App\Livewire\SubmissionProgress::class, ['submission' => $submission]);
+        $this->actingAs($user);
+        $component = Livewire::test(SubmissionProgress::class, ['submission' => $submission]);
 
         $component->assertSee('60%')
             ->assertSee('Klasifikasi BERT')
@@ -103,7 +116,9 @@ class SubmissionProgressTest extends TestCase
 
     public function test_livewire_shows_failed_state(): void
     {
+        $user = User::factory()->create();
         $submission = Submission::create([
+            'user_id' => $user->id,
             'input_type' => 'text',
             'raw_input' => str_repeat('Gagal. ', 10),
             'status' => 'failed',
@@ -111,7 +126,8 @@ class SubmissionProgressTest extends TestCase
             'failure_reason' => 'Model timeout',
         ]);
 
-        Livewire::test(\App\Livewire\SubmissionProgress::class, ['submission' => $submission])
+        $this->actingAs($user);
+        Livewire::test(SubmissionProgress::class, ['submission' => $submission])
             ->assertSee('Gagal')
             ->assertSee('Pemrosesan Gagal');
     }

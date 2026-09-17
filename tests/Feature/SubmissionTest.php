@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Jobs\ProcessSubmission;
 use App\Models\Submission;
 use App\Models\User;
+use App\Services\SubmissionAccess;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Queue;
@@ -14,6 +15,29 @@ use Tests\TestCase;
 class SubmissionTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_guest_can_submit_text_and_receives_a_session_bound_capability(): void
+    {
+        Queue::fake();
+        $text = str_repeat('Berita guest yang akan diperiksa. ', 3);
+
+        $response = $this->post(route('deteksi'), [
+            'input_type' => 'text',
+            'raw_input' => $text,
+        ]);
+
+        $submission = Submission::sole();
+        $sessionKey = SubmissionAccess::sessionKey($submission);
+        $token = session($sessionKey);
+
+        $response->assertRedirect(route('hasil', $submission));
+        $this->assertNull($submission->user_id);
+        $this->assertIsString($token);
+        $this->assertSame(64, strlen($token));
+        $this->assertSame(hash('sha256', $token), $submission->guest_access_token_hash);
+        $this->assertStringNotContainsString($token, (string) $response->headers->get('Location'));
+        Queue::assertPushed(ProcessSubmission::class);
+    }
 
     public function test_text_submission_is_stored_and_queued(): void
     {
@@ -29,6 +53,7 @@ class SubmissionTest extends TestCase
         $submission = Submission::sole();
         $response->assertRedirect(route('hasil', $submission));
         $this->assertSame($user->id, $submission->user_id);
+        $this->assertNull($submission->guest_access_token_hash);
         $this->assertSame('text', $submission->input_type);
         $this->assertSame(trim($text), $submission->raw_input);
         $this->assertSame('pending', $submission->status);
@@ -40,8 +65,9 @@ class SubmissionTest extends TestCase
     {
         Storage::fake('local');
         Queue::fake();
+        $user = User::factory()->create();
 
-        $this->post(route('deteksi'), [
+        $this->actingAs($user)->post(route('deteksi'), [
             'input_type' => 'image',
             'media_file' => UploadedFile::fake()->image('berita.jpg'),
         ])->assertRedirect();
@@ -56,8 +82,9 @@ class SubmissionTest extends TestCase
     {
         Storage::fake('local');
         Queue::fake();
+        $user = User::factory()->create();
 
-        $this->post(route('deteksi'), [
+        $this->actingAs($user)->post(route('deteksi'), [
             'input_type' => 'video',
             'media_file' => UploadedFile::fake()->create('berita.mp4', 1024, 'video/mp4'),
         ])->assertRedirect();
@@ -71,8 +98,9 @@ class SubmissionTest extends TestCase
     public function test_article_url_submission_is_stored_and_queued(): void
     {
         Queue::fake();
+        $user = User::factory()->create();
 
-        $this->post(route('deteksi'), [
+        $this->actingAs($user)->post(route('deteksi'), [
             'input_type' => 'url',
             'source_url' => 'https://example.com/berita',
         ])->assertRedirect();
@@ -86,8 +114,9 @@ class SubmissionTest extends TestCase
     public function test_video_url_is_normalized_to_video_submission(): void
     {
         Queue::fake();
+        $user = User::factory()->create();
 
-        $this->post(route('deteksi'), [
+        $this->actingAs($user)->post(route('deteksi'), [
             'input_type' => 'video_url',
             'source_url' => 'https://example.com/video/1',
         ])->assertRedirect();
@@ -98,6 +127,38 @@ class SubmissionTest extends TestCase
         Queue::assertPushed(ProcessSubmission::class);
     }
 
+    public function test_guest_cannot_submit_article_url(): void
+    {
+        $this->assertGuestSubmissionTypeIsForbidden('url', [
+            'source_url' => 'https://example.com/berita',
+        ]);
+    }
+
+    public function test_guest_cannot_submit_image(): void
+    {
+        Storage::fake('local');
+
+        $this->assertGuestSubmissionTypeIsForbidden('image', [
+            'media_file' => UploadedFile::fake()->image('berita.jpg'),
+        ]);
+    }
+
+    public function test_guest_cannot_submit_video(): void
+    {
+        Storage::fake('local');
+
+        $this->assertGuestSubmissionTypeIsForbidden('video', [
+            'media_file' => UploadedFile::fake()->create('berita.mp4', 1024, 'video/mp4'),
+        ]);
+    }
+
+    public function test_guest_cannot_submit_video_url(): void
+    {
+        $this->assertGuestSubmissionTypeIsForbidden('video_url', [
+            'source_url' => 'https://example.com/video.mp4',
+        ]);
+    }
+
     public function test_submission_validation_rejects_invalid_payloads(): void
     {
         Queue::fake();
@@ -106,6 +167,18 @@ class SubmissionTest extends TestCase
             'input_type' => 'text',
             'raw_input' => 'Terlalu pendek',
         ])->assertRedirect(route('home'))->assertSessionHasErrors('raw_input');
+
+        $this->assertDatabaseEmpty('submissions');
+        Queue::assertNothingPushed();
+    }
+
+    /** @param array<string, mixed> $payload */
+    private function assertGuestSubmissionTypeIsForbidden(string $inputType, array $payload): void
+    {
+        Queue::fake();
+
+        $this->post(route('deteksi'), ['input_type' => $inputType, ...$payload])
+            ->assertForbidden();
 
         $this->assertDatabaseEmpty('submissions');
         Queue::assertNothingPushed();

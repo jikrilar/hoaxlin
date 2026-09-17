@@ -19,6 +19,7 @@ class Submission extends Model
      */
     protected $fillable = [
         'user_id',
+        'guest_access_token_hash',
         'input_type',
         'raw_input',
         'extracted_text',
@@ -42,6 +43,13 @@ class Submission extends Model
         'last_error_code',
         'attempt_count',
         'pipeline_version',
+    ];
+
+    /**
+     * @var list<string>
+     */
+    protected $hidden = [
+        'guest_access_token_hash',
     ];
 
     protected function casts(): array
