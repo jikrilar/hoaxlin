@@ -112,7 +112,7 @@ Verifikasi:
 
 Targeted regression P0.1-P0.5 lulus 60 test dengan 251 assertions. Full suite pada image Docker target `test` lulus 123 test dengan 482 assertions, 4 real-BERT test skipped karena service tidak tersedia, dan 0 failed. `docker compose config` valid dan service scheduler berjalan healthy tanpa host-port binding.
 
-### [ ] P0.6 Sanitasi exception dan pemisahan error publik/internal
+### [x] P0.6 Sanitasi exception dan pemisahan error publik/internal
 
 Masalah:
 
@@ -124,14 +124,14 @@ Gunakan kode dan pesan publik yang aman. Simpan detail diagnosis hanya pada log/
 
 Acceptance criteria:
 
-- [ ] UI dan JSON tidak mengekspos exception mentah.
-- [ ] Error database, filesystem, konfigurasi, dan provider dipetakan ke pesan publik yang stabil.
-- [ ] Log internal memiliki context diagnosis tanpa membocorkan secret.
-- [ ] Submission/result dapat dikorelasikan dengan log internal.
+- [x] UI dan JSON tidak mengekspos exception mentah.
+- [x] Error database, filesystem, konfigurasi, dan provider dipetakan ke pesan publik yang stabil.
+- [x] Log internal memiliki context diagnosis tanpa membocorkan secret.
+- [x] Submission/result dapat dikorelasikan dengan log internal.
 
 Verifikasi:
 
-Jalankan test failure untuk database, filesystem, dan HTTP provider; pastikan payload sensitif tidak muncul pada respons publik.
+Docker test image berhasil dibuild. Full suite pada image Docker lulus 129 test dengan 524 assertions, 4 real-BERT test skipped pada suite terisolasi, dan 0 failed. Test sanitasi P0.6 lulus 6 test dengan 42 assertions. Verifikasi real-BERT terpisah pada network Compose lulus 4 test dengan 25 assertions. `docker compose config --quiet` dan `git diff --check` lulus.
 
 ## P1
 

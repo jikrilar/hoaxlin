@@ -101,8 +101,8 @@
                         </div>
                     </div>
                 @endif
-                @if($submission->failure_reason)
-                    <div class="warning-box" style="margin-top:1rem;">{{ $submission->failure_reason }}</div>
+                @if($failureReason)
+                    <div class="warning-box" style="margin-top:1rem;">{{ $failureReason }}</div>
                 @endif
             @elseif(! $result)
                 <div class="warning-box" role="alert">

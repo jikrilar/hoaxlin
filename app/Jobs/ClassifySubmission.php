@@ -47,15 +47,14 @@ class ClassifySubmission implements ShouldBeUnique, ShouldQueue
             }
 
             $started = hrtime(true);
-            $state->markProcessing($submission, ProcessingStage::Classifying, $this->attempts());
 
             try {
+                $state->markProcessing($submission, ProcessingStage::Classifying, $this->attempts());
                 $classification = $classifier->classify((string) $submission->analysis_text);
                 $state->markClassified($submission, $classification, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000));
                 GenerateSubmissionExplanation::dispatch($submission->id)->onQueue('explanation');
             } catch (Throwable $exception) {
                 $state->markFailed($submission, ProcessingStage::Classifying, $exception, $this->attempts());
-                throw $exception;
             }
         });
     }

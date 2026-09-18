@@ -28,10 +28,19 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
     public function __construct(public Submission $submission) {}
 
-    public function handle(): void
+    public function handle(SubmissionStateMachine $state): void
     {
-        ExtractSubmissionText::dispatch($this->submission->getKey())
-            ->onQueue(in_array($this->submission->input_type, ['image', 'video'], true) ? 'extract-media' : 'extract-text');
+        try {
+            ExtractSubmissionText::dispatch($this->submission->getKey())
+                ->onQueue(in_array($this->submission->input_type, ['image', 'video'], true) ? 'extract-media' : 'extract-text');
+        } catch (\Throwable $exception) {
+            $state->markFailed(
+                $this->submission,
+                ProcessingStage::Queued,
+                $exception,
+                $this->attempts(),
+            );
+        }
     }
 
     public function failed(\Throwable $exception): void

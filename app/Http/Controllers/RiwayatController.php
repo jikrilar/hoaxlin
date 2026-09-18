@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\HistoryRequest;
 use App\Models\Submission;
+use App\Services\Pipeline\PipelineFailureReporter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 
 class RiwayatController extends Controller
 {
+    public function __construct(private readonly PipelineFailureReporter $failures) {}
+
     public function index(HistoryRequest $request): View
     {
         $filters = $request->validated();
@@ -63,6 +66,9 @@ class RiwayatController extends Controller
             'submission' => $submission,
             'result' => $submission->isCompleted() ? $submission->detectionResult : null,
             'feedback' => $submission->feedbacks->firstWhere('user_id', request()->user()->getKey()),
+            'failureReason' => $submission->isFailed()
+                ? $this->failures->publicMessageForCode($submission->last_error_code)
+                : null,
         ]);
     }
 }

@@ -2,15 +2,20 @@
 
 namespace App\Services\Pipeline;
 
+use App\DataObjects\Classification;
+use App\DataObjects\Explanation;
 use App\Enums\EventOutcome;
 use App\Enums\ProcessingStage;
-use App\Exceptions\AiServiceException;
+use App\Models\DetectionResult;
 use App\Models\Submission;
 use Throwable;
 
 class SubmissionStateMachine
 {
-    public function __construct(private readonly ProcessingEventRecorder $events) {}
+    public function __construct(
+        private readonly ProcessingEventRecorder $events,
+        private readonly PipelineFailureReporter $failures,
+    ) {}
 
     public function markProcessing(Submission $submission, ProcessingStage $stage, int $attempt = 1): void
     {
@@ -47,11 +52,11 @@ class SubmissionStateMachine
         );
     }
 
-    public function markClassified(Submission $submission, \App\DataObjects\Classification $classification, int $attempt, int $durationMs): void
+    public function markClassified(Submission $submission, Classification $classification, int $attempt, int $durationMs): void
     {
         $submission->update(['processing_stage' => ProcessingStage::Classifying->value]);
 
-        \App\Models\DetectionResult::updateOrCreate(['submission_id' => $submission->id], [
+        DetectionResult::updateOrCreate(['submission_id' => $submission->id], [
             'label' => $classification->label->value,
             'confidence_score' => $classification->confidenceScore,
             'model_version' => $classification->modelVersion,
@@ -72,7 +77,7 @@ class SubmissionStateMachine
         );
     }
 
-    public function markExplained(Submission $submission, \App\DataObjects\Explanation $explanation, int $attempt): void
+    public function markExplained(Submission $submission, Explanation $explanation, int $attempt): void
     {
         $result = $submission->detectionResult;
         if ($result) {
@@ -111,63 +116,68 @@ class SubmissionStateMachine
         $this->events->record($submission, ProcessingStage::Done, EventOutcome::Succeeded, attempt: $attempt);
     }
 
-    public function markFailed(Submission $submission, ProcessingStage $stage, Throwable $exception, int $attempt, bool $isFinal = false): void
+    public function markFailed(Submission $submission, ProcessingStage $stage, Throwable $exception, int $attempt, bool $isFinal = false): never
     {
-        $retryable = $exception instanceof AiServiceException && $exception->retryable;
-        $service = $exception instanceof AiServiceException ? $exception->service : 'pipeline';
-        $code = $exception instanceof AiServiceException
-            ? ($exception->statusCode ? "HTTP_{$exception->statusCode}" : 'SERVICE_UNAVAILABLE')
-            : class_basename($exception);
+        $failure = $this->failures->report($submission, $stage, $exception, $attempt);
+        $shouldFail = ! $failure->retryable || $isFinal;
 
-        $this->events->record(
-            $submission,
-            $stage,
-            $isFinal ? EventOutcome::Failed : ($retryable ? EventOutcome::Retried : EventOutcome::Failed),
-            $service,
-            $attempt,
-            errorCode: $code,
-        );
+        try {
+            $this->events->record(
+                $submission,
+                $stage,
+                $shouldFail ? EventOutcome::Failed : EventOutcome::Retried,
+                $failure->service,
+                $attempt,
+                errorCode: $failure->errorCode,
+                metadata: ['error_reference' => $failure->reference],
+            );
 
-        // Only mark the submission as failed if it's a permanent error or this is the final attempt
-        $shouldFail = ! $retryable || $isFinal;
+            $submission->update([
+                'attempt_count' => $attempt,
+                'last_error_service' => $failure->service,
+                'last_error_code' => $failure->errorCode,
+                'failure_reason' => $shouldFail ? $failure->publicMessage : null,
+                'status' => $shouldFail ? 'failed' : 'processing',
+                'processing_stage' => $stage->value,
+                'processing_completed_at' => $shouldFail ? now() : null,
+            ]);
+        } catch (Throwable $persistenceException) {
+            $persistenceFailure = $this->failures->report($submission, $stage, $persistenceException, $attempt);
 
-        $isRetrying = $retryable && ! $shouldFail;
+            throw $this->failures->sanitizedException($persistenceFailure);
+        }
 
-        $submission->update([
-            'attempt_count' => $attempt,
-            'last_error_service' => $service,
-            'last_error_code' => $code,
-            // Don't expose "mode pemulihan" to the user while still retrying — keep UI on "Sedang Menganalisis"
-            'failure_reason' => $shouldFail ? $exception->getMessage() : null,
-            'status' => $shouldFail ? 'failed' : 'processing',
-            'processing_stage' => $stage->value,
-            'processing_completed_at' => $shouldFail ? now() : null,
-        ]);
-
-        // Always throw to let the queue handle retry/backoff, but the UI won't show the raw message while retrying
-        throw $exception;
+        // Keep the existing queue retry flow, but never hand raw provider or
+        // infrastructure exceptions to the worker log or failed_jobs storage.
+        throw $this->failures->sanitizedException($failure);
     }
 
     public function markFailedFinal(Submission $submission, ProcessingStage $stage, Throwable $exception, int $attempt): void
     {
-        $service = $exception instanceof AiServiceException ? $exception->service : 'pipeline';
-        $code = $exception instanceof AiServiceException
-            ? ($exception->statusCode ? "HTTP_{$exception->statusCode}" : 'SERVICE_UNAVAILABLE')
-            : class_basename($exception);
-
-        $submission->update([
-            'status' => 'failed',
-            'processing_stage' => $stage->value,
-            'processing_completed_at' => now(),
-            'failure_reason' => $exception->getMessage(),
-            'last_error_service' => $service,
-            'last_error_code' => $code,
-            'attempt_count' => $attempt,
-        ]);
+        $failure = $this->failures->report($submission, $stage, $exception, $attempt);
 
         try {
-            $this->events->record($submission, $stage, EventOutcome::Failed, $service, $attempt, errorCode: $code);
-        } catch (Throwable) {
+            $submission->update([
+                'status' => 'failed',
+                'processing_stage' => $stage->value,
+                'processing_completed_at' => now(),
+                'failure_reason' => $failure->publicMessage,
+                'last_error_service' => $failure->service,
+                'last_error_code' => $failure->errorCode,
+                'attempt_count' => $attempt,
+            ]);
+
+            $this->events->record(
+                $submission,
+                $stage,
+                EventOutcome::Failed,
+                $failure->service,
+                $attempt,
+                errorCode: $failure->errorCode,
+                metadata: ['error_reference' => $failure->reference],
+            );
+        } catch (Throwable $persistenceException) {
+            $this->failures->report($submission, $stage, $persistenceException, $attempt);
         }
     }
 }

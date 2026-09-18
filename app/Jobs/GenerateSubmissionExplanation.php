@@ -18,6 +18,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use Throwable;
 
 class GenerateSubmissionExplanation implements ShouldBeUnique, ShouldQueue
 {
@@ -50,18 +51,22 @@ class GenerateSubmissionExplanation implements ShouldBeUnique, ShouldQueue
                 return;
             }
 
-            $state->markProcessing($submission, ProcessingStage::Explaining, $this->attempts());
-            $classification = new Classification(
-                DetectionLabel::from($result->label),
-                (float) $result->confidence_score,
-                $result->model_version,
-                $result->raw_scores ?? [],
-                $result->inference_ms,
-                $result->classifier_cached,
-            );
-            $explanation = $explainer->explain($classification, mb_substr((string) $submission->analysis_text, 0, 1500));
-            $state->markExplained($submission, $explanation, $this->attempts());
-            $state->markCompleted($submission, $this->attempts());
+            try {
+                $state->markProcessing($submission, ProcessingStage::Explaining, $this->attempts());
+                $classification = new Classification(
+                    DetectionLabel::from($result->label),
+                    (float) $result->confidence_score,
+                    $result->model_version,
+                    $result->raw_scores ?? [],
+                    $result->inference_ms,
+                    $result->classifier_cached,
+                );
+                $explanation = $explainer->explain($classification, mb_substr((string) $submission->analysis_text, 0, 1500));
+                $state->markExplained($submission, $explanation, $this->attempts());
+                $state->markCompleted($submission, $this->attempts());
+            } catch (Throwable $exception) {
+                $state->markFailed($submission, ProcessingStage::Explaining, $exception, $this->attempts());
+            }
         });
     }
 
