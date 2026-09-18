@@ -215,8 +215,6 @@ class OpenAiTranslator implements Translator
 
     private function retryAfter(Response $response): ?int
     {
-        $header = $response->header('Retry-After');
-
-        return is_numeric($header) ? (int) $header : null;
+        return RetryAfter::seconds($response->header('Retry-After'));
     }
 }

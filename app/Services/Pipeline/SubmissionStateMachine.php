@@ -4,6 +4,7 @@ namespace App\Services\Pipeline;
 
 use App\DataObjects\Classification;
 use App\DataObjects\Explanation;
+use App\DataObjects\PipelineFailure;
 use App\Enums\EventOutcome;
 use App\Enums\ProcessingStage;
 use App\Models\DetectionResult;
@@ -116,7 +117,7 @@ class SubmissionStateMachine
         $this->events->record($submission, ProcessingStage::Done, EventOutcome::Succeeded, attempt: $attempt);
     }
 
-    public function markFailed(Submission $submission, ProcessingStage $stage, Throwable $exception, int $attempt, bool $isFinal = false): never
+    public function markFailed(Submission $submission, ProcessingStage $stage, Throwable $exception, int $attempt, bool $isFinal = false): PipelineFailure
     {
         $failure = $this->failures->report($submission, $stage, $exception, $attempt);
         $shouldFail = ! $failure->retryable || $isFinal;
@@ -144,16 +145,28 @@ class SubmissionStateMachine
         } catch (Throwable $persistenceException) {
             $persistenceFailure = $this->failures->report($submission, $stage, $persistenceException, $attempt);
 
-            throw $this->failures->sanitizedException($persistenceFailure);
+            return $persistenceFailure;
         }
 
-        // Keep the existing queue retry flow, but never hand raw provider or
-        // infrastructure exceptions to the worker log or failed_jobs storage.
-        throw $this->failures->sanitizedException($failure);
+        return $failure;
     }
 
     public function markFailedFinal(Submission $submission, ProcessingStage $stage, Throwable $exception, int $attempt): void
     {
+        $described = $this->failures->describe($exception);
+        $submission->refresh();
+
+        if ($submission->isCompleted()) {
+            return;
+        }
+
+        if ($submission->isFailed()
+            && $submission->last_error_service === $described->service
+            && $submission->last_error_code === $described->errorCode
+            && (int) $submission->attempt_count >= $attempt) {
+            return;
+        }
+
         $failure = $this->failures->report($submission, $stage, $exception, $attempt);
 
         try {

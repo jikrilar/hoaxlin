@@ -11,5 +11,6 @@ final readonly class PipelineFailure
         public bool $retryable,
         public string $reference,
         public ?int $providerStatus = null,
+        public ?int $retryAfterSeconds = null,
     ) {}
 }

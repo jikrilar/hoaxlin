@@ -8,6 +8,7 @@ use App\Enums\InputType;
 use App\Exceptions\AiServiceException;
 use App\Models\Submission;
 use App\Services\Network\SafeExternalHttpClient;
+use App\Support\RetryAfter;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -41,7 +42,7 @@ class ArticleExtractor implements TextExtractor
 
         if ($response->failed()) {
             throw $response->serverError()
-                ? AiServiceException::transient('article', 'Situs berita sementara tidak tersedia.', $response->status())
+                ? AiServiceException::transient('article', 'Situs berita sementara tidak tersedia.', $response->status(), RetryAfter::seconds($response->header('Retry-After')))
                 : AiServiceException::permanent('article', 'Konten artikel tidak dapat diambil.', $response->status());
         }
 

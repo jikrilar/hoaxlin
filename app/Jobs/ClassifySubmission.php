@@ -38,6 +38,11 @@ class ClassifySubmission implements ShouldBeUnique, ShouldQueue
     {
         Cache::lock("submission:{$this->submissionId}:classify", 60)->block(5, function () use ($classifier, $state): void {
             $submission = Submission::findOrFail($this->submissionId);
+
+            if ($submission->isTerminal()) {
+                return;
+            }
+
             $existing = DetectionResult::where('submission_id', $submission->id)->first();
 
             if ($existing !== null) {
@@ -54,7 +59,7 @@ class ClassifySubmission implements ShouldBeUnique, ShouldQueue
                 $state->markClassified($submission, $classification, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000));
                 GenerateSubmissionExplanation::dispatch($submission->id)->onQueue('explanation');
             } catch (Throwable $exception) {
-                $state->markFailed($submission, ProcessingStage::Classifying, $exception, $this->attempts());
+                $this->handlePipelineFailure($submission, ProcessingStage::Classifying, $exception, $state, $this->tries, $this->backoff());
             }
         });
     }

@@ -5,6 +5,7 @@ namespace App\Services\Bert;
 use App\Contracts\Classifier;
 use App\DataObjects\Classification;
 use App\Exceptions\AiServiceException;
+use App\Support\RetryAfter;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
@@ -90,6 +91,7 @@ class BertClassifier implements Classifier
                 service: self::SERVICE,
                 message: "Layanan BERT mengembalikan galat server ({$status}).",
                 statusCode: $status,
+                retryAfterSeconds: RetryAfter::seconds($response->header('Retry-After')),
                 previous: $previous,
             ),
             default => AiServiceException::permanent(
@@ -103,8 +105,6 @@ class BertClassifier implements Classifier
 
     private function retryAfter(Response $response): ?int
     {
-        $header = $response->header('Retry-After');
-
-        return is_numeric($header) ? (int) $header : null;
+        return RetryAfter::seconds($response->header('Retry-After'));
     }
 }

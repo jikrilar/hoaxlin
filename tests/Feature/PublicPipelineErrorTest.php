@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Enums\ProcessingStage;
 use App\Exceptions\AiServiceException;
-use App\Exceptions\SanitizedPipelineException;
 use App\Models\Submission;
 use App\Models\User;
 use App\Services\Pipeline\PipelineFailureReporter;
@@ -24,7 +23,7 @@ class PublicPipelineErrorTest extends TestCase
 
     private const SECRET = 'sk-proj-FAKE-SECRET Authorization: Bearer token-123 C:\\private\\media.mp4 SELECT * FROM users';
 
-    public function test_generic_exception_is_stored_and_rethrown_only_as_a_safe_error(): void
+    public function test_generic_exception_is_stored_and_returned_only_as_a_safe_failure(): void
     {
         $submission = $this->submission();
         $loggedContext = null;
@@ -37,18 +36,15 @@ class PublicPipelineErrorTest extends TestCase
                 return $message === 'Submission pipeline failure.';
             });
 
-        try {
-            app(SubmissionStateMachine::class)->markFailed(
-                $submission,
-                ProcessingStage::Classifying,
-                new RuntimeException(self::SECRET),
-                2,
-            );
-            $this->fail('A sanitized pipeline exception should be thrown to the worker.');
-        } catch (SanitizedPipelineException $exception) {
-            $this->assertSame(PipelineFailureReporter::UNKNOWN_ERROR, $exception->errorCode);
-            $this->assertStringNotContainsString(self::SECRET, $exception->getMessage());
-        }
+        $failure = app(SubmissionStateMachine::class)->markFailed(
+            $submission,
+            ProcessingStage::Classifying,
+            new RuntimeException(self::SECRET),
+            2,
+        );
+
+        $this->assertSame(PipelineFailureReporter::UNKNOWN_ERROR, $failure->errorCode);
+        $this->assertStringNotContainsString(self::SECRET, $failure->publicMessage);
 
         $submission->refresh();
         $event = $submission->processingEvents()->latest('id')->firstOrFail();
