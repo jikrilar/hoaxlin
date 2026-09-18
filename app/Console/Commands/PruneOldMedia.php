@@ -4,47 +4,69 @@ namespace App\Console\Commands;
 
 use App\Models\Submission;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class PruneOldMedia extends Command
 {
-    protected $signature = 'media:prune {--days=30 : Days to retain media} {--dry-run : Show what would be deleted}';
+    protected $signature = 'media:prune
+        {--hours= : Hours to retain media after terminal processing}
+        {--dry-run : Show what would be deleted}';
 
     protected $description = 'Delete old private media files for retention compliance (C12)';
 
     public function handle(): int
     {
-        $days = (int) $this->option('days');
+        $hours = max(1, (int) ($this->option('hours') ?? config('data_retention.media_hours', 24)));
         $dryRun = (bool) $this->option('dry-run');
-        $cutoff = now()->subDays($days);
+        $cutoff = now()->subHours($hours);
 
         $query = Submission::whereNotNull('media_path')
-            ->where('created_at', '<', $cutoff);
+            ->whereIn('status', ['completed', 'failed'])
+            ->whereNotNull('processing_completed_at')
+            ->where('processing_completed_at', '<=', $cutoff);
 
         $count = $query->count();
-        $this->info("Found {$count} submissions with media older than {$days} days (before {$cutoff->toDateString()}).");
+        $this->info("Found {$count} terminal submissions with media older than {$hours} hours.");
 
         if ($dryRun) {
             $this->info('Dry run — no files deleted.');
+
             return self::SUCCESS;
         }
 
         $disk = config('filesystems.media_disk', config('filesystems.default', 'local'));
-        $deleted = 0;
-        $query->chunkById(100, function ($submissions) use (&$deleted, $disk) {
+        $deletedFiles = 0;
+        $clearedRecords = 0;
+        $failedFiles = 0;
+        $query->chunkById(100, function ($submissions) use (&$deletedFiles, &$clearedRecords, &$failedFiles, $disk) {
             foreach ($submissions as $submission) {
                 $path = $submission->media_path;
                 if ($path && Storage::disk($disk)->exists($path)) {
-                    Storage::disk($disk)->delete($path);
-                    $deleted++;
+                    if (! Storage::disk($disk)->delete($path)) {
+                        $failedFiles++;
+                        $this->error("Failed to prune media for submission {$submission->getKey()}.");
+
+                        continue;
+                    }
+
+                    $deletedFiles++;
                 }
-                // Keep the submission record but clear the path for audit
+
                 $submission->update(['media_path' => null]);
+                $clearedRecords++;
             }
         });
 
-        $this->info("Pruned {$deleted} media files.");
+        $this->info("Pruned {$deletedFiles} media files and cleared {$clearedRecords} media references.");
+        Log::info('Media retention pruning completed.', [
+            'retention_hours' => $hours,
+            'cutoff' => $cutoff->toIso8601String(),
+            'deleted_files' => $deletedFiles,
+            'cleared_records' => $clearedRecords,
+            'failed_files' => $failedFiles,
+        ]);
 
-        return self::SUCCESS;
+        return $failedFiles === 0 ? self::SUCCESS : self::FAILURE;
     }
 }

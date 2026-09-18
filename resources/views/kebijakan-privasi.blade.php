@@ -14,7 +14,7 @@
 
         <div class="glass-card" style="padding:3rem;" role="main">
             <h1 style="font-size:2rem; font-weight:800; margin-bottom:0.5rem;">Kebijakan Privasi</h1>
-            <p style="color:var(--color-text-muted); font-size:0.9375rem; margin-bottom:2.5rem;">Terakhir diperbarui: 25 Juli 2026</p>
+            <p style="color:var(--color-text-muted); font-size:0.9375rem; margin-bottom:2.5rem;">Terakhir diperbarui: 18 September 2026</p>
 
             <div style="display:flex; flex-direction:column; gap:2rem; color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.8;">
 
@@ -74,14 +74,14 @@
 
                 <section aria-labelledby="retention-heading">
                     <h2 id="retention-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:700; margin-bottom:0.75rem;">5. Retensi Data</h2>
-                    <p>File media (gambar/video) yang diunggah akan dihapus secara otomatis setelah proses analisis selesai atau paling lambat 24 jam setelah unggahan. Data teks dan hasil analisis disimpan selama akun aktif atau hingga pengguna meminta penghapusan.</p>
+                    <p>File media asli (gambar/video) dihapus otomatis maksimal 24 jam setelah pemrosesan mencapai status selesai atau gagal. Data teks dan hasil analisis tetap tersedia dalam riwayat selama akun aktif.</p>
                 </section>
 
                 <div class="divider"></div>
 
                 <section aria-labelledby="rights-heading">
                     <h2 id="rights-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:700; margin-bottom:0.75rem;">6. Hak Pengguna</h2>
-                    <p>Pengguna terdaftar berhak untuk meminta penghapusan seluruh data riwayat melalui pengaturan akun. Untuk pertanyaan lebih lanjut mengenai privasi, hubungi kami melalui form di halaman Tentang.</p>
+                    <p>Pengguna terdaftar dapat menghapus akun melalui pengaturan akun. Penghapusan ini bersifat permanen dan menghapus akun, seluruh riwayat submission, hasil deteksi, feedback, serta file media terkait. Untuk pertanyaan lebih lanjut mengenai privasi, hubungi kami melalui form di halaman Tentang.</p>
                 </section>
 
                 <div class="warning-box" role="note">
