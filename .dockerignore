@@ -9,6 +9,7 @@
 !artisan
 !composer.json
 !composer.lock
+!docker-compose.yml
 !package.json
 !package-lock.json
 !phpunit.xml

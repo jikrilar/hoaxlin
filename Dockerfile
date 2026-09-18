@@ -109,6 +109,7 @@ FROM composer-production AS test
 
 COPY --from=frontend-build /build/public/build/ ./public/build/
 COPY phpunit.xml ./
+COPY docker-compose.yml ./
 COPY tests/ ./tests/
 
 RUN --mount=type=cache,target=/tmp/composer/cache \

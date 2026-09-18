@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PasswordUpdateRequest;
 use App\Http\Requests\ProfileDeleteRequest;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\Accounts\DeleteUserAccount;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -44,12 +45,12 @@ class ProfileController extends Controller
         return back()->with('success', 'Kata sandi berhasil diperbarui.');
     }
 
-    public function destroy(ProfileDeleteRequest $request): RedirectResponse
+    public function destroy(ProfileDeleteRequest $request, DeleteUserAccount $deleteUserAccount): RedirectResponse
     {
         $user = $request->user();
 
         Auth::logout();
-        $user->delete();
+        $deleteUserAccount->handle($user);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

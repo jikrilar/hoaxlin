@@ -90,7 +90,7 @@ Verifikasi:
 
 Test keamanan extractor artikel/direct media lulus 18 test dengan 23 assertions. Full suite pada image Docker target `test` lulus 118 test dengan 432 assertions, 4 real-BERT test skipped karena service tidak tersedia, dan 0 failed.
 
-### [ ] P0.5 Delete account penuh, retensi media 24 jam, dan scheduler aktif
+### [x] P0.5 Delete account penuh, retensi media 24 jam, dan scheduler aktif
 
 Masalah:
 
@@ -102,15 +102,15 @@ Hapus submission, result, feedback, dan media milik user ketika akun dihapus. Ha
 
 Acceptance criteria:
 
-- [ ] Delete account menghapus seluruh data/history milik user tanpa anonymization diam-diam.
-- [ ] Media asli dihapus maksimal 24 jam setelah processing completed atau failed.
-- [ ] Data teks/result mengikuti lifecycle history selama submission masih ada.
-- [ ] Scheduler aktif pada workflow deployment.
-- [ ] Cleanup idempoten dan dapat diaudit.
+- [x] Delete account menghapus seluruh data/history milik user tanpa anonymization diam-diam.
+- [x] Media asli dihapus maksimal 24 jam setelah processing completed atau failed.
+- [x] Data teks/result mengikuti lifecycle history selama submission masih ada.
+- [x] Scheduler aktif pada workflow deployment.
+- [x] Cleanup idempoten dan dapat diaudit.
 
 Verifikasi:
 
-Jalankan test cascade delete, penghapusan history/media, boundary 24 jam, cleanup berulang, dan smoke test scheduler.
+Targeted regression P0.1-P0.5 lulus 60 test dengan 251 assertions. Full suite pada image Docker target `test` lulus 123 test dengan 482 assertions, 4 real-BERT test skipped karena service tidak tersedia, dan 0 failed. `docker compose config` valid dan service scheduler berjalan healthy tanpa host-port binding.
 
 ### [ ] P0.6 Sanitasi exception dan pemisahan error publik/internal
 
