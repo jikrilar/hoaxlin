@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Contracts\Classifier;
 use App\Contracts\Explainer;
+use App\Contracts\HostResolver;
 use App\Contracts\Translator;
 use App\Models\Dataset;
 use App\Models\Submission;
@@ -18,6 +19,8 @@ use App\Services\Extraction\OpenAiVideoExtractor;
 use App\Services\Extraction\StoredTextExtractor;
 use App\Services\Extraction\TextExtractorResolver;
 use App\Services\Extraction\TextInputExtractor;
+use App\Services\Network\SafeExternalHttpClient;
+use App\Services\Network\SystemHostResolver;
 use App\Services\OpenAI\OpenAiExplainer;
 use App\Services\OpenAI\OpenAiQuota;
 use App\Services\Pipeline\ProcessingEventRecorder;
@@ -36,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(CircuitBreaker::class, fn ($app, array $parameters) => new CircuitBreaker($parameters['service'] ?? 'bert'));
         $this->app->singleton(OpenAiQuota::class, fn () => new OpenAiQuota);
+        $this->app->singleton(HostResolver::class, SystemHostResolver::class);
 
         $this->app->singleton(Classifier::class, function ($app): Classifier {
             $http = new BertClassifier;
@@ -62,7 +66,9 @@ class AppServiceProvider extends ServiceProvider
         // This makes the extractor pipeline extensible without editing the resolver wiring.
         $this->app->singleton(StoredTextExtractor::class, fn () => new StoredTextExtractor);
         $this->app->singleton(TextInputExtractor::class, fn () => new TextInputExtractor);
-        $this->app->singleton(ArticleExtractor::class, fn () => new ArticleExtractor);
+        $this->app->singleton(ArticleExtractor::class, fn ($app) => new ArticleExtractor(
+            $app->make(SafeExternalHttpClient::class),
+        ));
         $this->app->singleton(OpenAiImageExtractor::class, function ($app) {
             $quota = $app->make(OpenAiQuota::class);
 
@@ -71,7 +77,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(OpenAiVideoExtractor::class, function ($app) {
             $quota = $app->make(OpenAiQuota::class);
 
-            return new OpenAiVideoExtractor(new CircuitBreaker('openai'), $quota);
+            return new OpenAiVideoExtractor(
+                new CircuitBreaker('openai'),
+                $quota,
+                $app->make(SafeExternalHttpClient::class),
+            );
         });
         $this->app->tag([
             StoredTextExtractor::class,

@@ -7,12 +7,15 @@ use App\DataObjects\ExtractedText;
 use App\Enums\InputType;
 use App\Exceptions\AiServiceException;
 use App\Models\Submission;
+use App\Services\Network\SafeExternalHttpClient;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class ArticleExtractor implements TextExtractor
 {
+    public function __construct(private readonly SafeExternalHttpClient $http) {}
+
     public function supports(Submission $submission): bool
     {
         return $submission->input_type === InputType::Url->value && filled($submission->source_url);
@@ -21,7 +24,6 @@ class ArticleExtractor implements TextExtractor
     public function extract(Submission $submission): ExtractedText
     {
         $url = (string) $submission->source_url;
-        $this->guardPublicUrl($url);
         $key = 'article:1.0:'.hash('sha256', $url);
 
         if ($cached = Cache::get($key)) {
@@ -29,28 +31,13 @@ class ArticleExtractor implements TextExtractor
         }
 
         try {
-            $response = Http::connectTimeout(3)
+            $download = $this->http->get($url, Http::connectTimeout(3)
                 ->timeout(15)
-                ->withHeaders(['User-Agent' => 'hoaxlin.id article verifier'])
-                ->withOptions(['allow_redirects' => ['max' => 3, 'track_redirects' => true]])
-                ->get($url);
+                ->withHeaders(['User-Agent' => 'hoaxlin.id article verifier']), 'article');
         } catch (ConnectionException $exception) {
             throw AiServiceException::transient('article', 'Situs berita tidak dapat dihubungi.', previous: $exception);
         }
-
-        // SSRF: verify all redirect targets were public (C11)
-        if (method_exists($response, 'transferStats') && $response->transferStats) {
-            $stats = $response->transferStats->getHandlerStats();
-            $redirectHistory = $stats['redirect_url'] ?? null;
-            if (is_string($redirectHistory) && $redirectHistory !== '') {
-                $this->guardPublicUrl($redirectHistory);
-            }
-        }
-        // Also verify the effective URI if available
-        $effectiveUri = method_exists($response, 'effectiveUri') ? $response->effectiveUri() : null;
-        if (is_string($effectiveUri) && $effectiveUri !== $url) {
-            $this->guardPublicUrl($effectiveUri);
-        }
+        $response = $download['response'];
 
         if ($response->failed()) {
             throw $response->serverError()
@@ -69,7 +56,7 @@ class ArticleExtractor implements TextExtractor
             throw AiServiceException::permanent('article', 'Artikel terlalu besar (maks 2MB).');
         }
 
-        $text = $this->extractReadableText($body, $url);
+        $text = $this->extractReadableText($body, $download['url']);
         if (mb_strlen($text) < 50) {
             throw AiServiceException::permanent('article', 'Teks artikel terlalu pendek untuk dianalisis.');
         }
@@ -92,7 +79,7 @@ class ArticleExtractor implements TextExtractor
         $prev = libxml_use_internal_errors(true);
 
         try {
-            $doc = new \DOMDocument();
+            $doc = new \DOMDocument;
             // Prepend XML encoding to handle UTF-8
             $loaded = $doc->loadHTML('<?xml encoding="utf-8" ?>'.$html, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET);
             if (! $loaded) {
@@ -160,34 +147,6 @@ class ArticleExtractor implements TextExtractor
             libxml_use_internal_errors($prev);
 
             return trim(preg_replace('/\s+/u', ' ', strip_tags($html)) ?? '');
-        }
-    }
-
-    private function guardPublicUrl(string $url): void
-    {
-        $host = parse_url($url, PHP_URL_HOST);
-        if (! is_string($host) || $host === '') {
-            throw AiServiceException::permanent('article', 'URL tidak valid.');
-        }
-
-        // Direct IP check (no DNS lookup needed)
-        if (filter_var($host, FILTER_VALIDATE_IP)) {
-            if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-                throw AiServiceException::permanent('article', 'URL privat atau tidak valid tidak diizinkan.');
-            }
-            return;
-        }
-
-        // DNS rebinding protection: resolve and check all IPs
-        $ips = gethostbynamel($host);
-        if ($ips === false || $ips === []) {
-            throw AiServiceException::permanent('article', 'Host tidak dapat di-resolve.');
-        }
-
-        foreach ($ips as $ip) {
-            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-                throw AiServiceException::permanent('article', 'URL mengarah ke jaringan privat.');
-            }
         }
     }
 }

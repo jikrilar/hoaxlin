@@ -91,6 +91,10 @@ return [
         'prompt_version' => env('OPENAI_PROMPT_VERSION', '1.0'),
     ],
 
+    'external_http' => [
+        'max_redirects' => (int) env('EXTERNAL_HTTP_MAX_REDIRECTS', 3),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
