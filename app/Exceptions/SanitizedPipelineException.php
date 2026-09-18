@@ -12,6 +12,7 @@ final class SanitizedPipelineException extends RuntimeException
         public readonly string $errorCode,
         public readonly bool $retryable,
         public readonly ?int $providerStatus = null,
+        public readonly ?int $retryAfterSeconds = null,
     ) {
         parent::__construct($publicMessage);
     }

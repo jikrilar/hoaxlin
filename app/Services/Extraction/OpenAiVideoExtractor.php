@@ -10,6 +10,7 @@ use App\Models\Submission;
 use App\Services\Network\SafeExternalHttpClient;
 use App\Services\OpenAI\OpenAiQuota;
 use App\Services\Resilience\CircuitBreaker;
+use App\Support\RetryAfter;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -85,7 +86,7 @@ class OpenAiVideoExtractor implements TextExtractor
                 $this->breaker->recordFailure();
             }
             throw $response->serverError() || $response->status() === 429
-                ? AiServiceException::transient('openai', 'Layanan transkripsi sementara tidak tersedia.', $response->status())
+                ? AiServiceException::transient('openai', 'Layanan transkripsi sementara tidak tersedia.', $response->status(), RetryAfter::seconds($response->header('Retry-After')))
                 : AiServiceException::permanent('openai', 'Layanan transkripsi menolak media.', $response->status());
         }
 
@@ -138,7 +139,7 @@ class OpenAiVideoExtractor implements TextExtractor
 
         if ($response->failed()) {
             throw $response->serverError()
-                ? AiServiceException::transient('openai', 'Video URL sementara tidak tersedia.', $response->status())
+                ? AiServiceException::transient('openai', 'Video URL sementara tidak tersedia.', $response->status(), RetryAfter::seconds($response->header('Retry-After')))
                 : AiServiceException::permanent('openai', 'Video URL tidak dapat diakses.', $response->status());
         }
 

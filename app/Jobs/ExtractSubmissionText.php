@@ -7,7 +7,6 @@ use App\Jobs\Concerns\HandlesPipelineFailures;
 use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\Submission;
 use App\Services\Extraction\TextExtractorResolver;
-use App\Services\Pipeline\ProcessingEventRecorder;
 use App\Services\Pipeline\SubmissionStateMachine;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -33,10 +32,14 @@ class ExtractSubmissionText implements ShouldBeUnique, ShouldQueue
         return [10, 60, 180];
     }
 
-    public function handle(TextExtractorResolver $resolver, ProcessingEventRecorder $events, SubmissionStateMachine $state): void
+    public function handle(TextExtractorResolver $resolver, SubmissionStateMachine $state): void
     {
         Cache::lock("submission:{$this->submissionId}:extract", 90)->block(5, function () use ($resolver, $state): void {
             $submission = Submission::findOrFail($this->submissionId);
+
+            if ($submission->isTerminal()) {
+                return;
+            }
 
             if (filled($submission->content_hash)) {
                 $this->continueToTranslation($submission->id);
@@ -52,7 +55,7 @@ class ExtractSubmissionText implements ShouldBeUnique, ShouldQueue
                 $state->markExtracted($submission, $extracted->contentHash(), $extracted->provider, $extracted->cached, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000), $extracted->normalized());
                 $this->continueToTranslation($submission->id);
             } catch (Throwable $exception) {
-                $state->markFailed($submission, ProcessingStage::Extracting, $exception, $this->attempts());
+                $this->handlePipelineFailure($submission, ProcessingStage::Extracting, $exception, $state, $this->tries, $this->backoff());
             }
         });
     }

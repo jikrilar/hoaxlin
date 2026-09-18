@@ -135,7 +135,7 @@ Docker test image berhasil dibuild. Full suite pada image Docker lulus 129 test 
 
 ## P1
 
-### [ ] P1.1 Retry policy error permanen versus retryable
+### [x] P1.1 Retry policy error permanen versus retryable
 
 Masalah:
 
@@ -147,14 +147,17 @@ Satukan failure handling agar error permanen langsung terminal dan error transie
 
 Acceptance criteria:
 
-- [ ] Error permanen tidak diulang.
-- [ ] Error koneksi, 429, dan 5xx diulang sesuai policy.
-- [ ] Status tidak berubah dari failed kembali ke processing untuk error permanen.
-- [ ] Attempt dan outcome tercatat konsisten.
+- [x] Error permanen tidak diulang.
+- [x] Error koneksi, timeout, 429, dan 5xx diulang sesuai policy.
+- [x] `Retry-After` provider digunakan bila tersedia dan dibatasi secara aman.
+- [x] Error transient menjadi terminal failed setelah batas attempt.
+- [x] Status tidak berubah dari failed kembali ke processing untuk error permanen.
+- [x] Attempt dan outcome tercatat konsisten.
+- [x] Error worker dan pesan publik tetap tersanitasi.
 
 Verifikasi:
 
-Jalankan test worker untuk permanent error, transient error, max attempts, timeout, dan failed jobs.
+Lulus 9 test policy retry dengan 51 assertions serta test sanitasi P0.6. Full Docker suite lulus 138 test dengan 575 assertions, 4 real-BERT test di-skip pada suite terisolasi, dan 0 failed. Integrasi real BERT terpisah lulus 4 test dengan 25 assertions. `docker compose config --quiet`, Pint untuk seluruh file yang disentuh, dan `git diff --check` lulus.
 
 ### [ ] P1.2 Graceful degradation explanation
 

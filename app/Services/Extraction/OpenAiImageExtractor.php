@@ -7,12 +7,13 @@ use App\DataObjects\ExtractedText;
 use App\Enums\InputType;
 use App\Exceptions\AiServiceException;
 use App\Models\Submission;
+use App\Services\OpenAI\OpenAiQuota;
+use App\Services\Resilience\CircuitBreaker;
+use App\Support\RetryAfter;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use App\Services\OpenAI\OpenAiQuota;
-use App\Services\Resilience\CircuitBreaker;
 
 class OpenAiImageExtractor implements TextExtractor
 {
@@ -66,7 +67,7 @@ class OpenAiImageExtractor implements TextExtractor
                 $this->breaker->recordFailure();
             }
             throw $response->serverError() || $response->status() === 429
-                ? AiServiceException::transient('openai', 'Layanan OCR sementara tidak tersedia.', $response->status())
+                ? AiServiceException::transient('openai', 'Layanan OCR sementara tidak tersedia.', $response->status(), RetryAfter::seconds($response->header('Retry-After')))
                 : AiServiceException::permanent('openai', 'Layanan OCR menolak gambar.', $response->status());
         }
 

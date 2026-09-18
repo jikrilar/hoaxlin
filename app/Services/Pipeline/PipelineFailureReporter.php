@@ -9,6 +9,8 @@ use App\Exceptions\SanitizedPipelineException;
 use App\Models\Submission;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Queue\TimeoutExceededException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -65,6 +67,10 @@ class PipelineFailureReporter
             $context['provider_status'] = $failure->providerStatus;
         }
 
+        if ($failure->retryAfterSeconds !== null) {
+            $context['retry_after_seconds'] = $failure->retryAfterSeconds;
+        }
+
         // Never attach the exception, message, trace, payload, headers, or
         // connection details: any of them may contain credentials or user data.
         Log::error('Submission pipeline failure.', $context);
@@ -86,6 +92,7 @@ class PipelineFailureReporter
                 $exception->retryable,
                 (string) Str::uuid(),
                 $this->safeHttpStatus($exception->providerStatus),
+                $this->safeRetryAfter($exception->retryAfterSeconds),
             );
         }
 
@@ -101,7 +108,12 @@ class PipelineFailureReporter
                 $this->safeService($exception->service),
                 $exception->retryable,
                 $this->safeHttpStatus($exception->statusCode),
+                $this->safeRetryAfter($exception->retryAfterSeconds),
             );
+        }
+
+        if ($this->chainContains($exception, fn (Throwable $item): bool => $item instanceof ConnectionException || $item instanceof TimeoutExceededException)) {
+            return $this->failure(self::DEPENDENCY_UNAVAILABLE, 'pipeline', true);
         }
 
         if ($this->chainContains($exception, fn (Throwable $item): bool => $item instanceof QueryException || $item instanceof PDOException)) {
@@ -127,6 +139,7 @@ class PipelineFailureReporter
             $failure->errorCode,
             $failure->retryable,
             $failure->providerStatus,
+            $failure->retryAfterSeconds,
         );
     }
 
@@ -135,8 +148,13 @@ class PipelineFailureReporter
         return self::PUBLIC_MESSAGES[$errorCode ?? ''] ?? self::PUBLIC_MESSAGES[self::UNKNOWN_ERROR];
     }
 
-    private function failure(string $code, string $service, bool $retryable = false, ?int $providerStatus = null): PipelineFailure
-    {
+    private function failure(
+        string $code,
+        string $service,
+        bool $retryable = false,
+        ?int $providerStatus = null,
+        ?int $retryAfterSeconds = null,
+    ): PipelineFailure {
         return new PipelineFailure(
             self::PUBLIC_MESSAGES[$code],
             $service,
@@ -144,6 +162,7 @@ class PipelineFailureReporter
             $retryable,
             (string) Str::uuid(),
             $providerStatus,
+            $retryAfterSeconds,
         );
     }
 
@@ -166,6 +185,13 @@ class PipelineFailureReporter
     private function safeHttpStatus(?int $status): ?int
     {
         return $status !== null && $status >= 100 && $status <= 599 ? $status : null;
+    }
+
+    private function safeRetryAfter(?int $seconds): ?int
+    {
+        return $seconds !== null && $seconds > 0
+            ? min($seconds, max(1, (int) config('pipeline.retry.max_delay_seconds', 900)))
+            : null;
     }
 
     private function safeExceptionClass(Throwable $exception): string

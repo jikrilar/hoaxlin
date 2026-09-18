@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Enums\ProcessingStage;
+use App\Jobs\Concerns\HandlesPipelineFailures;
 use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\Submission;
 use App\Services\Pipeline\SubmissionStateMachine;
@@ -15,7 +16,7 @@ use Illuminate\Queue\SerializesModels;
 
 class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UniqueSubmissionStage;
+    use Dispatchable, HandlesPipelineFailures, InteractsWithQueue, Queueable, SerializesModels, UniqueSubmissionStage;
 
     public int $tries = 3;
 
@@ -30,15 +31,22 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
     public function handle(SubmissionStateMachine $state): void
     {
+        $this->submission->refresh();
+        if ($this->submission->isTerminal()) {
+            return;
+        }
+
         try {
             ExtractSubmissionText::dispatch($this->submission->getKey())
                 ->onQueue(in_array($this->submission->input_type, ['image', 'video'], true) ? 'extract-media' : 'extract-text');
         } catch (\Throwable $exception) {
-            $state->markFailed(
+            $this->handlePipelineFailure(
                 $this->submission,
                 ProcessingStage::Queued,
                 $exception,
-                $this->attempts(),
+                $state,
+                $this->tries,
+                config('pipeline.retry.backoff', [5, 15, 60]),
             );
         }
     }

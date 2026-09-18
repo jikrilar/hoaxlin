@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Contracts\Translator;
 use App\Enums\EventOutcome;
 use App\Enums\ProcessingStage;
+use App\Jobs\Concerns\HandlesPipelineFailures;
 use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\Submission;
 use App\Services\Pipeline\ProcessingEventRecorder;
@@ -20,7 +21,7 @@ use Throwable;
 
 class TranslateSubmissionText implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UniqueSubmissionStage;
+    use Dispatchable, HandlesPipelineFailures, InteractsWithQueue, Queueable, SerializesModels, UniqueSubmissionStage;
 
     public int $tries = 3;
 
@@ -37,6 +38,10 @@ class TranslateSubmissionText implements ShouldBeUnique, ShouldQueue
     {
         Cache::lock("submission:{$this->submissionId}:translate", 75)->block(5, function () use ($translator, $state, $events): void {
             $submission = Submission::findOrFail($this->submissionId);
+
+            if ($submission->isTerminal()) {
+                return;
+            }
 
             if (filled($submission->source_language)) {
                 $this->continueToClassification($submission->id);
@@ -75,7 +80,7 @@ class TranslateSubmissionText implements ShouldBeUnique, ShouldQueue
                 );
                 $this->continueToClassification($submission->id);
             } catch (Throwable $exception) {
-                $state->markFailed($submission, ProcessingStage::Translating, $exception, $this->attempts());
+                $this->handlePipelineFailure($submission, ProcessingStage::Translating, $exception, $state, $this->tries, $this->backoff());
             }
         });
     }

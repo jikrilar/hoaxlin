@@ -7,6 +7,7 @@ use App\DataObjects\Classification;
 use App\Enums\DetectionLabel;
 use App\Enums\ExplanationStatus;
 use App\Enums\ProcessingStage;
+use App\Jobs\Concerns\HandlesPipelineFailures;
 use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\Submission;
 use App\Services\Pipeline\ProcessingEventRecorder;
@@ -22,7 +23,7 @@ use Throwable;
 
 class GenerateSubmissionExplanation implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UniqueSubmissionStage;
+    use Dispatchable, HandlesPipelineFailures, InteractsWithQueue, Queueable, SerializesModels, UniqueSubmissionStage;
 
     public int $tries = 3;
 
@@ -39,6 +40,11 @@ class GenerateSubmissionExplanation implements ShouldBeUnique, ShouldQueue
     {
         Cache::lock("submission:{$this->submissionId}:explain", 75)->block(5, function () use ($explainer, $state): void {
             $submission = Submission::with('detectionResult')->findOrFail($this->submissionId);
+
+            if ($submission->isTerminal()) {
+                return;
+            }
+
             $result = $submission->detectionResult;
 
             if ($result === null) {
@@ -65,7 +71,7 @@ class GenerateSubmissionExplanation implements ShouldBeUnique, ShouldQueue
                 $state->markExplained($submission, $explanation, $this->attempts());
                 $state->markCompleted($submission, $this->attempts());
             } catch (Throwable $exception) {
-                $state->markFailed($submission, ProcessingStage::Explaining, $exception, $this->attempts());
+                $this->handlePipelineFailure($submission, ProcessingStage::Explaining, $exception, $state, $this->tries, $this->backoff());
             }
         });
     }
