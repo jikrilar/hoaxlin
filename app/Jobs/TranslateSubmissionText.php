@@ -45,9 +45,9 @@ class TranslateSubmissionText implements ShouldBeUnique, ShouldQueue
             }
 
             $started = hrtime(true);
-            $state->markProcessing($submission, ProcessingStage::Translating, $this->attempts());
 
             try {
+                $state->markProcessing($submission, ProcessingStage::Translating, $this->attempts());
                 $translation = $translator->translate((string) $submission->extracted_text);
                 $submission->update([
                     'source_language' => $translation->sourceLanguage,

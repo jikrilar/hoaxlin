@@ -45,15 +45,14 @@ class ExtractSubmissionText implements ShouldBeUnique, ShouldQueue
             }
 
             $started = hrtime(true);
-            $state->markProcessing($submission, ProcessingStage::Extracting, $this->attempts());
 
             try {
+                $state->markProcessing($submission, ProcessingStage::Extracting, $this->attempts());
                 $extracted = $resolver->resolve($submission)->extract($submission);
                 $state->markExtracted($submission, $extracted->contentHash(), $extracted->provider, $extracted->cached, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000), $extracted->normalized());
                 $this->continueToTranslation($submission->id);
             } catch (Throwable $exception) {
                 $state->markFailed($submission, ProcessingStage::Extracting, $exception, $this->attempts());
-                throw $exception;
             }
         });
     }

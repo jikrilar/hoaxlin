@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ProcessingStage;
 use App\Models\Submission;
+use App\Services\Pipeline\PipelineFailureReporter;
 use App\Services\SubmissionAccess;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -13,7 +14,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DeteksiController extends Controller
 {
-    public function __construct(private readonly SubmissionAccess $access) {}
+    public function __construct(
+        private readonly SubmissionAccess $access,
+        private readonly PipelineFailureReporter $failures,
+    ) {}
 
     // ── Show Results Page ─────────────────────────────────────────────────────
     public function hasil(Request $request, string $id): View
@@ -26,7 +30,11 @@ class DeteksiController extends Controller
             ? $submission->feedbacks->firstWhere('user_id', auth()->id())
             : null;
 
-        return view('hasil', compact('submission', 'result', 'feedback'));
+        $failureReason = $submission->isFailed()
+            ? $this->failures->publicMessageForCode($submission->last_error_code)
+            : null;
+
+        return view('hasil', compact('submission', 'result', 'feedback', 'failureReason'));
     }
 
     // ── Polling endpoint for progress bar (Livewire fallback + JS) ───────────
@@ -57,7 +65,9 @@ class DeteksiController extends Controller
             'progress' => $progress,
             'is_completed' => $submission->isCompleted(),
             'is_failed' => $submission->isFailed(),
-            'failure_reason' => $submission->failure_reason,
+            'failure_reason' => $submission->isFailed()
+                ? $this->failures->publicMessageForCode($submission->last_error_code)
+                : null,
             'label' => $result?->label,
             'confidence_score' => $result?->confidence_score,
         ]);

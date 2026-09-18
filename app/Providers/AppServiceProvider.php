@@ -23,6 +23,7 @@ use App\Services\Network\SafeExternalHttpClient;
 use App\Services\Network\SystemHostResolver;
 use App\Services\OpenAI\OpenAiExplainer;
 use App\Services\OpenAI\OpenAiQuota;
+use App\Services\Pipeline\PipelineFailureReporter;
 use App\Services\Pipeline\ProcessingEventRecorder;
 use App\Services\Pipeline\SubmissionStateMachine;
 use App\Services\Resilience\CircuitBreaker;
@@ -96,7 +97,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(SubmissionStateMachine::class, function ($app) {
-            return new SubmissionStateMachine($app->make(ProcessingEventRecorder::class));
+            return new SubmissionStateMachine(
+                $app->make(ProcessingEventRecorder::class),
+                $app->make(PipelineFailureReporter::class),
+            );
         });
     }
 
