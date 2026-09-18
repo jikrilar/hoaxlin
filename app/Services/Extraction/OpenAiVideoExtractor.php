@@ -7,18 +7,20 @@ use App\DataObjects\ExtractedText;
 use App\Enums\InputType;
 use App\Exceptions\AiServiceException;
 use App\Models\Submission;
+use App\Services\Network\SafeExternalHttpClient;
+use App\Services\OpenAI\OpenAiQuota;
+use App\Services\Resilience\CircuitBreaker;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use App\Services\OpenAI\OpenAiQuota;
-use App\Services\Resilience\CircuitBreaker;
 
 class OpenAiVideoExtractor implements TextExtractor
 {
     public function __construct(
         private readonly CircuitBreaker $breaker = new CircuitBreaker('openai'),
         private readonly OpenAiQuota $quota = new OpenAiQuota,
+        private readonly ?SafeExternalHttpClient $externalHttp = null,
     ) {}
 
     public function supports(Submission $submission): bool
@@ -113,8 +115,6 @@ class OpenAiVideoExtractor implements TextExtractor
      */
     private function downloadVideoSafely(string $url): array
     {
-        $this->guardPublicUrl($url);
-
         // Limit to direct video/audio URLs for now; YouTube etc. need dedicated handling
         $path = parse_url($url, PHP_URL_PATH) ?? '';
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
@@ -128,27 +128,18 @@ class OpenAiVideoExtractor implements TextExtractor
         }
 
         try {
-            $response = Http::connectTimeout(5)
+            $download = $this->externalHttp()->get($url, Http::connectTimeout(5)
                 ->timeout(30)
-                ->withHeaders(['User-Agent' => 'hoaxlin.id video verifier'])
-                ->withOptions(['allow_redirects' => ['max' => 3, 'track_redirects' => true]])
-                ->get($url);
+                ->withHeaders(['User-Agent' => 'hoaxlin.id video verifier']), 'openai');
         } catch (ConnectionException $exception) {
             throw AiServiceException::transient('openai', 'Video URL tidak dapat dihubungi.', previous: $exception);
         }
+        $response = $download['response'];
 
         if ($response->failed()) {
             throw $response->serverError()
                 ? AiServiceException::transient('openai', 'Video URL sementara tidak tersedia.', $response->status())
                 : AiServiceException::permanent('openai', 'Video URL tidak dapat diakses.', $response->status());
-        }
-
-        // Validate redirects for SSRF (check each redirect hop)
-        $redirectHistory = $response->transferStats?->getHandlerStats()['redirect_url'] ?? null;
-        // Fallback: check final host again
-        $finalHost = parse_url($response->effectiveUri() ?? $url, PHP_URL_HOST) ?? parse_url($url, PHP_URL_HOST);
-        if (is_string($finalHost)) {
-            $this->guardPublicUrl('http://'.$finalHost);
         }
 
         $contentType = strtolower((string) $response->header('Content-Type'));
@@ -178,7 +169,7 @@ class OpenAiVideoExtractor implements TextExtractor
         if (is_string($disposition) && preg_match('/filename="?([^";]+)"?/i', $disposition, $m)) {
             $filename = trim($m[1]);
         } else {
-            $filename = basename(parse_url($url, PHP_URL_PATH) ?? 'video.mp4');
+            $filename = basename(parse_url($download['url'], PHP_URL_PATH) ?? 'video.mp4');
             if (! str_contains($filename, '.')) {
                 $filename .= '.mp4';
             }
@@ -187,19 +178,8 @@ class OpenAiVideoExtractor implements TextExtractor
         return ['bytes' => $bytes, 'filename' => $filename];
     }
 
-    private function guardPublicUrl(string $url): void
+    private function externalHttp(): SafeExternalHttpClient
     {
-        $host = parse_url($url, PHP_URL_HOST);
-        if (! is_string($host) || $host === '') {
-            throw AiServiceException::permanent('openai', 'URL video tidak valid.');
-        }
-        if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false && filter_var($host, FILTER_VALIDATE_IP)) {
-            throw AiServiceException::permanent('openai', 'URL privat atau tidak valid tidak diizinkan.');
-        }
-        foreach (gethostbynamel($host) ?: [] as $ip) {
-            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-                throw AiServiceException::permanent('openai', 'URL mengarah ke jaringan privat.');
-            }
-        }
+        return $this->externalHttp ?? app(SafeExternalHttpClient::class);
     }
 }

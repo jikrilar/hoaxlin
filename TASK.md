@@ -69,7 +69,7 @@ Verifikasi:
 
 Targeted tests lulus 37 test dengan 184 assertions. Full suite pada image Docker target `test` lulus 100 test dengan 409 assertions, 4 real-BERT test skipped karena service tidak tersedia, dan 0 failed.
 
-### [ ] P0.4 SSRF redirect hardening pada artikel dan direct media URL
+### [x] P0.4 SSRF redirect hardening pada artikel dan direct media URL
 
 Masalah:
 
@@ -81,14 +81,14 @@ Validasi URL awal, setiap redirect, dan effective URI sebelum konten diambil. To
 
 Acceptance criteria:
 
-- [ ] Setiap redirect divalidasi sebelum request berikutnya.
-- [ ] Host yang tidak dapat di-resolve ditolak.
-- [ ] Alamat private/reserved/loopback/link-local ditolak.
-- [ ] Batas redirect, timeout, content type, dan body size tetap berlaku.
+- [x] Setiap redirect divalidasi sebelum request berikutnya.
+- [x] Host yang tidak dapat di-resolve ditolak.
+- [x] Alamat private/reserved/loopback/link-local ditolak.
+- [x] Batas redirect, timeout, content type, dan body size tetap berlaku.
 
 Verifikasi:
 
-Jalankan test extractor artikel dan direct media URL dengan HTTP fake untuk redirect publik, privat, DNS gagal, dan redirect berlebih.
+Test keamanan extractor artikel/direct media lulus 18 test dengan 23 assertions. Full suite pada image Docker target `test` lulus 118 test dengan 432 assertions, 4 real-BERT test skipped karena service tidak tersedia, dan 0 failed.
 
 ### [ ] P0.5 Delete account penuh, retensi media 24 jam, dan scheduler aktif
 
