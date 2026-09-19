@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Services\Media\MediaDurationProbe;
+use App\Services\Media\TranscriptionMediaContract;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,6 +16,8 @@ class StoreSubmissionRequest extends FormRequest
 
     public function rules(): array
     {
+        $media = app(TranscriptionMediaContract::class);
+
         return match ($this->input('input_type')) {
             'text' => [
                 'input_type' => ['required', Rule::in(['text', 'image', 'video', 'video_url', 'url'])],
@@ -25,9 +29,19 @@ class StoreSubmissionRequest extends FormRequest
             ],
             'video' => [
                 'input_type' => ['required', Rule::in(['text', 'image', 'video', 'video_url', 'url'])],
-                'media_file' => ['required', 'file', 'mimes:mp4,mov,avi,mkv,webm', 'max:204800'],
+                'media_file' => [
+                    'required',
+                    'file',
+                    'extensions:'.implode(',', $media->uploadExtensions()),
+                    'mimetypes:'.implode(',', $media->uploadMimeTypes()),
+                    'max:'.$media->maxKilobytes(),
+                ],
             ],
-            'video_url', 'url' => [
+            'video_url' => [
+                'input_type' => ['required', Rule::in(['text', 'image', 'video', 'video_url', 'url'])],
+                'source_url' => ['required', 'url:http,https', 'max:2048'],
+            ],
+            'url' => [
                 'input_type' => ['required', Rule::in(['text', 'image', 'video', 'video_url', 'url'])],
                 'source_url' => ['required', 'url:http,https', 'max:2048'],
             ],
@@ -40,6 +54,8 @@ class StoreSubmissionRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            $media = app(TranscriptionMediaContract::class);
+
             // Honeypot (C17)
             if (filled($this->input('website'))) {
                 $validator->errors()->add('website', 'Spam terdeteksi.');
@@ -66,6 +82,12 @@ class StoreSubmissionRequest extends FormRequest
                 }
             }
 
+            if ($this->input('input_type') === 'video_url' && filled($this->input('source_url'))) {
+                if ($message = $media->directUrlError((string) $this->input('source_url'))) {
+                    $validator->errors()->add('source_url', $message);
+                }
+            }
+
             $file = $this->file('media_file');
             if (! $file) {
                 return;
@@ -79,31 +101,22 @@ class StoreSubmissionRequest extends FormRequest
                 }
             }
 
-            // Video duration guard: use file size as proxy if ffprobe not available
             if ($this->input('input_type') === 'video') {
-                if ($file->getSize() > 200 * 1024 * 1024) {
-                    $validator->errors()->add('media_file', 'File video terlalu besar.');
+                if ($file->getSize() > $media->maxBytes()) {
+                    $validator->errors()->add('media_file', 'Ukuran media melebihi batas transkripsi.');
                 }
-                // If ffprobe is available, check duration (max 5 minutes)
-                $duration = $this->probeVideoDuration($file->getRealPath());
-                if ($duration !== null && $duration > 300) {
-                    $validator->errors()->add('media_file', 'Durasi video maksimal 5 menit.');
+
+                $mimeType = $file->getMimeType() ?: $file->getClientMimeType();
+                if (! $media->isUploadCompatible($file->getClientOriginalName(), $mimeType)) {
+                    $validator->errors()->add('media_file', 'Extension dan MIME media tidak kompatibel.');
+                }
+
+                $duration = app(MediaDurationProbe::class)->probePath($file->getRealPath());
+                if ($duration !== null && $duration > $media->maxDurationSeconds()) {
+                    $validator->errors()->add('media_file', 'Durasi media melebihi batas transkripsi.');
                 }
             }
         });
-    }
-
-    private function probeVideoDuration(string $path): ?float
-    {
-        $ffprobe = trim((string) shell_exec('which ffprobe 2>/dev/null'));
-        if ($ffprobe === '' || ! is_file($path)) {
-            return null;
-        }
-
-        $cmd = escapeshellcmd($ffprobe).' -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 '.escapeshellarg($path).' 2>/dev/null';
-        $output = trim((string) shell_exec($cmd));
-
-        return is_numeric($output) ? (float) $output : null;
     }
 
     public function messages(): array
@@ -115,6 +128,8 @@ class StoreSubmissionRequest extends FormRequest
             'raw_input.max' => 'Teks maksimal 50.000 karakter.',
             'media_file.required' => 'File wajib diunggah.',
             'media_file.mimes' => 'Format file tidak didukung.',
+            'media_file.mimetypes' => 'MIME file tidak didukung.',
+            'media_file.extensions' => 'Extension file tidak didukung.',
             'media_file.max' => 'Ukuran file melebihi batas yang diizinkan.',
             'source_url.required' => 'Tautan URL wajib diisi.',
             'source_url.url' => 'URL harus valid dan menggunakan protokol HTTP atau HTTPS.',

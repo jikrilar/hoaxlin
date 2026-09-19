@@ -163,7 +163,7 @@ class ExternalUrlSecurityTest extends TestCase
 
         Http::fake(function (Request $request) {
             if ($request->url() === 'https://media.test:9443/files/video.mp4?download=1') {
-                return Http::response(str_repeat('v', 2048), 200, ['Content-Type' => 'video/mp4']);
+                return Http::response($this->mp4Bytes(), 200, ['Content-Type' => 'video/mp4']);
             }
 
             if ($request->url() === 'https://api.openai.com/v1/audio/transcriptions') {
@@ -246,6 +246,11 @@ class ExternalUrlSecurityTest extends TestCase
             200,
             ['Content-Type' => 'text/html; charset=UTF-8'],
         );
+    }
+
+    private function mp4Bytes(): string
+    {
+        return "\x00\x00\x00\x18ftypisom".str_repeat("\0", 2036);
     }
 }
 

@@ -23,9 +23,12 @@ class ExtractSubmissionText implements ShouldBeUnique, ShouldQueue
 
     public int $tries = 3;
 
-    public int $timeout = 75;
+    public int $timeout;
 
-    public function __construct(public readonly int $submissionId) {}
+    public function __construct(public readonly int $submissionId)
+    {
+        $this->timeout = (int) config('media.transcription.job_timeout_seconds', 150);
+    }
 
     public function backoff(): array
     {
@@ -34,7 +37,8 @@ class ExtractSubmissionText implements ShouldBeUnique, ShouldQueue
 
     public function handle(TextExtractorResolver $resolver, SubmissionStateMachine $state): void
     {
-        Cache::lock("submission:{$this->submissionId}:extract", 90)->block(5, function () use ($resolver, $state): void {
+        $lockSeconds = max(30, $this->timeout + 15);
+        Cache::lock("submission:{$this->submissionId}:extract", $lockSeconds)->block(5, function () use ($resolver, $state): void {
             $submission = Submission::findOrFail($this->submissionId);
 
             if ($submission->isTerminal()) {

@@ -7,6 +7,8 @@ use App\DataObjects\ExtractedText;
 use App\Enums\InputType;
 use App\Exceptions\AiServiceException;
 use App\Models\Submission;
+use App\Services\Media\MediaDurationProbe;
+use App\Services\Media\TranscriptionMediaContract;
 use App\Services\Network\SafeExternalHttpClient;
 use App\Services\OpenAI\OpenAiQuota;
 use App\Services\Resilience\CircuitBreaker;
@@ -22,6 +24,8 @@ class OpenAiVideoExtractor implements TextExtractor
         private readonly CircuitBreaker $breaker = new CircuitBreaker('openai'),
         private readonly OpenAiQuota $quota = new OpenAiQuota,
         private readonly ?SafeExternalHttpClient $externalHttp = null,
+        private readonly ?TranscriptionMediaContract $mediaContract = null,
+        private readonly ?MediaDurationProbe $durationProbe = null,
     ) {}
 
     public function supports(Submission $submission): bool
@@ -32,32 +36,42 @@ class OpenAiVideoExtractor implements TextExtractor
 
     public function extract(Submission $submission): ExtractedText
     {
+        $this->contract()->assertTimeoutHierarchy();
+
         $bytes = null;
         $filename = null;
-
         $disk = config('filesystems.media_disk', config('filesystems.default', 'local'));
+
         if (filled($submission->media_path)) {
             $bytes = Storage::disk($disk)->get($submission->media_path);
             $filename = basename($submission->media_path);
+            $this->contract()->assertUpload(
+                $filename,
+                Storage::disk($disk)->mimeType($submission->media_path),
+                $bytes,
+            );
         } elseif (filled($submission->source_url)) {
             $download = $this->downloadVideoSafely((string) $submission->source_url);
             $bytes = $download['bytes'];
             $filename = $download['filename'];
-            // Optionally store the downloaded video for retention/audit (private disk)
-            try {
-                $storedPath = 'videos/'.uniqid('url_', true).'_'.preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
-                Storage::disk($disk)->put($storedPath, $bytes);
-                $submission->update(['media_path' => $storedPath]);
-            } catch (\Throwable) {
-                // Non-critical if storing fails — still transcribe from memory
+
+            $storedPath = 'videos/'.uniqid('url_', true).'_'.preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
+            if (! Storage::disk($disk)->put($storedPath, $bytes)) {
+                throw new \RuntimeException('Media storage write failed.');
             }
+            $submission->update(['media_path' => $storedPath]);
         }
 
         if ($bytes === null || $bytes === '') {
             throw AiServiceException::permanent('openai', 'Video tidak ditemukan untuk ditranskripsi.');
         }
-        $key = 'transcription:'.config('services.openai.transcribe_model').':'.hash('sha256', $bytes);
 
+        $duration = $this->probe()->probeBytes($bytes);
+        if ($duration !== null && $duration > $this->contract()->maxDurationSeconds()) {
+            throw AiServiceException::permanent('openai', 'Durasi media melebihi batas transkripsi.');
+        }
+
+        $key = 'transcription:'.config('services.openai.transcribe_model').':'.hash('sha256', $bytes);
         if ($cached = Cache::get($key)) {
             return new ExtractedText($cached, InputType::Video, 'openai', cached: true);
         }
@@ -69,11 +83,10 @@ class OpenAiVideoExtractor implements TextExtractor
             $this->breaker->check();
             $response = Http::withToken($config['key'])
                 ->connectTimeout($config['connect_timeout'])
-                ->timeout(max(120, $config['timeout']))
-                ->attach('file', $bytes, $filename ?? basename($submission->media_path ?? 'video.mp4'))
+                ->timeout((int) config('media.transcription.provider_timeout_seconds', 90))
+                ->attach('file', $bytes, $filename ?? 'video.mp4')
                 ->post('https://api.openai.com/v1/audio/transcriptions', [
                     'model' => $config['transcribe_model'],
-                    'language' => 'id',
                     'response_format' => 'json',
                 ]);
         } catch (ConnectionException $exception) {
@@ -82,22 +95,22 @@ class OpenAiVideoExtractor implements TextExtractor
         }
 
         if ($response->failed()) {
-            if ($response->serverError() || $response->status() === 429) {
+            $transient = $response->serverError() || in_array($response->status(), [408, 429], true);
+            if ($transient) {
                 $this->breaker->recordFailure();
             }
-            throw $response->serverError() || $response->status() === 429
+
+            throw $transient
                 ? AiServiceException::transient('openai', 'Layanan transkripsi sementara tidak tersedia.', $response->status(), RetryAfter::seconds($response->header('Retry-After')))
                 : AiServiceException::permanent('openai', 'Layanan transkripsi menolak media.', $response->status());
         }
 
         $this->breaker->recordSuccess();
-        $payload = $response->json();
-        $text = $payload['text'] ?? null;
+        $text = $response->json('text');
         if (! is_string($text) || trim($text) === '') {
             throw AiServiceException::permanent('openai', 'Transkripsi tidak menghasilkan teks.');
         }
 
-        // Whisper cost is per minute of audio; estimate from bytes (approx 1MB ~ 1 minute)
         $minutes = max(1, strlen($bytes) / (1024 * 1024));
         $cost = $this->quota->estimateCost($config['transcribe_model'], (int) $minutes * 100, (int) $minutes * 100);
         $this->quota->recordUsage((int) $minutes * 100, (int) $minutes * 100, $cost);
@@ -106,75 +119,37 @@ class OpenAiVideoExtractor implements TextExtractor
         return new ExtractedText(trim($text), InputType::Video, 'openai');
     }
 
-    /**
-     * Safely download a remote video for transcription (C10).
-     *
-     * Applies SSRF protection, redirect limits, content-type and size guards.
-     * Returns bytes and a safe filename.
-     *
-     * @return array{bytes: string, filename: string}
-     */
+    /** @return array{bytes: string, filename: string} */
     private function downloadVideoSafely(string $url): array
     {
-        // Limit to direct video/audio URLs for now; YouTube etc. need dedicated handling
-        $path = parse_url($url, PHP_URL_PATH) ?? '';
-        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        $allowedExts = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'mp3', 'm4a', 'wav', 'ogg', 'flac'];
-        $isDirectVideo = in_array($ext, $allowedExts, true);
-
-        // For non-direct URLs (e.g., youtube.com), we could attempt to extract,
-        // but for now we require a direct file URL and give a clear error.
-        if (! $isDirectVideo && ! str_contains(strtolower($url), 'video')) {
-            // Still try to download, but we will validate content-type after
-        }
+        $this->contract()->assertDirectUrl($url);
 
         try {
             $download = $this->externalHttp()->get($url, Http::connectTimeout(5)
-                ->timeout(30)
+                ->timeout((int) config('media.transcription.download_timeout_seconds', 20))
                 ->withHeaders(['User-Agent' => 'hoaxlin.id video verifier']), 'openai');
         } catch (ConnectionException $exception) {
             throw AiServiceException::transient('openai', 'Video URL tidak dapat dihubungi.', previous: $exception);
         }
-        $response = $download['response'];
 
+        $response = $download['response'];
         if ($response->failed()) {
-            throw $response->serverError()
+            $transient = $response->serverError() || in_array($response->status(), [408, 429], true);
+
+            throw $transient
                 ? AiServiceException::transient('openai', 'Video URL sementara tidak tersedia.', $response->status(), RetryAfter::seconds($response->header('Retry-After')))
                 : AiServiceException::permanent('openai', 'Video URL tidak dapat diakses.', $response->status());
         }
 
-        $contentType = strtolower((string) $response->header('Content-Type'));
-        $isVideoType = str_contains($contentType, 'video') || str_contains($contentType, 'audio') || str_contains($contentType, 'octet-stream');
-        if ($contentType && ! $isVideoType && ! str_contains($contentType, 'application')) {
-            // Allow application/octet-stream for videos
-            throw AiServiceException::permanent('openai', 'URL tidak mengarah ke file video/audio.');
-        }
-
-        // Size guards (C12): limit to 100MB (Whisper limit is 25MB, but we allow a bit more before transcode)
-        $contentLength = $response->header('Content-Length');
-        if (is_numeric($contentLength) && (int) $contentLength > 100 * 1024 * 1024) {
-            throw AiServiceException::permanent('openai', 'File video terlalu besar (maks 100MB).');
-        }
-
         $bytes = $response->body();
-        if (strlen($bytes) > 100 * 1024 * 1024) {
-            throw AiServiceException::permanent('openai', 'File video terlalu besar (maks 100MB).');
-        }
-
-        if (strlen($bytes) < 1024) {
-            throw AiServiceException::permanent('openai', 'File video terlalu kecil atau tidak valid.');
-        }
-
-        // Derive filename from URL or Content-Disposition
-        $disposition = $response->header('Content-Disposition');
-        if (is_string($disposition) && preg_match('/filename="?([^";]+)"?/i', $disposition, $m)) {
-            $filename = trim($m[1]);
-        } else {
-            $filename = basename(parse_url($download['url'], PHP_URL_PATH) ?? 'video.mp4');
-            if (! str_contains($filename, '.')) {
-                $filename .= '.mp4';
-            }
-        }
+        $this->contract()->assertDirectUrl($download['url']);
+        $filename = $this->contract()->validateRemoteResponse(
+            $download['url'],
+            $response->header('Content-Disposition'),
+            $response->header('Content-Type'),
+            $response->header('Content-Length'),
+            $bytes,
+        );
 
         return ['bytes' => $bytes, 'filename' => $filename];
     }
@@ -182,5 +157,15 @@ class OpenAiVideoExtractor implements TextExtractor
     private function externalHttp(): SafeExternalHttpClient
     {
         return $this->externalHttp ?? app(SafeExternalHttpClient::class);
+    }
+
+    private function contract(): TranscriptionMediaContract
+    {
+        return $this->mediaContract ?? app(TranscriptionMediaContract::class);
+    }
+
+    private function probe(): MediaDurationProbe
+    {
+        return $this->durationProbe ?? app(MediaDurationProbe::class);
     }
 }
