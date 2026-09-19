@@ -159,7 +159,7 @@ Verifikasi:
 
 Lulus 9 test policy retry dengan 51 assertions serta test sanitasi P0.6. Full Docker suite lulus 138 test dengan 575 assertions, 4 real-BERT test di-skip pada suite terisolasi, dan 0 failed. Integrasi real BERT terpisah lulus 4 test dengan 25 assertions. `docker compose config --quiet`, Pint untuk seluruh file yang disentuh, dan `git diff --check` lulus.
 
-### [ ] P1.2 Graceful degradation explanation
+### [x] P1.2 Graceful degradation explanation
 
 Masalah:
 
@@ -171,14 +171,17 @@ Layani cache sebelum quota check dan ubah kegagalan explanation non-kritis menja
 
 Acceptance criteria:
 
-- [ ] Cache explanation tetap dapat digunakan saat quota habis.
-- [ ] API key kosong, quota habis, circuit open, timeout, 429, dan 5xx menghasilkan explanation unavailable.
-- [ ] Submission tetap completed ketika hasil BERT valid.
-- [ ] Kegagalan persistensi/correctness internal tetap dapat menjadi failure.
+- [x] Cache explanation diperiksa sebelum quota/provider dan tetap dapat digunakan saat quota habis.
+- [x] API key kosong, quota habis, circuit open, connection error, timeout, 429, dan 5xx menghasilkan explanation unavailable.
+- [x] Respons tanpa narrative yang dapat digunakan menghasilkan explanation unavailable tanpa narrative palsu.
+- [x] Submission tetap completed ketika hasil BERT valid.
+- [x] Redelivery pada hasil unavailable bersifat idempotent.
+- [x] Kegagalan persistensi/correctness internal tetap dapat menjadi failure.
+- [x] Retry policy stage selain explanation dan sanitasi error tetap tidak berubah.
 
 Verifikasi:
 
-Jalankan test implementasi explainer untuk cache, quota, circuit breaker, dan HTTP failure.
+Lulus 16 test graceful degradation dengan 140 assertions. Regression P1.1 dan sanitasi P0.6 lulus; regression P0.1–P0.6 lulus 61 test dengan 278 assertions. Full Docker suite lulus 154 test dengan 715 assertions, 4 real-BERT test di-skip pada suite terisolasi, dan 0 failed. Integrasi real BERT terpisah lulus 4 test dengan 25 assertions. `docker compose config --quiet`, Pint untuk seluruh file yang disentuh, dan `git diff --check` lulus.
 
 ### [ ] P1.3 Kontrak video upload dan direct media URL
 

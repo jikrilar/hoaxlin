@@ -51,7 +51,10 @@ class GenerateSubmissionExplanation implements ShouldBeUnique, ShouldQueue
                 return;
             }
 
-            if ($result->explanation_status === ExplanationStatus::Ready->value) {
+            if (in_array($result->explanation_status, [
+                ExplanationStatus::Ready->value,
+                ExplanationStatus::Unavailable->value,
+            ], true)) {
                 $state->markCompleted($submission, $this->attempts());
 
                 return;

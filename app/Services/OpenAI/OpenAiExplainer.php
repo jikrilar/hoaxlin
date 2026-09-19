@@ -21,7 +21,6 @@ class OpenAiExplainer implements Explainer
     public function explain(Classification $classification, string $excerpt): Explanation
     {
         $config = config('services.openai');
-        $this->quota->ensureAvailable();
         $key = 'explanation:'.sha1(implode('|', [
             config('app.ai_prompt_version', '1.0'),
             $config['chat_model'],
@@ -41,8 +40,31 @@ class OpenAiExplainer implements Explainer
             );
         }
 
+        if (blank($config['key'] ?? null)) {
+            return Explanation::unavailable();
+        }
+
+        try {
+            $this->quota->ensureAvailable();
+        } catch (AiServiceException $exception) {
+            if ($this->isNonCriticalProviderFailure($exception)) {
+                return Explanation::unavailable();
+            }
+
+            throw $exception;
+        }
+
         try {
             $this->breaker->check();
+        } catch (AiServiceException $exception) {
+            if ($this->isNonCriticalProviderFailure($exception)) {
+                return Explanation::unavailable();
+            }
+
+            throw $exception;
+        }
+
+        try {
             $response = Http::withToken($config['key'])
                 ->connectTimeout($config['connect_timeout'])
                 ->timeout($config['timeout'])
@@ -63,31 +85,34 @@ class OpenAiExplainer implements Explainer
         } catch (ConnectionException $exception) {
             $this->breaker->recordFailure();
 
-            return Explanation::unavailable('Penjelasan AI sedang tidak tersedia. Hasil klasifikasi BERT tetap dapat digunakan.');
-        } catch (\Throwable $exception) {
-            if ($exception instanceof AiServiceException && $exception->retryable) {
-                $this->breaker->recordFailure();
-            }
-
-            return Explanation::unavailable('Penjelasan AI sedang tidak tersedia. Hasil klasifikasi BERT tetap dapat digunakan.');
+            return Explanation::unavailable();
         }
 
         if ($response->failed()) {
-            if ($response->serverError() || $response->status() === 429) {
+            if ($response->serverError() || in_array($response->status(), [408, 429], true)) {
                 $this->breaker->recordFailure();
+
+                return Explanation::unavailable();
             }
 
-            return Explanation::unavailable('Penjelasan AI sedang tidak tersedia. Hasil klasifikasi BERT tetap dapat digunakan.');
+            throw AiServiceException::permanent(
+                service: 'openai',
+                message: "Permintaan explanation OpenAI ditolak ({$response->status()}).",
+                statusCode: $response->status(),
+                previous: $response->toException(),
+            );
         }
 
-        $this->breaker->recordSuccess();
         $payload = $response->json();
         $narrative = data_get($payload, 'choices.0.message.content');
 
         if (! is_string($narrative) || trim($narrative) === '') {
-            return Explanation::unavailable('Penjelasan AI tidak menghasilkan narasi.');
+            $this->breaker->recordFailure();
+
+            return Explanation::unavailable();
         }
 
+        $this->breaker->recordSuccess();
         $usage = $payload['usage'] ?? [];
         $promptTokens = (int) ($usage['prompt_tokens'] ?? 0);
         $completionTokens = (int) ($usage['completion_tokens'] ?? 0);
@@ -109,5 +134,11 @@ class OpenAiExplainer implements Explainer
         ], $config['cache_ttl']);
 
         return $result;
+    }
+
+    private function isNonCriticalProviderFailure(AiServiceException $exception): bool
+    {
+        return $exception->service === 'openai'
+            && ($exception->retryable || $exception->statusCode === 429);
     }
 }
