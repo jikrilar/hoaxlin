@@ -41,6 +41,7 @@ RUN set -eux; \
 
 COPY --from=php-extensions /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=php-extensions /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
+COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/zz-hoaxlin-uploads.ini
 
 WORKDIR /var/www/html
 

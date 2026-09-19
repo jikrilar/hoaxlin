@@ -245,28 +245,29 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                              ondragover="event.preventDefault(); this.classList.add('dragover')"
                              ondragleave="this.classList.remove('dragover')"
                              ondrop="handleFileDrop(event, 'video')">
-                            <input type="file" id="video-file-input" name="media_file" accept="video/*" onchange="previewFile(event, 'video')">
+                            <input type="file" id="video-file-input" name="media_file" accept="video/mp4,video/mpeg,video/webm,.mp4,.mpeg,.webm" onchange="previewFile(event, 'video')">
                             <div class="upload-zone-icon" aria-hidden="true">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
                             </div>
                             <div id="video-preview-label">
                                 <div class="upload-zone-title">Klik atau Seret Video ke Sini</div>
-                                <div class="upload-zone-subtitle">MP4, MOV, AVI hingga 200MB</div>
+                                <div class="upload-zone-subtitle">MP4, MPEG, atau WEBM hingga 24 MiB</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- URL Video -->
                     <div id="video-url-panel" style="display:none;">
-                        <label for="video-url-input" style="display:block; color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; margin-bottom:0.625rem;">Tautan Video (YouTube, dll.)</label>
+                        <label for="video-url-input" style="display:block; color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; margin-bottom:0.625rem;">URL Langsung File Audio/Video</label>
                         <input type="url" id="video-url-input" name="source_url" class="form-input"
-                               placeholder="https://www.youtube.com/watch?v=..."
+                               placeholder="https://cdn.example.com/rekaman.mp4"
                                aria-label="URL video berita">
+                        <p style="color:var(--color-text-muted); font-size:0.75rem; margin-top:0.5rem;">Mendukung FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, dan WEBM hingga 24 MiB. Halaman YouTube atau platform sosial tidak didukung.</p>
                     </div>
 
                     <div class="warning-box" style="margin-top:1rem;" role="note">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:1px;" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                        <span>Proses video memerlukan waktu lebih lama (ekstraksi audio + transkripsi). Kamu akan menerima notifikasi saat hasil siap. Disarankan masuk ke akun untuk melihat riwayat.</span>
+                        <span>Proses video memerlukan waktu lebih lama untuk transkripsi. Tetap buka halaman hasil untuk melihat progres; pengguna masuk juga dapat membukanya kembali dari riwayat.</span>
                     </div>
 
                     <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -505,7 +506,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
             $features = [
                 ['icon'=>'🔤', 'color'=>'rgba(99,102,241,0.12)', 'title'=>'Input Teks Langsung', 'desc'=>'Tempel teks berita dan dapatkan hasil analisis dalam hitungan detik. Tidak perlu daftar untuk menggunakannya.'],
                 ['icon'=>'🖼️', 'color'=>'rgba(6,182,212,0.12)', 'title'=>'OCR Gambar Otomatis', 'desc'=>'Unggah foto tangkapan layar berita dari WhatsApp atau media sosial. Teks diekstraksi otomatis menggunakan AI.'],
-                ['icon'=>'🎬', 'color'=>'rgba(168,85,247,0.12)', 'title'=>'Transkripsi Video', 'desc'=>'Unggah video atau masukkan tautan YouTube. Audio ditranskripsi menjadi teks menggunakan Whisper AI.'],
+                ['icon'=>'🎬', 'color'=>'rgba(168,85,247,0.12)', 'title'=>'Transkripsi Video', 'desc'=>'Unggah video atau masukkan URL langsung file audio/video. Bahasa audio dideteksi otomatis sebelum analisis.'],
                 ['icon'=>'🔗', 'color'=>'rgba(16,185,129,0.12)', 'title'=>'Analisis Tautan', 'desc'=>'Tempel URL artikel berita. Sistem mengambil dan mengekstraksi konten artikel secara otomatis.'],
                 ['icon'=>'📈', 'color'=>'rgba(245,158,11,0.12)', 'title'=>'Skor Keyakinan', 'desc'=>'Setiap hasil dilengkapi confidence score yang menunjukkan seberapa yakin model terhadap prediksinya.'],
                 ['icon'=>'📋', 'color'=>'rgba(239,68,68,0.12)', 'title'=>'Riwayat Pengecekan', 'desc'=>'Daftarkan akun gratis untuk menyimpan riwayat pengecekan dan memberikan umpan balik hasil analisis.'],

@@ -38,7 +38,7 @@ Platform web untuk memeriksa indikasi hoax pada berita berbahasa Indonesia. **Mo
 - **MySQL** 8+ (atau gunakan SQLite untuk test)
 - **Python** 3.10+ (disarankan 3.12, terverifikasi di 3.14) + pip
 - **Git**, **XAMPP** (atau MySQL standalone) di Windows
-- **FFprobe** opsional (untuk cek durasi video, `StoreSubmissionRequest` akan skip jika tidak ada)
+- **FFprobe** opsional. Jika tersedia, durasi media dibatasi 5 menit; jika tidak tersedia, submission tetap diproses dengan validasi ukuran, MIME, extension, dan signature, tetapi batas durasi tidak dapat diverifikasi lokal.
 - **ClamAV** opsional (`clamdscan` untuk malware scan)
 
 Cek versi:
@@ -121,12 +121,30 @@ OPENAI_CHAT_MODEL=gpt-4o-mini
 OPENAI_VISION_MODEL=gpt-4o-mini
 OPENAI_TRANSCRIBE_MODEL=whisper-1
 
+# Kontrak transkripsi media: provider 90s < job 150s < worker 180s < retry_after 1800s
+MEDIA_TRANSCRIPTION_MAX_BYTES=25165824
+MEDIA_TRANSCRIPTION_MAX_DURATION=300
+MEDIA_DOWNLOAD_TIMEOUT=20
+MEDIA_TRANSCRIPTION_TIMEOUT=90
+MEDIA_JOB_TIMEOUT=150
+MEDIA_WORKER_TIMEOUT=180
+MEDIA_QUEUE_RETRY_AFTER=1800
+FFPROBE_BINARY=ffprobe
+
 # Queue & cache (dev)
 QUEUE_CONNECTION=database
 CACHE_STORE=database
 ```
 
 > **Token:** `BERT_SERVICE_TOKEN` **harus identik** di `.env` dan `bert-service/.env`. Jika kosong atau beda, klasifikasi gagal `401` dan submission akan `failed` (bukan stuck) berkat `failed()` hook C7.
+
+### Kontrak transkripsi media
+
+- Upload video menerima MP4, MPEG, dan WEBM. URL media langsung menerima FLAC, MP3, MP4, MPEG/MPGA, M4A, OGG, WAV, dan WEBM.
+- Batas upload dan download sama-sama 24 MiB, menyediakan headroom multipart terhadap batas request transkripsi provider 25 MiB.
+- Video URL harus menunjuk langsung ke file. Halaman YouTube, TikTok, Instagram, Facebook, player, HTML, dan JSON tidak didukung.
+- Bahasa audio tidak dipaksa. Hasil transkripsi Indonesia langsung masuk classifier; hasil Inggris melewati deteksi bahasa dan terjemahan ke Indonesia sebelum IndoBERT.
+- `ffprobe` tetap opsional. Tanpanya, validasi durasi 5 menit tidak dapat dijalankan, tetapi validasi ukuran/format tetap wajib.
 
 ### 2. Database
 
@@ -378,4 +396,3 @@ hoax-detector/
 - Progress: `CHECKLIST_TASK.md` (95%) + `PROJECT_PROGRESS.md` (perlu re-audit)
 - BERT: `bert-service/README.md`
 - API: `POST /predict` → `bert-service/app/contracts.py`, auth `Bearer`, `X-Request-ID`
-

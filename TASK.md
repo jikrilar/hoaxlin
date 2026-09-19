@@ -183,7 +183,7 @@ Verifikasi:
 
 Lulus 16 test graceful degradation dengan 140 assertions. Regression P1.1 dan sanitasi P0.6 lulus; regression P0.1–P0.6 lulus 61 test dengan 278 assertions. Full Docker suite lulus 154 test dengan 715 assertions, 4 real-BERT test di-skip pada suite terisolasi, dan 0 failed. Integrasi real BERT terpisah lulus 4 test dengan 25 assertions. `docker compose config --quiet`, Pint untuk seluruh file yang disentuh, dan `git diff --check` lulus.
 
-### [ ] P1.3 Kontrak video upload dan direct media URL
+### [x] P1.3 Kontrak video upload dan direct media URL
 
 Masalah:
 
@@ -195,16 +195,16 @@ Validasi direct media URL, tolak halaman HTML/platform video, selaraskan format/
 
 Acceptance criteria:
 
-- [ ] Hanya direct media URL dengan format/content type yang didukung yang diterima.
-- [ ] YouTube dan platform video lain tidak didukung atau diklaim.
-- [ ] Audio Inggris diteruskan ke language detection/translation dengan benar.
-- [ ] Batas ukuran konsisten untuk upload dan URL.
-- [ ] Keterbatasan pemeriksaan durasi tanpa ffprobe terdokumentasi.
-- [ ] Job tidak timeout sebelum request provider selesai ditangani.
+- [x] Hanya direct media URL dengan format/content type yang didukung yang diterima.
+- [x] YouTube dan platform video lain tidak didukung atau diklaim.
+- [x] Audio Inggris diteruskan ke language detection/translation dengan benar.
+- [x] Batas ukuran konsisten untuk upload dan URL.
+- [x] Keterbatasan pemeriksaan durasi tanpa ffprobe terdokumentasi.
+- [x] Job tidak timeout sebelum request provider selesai ditangani.
 
 Verifikasi:
 
-Jalankan test upload/direct URL ID dan EN, HTML URL, format unsupported, size, timeout, serta kondisi tanpa ffprobe.
+Lulus 26 test kontrak media dengan 50 assertions dan targeted regression P0/P1 sebanyak 109 test dengan 491 assertions. Full Docker suite lulus 180 test dengan 765 assertions, 4 real-BERT test di-skip pada suite terisolasi, dan 0 failed. Integrasi real BERT terpisah lulus 4 test dengan 25 assertions. `docker compose config --quiet`, Pint untuk seluruh file PHP yang disentuh, dan `git diff --check` lulus.
 
 ### [ ] P1.4 CAPTCHA dan quota yang atomik
 

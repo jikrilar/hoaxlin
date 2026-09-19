@@ -118,12 +118,12 @@ class SubmissionTest extends TestCase
 
         $this->actingAs($user)->post(route('deteksi'), [
             'input_type' => 'video_url',
-            'source_url' => 'https://example.com/video/1',
+            'source_url' => 'https://example.com/video/1.mp4',
         ])->assertRedirect();
 
         $submission = Submission::sole();
         $this->assertSame('video', $submission->input_type);
-        $this->assertSame('https://example.com/video/1', $submission->source_url);
+        $this->assertSame('https://example.com/video/1.mp4', $submission->source_url);
         Queue::assertPushed(ProcessSubmission::class);
     }
 

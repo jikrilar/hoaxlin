@@ -10,6 +10,10 @@
 !composer.json
 !composer.lock
 !docker-compose.yml
+!docker/
+docker/**
+!docker/php/
+!docker/php/uploads.ini
 !package.json
 !package-lock.json
 !phpunit.xml

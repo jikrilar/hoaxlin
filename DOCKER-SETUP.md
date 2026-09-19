@@ -53,6 +53,10 @@ Setup dapat dijalankan ulang dengan aman. File `.env`, secret, database, dan sto
 
 `OPENAI_API_KEY` bersifat opsional untuk bootstrap infrastruktur, tetapi wajib untuk OCR gambar, transkripsi video/audio, terjemahan, dan pembuatan explanation.
 
+Transkripsi menerima upload video MP4/MPEG/WEBM atau URL langsung file audio/video yang didukung, maksimal 24 MiB. URL halaman platform seperti YouTube/TikTok/Instagram/Facebook tidak didukung. Bahasa audio dideteksi provider; audio Inggris kemudian diterjemahkan oleh pipeline sebelum klasifikasi IndoBERT.
+
+`ffprobe` bersifat opsional dan tidak dipasang sebagai dependency wajib image. Jika binary tersedia melalui `FFPROBE_BINARY`, media di atas 300 detik ditolak. Tanpa `ffprobe`, pemeriksaan durasi dilewati; validasi ukuran, extension, MIME, dan signature tetap dijalankan. Hierarki timeout default adalah provider 90 detik, job 150 detik, worker 180 detik, dan Redis `retry_after` 1800 detik.
+
 Untuk mengaktifkannya, isi nilai berikut di file `.env` yang dibuat oleh setup:
 
 ```dotenv
