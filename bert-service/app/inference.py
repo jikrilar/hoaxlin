@@ -4,6 +4,8 @@ import asyncio
 import hashlib
 import json
 import logging
+import math
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -37,6 +39,7 @@ class ModelRuntime:
         self.model_version: str | None = settings.model_version
         self.threshold: float | None = None
         self.temperature: float | None = None
+        self.evaluation_metadata: dict[str, Any] = {}
         self.label_map: dict[int, str] = {}
         self._tokenizer: Any = None
         self._model: Any = None
@@ -70,6 +73,7 @@ class ModelRuntime:
             self._load_model_and_tokenizer()
             self._verify_label_map()
             self._load_sidecars()
+            self._load_evaluation_metadata()
             if not self.settings.require_release_manifest:
                 self._verify_checksum_if_available()
             self.status = "ready"
@@ -202,6 +206,135 @@ class ModelRuntime:
                     logger.info("Loaded calibration sidecar: T=%s", temp)
             except Exception as exc:
                 logger.warning("Failed to load calibration.json: %s", exc)
+
+    def _load_evaluation_metadata(self) -> None:
+        """Load safe, optional provenance for the active model artifact.
+
+        Evaluation metadata is best-effort. The serving model remains usable
+        when an older release has no evaluation sidecar or optional fields are
+        malformed. Paths, checkpoints, prompts, and other training internals
+        are deliberately excluded from the public /version response.
+        """
+        source = Path(self.settings.model_path)
+        evaluation_path = source / "evaluation.json"
+        if not evaluation_path.is_file():
+            return
+
+        try:
+            evaluation = json.loads(evaluation_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            logger.warning("Failed to read optional evaluation metadata: %s", type(exc).__name__)
+            return
+
+        if not isinstance(evaluation, dict):
+            logger.warning("Optional evaluation metadata must be an object")
+            return
+
+        version = self.model_version
+        if not isinstance(version, str) or not version.strip():
+            return
+
+        entry = self._release_manifest_entry(source, version)
+        if entry is False:
+            # A manifest exists but does not identify the active version. Do
+            # not present metrics from an unrelated artifact as current.
+            logger.warning("Evaluation metadata does not match active model version")
+            return
+
+        reported_version = evaluation.get("model_version")
+        if isinstance(reported_version, str) and not self._same_version(reported_version, version):
+            logger.warning("Evaluation sidecar model version does not match active model")
+            return
+
+        def number(name: str) -> float | None:
+            value = evaluation.get(name)
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                return None
+            try:
+                value = float(value)
+            except (OverflowError, ValueError):
+                return None
+            return value if math.isfinite(value) and 0.0 <= value <= 1.0 else None
+
+        sample_count = evaluation.get("sample_count", evaluation.get("n"))
+        try:
+            sample_count_value = int(sample_count)
+        except (OverflowError, TypeError, ValueError):
+            sample_count_value = 0
+        if isinstance(sample_count, bool) or not isinstance(sample_count, (int, float)) or sample_count_value <= 0:
+            sample_count = None
+        else:
+            sample_count = sample_count_value
+
+        def text(*values: Any) -> str | None:
+            for value in values:
+                if isinstance(value, str) and value.strip():
+                    return value.strip()[:160]
+            return None
+
+        manifest_entry = entry if isinstance(entry, dict) else {}
+        provenance = manifest_entry.get("provenance") if isinstance(manifest_entry.get("provenance"), dict) else {}
+        accuracy = number("accuracy")
+        macro_f1 = number("macro_f1")
+        dataset_name = text(evaluation.get("dataset_name"), manifest_entry.get("dataset_name"))
+        dataset_version = text(evaluation.get("dataset_version"), manifest_entry.get("dataset_version"))
+        if dataset_name is None or dataset_version is None:
+            card_path = source / "MODEL_CARD.md"
+            if card_path.is_file():
+                try:
+                    card = card_path.read_text(encoding="utf-8")
+                    match = re.search(r"^[-*] Dataset:\s*([^\r\n]+?)\s+v([0-9]+(?:\.[0-9]+){1,2})\b", card, re.MULTILINE)
+                    if match:
+                        dataset_name = dataset_name or match.group(1).strip()
+                        dataset_version = dataset_version or f"v{match.group(2).strip()}"
+                except (OSError, UnicodeError):
+                    pass
+        split = text(evaluation.get("split"))
+        if split is None and (accuracy is not None or macro_f1 is not None or sample_count is not None):
+            # evaluate_checkpoint() explicitly evaluates test.jsonl.
+            split = "held-out test"
+
+        exported_at = text(
+            evaluation.get("exported_at"),
+            manifest_entry.get("exported_at"),
+            provenance.get("exported_at"),
+        )
+
+        self.evaluation_metadata = {
+            "model_version": version,
+            "accuracy": accuracy,
+            "macro_f1": macro_f1,
+            "sample_count": sample_count,
+            "dataset_name": dataset_name,
+            "dataset_version": dataset_version,
+            "split": split,
+            "exported_at": exported_at,
+        }
+
+    def _release_manifest_entry(self, source: Path, version: str) -> dict[str, Any] | bool | None:
+        candidates = [source / "manifest.json", source.parent / "manifest.json"]
+        manifest_path = next((path for path in candidates if path.is_file()), None)
+        if manifest_path is None:
+            return None
+
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            logger.warning("Failed to read optional release metadata: %s", type(exc).__name__)
+            return False
+
+        entries = manifest if isinstance(manifest, list) else [manifest]
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            candidate_version = entry.get("version")
+            if isinstance(candidate_version, str) and self._same_version(candidate_version, version):
+                return entry
+
+        return False
+
+    def _same_version(self, left: str, right: str) -> bool:
+        return left.lstrip("vV") == right.lstrip("vV")
 
     def _verify_checksum_if_available(self) -> None:
         # Verify model files against manifest.json if present (either in model dir or parent)

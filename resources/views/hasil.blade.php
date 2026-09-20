@@ -241,7 +241,7 @@
         <div class="glass-card animate-fade-in-up delay-200" style="padding:2rem; margin-bottom:1.5rem;" role="region" aria-label="Umpan balik">
             <h2 style="font-size:1.0625rem; font-weight:700; margin-bottom:0.5rem;">Apakah hasil ini akurat?</h2>
             <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:1.25rem;">
-                Umpan balikmu membantu kami meningkatkan akurasi model BERT.
+                Umpan balikmu membantu evaluasi dan pengembangan model BERT di masa depan.
             </p>
 
             @auth
@@ -299,7 +299,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <span>
                     <a href="{{ route('login') }}" style="color:var(--color-primary-light); text-decoration:none; font-weight:500;">Masuk ke akun</a>
-                    untuk memberikan umpan balik dan membantu meningkatkan akurasi model.
+                    untuk memberikan umpan balik dan membantu evaluasi model di masa depan.
                 </span>
             </div>
             @endauth

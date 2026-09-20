@@ -118,7 +118,7 @@ On `ModelRuntime.load()` the service asserts:
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8001/health/live          # 200 ok
 Invoke-RestMethod http://127.0.0.1:8001/health/ready         # 200 when ready, 503 model_unavailable otherwise
-Invoke-RestMethod http://127.0.0.1:8001/version              # {service, service_version, model_version, model_status, model_labels:[valid,hoax], threshold:0.99, temperature:0.87}
+Invoke-RestMethod http://127.0.0.1:8001/version              # runtime model/status/labels/threshold/temperature + optional evaluation provenance
 Invoke-RestMethod http://127.0.0.1:8001/health -Headers @{Authorization="Bearer $env:BERT_SERVICE_TOKEN"}
 ```
 
@@ -225,7 +225,7 @@ Single steps (resumable via `models/runs/pipeline_state.json`):
 .\.venv\Scripts\python.exe -m train.pipeline train       # Trainer, best by val macro-F1, early stopping
 .\.venv\Scripts\python.exe -m train.pipeline calibrate  # temperature scaling on validation (T=0.87)
 .\.venv\Scripts\python.exe -m train.pipeline threshold  # meragukan threshold 0.99 on validation
-.\.venv\Scripts\python.exe -m train.pipeline evaluate   # held-out test: accuracy 1.0, per-class P/R/F1 1.0, confusion [[398,0],[0,383]], ECE 0.0007
+.\.venv\Scripts\python.exe -m train.pipeline evaluate   # writes held-out-test metrics to the versioned artifact
 .\.venv\Scripts\python.exe -m train.pipeline export     # safe serialization to models/indobert-hoax/v1.0.0
 ```
 
@@ -238,8 +238,13 @@ Exporting an artifact does not activate it in production. The inference service
 loads only the versioned path supplied through `BERT_MODEL_PATH`; release validation
 and deployment are explicit operational steps.
 
-**Known limitation:** valid is long Antara news vs hoax is short claim
-(`"Beredar unggahan..."` vs `"Jakarta (ANTARA) -"`). Held-out 1.0 is inflated
-by style/length; short valid claims will score near the hoax side and may fall
-to `meragukan` under the 0.99 threshold. Future work: add short valid headlines
-and length-controlled hard negatives.
+**Current artifact note (indobert-hoax v1.0.0):** `evaluation.json` records the
+held-out test split for dataset `komdigi-antara` v1.0.0 (`n=781`), including
+accuracy, macro precision/recall/F1, confusion matrix, and calibration metrics.
+These are offline evaluation metrics for that artifact, not production
+accuracy or a guarantee for every input. The known limitation remains: valid
+is long Antara news vs hoax is short claim
+(`"Beredar unggahan..."` vs `"Jakarta (ANTARA) -"`). The held-out score is
+inflated by style/length; short valid claims will score near the hoax side and
+may fall to `meragukan` under the 0.99 threshold. Future work: add short valid
+headlines and length-controlled hard negatives.

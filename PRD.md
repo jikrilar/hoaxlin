@@ -59,7 +59,7 @@ Perkembangan Natural Language Processing (NLP), khususnya model berbasis Transfo
 | Masyarakat umum | Pengguna media sosial yang menerima berita/forward pesan dan ingin memverifikasi cepat | Antarmuka sederhana, hasil cepat, mudah dipahami |
 | Mahasiswa/akademisi | Meneliti atau mempelajari topik literasi digital dan misinformasi | Detail skor keyakinan, riwayat, ekspor data |
 | Pengelola komunitas/redaksi kecil | Admin grup, komunitas, atau media lokal yang ingin menyaring info sebelum disebar | Riwayat pengecekan, kemampuan input massal (future work) |
-| Administrator sistem | Mengelola katalog kurasi, memantau performa model, moderasi | Panel admin (Filament), statistik akurasi model |
+| Administrator sistem | Mengelola katalog kurasi, memantau metadata runtime/evaluasi model, moderasi | Panel admin (Filament), statistik dengan provenance |
 
 # Arsitektur Sistem (Gambaran Tingkat Tinggi)
 
@@ -120,7 +120,7 @@ Prioritas menggunakan skala MoSCoW: **M**ust have, **S**hould have, **C**ould ha
 
 | Kategori | Kebutuhan |
 |---|---|
-| Performa | Waktu proses input teks/URL ditargetkan di bawah ±10–15 detik; input gambar/video diproses asinkron dengan notifikasi progres |
+| Performa | Tidak ada klaim latency produksi tanpa telemetry; `inference_ms` dilaporkan sebagai latency inferensi BERT, sedangkan input gambar/video diproses asinkron dengan progres |
 | Skalabilitas | Proses berat (OCR, transkripsi, inferensi) dijalankan melalui job queue agar tidak memblokir request utama |
 | Keamanan | Validasi & sanitasi seluruh input (termasuk file upload), proteksi CSRF/XSS/SQL Injection bawaan Laravel, penyimpanan API key secara terenkripsi di `.env` |
 | Privasi | Kebijakan retensi data untuk media yang diunggah publik; opsi penghapusan riwayat oleh pengguna |
@@ -194,9 +194,9 @@ Halaman publik utama yang perlu dirancang: (1) Landing page dengan form empat je
 
 | Aspek | Target Indikatif |
 |---|---|
-| Akurasi model BERT pada test set | Ditentukan berdasarkan hasil eksperimen; didokumentasikan lengkap dengan confusion matrix |
+| Akurasi model BERT pada test set | Hanya ditampilkan dari artefak evaluasi held-out yang cocok dengan versi runtime, bersama provenance dan confusion matrix |
 | Precision & Recall per kelas | Seimbang antar kelas Valid/Hoax, dilaporkan pada bab pengujian |
-| Waktu respons deteksi teks/URL | Idealnya di bawah ±15 detik |
+| Latency deteksi | Dilaporkan dari telemetry dengan definisi/populasi yang jelas; tidak ada angka target yang ditampilkan sebagai hasil aktual |
 | Keberhasilan integrasi end-to-end | Seluruh jalur input (teks, gambar, video, URL) berhasil menghasilkan output yang konsisten |
 | Usability | Umpan balik positif dari pengujian terbatas terhadap pengguna awam (opsional, misalnya kuesioner sederhana) |
 

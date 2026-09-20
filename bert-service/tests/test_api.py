@@ -59,6 +59,19 @@ def test_readiness_503_when_not_configured() -> None:
         assert body["error"]["code"] == "model_unavailable"
 
 
+def test_version_unavailable_does_not_invent_evaluation_metadata() -> None:
+    app = create_app(_settings_without_model())
+    with TestClient(app) as client:
+        resp = client.get("/version")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["model_status"] == "not_configured"
+        assert body["model_version"] is None
+        assert body["evaluation_model_version"] is None
+        assert body["evaluation_accuracy"] is None
+        assert body["evaluation_sample_count"] is None
+
+
 def test_readiness_200_when_ready() -> None:
     app = create_app(_settings_with_model())
     with TestClient(app) as client:
@@ -80,6 +93,14 @@ def test_version_exposes_labels_and_threshold() -> None:
         assert body["model_labels"] == ["valid", "hoax"]
         assert body["threshold"] == pytest.approx(0.99)
         assert body["temperature"] == pytest.approx(0.8706, abs=0.01)
+        assert body["evaluation_model_version"] == "v1.0.0"
+        assert body["evaluation_accuracy"] == pytest.approx(1.0)
+        assert body["evaluation_macro_f1"] == pytest.approx(1.0)
+        assert body["evaluation_sample_count"] == 781
+        assert body["evaluation_dataset_name"] == "komdigi-antara"
+        assert body["evaluation_dataset_version"] == "v1.0.0"
+        assert body["evaluation_split"] == "held-out test"
+        assert body["exported_at"]
 
 
 def test_predict_requires_auth() -> None:

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'hoaxlin.id — Deteksi Berita Hoax dengan AI BERT')
-@section('description', 'Periksa kebenaran berita dengan teknologi AI BERT. Deteksi hoax dari teks, gambar, video, atau tautan berita secara instan dan akurat.')
+@section('description', 'Periksa kebenaran berita dengan teknologi AI BERT. Deteksi hoax dari teks, gambar, video, atau tautan berita secara otomatis.')
 
 @section('content')
 
@@ -50,19 +50,14 @@
         </div>
 
         <!-- Stats Row -->
-        <div class="animate-fade-in-up delay-400" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; max-width:600px; margin:0 auto;" role="region" aria-label="Statistik sistem">
+        <div class="animate-fade-in-up delay-400" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:1rem; max-width:900px; margin:0 auto;" role="region" aria-label="Statistik runtime dan evaluasi">
+            @foreach($modelStatistics as $stat)
             <div class="stat-card">
-                <div class="stat-value" aria-label="Lebih dari 95 persen akurasi">95%+</div>
-                <div class="stat-label">Akurasi Model</div>
+                <div class="stat-value" aria-label="{{ $stat['label'] }}: {{ $stat['value'] }}">{{ $stat['value'] }}</div>
+                <div class="stat-label">{{ $stat['label'] }}</div>
+                <div style="margin-top:0.35rem; color:var(--color-text-muted); font-size:0.6875rem; line-height:1.35;">{{ $stat['description'] }}</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" aria-label="Kurang dari 15 detik proses">15s</div>
-                <div class="stat-label">Waktu Proses</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" aria-label="4 jenis input">4</div>
-                <div class="stat-label">Jenis Input</div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>

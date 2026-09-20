@@ -34,6 +34,6 @@ class FeedbackController extends Controller
             'comment' => $request->validated('comment'),
         ]);
 
-        return back()->with('success', 'Umpan balik berhasil dikirim. Terima kasih telah membantu meningkatkan akurasi model!');
+        return back()->with('success', 'Umpan balik berhasil dikirim. Terima kasih telah membantu evaluasi model di masa depan.');
     }
 }
