@@ -45,6 +45,16 @@ class VersionResponse(BaseModel):
     model_labels: list[str] | None = None
     threshold: float | None = None
     temperature: float | None = None
+    # Optional provenance from the evaluation artifact shipped with the
+    # active release. Missing metadata is represented as null.
+    evaluation_model_version: str | None = None
+    evaluation_accuracy: float | None = None
+    evaluation_macro_f1: float | None = None
+    evaluation_sample_count: int | None = None
+    evaluation_dataset_name: str | None = None
+    evaluation_dataset_version: str | None = None
+    evaluation_split: str | None = None
+    exported_at: str | None = None
 
 
 class ErrorDetail(BaseModel):

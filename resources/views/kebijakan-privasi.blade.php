@@ -52,7 +52,7 @@
                         @foreach([
                             'Menjalankan proses deteksi hoax menggunakan model BERT',
                             'Menyimpan riwayat pengecekan untuk pengguna terdaftar',
-                            'Meningkatkan akurasi model melalui umpan balik pengguna (opsional)',
+                            'Mendukung evaluasi model melalui umpan balik pengguna (opsional)',
                             'Memantau performa dan keandalan sistem',
                         ] as $item)
                         <li style="display:flex; gap:0.625rem; align-items:flex-start;">

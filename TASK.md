@@ -291,7 +291,7 @@ full Laravel suite lulus 218 test dengan 902 assertions, 4 real-BERT test di-ski
 karena inference service tidak tersedia, dan 0 failed. Gate Compose, Pint untuk
 seluruh file PHP yang disentuh, dan `git diff --check` lulus.
 
-### [ ] P1.7 Penghapusan klaim statistik/model yang tidak didukung
+### [x] P1.7 Penghapusan klaim statistik/model yang tidak didukung
 
 Masalah:
 
@@ -303,14 +303,22 @@ Gunakan artefak evaluasi, version endpoint, dan telemetry sebagai sumber klaim; 
 
 Acceptance criteria:
 
-- [ ] Model aktif berasal dari runtime/config aktif.
-- [ ] Akurasi menyertakan versi model, dataset/split, tanggal, dan definisi metrik.
-- [ ] Latency berasal dari telemetry dengan definisi yang jelas.
-- [ ] Ketiadaan data tidak menghasilkan angka pemasaran hard-coded.
+- [x] Model aktif dan threshold berasal dari runtime BERT `/version`.
+- [x] Akurasi hanya ditampilkan bila artefak evaluasi cocok dan menyertakan versi model, dataset/split, sample count, serta provenance export.
+- [x] Latency berasal dari `inference_ms` dengan definisi median dan populasi completed classifications yang eksplisit.
+- [x] Ketiadaan atau ketidaktersediaan data menghasilkan `n/a`, tanpa angka pemasaran hard-coded.
 
 Verifikasi:
 
-Bandingkan output dengan endpoint version, release artifact, dan telemetry; jalankan test runtime unavailable dan pergantian versi.
+Test P1.7 lulus 9 test dengan 42 assertions untuk runtime ready/unavailable/timeout,
+metadata malformed, threshold aktif, mismatch artefak evaluasi, provenance evaluasi,
+historical-version isolation, latency median, dan fallback `n/a`. Regression terarah
+P0.1-P0.6 dan P1.1-P1.6 lulus 143 test dengan 656 assertions. Full Laravel suite
+lokal lulus 227 test dengan 944 assertions; 4 real-BERT test di-skip karena service
+tidak tersedia. Full BERT suite lulus 74 test. Docker test image berhasil dibuild
+dan full Laravel suite di image lulus 227 test dengan 944 assertions, 4 real-BERT
+test di-skip, dan 0 failed. `docker compose config --quiet`, Pint, dan
+`git diff --check` lulus.
 
 ### [ ] P1.8 Sinkronisasi dokumentasi, copy fitur, dan workflow operasional
 

@@ -44,7 +44,7 @@
                 </div>
                 <div style="display:flex; flex-direction:column; gap:1rem;">
                     @foreach([
-                        ['num'=>'95%+', 'label'=>'Target Akurasi Model', 'color'=>'#818cf8'],
+                        ['num'=>'n/a', 'label'=>'Evaluasi model aktif', 'color'=>'#818cf8'],
                         ['num'=>'4', 'label'=>'Jenis Input Didukung', 'color'=>'#22d3ee'],
                         ['num'=>'2026', 'label'=>'Tahun Pengembangan', 'color'=>'#c084fc'],
                     ] as $stat)

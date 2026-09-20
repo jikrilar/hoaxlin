@@ -1,8 +1,8 @@
 # hoaxlin.id — Sistem Deteksi Hoax BERT
 
-Platform web untuk memeriksa indikasi hoax pada berita berbahasa Indonesia. **Model BERT** yang di-*fine-tune* (IndoBERT) menentukan label `valid` / `hoax` / `meragukan` (threshold 0.99); **OpenAI** hanya untuk OCR gambar, transkripsi video, dan penjelasan naratif.
+Platform web untuk memeriksa indikasi hoax pada berita berbahasa Indonesia. **Model BERT** yang di-*fine-tune* (IndoBERT) menentukan label `valid` / `hoax` / `meragukan`; threshold aktif dibaca dari artefak runtime BERT melalui `/version`. **OpenAI** hanya untuk OCR gambar, transkripsi video, dan penjelasan naratif.
 
-> **Status:** Pipeline `text` end-to-end telah proven (C5): `ProcessSubmission → Extract → Classify (BERT 1.0)` → `DetectionResult` via `queue:work`. Lihat `CHECKLIST_TASK.md` untuk progress 95%.
+> **Status:** Pipeline `text` end-to-end telah proven (C5): `ProcessSubmission → Extract → Classify (BERT)` → `DetectionResult` via `queue:work`. Status pekerjaan terdokumentasi di `TASK.md`.
 
 ---
 
@@ -219,7 +219,7 @@ Get-Content .env | ForEach-Object {
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8001/health/live              # -> {"status":"ok"}
 Invoke-RestMethod http://127.0.0.1:8001/health/ready             # -> 200 {"status":"ok","model_status":"ready"} atau 503 jika BERT_MODEL_PATH salah
-Invoke-RestMethod http://127.0.0.1:8001/version                  # -> labels [valid,hoax], threshold 0.99
+Invoke-RestMethod http://127.0.0.1:8001/version                  # -> active runtime version/threshold + optional evaluation provenance
 # Predict (butuh Bearer token):
 $h = @{Authorization="Bearer local-dev-token-change-me"}
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8001/predict -Headers $h -Body '{"text":"Beredar unggahan..."}' -ContentType application/json
@@ -370,7 +370,7 @@ hoax-detector/
 ├── models/indobert-hoax/v1.0.0/             # 498 MB, config.json, threshold.json
 ├── resources/views/{hasil.blade.php,livewire/submission-progress.blade.php}
 ├── routes/{web.php,console.php}            # console.php: media:prune schedule
-└── CHECKLIST_TASK.md + PROJECT_PROGRESS.md  # progress 95%
+└── TASK.md                                  # audited implementation backlog
 ```
 
 ---
@@ -400,6 +400,6 @@ hoax-detector/
 ## Referensi
 
 - PRD: `PRD-Sistem-Deteksi-Hoax-BERT.md`
-- Progress: `CHECKLIST_TASK.md` (95%) + `PROJECT_PROGRESS.md` (perlu re-audit)
+- Backlog: `TASK.md`
 - BERT: `bert-service/README.md`
 - API: `POST /predict` → `bert-service/app/contracts.py`, auth `Bearer`, `X-Request-ID`

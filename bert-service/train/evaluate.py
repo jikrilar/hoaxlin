@@ -64,7 +64,12 @@ def evaluate_checkpoint(
     predictions = np.argmax(probs, axis=1)
 
     metrics = classification_metrics(y_true, predictions, len(config.labels))
+    dataset_name, dataset_version = _dataset_provenance(config.data_dir)
     report: dict = {
+        "model_version": f"v{config.version.removeprefix('v')}",
+        "dataset_name": dataset_name,
+        "dataset_version": dataset_version,
+        "split": "held-out test",
         "n": int(len(y_true)),
         "class_names": config.labels,
         "accuracy": metrics["accuracy"],
@@ -94,6 +99,26 @@ def evaluate_checkpoint(
         },
     }
     return report
+
+
+def _dataset_provenance(data_dir: Path) -> tuple[str | None, str | None]:
+    """Read only the public dataset identity from the versioned manifest."""
+    manifest_path = data_dir / "manifest.json"
+    if not manifest_path.is_file():
+        return None, None
+
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return None, None
+
+    dataset = manifest.get("dataset") if isinstance(manifest, dict) else None
+    if not isinstance(dataset, dict):
+        return None, None
+
+    name = dataset.get("name") if isinstance(dataset.get("name"), str) else None
+    version = dataset.get("version") if isinstance(dataset.get("version"), str) else None
+    return name, version
 
 
 def _reliability_curve(y_true: np.ndarray, probs: np.ndarray, n_bins: int = 10) -> list[dict]:

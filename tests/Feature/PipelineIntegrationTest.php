@@ -7,10 +7,13 @@ use App\Contracts\Explainer;
 use App\DataObjects\Classification;
 use App\DataObjects\Explanation;
 use App\Enums\DetectionLabel;
+use App\Exceptions\AiServiceException;
 use App\Jobs\ClassifySubmission;
 use App\Jobs\ExtractSubmissionText;
 use App\Jobs\GenerateSubmissionExplanation;
 use App\Models\Submission;
+use App\Services\Bert\BertClassifier;
+use App\Services\Bert\CircuitBreakingClassifier;
 use App\Services\Extraction\TextExtractorResolver;
 use App\Services\Extraction\TextInputExtractor;
 use App\Services\Fakes\FakeClassifier;
@@ -28,6 +31,10 @@ class PipelineIntegrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Keep this cache test independent from a developer .env threshold;
+        // its fixture confidence (0.92) is intentionally above the test
+        // contract threshold used by the rest of the fake classifier suite.
+        config(['services.bert.confidence_threshold' => 0.65]);
         Cache::flush();
         Cache::forget('breaker:bert:failures');
         Cache::forget('breaker:bert:open');
@@ -68,7 +75,7 @@ class PipelineIntegrationTest extends TestCase
     public function test_openai_ocr_cache_hit_avoids_second_api_call(): void
     {
         $this->app->instance(
-            \App\Contracts\Classifier::class,
+            Classifier::class,
             (new FakeClassifier)->willReturn(new Classification(DetectionLabel::Hoax, 0.9, 'v1.0.0', ['valid' => 0.1, 'hoax' => 0.9], 10))
         );
         $this->app->instance(
@@ -112,7 +119,7 @@ class PipelineIntegrationTest extends TestCase
         try {
             $classifier->classify(str_repeat('Klaim yang akan diuji retry. ', 10));
             $this->fail('Expected AiServiceException');
-        } catch (\App\Exceptions\AiServiceException $e) {
+        } catch (AiServiceException $e) {
             $this->assertTrue($e->retryable);
             $this->assertSame(429, $e->statusCode);
         }
@@ -129,7 +136,7 @@ class PipelineIntegrationTest extends TestCase
         try {
             $classifier->classify(str_repeat('Klaim invalid. ', 10));
             $this->fail('Expected AiServiceException');
-        } catch (\App\Exceptions\AiServiceException $e) {
+        } catch (AiServiceException $e) {
             $this->assertFalse($e->retryable);
             $this->assertSame(422, $e->statusCode);
         }
@@ -168,8 +175,8 @@ class PipelineIntegrationTest extends TestCase
         ]);
 
         $breaker = new CircuitBreaker('bert-test-'.uniqid());
-        $classifier = new \App\Services\Bert\CircuitBreakingClassifier(
-            new \App\Services\Bert\BertClassifier,
+        $classifier = new CircuitBreakingClassifier(
+            new BertClassifier,
             $breaker
         );
 
@@ -185,7 +192,7 @@ class PipelineIntegrationTest extends TestCase
         try {
             $classifier->classify('test text '.str_repeat('a', 50));
             $this->fail('Expected circuit breaker to be open');
-        } catch (\App\Exceptions\AiServiceException $e) {
+        } catch (AiServiceException $e) {
             $this->assertStringContainsString('mode pemulihan', $e->getMessage());
             $this->assertTrue($e->retryable);
         }
@@ -206,4 +213,3 @@ class PipelineIntegrationTest extends TestCase
         $this->assertSame($first->narrative, $second->narrative);
     }
 }
-

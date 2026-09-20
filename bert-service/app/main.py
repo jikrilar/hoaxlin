@@ -159,6 +159,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @application.get("/version", response_model=VersionResponse, tags=["metadata"])
     async def version() -> VersionResponse:
+        active_model_version = runtime.model_version if runtime.ready else None
         labels = None
         if runtime.label_map:
             labels = [runtime.label_map[i] for i in sorted(runtime.label_map.keys())]
@@ -168,11 +169,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return VersionResponse(
             service=configured_settings.service_name,
             service_version=configured_settings.service_version,
-            model_version=runtime.model_version,
+            model_version=active_model_version,
             model_status=runtime.status,
             model_labels=labels,
             threshold=runtime.threshold,
             temperature=runtime.temperature,
+            evaluation_model_version=runtime.evaluation_metadata.get("model_version"),
+            evaluation_accuracy=runtime.evaluation_metadata.get("accuracy"),
+            evaluation_macro_f1=runtime.evaluation_metadata.get("macro_f1"),
+            evaluation_sample_count=runtime.evaluation_metadata.get("sample_count"),
+            evaluation_dataset_name=runtime.evaluation_metadata.get("dataset_name"),
+            evaluation_dataset_version=runtime.evaluation_metadata.get("dataset_version"),
+            evaluation_split=runtime.evaluation_metadata.get("split"),
+            exported_at=runtime.evaluation_metadata.get("exported_at"),
         )
 
     @application.get("/metrics", tags=["monitoring"])
