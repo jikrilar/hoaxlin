@@ -296,8 +296,10 @@ try {
     Invoke-Compose -Arguments @('exec', '-T', 'app', 'php', 'artisan', 'migrate', '--force')
     Write-Step 'PASS' 'Database migration complete'
 
-    Invoke-Compose -Arguments @('up', '-d', 'queue')
-    Wait-Service 'queue' @('healthy', 'running')
+    Invoke-Compose -Arguments @('up', '-d', 'queue', 'scheduler')
+    foreach ($service in @('queue', 'scheduler')) {
+        Wait-Service $service @('healthy', 'running')
+    }
 
     Write-Host ''
     Invoke-Compose -Arguments @('ps')

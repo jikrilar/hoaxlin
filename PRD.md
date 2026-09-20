@@ -9,7 +9,7 @@ date: "25 Juli 2026"
 
 Dokumen ini merupakan Product Requirements Document (PRD) untuk proyek Tugas Akhir Program Diploma III Teknik Komputer berjudul **"Rancang Bangun Sistem Pendeteksi Berita Hoax dengan Metode BERT untuk Analisis Teks Mendalam"**. Sistem yang dibangun adalah aplikasi web publik yang membantu pengguna umum memeriksa kebenaran suatu berita yang beredar di internet maupun media sosial. Pengguna dapat mengirimkan berita dalam empat bentuk masukan: teks langsung, foto/tangkapan layar, video, atau tautan (URL) berita. Sistem kemudian memproses masukan tersebut, mengekstraksi kontennya menjadi teks, dan melakukan klasifikasi menggunakan model **BERT (Bidirectional Encoder Representations from Transformers)** yang telah di-*fine-tune* untuk tugas deteksi hoax berbahasa Indonesia, lalu menampilkan hasil berupa label **Valid**, **Hoax**, atau **Meragukan** beserta tingkat keyakinan (*confidence score*) dan penjelasan singkat.
 
-Aplikasi dibangun di atas **Laravel** dengan **Livewire** dan **Filament** untuk antarmuka pengguna dan panel admin, **MySQL** sebagai basis data, **Tailwind CSS** untuk styling, serta **OpenAI API** yang berperan sebagai layanan pendukung (OCR gambar, transkripsi audio/video, dan penyusunan penjelasan hasil dalam bahasa alami) — bukan sebagai mesin klasifikasi utama, karena metode inti deteksi hoax tetap dijalankan oleh model BERT sesuai judul Tugas Akhir.
+Aplikasi dibangun di atas **Laravel** dengan **Livewire** dan **Filament** untuk antarmuka pengguna dan panel admin, **MySQL** sebagai basis data, **Tailwind CSS** untuk styling, serta **OpenAI API** yang berperan sebagai layanan pendukung (OCR gambar, transkripsi audio/video, terjemahan Inggris ke Indonesia, dan penyusunan penjelasan hasil dalam bahasa alami) — bukan sebagai mesin klasifikasi utama, karena metode inti deteksi hoax tetap dijalankan oleh model BERT sesuai judul Tugas Akhir.
 
 # Latar Belakang
 
@@ -36,10 +36,11 @@ Perkembangan Natural Language Processing (NLP), khususnya model berbasis Transfo
 
 ## Termasuk dalam Lingkup (In-Scope)
 
-- Website publik dengan empat mekanisme input: teks, unggah foto, unggah/tautan video, dan tautan URL berita.
+- Website dengan empat mekanisme input: teks, unggah foto, unggah/direct media URL, dan URL artikel. Guest hanya dapat mengirim teks; input URL dan media memerlukan login.
 - Ekstraksi teks dari gambar (OCR) dan dari video (transkripsi audio) sebagai tahap pra-pemrosesan sebelum masuk ke model BERT.
 - Model BERT (fine-tuned) untuk klasifikasi teks berita berbahasa Indonesia ke dalam kategori Valid / Hoax / Meragukan.
-- Penjelasan hasil deteksi berbasis bahasa alami menggunakan OpenAI API.
+- Terjemahan input Inggris ke Indonesia sebelum klasifikasi IndoBERT.
+- Penjelasan hasil deteksi berbasis bahasa alami menggunakan OpenAI API, dengan state `unavailable` bila dependency non-kritis tidak tersedia.
 - Riwayat pengecekan bagi pengguna terdaftar dan mekanisme umpan balik (feedback) atas hasil deteksi.
 - Panel admin (Filament) untuk pengelolaan dataset, pengguna, dan pemantauan statistik model.
 - Autentikasi pengguna dasar (registrasi, login) untuk fitur riwayat dan feedback.
@@ -48,7 +49,7 @@ Perkembangan Natural Language Processing (NLP), khususnya model berbasis Transfo
 
 - Pemantauan otomatis (crawling real-time) media sosial tanpa input eksplisit dari pengguna.
 - Aplikasi mobile native (fokus awal pada web responsif).
-- Dukungan penuh untuk berita berbahasa asing selain Bahasa Indonesia (model BERT dilatih khusus korpus Indonesia).
+- Dukungan bahasa selain Indonesia dan Inggris. Input Inggris diterjemahkan ke Indonesia; model BERT tetap dilatih khusus korpus Indonesia.
 - Putusan hukum atau sertifikasi resmi atas status suatu berita — sistem hanya memberikan **indikasi probabilistik**, bukan vonis final, dan tetap menyarankan verifikasi ke sumber tepercaya.
 - Analisis konten visual video secara mendalam (deepfake detection) — dicatat sebagai potensi pengembangan lanjutan.
 
@@ -67,9 +68,9 @@ Sistem terdiri atas beberapa lapisan utama:
 
 1. **Frontend/UI** — Dibangun dengan Blade + Livewire dan Tailwind CSS, menyediakan form input multimoda serta halaman hasil deteksi yang reaktif (live update status proses tanpa reload penuh).
 2. **Backend Aplikasi (Laravel)** — Menangani autentikasi, validasi input, penyimpanan data, orkestrasi job queue, serta komunikasi ke layanan eksternal (BERT service dan OpenAI API) melalui `Illuminate\Support\Facades\Http`.
-3. **Job Queue (Laravel Queue, disarankan dengan Horizon)** — Karena proses OCR, transkripsi video, dan inferensi model dapat memakan waktu, seluruh proses berat dijalankan secara asinkron di background, dengan status yang dipantau Livewire secara real-time.
+3. **Job Queue (Laravel Queue)** — Ekstraksi, deteksi bahasa/terjemahan, inferensi, dan explanation dijalankan asinkron pada named queue `default`, `extract-text`, `extract-media`, `inference`, dan `explanation`; status dipantau melalui polling halaman hasil.
 4. **Layanan Inferensi BERT (Python microservice)** — BERT dan library seperti Hugging Face Transformers berjalan di ekosistem Python, bukan PHP. Oleh karena itu, disarankan membangun microservice terpisah (misalnya dengan FastAPI atau Flask) yang meng-*host* model BERT hasil fine-tuning, diekspos sebagai REST API internal, dan dipanggil oleh Laravel melalui HTTP request. Ini menjaga aplikasi Laravel tetap ringan sekaligus memisahkan tanggung jawab (separation of concerns) antara logika aplikasi web dan komputasi machine learning.
-5. **OpenAI API (Layanan Pendukung)** — Digunakan untuk OCR gambar, transkripsi audio/video, ekstraksi/rangkuman konten dari tautan, dan penyusunan penjelasan hasil deteksi dalam bahasa alami.
+5. **OpenAI API (Layanan Pendukung)** — Digunakan untuk OCR gambar, transkripsi audio/video, terjemahan Inggris ke Indonesia, dan penyusunan penjelasan hasil deteksi dalam bahasa alami. Artikel URL diekstrak oleh parser aplikasi, bukan diklasifikasikan OpenAI.
 6. **Basis Data (MySQL)** — Menyimpan data pengguna, riwayat submission, hasil deteksi, katalog kurasi production, dan log aktivitas admin.
 7. **Panel Admin (Filament)** — Antarmuka pengelolaan katalog kurasi, pengguna, dan pemantauan performa model. Katalog ini tidak menjadi input training otomatis.
 
@@ -80,19 +81,19 @@ Sistem terdiri atas beberapa lapisan utama:
 Alur umum berlaku untuk semua jenis input, dengan tahap pra-pemrosesan yang berbeda di awal:
 
 **1. Input Teks**
-Pengguna menempelkan teks berita → validasi & pembersihan teks (normalisasi, penghapusan karakter tidak relevan) → tokenisasi BERT → inferensi klasifikasi → hasil (label + skor keyakinan).
+Pengguna menempelkan teks berita → ekstraksi/normalisasi → deteksi bahasa → teks Indonesia diteruskan, sedangkan teks Inggris diterjemahkan ke Indonesia → tokenisasi dan inferensi BERT → hasil (label + skor keyakinan).
 
 **2. Input Foto**
-Pengguna mengunggah gambar/tangkapan layar berita → ekstraksi teks melalui OCR (OpenAI Vision API) → hasil ekstraksi ditampilkan untuk konfirmasi pengguna (opsional) → lanjut ke alur analisis teks seperti di atas.
+User login mengunggah gambar/tangkapan layar berita → ekstraksi teks melalui OCR (OpenAI Vision API) → deteksi bahasa/terjemahan bila diperlukan → lanjut ke klasifikasi.
 
 **3. Input Video**
-Pengguna mengunggah video atau menempelkan tautan video → ekstraksi audio → transkripsi ke teks (OpenAI Whisper API) → lanjut ke alur analisis teks. Proses ini dijalankan secara asinkron mengingat durasinya lebih lama, dengan indikator progres di antarmuka.
+User login mengunggah video atau memasukkan direct URL file audio/video → transkripsi dengan bahasa dideteksi provider → deteksi bahasa/terjemahan bila diperlukan → lanjut ke klasifikasi. URL halaman platform/player tidak didukung. Proses berjalan asinkron dengan indikator progres.
 
 **4. Input Tautan (URL)**
 Pengguna menempelkan tautan berita → sistem mengambil (fetch) halaman → ekstraksi konten artikel utama (menghilangkan elemen non-konten seperti iklan/navigasi) → lanjut ke alur analisis teks.
 
 **Tahap Akhir (berlaku untuk semua jalur):**
-Hasil klasifikasi BERT (label + skor keyakinan) dikirim ke OpenAI API untuk disusun menjadi penjelasan naratif yang mudah dipahami awam → seluruh hasil (input asli, teks hasil ekstraksi, label, skor, penjelasan) disimpan ke database → ditampilkan ke pengguna → pengguna dapat memberikan feedback atas akurasi hasil (opsional, untuk perbaikan dataset ke depan).
+Pipeline aktual adalah `ProcessSubmission → ExtractSubmissionText → TranslateSubmissionText → ClassifySubmission → GenerateSubmissionExplanation → completed/failed`, dengan stage `queued → extracting → translating → classifying → explaining → done`. Hasil BERT (label + skor keyakinan) adalah hasil inti. OpenAI dapat menyusun penjelasan naratif; jika dependency explanation gagal secara non-kritis, explanation menjadi `unavailable` dan hasil BERT tetap final. Pengguna login dapat memberikan feedback, tetapi data production tidak otomatis menjadi corpus training.
 
 # Kebutuhan Fungsional
 
@@ -100,12 +101,12 @@ Prioritas menggunakan skala MoSCoW: **M**ust have, **S**hould have, **C**ould ha
 
 | ID | Fitur | Deskripsi | Prioritas |
 |---|---|---|---|
-| FR-01 | Input teks manual | Pengguna memasukkan teks berita secara langsung | Must |
-| FR-02 | Input gambar + OCR | Unggah foto/tangkapan layar, teks diekstraksi otomatis | Must |
-| FR-03 | Input video/tautan video + transkripsi | Unggah video atau tautan, audio ditranskripsi menjadi teks | Should |
-| FR-04 | Input tautan URL berita | Sistem mengambil dan mengekstraksi konten artikel dari tautan | Must |
+| FR-01 | Input teks manual | Guest maupun user login memasukkan teks berita secara langsung | Must |
+| FR-02 | Input gambar + OCR | User login mengunggah foto/tangkapan layar, teks diekstraksi otomatis | Must |
+| FR-03 | Input video/direct media URL + transkripsi | User login mengunggah video atau direct URL file audio/video; halaman platform tidak didukung | Should |
+| FR-04 | Input tautan URL berita | User login memasukkan URL; sistem mengambil dan mengekstraksi konten artikel | Must |
 | FR-05 | Klasifikasi BERT | Proses inti deteksi hoax menghasilkan label & skor keyakinan | Must |
-| FR-06 | Penjelasan hasil berbasis AI | Narasi penjelasan hasil deteksi menggunakan OpenAI API | Should |
+| FR-06 | Penjelasan hasil berbasis AI | Narasi OpenAI dapat tersedia atau `unavailable`; hasil klasifikasi BERT tetap inti | Should |
 | FR-07 | Autentikasi pengguna | Registrasi, login, manajemen profil | Must |
 | FR-08 | Riwayat pengecekan | Pengguna terdaftar dapat melihat riwayat submission mereka | Should |
 | FR-09 | Feedback hasil deteksi | Pengguna melaporkan jika hasil dirasa kurang tepat | Should |
@@ -123,7 +124,7 @@ Prioritas menggunakan skala MoSCoW: **M**ust have, **S**hould have, **C**ould ha
 | Performa | Tidak ada klaim latency produksi tanpa telemetry; `inference_ms` dilaporkan sebagai latency inferensi BERT, sedangkan input gambar/video diproses asinkron dengan progres |
 | Skalabilitas | Proses berat (OCR, transkripsi, inferensi) dijalankan melalui job queue agar tidak memblokir request utama |
 | Keamanan | Validasi & sanitasi seluruh input (termasuk file upload), proteksi CSRF/XSS/SQL Injection bawaan Laravel, penyimpanan API key secara terenkripsi di `.env` |
-| Privasi | Kebijakan retensi data untuk media yang diunggah publik; opsi penghapusan riwayat oleh pengguna |
+| Privasi | Media asli dihapus maksimal 24 jam setelah `completed`/`failed`; delete account menghapus permanen data/history user |
 | Keandalan | Penanganan kegagalan (fallback/pesan error yang jelas) bila layanan BERT atau OpenAI API tidak tersedia |
 | Kegunaan (Usability) | Antarmuka sederhana, responsif di perangkat mobile, dapat digunakan tanpa latar belakang teknis |
 | Kontrol Biaya | Pembatasan kuota pemanggilan OpenAI API mengingat sistem bersifat publik dan terbuka |
@@ -142,7 +143,7 @@ Korpus training dikelola sebagai file offline/versioned dengan provenance dan sp
 Pembersihan teks (penghapusan tag HTML, URL, karakter non-standar), normalisasi (penanganan singkatan/typo umum bila diperlukan), dan tokenisasi menggunakan WordPiece tokenizer bawaan model BERT yang dipilih.
 
 **3. Pemilihan Model Dasar**
-Menggunakan model BERT yang telah dilatih untuk Bahasa Indonesia (misalnya varian IndoBERT) sebagai *pretrained base model*, kemudian dilakukan **fine-tuning** untuk tugas klasifikasi teks (binary/multi-class: Valid, Hoax, dan opsional Meragukan).
+Menggunakan model BERT yang telah dilatih untuk Bahasa Indonesia (IndoBERT) sebagai *pretrained base model*, kemudian dilakukan **fine-tuning** untuk klasifikasi binary `valid`/`hoax`. `Meragukan` bukan kelas training, melainkan abstention ketika confidence di bawah threshold runtime.
 
 **4. Pipeline Pelatihan**
 Data dibagi menjadi train/validation/test set, fine-tuning dilakukan menggunakan library Hugging Face Transformers (berbasis PyTorch), dengan pemantauan loss dan metrik pada tiap epoch untuk mencegah overfitting.
@@ -159,7 +160,7 @@ Judul Tugas Akhir menegaskan **metode BERT** sebagai metode analisis teks utama.
 
 - **OCR gambar** — mengekstraksi teks dari foto/tangkapan layar berita sebelum diproses BERT.
 - **Transkripsi audio/video** — mengubah audio dari video menjadi teks sebelum diproses BERT.
-- **Ekstraksi/rangkuman tautan** — membantu membersihkan/merapikan hasil scraping artikel dari URL bila diperlukan.
+- **Terjemahan EN→ID** — menerjemahkan hasil ekstraksi/transkripsi Inggris ke Indonesia sebelum diproses IndoBERT.
 - **Penyusunan penjelasan hasil** — mengubah output teknis model BERT (label + skor) menjadi narasi yang mudah dipahami pengguna awam.
 
 Klasifikasi akhir **valid/hoax tetap ditentukan oleh model BERT**, sehingga alur kerja sistem selaras dengan judul dan rumusan masalah Tugas Akhir, sekaligus tetap memanfaatkan OpenAI API secara praktis untuk menangani input multimoda.
@@ -203,7 +204,7 @@ Halaman publik utama yang perlu dirancang: (1) Landing page dengan form empat je
 # Batasan dan Asumsi
 
 - Kualitas hasil deteksi sangat bergantung pada kualitas dan keberagaman dataset pelatihan.
-- Model BERT dioptimalkan untuk berita berbahasa Indonesia; berita berbahasa lain tidak dijamin akurat.
+- Model BERT dioptimalkan untuk berita berbahasa Indonesia. Input Inggris bergantung pada kualitas terjemahan EN→ID; bahasa lain tidak didukung.
 - Akurasi OCR dan transkripsi audio memengaruhi kualitas teks yang masuk ke model BERT, sehingga turut memengaruhi hasil akhir.
 - Penggunaan OpenAI API pada layanan publik memerlukan pemantauan biaya dan pembatasan kuota.
 - Sistem memberikan **indikasi probabilistik**, bukan keputusan hukum atau jaminan mutlak kebenaran suatu berita; pengguna tetap dianjurkan melakukan verifikasi lanjutan ke sumber tepercaya.
@@ -215,7 +216,7 @@ Halaman publik utama yang perlu dirancang: (1) Landing page dengan form empat je
 | Dataset tidak seimbang/terbatas | Model bias terhadap satu kelas | Augmentasi data, oversampling/undersampling, evaluasi per kelas |
 | Biaya OpenAI API membengkak (sistem publik) | Beban operasional/keberlanjutan proyek | Rate limiting, caching hasil, batas ukuran file/durasi video |
 | Waktu pengerjaan terbatas (jadwal Tugas Akhir) | Fitur tidak selesai tepat waktu | Prioritas MoSCoW, membangun MVP (teks & URL dahulu) sebelum fitur gambar/video |
-| Layanan BERT/OpenAI API tidak tersedia | Proses deteksi gagal | Penanganan error yang jelas, retry mechanism, status job yang transparan bagi pengguna |
+| Layanan BERT/OpenAI API tidak tersedia | Stage inti dapat gagal; explanation non-kritis dapat unavailable | Retry policy, error publik tersanitasi, status transparan, dan graceful degradation explanation |
 | Penyalahgunaan sistem (spam/upload berlebihan) | Beban server & biaya API tinggi | CAPTCHA, rate limiting per IP/akun, validasi ukuran file |
 
 # Rencana Pengujian

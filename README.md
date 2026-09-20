@@ -1,405 +1,167 @@
-# hoaxlin.id — Sistem Deteksi Hoax BERT
+# hoaxlin.id — Deteksi Hoaks Berbasis IndoBERT
 
-Platform web untuk memeriksa indikasi hoax pada berita berbahasa Indonesia. **Model BERT** yang di-*fine-tune* (IndoBERT) menentukan label `valid` / `hoax` / `meragukan`; threshold aktif dibaca dari artefak runtime BERT melalui `/version`. **OpenAI** hanya untuk OCR gambar, transkripsi video, dan penjelasan naratif.
+Hoaxlin adalah aplikasi Laravel 12 dengan layanan inferensi FastAPI. IndoBERT menentukan label inti `valid` atau `hoax`; `meragukan` adalah abstention ketika confidence tidak melewati threshold runtime. OpenAI mendukung OCR, transkripsi, terjemahan Inggris ke Indonesia, dan penjelasan naratif—bukan classifier.
 
-> **Status:** Pipeline `text` end-to-end telah proven (C5): `ProcessSubmission → Extract → Classify (BERT)` → `DetectionResult` via `queue:work`. Status pekerjaan terdokumentasi di `TASK.md`.
+## Fitur dan batas akses
 
----
+- Guest hanya dapat mengirim teks dan membuka hasilnya dengan capability token submission tersebut.
+- User login dapat mengirim teks, URL artikel, gambar, upload video, atau URL langsung file audio/video. Riwayat dan hasil user dilindungi ownership.
+- URL media harus menunjuk langsung ke file yang didukung. Halaman YouTube, TikTok, Instagram, Facebook, player, HTML, dan JSON tidak didukung.
+- Hasil klasifikasi BERT adalah hasil inti. Penjelasan dapat berstatus `unavailable` tanpa membatalkan klasifikasi yang valid.
+- Halaman hasil melakukan polling status; aplikasi tidak mengirim completion notification.
 
-## Daftar Isi
-- [Stack](#stack)
-- [Prasyarat](#prasyarat)
-- [Quick Start — 5 Menit](#quick-start--5-menit)
-- [Setup Developer Lengkap](#setup-developer-lengkap)
-- [Layanan BERT (FastAPI)](#layanan-bert-fastapi)
-- [Queue & Pipeline](#queue--pipeline)
-- [Testing](#testing)
-- [Panduan Administrator](#panduan-administrator)
-- [Struktur Proyek](#struktur-proyek)
-- [Troubleshooting](#troubleshooting)
-- [Deployment Singkat](#deployment-singkat)
+## Arsitektur dan pipeline
 
----
-
-## Stack
-
-| Lapisan | Teknologi |
+| Komponen | Tanggung jawab |
 |---|---|
-| **Backend** | Laravel 12, PHP 8.2+, MySQL 8+, Laravel Queue (database) |
-| **Frontend** | Livewire 4.3, Filament 5, Tailwind 4, Vite |
-| **AI** | FastAPI + Transformers 5.14 + PyTorch 2.13 (IndoBERT `indobenchmark/indobert-base-p1`) |
-| **Layanan Pendukung** | OpenAI API (Vision `gpt-4o-mini`, Whisper `whisper-1`, Chat `gpt-4o-mini`) |
+| Laravel | HTTP, autentikasi/otorisasi, validasi, penyimpanan, queue, admin Filament |
+| FastAPI/IndoBERT | Klasifikasi teks dan metadata runtime `/version` |
+| OpenAI | OCR, transkripsi, terjemahan EN→ID, dan penjelasan naratif |
+| MySQL | Data aplikasi dan ledger kuota OpenAI bulanan |
+| Redis | Queue, cache, session, lock, dan limiter sementara |
 
----
-
-## Prasyarat
-
-- **PHP** 8.2+ + Composer 2.x + Node 18+ + npm
-- **MySQL** 8+ (atau gunakan SQLite untuk test)
-- **Python** 3.10+ (disarankan 3.12, terverifikasi di 3.14) + pip
-- **Git**, **XAMPP** (atau MySQL standalone) di Windows
-- **FFprobe** opsional. Jika tersedia, durasi media dibatasi 5 menit; jika tidak tersedia, submission tetap diproses dengan validasi ukuran, MIME, extension, dan signature, tetapi batas durasi tidak dapat diverifikasi lokal.
-- **ClamAV** opsional (`clamdscan` untuk malware scan)
-
-Cek versi:
-
-```powershell
-php -v; composer -v; node -v; npm -v; python --version; mysql --version
+```text
+ProcessSubmission
+→ ExtractSubmissionText
+→ TranslateSubmissionText
+→ ClassifySubmission
+→ GenerateSubmissionExplanation
+→ completed | failed
 ```
 
----
+Stage progres adalah `queued → extracting → translating → classifying → explaining → done`. Teks Indonesia melewati stage translation tanpa pemanggilan provider; teks Inggris diterjemahkan ke Indonesia sebelum IndoBERT. `DetectionResult` parsial tidak dianggap final sebelum status submission `completed`.
 
-## Quick Start — 5 Menit
+## Setup pengembangan
+
+Prasyarat manual: PHP 8.2+, Composer, Node.js/npm, MySQL, Python 3.10+, virtual environment BERT, dan artifact model release yang disetujui.
 
 ```powershell
-# 1. Clone & install
-git clone <repo> hoax-detector; cd hoax-detector
-composer install; npm install
-
-# 2. Env & DB
+composer install
+npm install
 Copy-Item .env.example .env
-# → isi DB_DATABASE=hoax_detector, OPENAI_API_KEY, BERT_SERVICE_TOKEN (lihat di bawah)
 php artisan key:generate
-# Buat DB di MySQL: CREATE DATABASE hoax_detector CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 php artisan migrate --seed
 php artisan storage:link
 
-# 3. Admin
-php artisan make:filament-user  # isi email & password, lalu di DB: UPDATE users SET is_admin=1 WHERE email='...';
-
-# 4. BERT (wajib untuk klasifikasi — bukan opsional)
-cd bert-service
-py -m venv .venv; .\.venv\Scripts\Activate.ps1
+Set-Location bert-service
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 Copy-Item .env.example .env
-# Pastikan .env berisi:
-#   BERT_MODEL_PATH=C:/xampp/htdocs/hoax-detector/models/indobert-hoax/v1.0.0
-#   BERT_MODEL_VERSION=v1.0.0
-#   BERT_SERVICE_TOKEN=local-dev-token-change-me  (samakan dengan Laravel .env)
-cd ..
-
-# 5. Jalankan SEMUA layanan (4 proses sekaligus)
-composer run dev
-# → http://localhost:8000 (Laravel)
-# → http://127.0.0.1:8001/health/live (BERT liveness) — harus 200
-
-# 6. Cek di browser: buka http://localhost:8000, kirim teks "Beredar unggahan..." → /hasil/{id} akan polling 2s dan menampilkan label
+Set-Location ..
 ```
 
-**Kenapa `composer run dev` wajib (bukan `php artisan serve` saja)?** Karena ekstraksi & klasifikasi berjalan **async via queue** di `extract-text,extract-media,inference,explanation`. `php artisan serve` saja tidak menjalankan `queue:listen`, sehingga submission akan **stuck 60% (classifying)** selamanya. `composer run dev` menjalankan `serve + queue:listen --queue=extract-text,extract-media,inference,explanation,default + pail + vite` sekaligus.
+Isi konfigurasi lokal dengan nilai sendiri; jangan commit credential:
 
----
-
-## Setup Developer Lengkap
-
-### 1. Konfigurasi `.env` (Laravel)
-
-Salin dan isi:
-
-```powershell
-Copy-Item .env.example .env
-php artisan key:generate
-```
-
-Wajib isi di `.env`:
-
-```ini
+```dotenv
 DB_DATABASE=hoax_detector
-DB_USERNAME=root
-DB_PASSWORD=
-
-# BERT — harus sama dengan bert-service/.env
 BERT_SERVICE_URL=http://127.0.0.1:8001
-BERT_SERVICE_TOKEN=local-dev-token-change-me
-BERT_SERVICE_TIMEOUT=30
-BERT_SERVICE_CONNECT_TIMEOUT=3
-BERT_CONFIDENCE_THRESHOLD=0.99   # samakan dengan threshold.json (0.99)
-
-# OpenAI — untuk OCR / transkripsi / penjelasan (jika kosong, pipeline tetap jalan untuk teks, tapi gambar/video & penjelasan akan degraded)
-OPENAI_API_KEY=sk-proj-...
-OPENAI_CHAT_MODEL=gpt-4o-mini
-OPENAI_VISION_MODEL=gpt-4o-mini
-OPENAI_TRANSCRIBE_MODEL=whisper-1
-
-# Kontrak transkripsi media: provider 90s < job 150s < worker 180s < retry_after 1800s
-MEDIA_TRANSCRIPTION_MAX_BYTES=25165824
-MEDIA_TRANSCRIPTION_MAX_DURATION=300
-MEDIA_DOWNLOAD_TIMEOUT=20
-MEDIA_TRANSCRIPTION_TIMEOUT=90
-MEDIA_JOB_TIMEOUT=150
-MEDIA_WORKER_TIMEOUT=180
-MEDIA_QUEUE_RETRY_AFTER=1800
-FFPROBE_BINARY=ffprobe
-
-# Queue & cache (dev)
-QUEUE_CONNECTION=database
-CACHE_STORE=database
+BERT_SERVICE_TOKEN=<generate-a-local-token>
+OPENAI_API_KEY=
 ```
 
-> **Token:** `BERT_SERVICE_TOKEN` **harus identik** di `.env` dan `bert-service/.env`. Jika kosong atau beda, klasifikasi gagal `401` dan submission akan `failed` (bukan stuck) berkat `failed()` hook C7.
+Token Laravel dan BERT service harus identik. Konfigurasi lengkap tersedia di `.env.example` dan `bert-service/.env.example`.
 
-### Kontrak transkripsi media
-
-- Upload video menerima MP4, MPEG, dan WEBM. URL media langsung menerima FLAC, MP3, MP4, MPEG/MPGA, M4A, OGG, WAV, dan WEBM.
-- Batas upload dan download sama-sama 24 MiB, menyediakan headroom multipart terhadap batas request transkripsi provider 25 MiB.
-- Video URL harus menunjuk langsung ke file. Halaman YouTube, TikTok, Instagram, Facebook, player, HTML, dan JSON tidak didukung.
-- Bahasa audio tidak dipaksa. Hasil transkripsi Indonesia langsung masuk classifier; hasil Inggris melewati deteksi bahasa dan terjemahan ke Indonesia sebelum IndoBERT.
-- `ffprobe` tetap opsional. Tanpanya, validasi durasi 5 menit tidak dapat dijalankan, tetapi validasi ukuran/format tetap wajib.
-
-### 2. Database
+### Mode A: all-in-one
 
 ```powershell
-# Buat DB
-mysql -u root -e "CREATE DATABASE hoax_detector CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-php artisan migrate
-php artisan db:seed              # data demo: user, admin, dataset
-php artisan storage:link
+composer run dev
 ```
 
-Untuk test tanpa MySQL, `phpunit.xml` sudah `DB_CONNECTION=sqlite` `:memory:` → `php artisan test` langsung jalan (46 tests).
+Script ini menjalankan lima proses dari `composer.json`: Laravel server, queue listener, Pail, Vite, dan uvicorn BERT. Jangan menjalankan BERT lagi di terminal kedua saat memakai mode ini.
 
-### 3. Filament Admin
+### Mode B: manual
+
+Jalankan masing-masing di terminal terpisah:
 
 ```powershell
-php artisan make:filament-user
-# → email: admin@hoaxlin.id, password: ****
-# lalu:
-# mysql -u root -e "UPDATE hoax_detector.users SET is_admin=1 WHERE email='admin@hoaxlin.id';"
+php artisan serve
+php artisan queue:work --queue=extract-text,extract-media,inference,explanation,default --tries=3
+php artisan pail --timeout=0
+npm run dev
+.\bert-service\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir bert-service --host 127.0.0.1 --port 8001
 ```
 
-Buka `http://localhost:8000/admin` → login.
+Named queue yang harus dikonsumsi adalah `default`, `extract-text`, `extract-media`, `inference`, dan `explanation`.
 
-### 4. Frontend
+## Kontrak media dan dependency opsional
+
+- Upload video: MP4, MPEG, WEBM.
+- Direct media URL: FLAC, MP3, MP4, MPEG/MPGA, M4A, OGG, WAV, WEBM dengan pasangan extension dan Content-Type yang kompatibel.
+- Ukuran maksimum upload maupun download: 24 MiB.
+- Bahasa transkripsi dideteksi provider. Audio Indonesia tidak diterjemahkan; audio Inggris masuk stage EN→ID sebelum klasifikasi.
+- Hierarki timeout default: provider 90 detik < job 150 detik < worker 180 detik < queue `retry_after` 1800 detik.
+- Fetch artikel dan media memvalidasi target awal dan setiap redirect terhadap SSRF.
+
+`ffprobe` opsional. Jika tersedia, durasi diverifikasi terhadap `MEDIA_TRANSCRIPTION_MAX_DURATION` (default 300 detik). Tanpanya, pemeriksaan durasi lokal dilewati, tetapi validasi ukuran, extension, MIME, dan signature tetap berjalan.
+
+`clamdscan` opsional sebagai defense-in-depth. Jika tersedia, upload dipindai ClamAV. Tanpanya, scanner tetap menjalankan pemeriksaan pola berbahaya dasar dan validasi upload lainnya tetap berlaku.
+
+## Queue, recovery, dan retensi
 
 ```powershell
-npm install
-npm run dev     # dev dengan HMR
-# atau
-npm run build   # production build ke public/build
+php artisan submissions:recover-stale --dry-run
+php artisan submissions:recover-stale
+php artisan submissions:recover --dry-run
+php artisan media:prune --hours=24 --dry-run
+php artisan media:prune --hours=24
+php artisan hoaxlin:doctor
 ```
 
----
+Scheduler mendaftarkan `media:prune` setiap menit dan `submissions:recover-stale` setiap lima menit dengan overlap protection. Media asli lokal dipertahankan maksimal `MEDIA_RETENTION_HOURS` (default 24 jam) setelah terminal `completed` atau `failed`; submission yang masih diproses tidak disentuh. Teks, hasil, dan history tidak dihapus oleh pruning media.
 
-## Layanan BERT (FastAPI)
+## CAPTCHA dan kuota
 
-Model IndoBERT v1.0.0 sudah ada di `models/indobert-hoax/v1.0.0/` (498 MB, `model.safetensors` + `tokenizer.json`, `config.json` `id2label {0:valid,1:hoax}`, `threshold.json` 0.99, `calibration.json` T=0.87). Jika belum ada, build via pipeline C3:
+Submission memakai CAPTCHA one-time yang di-reserve/consume secara atomik. Daily quota default adalah 30 submission per IP dan 100 per akun, terpisah dari burst throttle route. Limiter OpenAI per menit memakai counter dengan TTL; budget bulanan memakai ledger database durable dengan reservation dan reconciliation. Cache hit tidak dihitung sebagai request provider baru.
 
-```powershell
-cd bert-service
-# ... venv & pip install seperti di atas ...
-# Dataset sudah ada: datasets/processed/komdigi-antara-v1/ (7816 rows)
-# Jika ingin retrain:
-.\.venv\Scripts\python.exe -m train.pipeline
-```
+## Admin, dataset, dan statistik model
 
-### Batas katalog production dan training
+Panel `/admin` hanya dapat diakses admin. **Katalog Dataset** adalah katalog/kurasi production; hanya admin dapat menjadi verifier. Record katalog bukan corpus training aktif dan tidak memicu export, sinkronisasi, retraining, reload, atau promosi model.
 
-- Menu **Katalog Dataset** di `/admin` adalah katalog/kurasi manual untuk referensi operasional. Record Laravel `datasets` bukan corpus training aktif dan perubahan pada record tidak mengubah model yang sedang dilayani.
-- Training BERT tetap merupakan workflow offline melalui `bert-service/dataset/` dan `bert-service/train/`. Inputnya adalah file JSONL versioned di `datasets/processed/komdigi-antara-v1/`, bukan tabel database Laravel.
-- Model training bersifat binary (`valid`/`hoax`). Nilai `meragukan` pada aplikasi adalah state abstention berbasis confidence threshold; label katalog production tidak otomatis menjadi kontrak kelas training.
-- Menjadikan record katalog sebagai kandidat corpus di masa depan memerlukan kurasi, provenance, preprocessing, evaluasi, export artifact, dan deployment versi model secara eksplisit. Aplikasi tidak menyediakan import, auto-export, auto-sync, retraining, reload, atau promosi model otomatis.
+Training BERT tetap offline dan versioned melalui `bert-service/dataset/` dan `bert-service/train/`, memakai file di `datasets/processed/`. Model baru hanya aktif melalui evaluasi, export artifact, release, dan deployment eksplisit.
 
-**Start manual (tanpa `composer run dev`):**
-
-```powershell
-cd bert-service
-# PowerShell: load .env ke process env
-Get-Content .env | ForEach-Object {
-    if ($_ -match '^\s*([^#][^=]*)=(.*)$') {
-        [Environment]::SetEnvironmentVariable($matches[1].Trim(), $matches[2].Trim().Trim('"'), 'Process')
-    }
-}
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8001 --log-level info
-# Tunggu "Application startup complete." + "Uvicorn running on http://127.0.0.1:8001"
-```
-
-**Health check (wajib 200 sebelum kirim submission):**
-
-```powershell
-Invoke-RestMethod http://127.0.0.1:8001/health/live              # -> {"status":"ok"}
-Invoke-RestMethod http://127.0.0.1:8001/health/ready             # -> 200 {"status":"ok","model_status":"ready"} atau 503 jika BERT_MODEL_PATH salah
-Invoke-RestMethod http://127.0.0.1:8001/version                  # -> active runtime version/threshold + optional evaluation provenance
-# Predict (butuh Bearer token):
-$h = @{Authorization="Bearer local-dev-token-change-me"}
-Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8001/predict -Headers $h -Body '{"text":"Beredar unggahan..."}' -ContentType application/json
-```
-
-Detail lengkap: `bert-service/README.md` (Model Serving, Dataset, Fine-tuning).
-
----
-
-## Queue & Pipeline
-
-**Alur:** `ProcessSubmission` → `ExtractSubmissionText` (`extract-text` / `extract-media`) → `ClassifySubmission` (`inference`) → `GenerateSubmissionExplanation` (`explanation`) → `completed`. Setiap job punya `tries`/`backoff`/`timeout` dan `failed()` hook (C7) yang menandai `submissions.status=failed` + `processing_events` agar tidak stuck `processing` selamanya.
-
-**Queue yang harus didengar (penting!):**
-
-```ini
-# composer.json dev sudah benar:
-# "php artisan queue:listen --queue=extract-text,extract-media,inference,explanation,default --tries=3"
-```
-
-Manual per-queue:
-
-```powershell
-php artisan queue:work --queue=extract-text,extract-media,inference,explanation,default --stop-when-empty --tries=3
-# atau per-queue untuk debug:
-php artisan queue:work --queue=inference --stop-when-empty -v
-```
-
-**Cek antrean:**
-
-```powershell
-php artisan tinker --execute="echo DB::table('jobs')->count().' jobs pending, '.DB::table('failed_jobs')->count().' failed';"
-# atau pakai helper:
-php check_jobs.php   # (jika ada)
-```
-
-**Hapus stuck jobs setelah perbaiki token/BERT:**
-
-```powershell
-php artisan tinker --execute="DB::table('jobs')->delete(); DB::table('failed_jobs')->delete();"
-# lalu kirim submission baru dan jalankan queue:work lagi
-```
-
-**Progress bar:** `ProcessingStage` enum (`queued 0% → extracting 25% → classifying 60% → explaining 85% → done 100%`). Halaman `/hasil/{id}` polling `GET /hasil/{id}/status` via Livewire `wire:poll.2s.visible` + JS fallback, auto-reload saat `completed`/`failed`.
-
----
+Model aktif dan threshold pada UI berasal dari runtime BERT `/version`, bukan histori hasil. Metrik evaluasi hanya tampil jika artifact aktif memberi provenance yang cocok. Latency adalah median `inference_ms` untuk completed classifications pada versi aktif, bukan total waktu proses. Data yang tidak dapat diverifikasi ditampilkan sebagai `n/a`.
 
 ## Testing
 
-### Laravel (46 tests, SQLite in-memory, no MySQL needed)
-
 ```powershell
 php artisan test
-php artisan test --filter=BertClassifierTest
-php artisan test --filter=RealBertInferenceTest  # butuh BERT hidup, else skipped
-php artisan test --filter=SubmissionProgressTest
+
+Set-Location bert-service
+.\.venv\Scripts\python.exe -m pytest -q
+Set-Location ..
+
+docker build --target test -t hoaxlin-app:test .
+docker run --rm -e APP_KEY="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" hoaxlin-app:test
+docker compose config --quiet
 ```
 
-`phpunit.xml` sudah `DB_CONNECTION=sqlite` `:memory:`, `QUEUE_CONNECTION=sync`, `CACHE_STORE=array`.
+Test real-BERT membutuhkan service dan artifact yang tersedia; test tersebut skip secara eksplisit jika dependency tidak tersedia.
 
-### BERT Service (64 tests)
+## Docker
 
-```powershell
-cd bert-service
-.\.venv\Scripts\python.exe -m pytest -q          # 64 passed
-.\.venv\Scripts\python.exe -m pytest tests/test_api.py -q  # 12 contract tests
+Docker adalah referensi deployment lokal utama. Lihat [DOCKER-SETUP.md](DOCKER-SETUP.md) untuk bootstrap dan [RUNBOOK.md](RUNBOOK.md) untuk operasi.
+
+```console
+docker compose up -d
+docker compose ps
+docker compose exec app php artisan hoaxlin:doctor
+docker compose down
 ```
 
-### Verifikasi manual end-to-end
+Compose menjalankan `app`, `queue`, `scheduler`, `mysql`, `redis`, dan `bert`. Hanya `app` mengekspos port host. `docker compose down` tidak menghapus named volume; jangan gunakan `down -v` sebagai operasi normal.
 
-```powershell
-# 1. Pastikan BERT ready
-Invoke-RestMethod http://127.0.0.1:8001/health/ready
-# 2. Buat submission via tinker
-php artisan tinker --execute="\$s=App\Models\Submission::create(['input_type'=>'text','raw_input'=>str_repeat('Beredar unggahan... ',3),'status'=>'pending']); App\Jobs\ProcessSubmission::dispatch(\$s); echo 'id='.\$s->id;"
-# 3. Jalankan queue
-php artisan queue:work --queue=extract-text,extract-media,inference,explanation,default --stop-when-empty
-# 4. Cek hasil
-php artisan tinker --execute="\$s=App\Models\Submission::latest()->first(); echo \$s->status.' '.\$s->processing_stage.' label='.\$s->detectionResult?->label;"
-```
+## Privasi
 
----
-
-## Panduan Administrator
-
-### Menjalankan Lokal (untuk demo / sidang)
-
-1. **Siapkan dua terminal:**
-   - Terminal 1: `composer run dev` (menjalankan `serve` + `queue:listen` semua queue + `pail` + `vite`)
-   - Terminal 2: `cd bert-service` → `uvicorn` (jika tidak pakai `composer run dev`, jalankan manual seperti di atas)
-
-2. **Buat admin & atur:** `http://localhost:8000/admin` → cek **Users**, **Submissions**, **Detection Results**, **Feedback**.
-
-3. **Kirim uji:** buka `/` → tab **Teks** → tempel `Beredar unggahan di media sosial yang mengklaim bansos Rp 50 juta untuk semua warga` → **Cek Sekarang** → akan redirect ke `/hasil/{id}` dengan progress 0% → 100% (2s polling). Jika `failed`, cek `storage/logs/laravel.log` dan `failed_jobs`.
-
-### Kelola Pengguna & Dataset
-
-- **Jadikan admin:** `UPDATE users SET is_admin=1 WHERE email='...';`
-- **Katalog Dataset:** `/admin` → **Katalog Dataset** untuk mencatat dan memverifikasi referensi kurasi production. Hanya admin dapat menjadi verifier; perubahan katalog tidak menjalankan training atau mengganti model aktif.
-- **Submission:** read-only di Filament untuk audit; ubah status manual via `php artisan tinker` jika perlu.
-
-### Monitoring & Pemeliharaan
-
-```powershell
-# Lihat job tertunda / gagal
-php artisan queue:monitor
-php artisan queue:failed              # list
-php artisan queue:retry all           # retry
-php artisan queue:flush               # hapus failed
-
-# Media retention (C12) — hapus file >30 hari
-php artisan media:prune --dry-run
-php artisan media:prune --days=30
-
-# Cache & view
-php artisan config:clear; php artisan cache:clear; php artisan view:clear
-
-# Log
-Get-Content storage\logs\laravel.log -Tail 50 -Wait  # atau php artisan pail
-Get-Content bert-service\uvicorn.log -Tail 50
-```
-
-**Jika klasifikasi stuck 60% / `failed` 401:**
-- Cek `BERT_SERVICE_TOKEN` sama di `.env` dan `bert-service/.env` → `php artisan config:clear` → restart BERT.
-- Cek BERT hidup: `Invoke-RestMethod http://127.0.0.1:8001/health/ready`.
-- Cek queue: `DB::table('jobs')->count()` — jika >0, jalankan `queue:work` dengan semua queue (bukan hanya `default`).
-
----
-
-## Struktur Proyek
-
-```
-hoax-detector/
-├── app/
-│   ├── Actions/Submissions/CreateSubmission.php
-│   ├── Console/Commands/PruneOldMedia.php  # media:prune (C12)
-│   ├── Enums/ProcessingStage.php            # progressPercentage() untuk Livewire bar
-│   ├── Http/Controllers/{SubmissionController,DeteksiController,RiwayatController}
-│   ├── Jobs/{ProcessSubmission,ExtractSubmissionText,ClassifySubmission,GenerateSubmissionExplanation}
-│   ├── Livewire/SubmissionProgress.php      # wire:poll.2s.visible (D4)
-│   └── Services/{Bert/*,Extraction/*,OpenAI/*,Media/MalwareScanner.php}
-├── bert-service/
-│   ├── app/{main.py,config.py,inference.py} # ModelRuntime + label-map + threshold
-│   ├── dataset/ + train/                    # C2 + C3 pipelines
-│   ├── tests/test_api.py                   # 12 contract tests
-│   └── Dockerfile                          # C18
-├── datasets/processed/komdigi-antara-v1/    # 7816 rows, manifest.json
-├── models/indobert-hoax/v1.0.0/             # 498 MB, config.json, threshold.json
-├── resources/views/{hasil.blade.php,livewire/submission-progress.blade.php}
-├── routes/{web.php,console.php}            # console.php: media:prune schedule
-└── TASK.md                                  # audited implementation backlog
-```
-
----
-
-## Troubleshooting
-
-| Gejala | Penyebab Umum | Solusi |
-|---|---|---|
-| `hasil` stuck `pending` 0% | `queue:listen` hanya `default` | Gunakan `composer run dev` atau `queue:work --queue=extract-text,extract-media,inference,explanation,default` |
-| `failed` `401 Permintaan ke layanan BERT ditolak` | Token beda | Samakan `BERT_SERVICE_TOKEN` di `.env` & `bert-service/.env`, lalu `config:clear` + restart BERT |
-| `503 Model is not ready` / `CircuitBreaker open` | BERT mati atau `BERT_MODEL_PATH` salah | `Test-NetConnection 127.0.0.1 -Port 8001`, cek `uvicorn.log`, `Cache::get('breaker:bert:failures')` |
-| `SQLSTATE [2002]` di test | MySQL mati | Test sudah sqlite `:memory:`, cukup `php artisan test`; untuk manual, `mysql -u root -e "CREATE DATABASE hoax_detector;"` |
-| `git status fatal` | `.git` kosong | Sudah diperbaiki `git init` — `git log` harus ada 3 commit |
-| Gambar/video `failed` | `OPENAI_API_KEY` kosong atau kuota habis | Isi `OPENAI_API_KEY` di `.env`; cek `openai:rate` di cache; lihat `detection_results.estimated_cost_usd` |
-
----
-
-## Deployment Singkat
-
-- **Env:** `APP_ENV=production`, `APP_DEBUG=false`, `QUEUE_CONNECTION=redis` + `CACHE_STORE=redis` + `config/horizon.php`, `FILESYSTEM_DISK=s3` untuk media.
-- **Build:** `composer install --no-dev --optimize-autoloader`, `npm run build`, `php artisan migrate --force`, `php artisan storage:link`.
-- **Proses:** `php artisan horizon` (supervisor), `uvicorn app.main:app --host 0.0.0.0 --port 8001` via systemd/supervisord, `caddy`/`nginx` reverse proxy, `HEALTHCHECK` di `bert-service/Dockerfile` sudah ada.
-- **Backup:** `mysqldump hoax_detector`, `storage/app/private/submissions/*`.
-
----
+- Media asli dipruning maksimal 24 jam setelah processing terminal.
+- Delete account menghapus permanen akun, submission/history, result, feedback, event turunan, dan media terkait milik user.
+- Konten yang memerlukan OCR, transkripsi, terjemahan, atau explanation dapat diproses OpenAI.
+- Submission, feedback, dan katalog production tidak otomatis menjadi data training.
 
 ## Referensi
 
-- PRD: `PRD-Sistem-Deteksi-Hoax-BERT.md`
-- Backlog: `TASK.md`
-- BERT: `bert-service/README.md`
-- API: `POST /predict` → `bert-service/app/contracts.py`, auth `Bearer`, `X-Request-ID`
+- [PRD.md](PRD.md) — ruang lingkup produk dan akademik
+- [DOCKER-SETUP.md](DOCKER-SETUP.md) — bootstrap Docker
+- [RUNBOOK.md](RUNBOOK.md) — operasi, recovery, dan retensi
+- [bert-service/README.md](bert-service/README.md) — serving, dataset, training, dan release BERT
+- [TASK.md](TASK.md) — backlog dan hasil verifikasi historis

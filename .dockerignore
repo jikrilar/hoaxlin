@@ -18,6 +18,14 @@ docker/**
 !package-lock.json
 !phpunit.xml
 !vite.config.js
+!README.md
+!PRD.md
+!DOCKER-SETUP.md
+!RUNBOOK.md
+!TASK.md
+!scripts/
+!scripts/docker-setup.ps1
+!scripts/docker-setup.sh
 
 !app/
 !app/**
@@ -51,6 +59,7 @@ storage/**
 !bert-service/
 bert-service/**
 !bert-service/Dockerfile
+!bert-service/README.md
 !bert-service/requirements-runtime.txt
 !bert-service/app/
 !bert-service/app/**
