@@ -33,6 +33,7 @@ class DatabaseSeederTest extends TestCase
         $this->assertSame(0, DetectionResult::whereDoesntHave('submission')->count());
         $this->assertSame(0, Feedback::whereDoesntHave('submission')->orWhereDoesntHave('user')->count());
         $this->assertSame(0, Dataset::whereNotNull('verified_by')->whereDoesntHave('verifier')->count());
+        $this->assertSame(0, Dataset::whereHas('verifier', fn ($query) => $query->where('is_admin', false))->count());
         $this->assertSame(0, AdminLog::whereDoesntHave('admin')->count());
 
         $this->seed(DatabaseSeeder::class);

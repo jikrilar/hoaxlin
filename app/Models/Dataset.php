@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Rules\AdminUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Validator;
 
 class Dataset extends Model
 {
@@ -20,6 +22,16 @@ class Dataset extends Model
         'source',
         'verified_by',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Dataset $dataset): void {
+            Validator::make(
+                ['verified_by' => $dataset->verified_by],
+                ['verified_by' => ['nullable', new AdminUser]],
+            )->validate();
+        });
+    }
 
     public function scopeWithLabel(Builder $query, string $label): void
     {

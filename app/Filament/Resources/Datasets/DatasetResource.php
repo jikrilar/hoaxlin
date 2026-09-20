@@ -20,11 +20,11 @@ class DatasetResource extends Resource
 {
     protected static ?string $model = Dataset::class;
 
-    protected static ?string $navigationLabel = 'Dataset';
+    protected static ?string $navigationLabel = 'Katalog Dataset';
 
-    protected static ?string $modelLabel = 'dataset';
+    protected static ?string $modelLabel = 'data kurasi';
 
-    protected static ?string $pluralModelLabel = 'dataset';
+    protected static ?string $pluralModelLabel = 'katalog dataset';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

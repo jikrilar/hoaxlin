@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Validation\ValidationException;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
@@ -42,6 +43,19 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             'password' => 'hashed',
             'is_admin' => 'boolean',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::updating(function (User $user): void {
+            $isBeingDemoted = $user->isDirty('is_admin') && ! $user->is_admin;
+
+            if ($isBeingDemoted && $user->verifiedDatasets()->exists()) {
+                throw ValidationException::withMessages([
+                    'is_admin' => 'Administrator masih tercatat sebagai verifier katalog dataset.',
+                ]);
+            }
+        });
     }
 
     public function submissions(): HasMany

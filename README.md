@@ -193,6 +193,13 @@ cd bert-service
 .\.venv\Scripts\python.exe -m train.pipeline
 ```
 
+### Batas katalog production dan training
+
+- Menu **Katalog Dataset** di `/admin` adalah katalog/kurasi manual untuk referensi operasional. Record Laravel `datasets` bukan corpus training aktif dan perubahan pada record tidak mengubah model yang sedang dilayani.
+- Training BERT tetap merupakan workflow offline melalui `bert-service/dataset/` dan `bert-service/train/`. Inputnya adalah file JSONL versioned di `datasets/processed/komdigi-antara-v1/`, bukan tabel database Laravel.
+- Model training bersifat binary (`valid`/`hoax`). Nilai `meragukan` pada aplikasi adalah state abstention berbasis confidence threshold; label katalog production tidak otomatis menjadi kontrak kelas training.
+- Menjadikan record katalog sebagai kandidat corpus di masa depan memerlukan kurasi, provenance, preprocessing, evaluasi, export artifact, dan deployment versi model secara eksplisit. Aplikasi tidak menyediakan import, auto-export, auto-sync, retraining, reload, atau promosi model otomatis.
+
 **Start manual (tanpa `composer run dev`):**
 
 ```powershell
@@ -311,7 +318,7 @@ php artisan tinker --execute="\$s=App\Models\Submission::latest()->first(); echo
 ### Kelola Pengguna & Dataset
 
 - **Jadikan admin:** `UPDATE users SET is_admin=1 WHERE email='...';`
-- **Dataset:** `/admin` → **Datasets** → tambah data valid/hoax untuk retrain (format `text`, `label`).
+- **Katalog Dataset:** `/admin` → **Katalog Dataset** untuk mencatat dan memverifikasi referensi kurasi production. Hanya admin dapat menjadi verifier; perubahan katalog tidak menjalankan training atau mengganti model aktif.
 - **Submission:** read-only di Filament untuk audit; ubah status manual via `php artisan tinker` jika perlu.
 
 ### Monitoring & Pemeliharaan

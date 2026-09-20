@@ -141,6 +141,12 @@ schema -> normalization -> label reconciliation + quality gates -> exact +
 near-duplicate (MinHash LSH) dedup with claim-group clustering -> group-stratified
 train/val/test split -> provenance manifest + data card.
 
+This is an offline, file-based workflow. It reads explicitly supplied source files
+and writes versioned artifacts under `datasets/processed/`; it does not read the
+Laravel `datasets` table or synchronize records from the production admin catalog.
+Any future use of catalog records would require a separate reviewed offline curation
+workflow, which is not implemented by the application.
+
 Run against the prepared Komdigi export:
 
 ```powershell
@@ -196,6 +202,8 @@ Tests:
 ## Fine-tuning (C3)
 
 `train/` fine-tunes `indobenchmark/indobert-base-p1` with HuggingFace Trainer.
+The configured classes are binary (`valid`, `hoax`); `meragukan` is derived later
+from the calibrated confidence threshold and is not a trained class.
 
 Install training extras:
 
@@ -225,6 +233,10 @@ Artifacts: `models/indobert-hoax/v1.0.0/` (model.safetensors, tokenizer, config
 with id2label {0:valid,1:hoax}, calibration.json, threshold.json,
 evaluation.json, MODEL_CARD.md) + `models/runs/indobert-hoax-eval/`
 (evaluation_report.md, confusion_matrix.png, reliability_diagram.png).
+
+Exporting an artifact does not activate it in production. The inference service
+loads only the versioned path supplied through `BERT_MODEL_PATH`; release validation
+and deployment are explicit operational steps.
 
 **Known limitation:** valid is long Antara news vs hoax is short claim
 (`"Beredar unggahan..."` vs `"Jakarta (ANTARA) -"`). Held-out 1.0 is inflated

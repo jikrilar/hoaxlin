@@ -262,7 +262,7 @@ test image berhasil dibuild dan full suite lulus 210 test dengan 877 assertions,
 4 real-BERT test di-skip karena service tidak tersedia, dan 0 failed. `docker compose
 config --quiet`, Pint untuk seluruh file yang disentuh, dan `git diff --check` lulus.
 
-### [ ] P1.6 Dataset admin sebagai katalog kurasi terpisah dari training offline
+### [x] P1.6 Dataset admin sebagai katalog kurasi terpisah dari training offline
 
 Masalah:
 
@@ -274,14 +274,22 @@ Dokumentasikan dataset admin hanya sebagai katalog/kurasi, batasi verifier pada 
 
 Acceptance criteria:
 
-- [ ] Dataset admin dinyatakan bukan sumber training otomatis.
-- [ ] Hanya admin sah dapat menjadi verifier.
-- [ ] Training BERT tetap memakai dataset offline/versioned dengan provenance terpisah.
-- [ ] Tidak ada job, command, observer, atau admin action yang otomatis mengirim data production ke training.
+- [x] Dataset admin dinyatakan bukan sumber training otomatis.
+- [x] Hanya admin sah dapat menjadi verifier.
+- [x] Training BERT tetap memakai dataset offline/versioned dengan provenance terpisah.
+- [x] Tidak ada job, command, observer, atau admin action yang otomatis mengirim data production ke training.
 
 Verifikasi:
 
-Jalankan test authorization/verifier resource Filament dan periksa bahwa workflow release model tetap offline/versioned.
+Targeted P1.6, seeder, dan account-deletion regression lulus 12 test dengan 65
+assertions untuk akses resource, dropdown admin-only, forged/direct persistence,
+null/admin verifier, invariant edit/demotion, dan ketiadaan dispatch/subprocess saat
+CRUD katalog. Regression P0/P1.4/P1.5 lulus 62 test dengan 270 assertions. Seluruh
+69 test BERT service lulus, termasuk verifikasi training membaca JSONL versioned dari
+filesystem dengan kelas binary `valid`/`hoax`. Docker test image berhasil dibuild dan
+full Laravel suite lulus 218 test dengan 902 assertions, 4 real-BERT test di-skip
+karena inference service tidak tersedia, dan 0 failed. Gate Compose, Pint untuk
+seluruh file PHP yang disentuh, dan `git diff --check` lulus.
 
 ### [ ] P1.7 Penghapusan klaim statistik/model yang tidak didukung
 

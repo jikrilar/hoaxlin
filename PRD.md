@@ -59,7 +59,7 @@ Perkembangan Natural Language Processing (NLP), khususnya model berbasis Transfo
 | Masyarakat umum | Pengguna media sosial yang menerima berita/forward pesan dan ingin memverifikasi cepat | Antarmuka sederhana, hasil cepat, mudah dipahami |
 | Mahasiswa/akademisi | Meneliti atau mempelajari topik literasi digital dan misinformasi | Detail skor keyakinan, riwayat, ekspor data |
 | Pengelola komunitas/redaksi kecil | Admin grup, komunitas, atau media lokal yang ingin menyaring info sebelum disebar | Riwayat pengecekan, kemampuan input massal (future work) |
-| Administrator sistem | Mengelola dataset, memantau performa model, moderasi | Panel admin (Filament), statistik akurasi model |
+| Administrator sistem | Mengelola katalog kurasi, memantau performa model, moderasi | Panel admin (Filament), statistik akurasi model |
 
 # Arsitektur Sistem (Gambaran Tingkat Tinggi)
 
@@ -70,8 +70,8 @@ Sistem terdiri atas beberapa lapisan utama:
 3. **Job Queue (Laravel Queue, disarankan dengan Horizon)** — Karena proses OCR, transkripsi video, dan inferensi model dapat memakan waktu, seluruh proses berat dijalankan secara asinkron di background, dengan status yang dipantau Livewire secara real-time.
 4. **Layanan Inferensi BERT (Python microservice)** — BERT dan library seperti Hugging Face Transformers berjalan di ekosistem Python, bukan PHP. Oleh karena itu, disarankan membangun microservice terpisah (misalnya dengan FastAPI atau Flask) yang meng-*host* model BERT hasil fine-tuning, diekspos sebagai REST API internal, dan dipanggil oleh Laravel melalui HTTP request. Ini menjaga aplikasi Laravel tetap ringan sekaligus memisahkan tanggung jawab (separation of concerns) antara logika aplikasi web dan komputasi machine learning.
 5. **OpenAI API (Layanan Pendukung)** — Digunakan untuk OCR gambar, transkripsi audio/video, ekstraksi/rangkuman konten dari tautan, dan penyusunan penjelasan hasil deteksi dalam bahasa alami.
-6. **Basis Data (MySQL)** — Menyimpan data pengguna, riwayat submission, hasil deteksi, dataset training, dan log aktivitas admin.
-7. **Panel Admin (Filament)** — Antarmuka pengelolaan dataset, pengguna, dan pemantauan performa model.
+6. **Basis Data (MySQL)** — Menyimpan data pengguna, riwayat submission, hasil deteksi, katalog kurasi production, dan log aktivitas admin.
+7. **Panel Admin (Filament)** — Antarmuka pengelolaan katalog kurasi, pengguna, dan pemantauan performa model. Katalog ini tidak menjadi input training otomatis.
 
 **Catatan arsitektur penting:** karena Laravel/PHP tidak menjalankan model BERT secara native, komunikasi antara Laravel dan layanan BERT sebaiknya dirancang sejak awal sebagai API call antar-service (bukan proses inline), agar arsitektur tetap jelas saat dipresentasikan pada sidang Tugas Akhir dan mudah dikembangkan lebih lanjut.
 
@@ -110,7 +110,7 @@ Prioritas menggunakan skala MoSCoW: **M**ust have, **S**hould have, **C**ould ha
 | FR-08 | Riwayat pengecekan | Pengguna terdaftar dapat melihat riwayat submission mereka | Should |
 | FR-09 | Feedback hasil deteksi | Pengguna melaporkan jika hasil dirasa kurang tepat | Should |
 | FR-10 | Panel admin (Filament) | Kelola dataset, pengguna, dan pantau statistik model | Must |
-| FR-11 | Manajemen dataset & label | Admin menambah/mengoreksi data untuk retraining model | Should |
+| FR-11 | Katalog kurasi & label | Admin mencatat dan memverifikasi referensi kurasi production; tidak ada retraining otomatis | Should |
 | FR-12 | Statistik & visualisasi tren | Grafik tren jumlah hoax terdeteksi berdasarkan waktu/topik | Could |
 | FR-13 | Rate limiting & CAPTCHA | Mencegah penyalahgunaan/spam pada endpoint publik | Must |
 | FR-14 | Ekspor hasil (PDF/CSV) | Unduh hasil deteksi sebagai dokumen | Could |
@@ -135,6 +135,8 @@ Bagian ini menjadi inti metodologis Tugas Akhir sesuai judul yang diangkat.
 
 **1. Dataset**
 Dibutuhkan korpus berita berbahasa Indonesia yang telah berlabel valid/hoax, dapat dihimpun dari kombinasi sumber berita resmi (sebagai kelas valid) dan basis data klarifikasi hoax dari lembaga pemeriksa fakta maupun dataset publik yang tersedia untuk riset klasifikasi hoax berbahasa Indonesia. Disarankan melakukan audit keseimbangan kelas (class balance) sejak awal.
+
+Korpus training dikelola sebagai file offline/versioned dengan provenance dan split yang terpisah dari tabel `datasets` Laravel. Tabel Laravel hanya katalog/kurasi production dan tidak otomatis disinkronkan, diekspor, atau dipakai untuk melatih maupun mempromosikan model. Model training menggunakan kelas binary `valid`/`hoax`; `meragukan` merupakan state abstention berdasarkan confidence threshold.
 
 **2. Pra-pemrosesan Teks**
 Pembersihan teks (penghapusan tag HTML, URL, karakter non-standar), normalisasi (penanganan singkatan/typo umum bila diperlukan), dan tokenisasi menggunakan WordPiece tokenizer bawaan model BERT yang dipilih.
@@ -172,7 +174,7 @@ Struktur tabel utama yang disarankan (disederhanakan, dapat dikembangkan lebih d
 | `submissions` | id, user_id (nullable), input_type (text/image/video/url), raw_input, extracted_text, media_path, source_url, status | Data pengajuan pengecekan berita |
 | `detection_results` | id, submission_id, label, confidence_score, model_version, explanation | Hasil klasifikasi BERT & penjelasan |
 | `feedback` | id, submission_id, user_id, is_correct, comment | Umpan balik pengguna atas hasil |
-| `datasets` | id, text, label, source, verified_by | Data latih yang dikelola admin |
+| `datasets` | id, text, label, source, verified_by | Katalog/kurasi production; bukan corpus training otomatis |
 | `admin_logs` | id, admin_id, action, target_table, target_id, created_at | Audit trail aktivitas admin |
 
 # Rancangan Antarmuka & Peran Livewire/Filament
@@ -182,7 +184,7 @@ Struktur tabel utama yang disarankan (disederhanakan, dapat dikembangkan lebih d
 **Filament** digunakan untuk membangun panel admin, mencakup:
 
 - Dashboard ringkasan (jumlah submission, distribusi label, tren waktu).
-- Manajemen dataset training dan proses verifikasi label oleh admin.
+- Manajemen katalog kurasi production dan proses verifikasi label oleh admin.
 - Manajemen pengguna dan hak akses.
 - Log aktivitas dan audit trail.
 
