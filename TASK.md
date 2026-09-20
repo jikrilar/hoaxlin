@@ -234,7 +234,7 @@ karena service tidak tersedia, dan 0 failed. Fresh migration SQLite membuat tabe
 ledger OpenAI berhasil; `docker compose config --quiet`, Pint untuk file tersentuh,
 dan `git diff --check` lulus.
 
-### [ ] P1.5 Keamanan dan skalabilitas CSV
+### [x] P1.5 Keamanan dan skalabilitas CSV
 
 Masalah:
 
@@ -246,14 +246,21 @@ Netralisasi formula spreadsheet dan stream record menggunakan cursor/chunk sambi
 
 Acceptance criteria:
 
-- [ ] Nilai berawalan formula/control character tidak dieksekusi sebagai formula.
-- [ ] Export hanya berisi submission milik user.
-- [ ] Export besar tidak memuat seluruh history ke memory.
-- [ ] Encoding dan struktur CSV tetap kompatibel.
+- [x] Nilai berawalan formula/control character tidak dieksekusi sebagai formula.
+- [x] Export hanya berisi submission milik user.
+- [x] Export besar tidak memuat seluruh history ke memory.
+- [x] Encoding dan struktur CSV tetap kompatibel.
 
 Verifikasi:
 
-Jalankan test formula injection, cross-user ownership, encoding, dan export dataset besar.
+Test P1.5 lulus 19 test dengan 60 assertions untuk formula/control-character
+injection, quoting, multiline, Unicode, BOM, ownership, guest denial, final-result
+semantics, dan export besar. Dataset 205 submission dibaca dalam tiga chunk dengan
+tiga eager-load query DetectionResult sehingga tidak memakai collection penuh atau
+N+1. Regression P0.1/P0.2/P0.6/P1.4 lulus 42 test dengan 201 assertions. Docker
+test image berhasil dibuild dan full suite lulus 210 test dengan 877 assertions,
+4 real-BERT test di-skip karena service tidak tersedia, dan 0 failed. `docker compose
+config --quiet`, Pint untuk seluruh file yang disentuh, dan `git diff --check` lulus.
 
 ### [ ] P1.6 Dataset admin sebagai katalog kurasi terpisah dari training offline
 
