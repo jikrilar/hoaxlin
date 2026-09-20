@@ -58,7 +58,10 @@ class ProfileTest extends TestCase
         Storage::fake('local');
         config()->set('filesystems.media_disk', 'local');
 
-        $user = User::factory()->create(['password' => 'password']);
+        $user = User::factory()->create([
+            'password' => 'password',
+            'is_admin' => true,
+        ]);
         $otherUser = User::factory()->create();
         $mediaPath = 'submissions/images/user-media.jpg';
         $otherMediaPath = 'submissions/images/other-media.jpg';

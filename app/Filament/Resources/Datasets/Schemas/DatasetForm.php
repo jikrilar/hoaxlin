@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\Datasets\Schemas;
 
+use App\Rules\AdminUser;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class DatasetForm
 {
@@ -14,7 +16,8 @@ class DatasetForm
     {
         return $schema
             ->components([
-                Section::make('Data Training')
+                Section::make('Katalog & Kurasi')
+                    ->description('Referensi kurasi production. Perubahan di sini tidak melatih ulang atau mengganti model BERT aktif.')
                     ->schema([
                         Textarea::make('text')
                             ->label('Teks')
@@ -31,7 +34,12 @@ class DatasetForm
                             ->maxLength(255),
                         Select::make('verified_by')
                             ->label('Diverifikasi oleh')
-                            ->relationship('verifier', 'name')
+                            ->relationship(
+                                'verifier',
+                                'name',
+                                modifyQueryUsing: fn (Builder $query): Builder => $query->admins(),
+                            )
+                            ->rule(new AdminUser)
                             ->searchable()
                             ->preload()
                             ->nullable(),

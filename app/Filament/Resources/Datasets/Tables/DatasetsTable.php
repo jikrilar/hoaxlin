@@ -9,6 +9,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class DatasetsTable
 {
@@ -24,7 +25,13 @@ class DatasetsTable
             ])
             ->filters([
                 SelectFilter::make('label')->options(['valid' => 'Valid', 'hoax' => 'Hoax', 'meragukan' => 'Meragukan']),
-                SelectFilter::make('verified_by')->label('Verifikasi')->relationship('verifier', 'name'),
+                SelectFilter::make('verified_by')
+                    ->label('Verifikasi')
+                    ->relationship(
+                        'verifier',
+                        'name',
+                        modifyQueryUsing: fn (Builder $query): Builder => $query->admins(),
+                    ),
             ])
             ->recordActions([
                 ViewAction::make(),
