@@ -52,7 +52,7 @@
                         @foreach([
                             'Menjalankan proses deteksi hoax menggunakan model BERT',
                             'Menyimpan riwayat pengecekan untuk pengguna terdaftar',
-                            'Mendukung evaluasi model melalui umpan balik pengguna (opsional)',
+                            'Mendukung evaluasi layanan melalui umpan balik pengguna (opsional); data production tidak otomatis menjadi data training',
                             'Memantau performa dan keandalan sistem',
                         ] as $item)
                         <li style="display:flex; gap:0.625rem; align-items:flex-start;">
@@ -86,7 +86,7 @@
 
                 <div class="warning-box" role="note">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <span>Kebijakan ini dapat berubah sewaktu-waktu. Perubahan material akan diberitahukan melalui email untuk pengguna terdaftar atau melalui pengumuman di website.</span>
+                    <span>Kebijakan ini dapat berubah sewaktu-waktu. Perubahan material akan diumumkan melalui website.</span>
                 </div>
             </div>
         </div>

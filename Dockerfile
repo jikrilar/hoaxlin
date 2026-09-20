@@ -111,6 +111,9 @@ FROM composer-production AS test
 COPY --from=frontend-build /build/public/build/ ./public/build/
 COPY phpunit.xml ./
 COPY docker-compose.yml ./
+COPY README.md PRD.md DOCKER-SETUP.md RUNBOOK.md TASK.md ./
+COPY bert-service/README.md ./bert-service/README.md
+COPY scripts/ ./scripts/
 COPY tests/ ./tests/
 
 RUN --mount=type=cache,target=/tmp/composer/cache \

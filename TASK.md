@@ -320,7 +320,7 @@ dan full Laravel suite di image lulus 227 test dengan 944 assertions, 4 real-BER
 test di-skip, dan 0 failed. `docker compose config --quiet`, Pint, dan
 `git diff --check` lulus.
 
-### [ ] P1.8 Sinkronisasi dokumentasi, copy fitur, dan workflow operasional
+### [x] P1.8 Sinkronisasi dokumentasi, copy fitur, dan workflow operasional
 
 Masalah:
 
@@ -332,18 +332,24 @@ Selaraskan dokumentasi dan copy dengan source serta keputusan owner tanpa redesi
 
 Acceptance criteria:
 
-- [ ] Pipeline mencakup extraction, language detection/translation, classification, explanation, dan terminal state.
-- [ ] Command worker mencakup seluruh named queue.
-- [ ] Notification completion dan YouTube/platform video tidak diklaim sebagai fitur.
-- [ ] Video URL dijelaskan hanya untuk direct media URL.
-- [ ] Dataset admin dijelaskan terpisah dari training offline/versioned.
-- [ ] clamdscan dijelaskan sebagai optional defense-in-depth.
-- [ ] ffprobe dijelaskan opsional beserta keterbatasan validasi durasi.
-- [ ] Referensi file/package/angka progress yang stale dihapus.
+- [x] Pipeline mencakup extraction, language detection/translation, classification, explanation, dan terminal state.
+- [x] Command worker mencakup seluruh named queue.
+- [x] Notification completion dan YouTube/platform video tidak diklaim sebagai fitur.
+- [x] Video URL dijelaskan hanya untuk direct media URL.
+- [x] Dataset admin dijelaskan terpisah dari training offline/versioned.
+- [x] clamdscan dijelaskan sebagai optional defense-in-depth.
+- [x] ffprobe dijelaskan opsional beserta keterbatasan validasi durasi.
+- [x] Referensi file/package/angka progress yang stale dihapus.
 
 Verifikasi:
 
-Ikuti quick-start dari environment bersih dan periksa seluruh command, link dokumen, serta copy fitur terkait.
+Kontrak dokumentasi lulus 5 test dengan 26 assertions dan targeted regression P0/P1
+lulus 145 test dengan 660 assertions. Image Docker target `test` berhasil dibuild;
+full Laravel suite di image lulus 232 test dengan 970 assertions, 4 real-BERT test
+di-skip pada suite terisolasi, dan 0 failed. Integrasi real-BERT terpisah pada network
+Compose lulus 4 test dengan 25 assertions. Enam service Compose termasuk scheduler
+healthy, `hoaxlin:doctor` PASS, link dokumen lokal valid, `docker compose config
+--quiet`, Pint, dan `git diff --check` lulus.
 
 ## P2
 

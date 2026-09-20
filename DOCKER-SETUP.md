@@ -30,7 +30,7 @@ Script setup membuat `.env` jika belum ada, menghasilkan secret lokal yang diper
 ### Windows (PowerShell)
 
 ```powershell
-git clone --branch build/docker-environment <repository-url> hoaxlin
+git clone <repository-url> hoaxlin
 Set-Location hoaxlin
 docker load --input <path-to>\hoaxlin-bert-v1.0.0.tar
 docker image inspect hoaxlin-bert:v1.0.0
@@ -40,7 +40,7 @@ docker image inspect hoaxlin-bert:v1.0.0
 ### Linux/macOS
 
 ```bash
-git clone --branch build/docker-environment <repository-url> hoaxlin
+git clone <repository-url> hoaxlin
 cd hoaxlin
 docker load --input /path/to/hoaxlin-bert-v1.0.0.tar
 docker image inspect hoaxlin-bert:v1.0.0
@@ -51,11 +51,13 @@ Setup dapat dijalankan ulang dengan aman. File `.env`, secret, database, dan sto
 
 ## OpenAI
 
-`OPENAI_API_KEY` bersifat opsional untuk bootstrap infrastruktur, tetapi wajib untuk OCR gambar, transkripsi video/audio, terjemahan, dan pembuatan explanation.
+`OPENAI_API_KEY` bersifat opsional untuk bootstrap infrastruktur, tetapi diperlukan saat pipeline benar-benar memanggil OCR gambar, transkripsi video/audio, terjemahan Inggris ke Indonesia, atau explanation. Klasifikasi tetap dilakukan IndoBERT. Gangguan explanation yang non-kritis menghasilkan status explanation `unavailable` tanpa membatalkan hasil BERT yang valid.
 
 Transkripsi menerima upload video MP4/MPEG/WEBM atau URL langsung file audio/video yang didukung, maksimal 24 MiB. URL halaman platform seperti YouTube/TikTok/Instagram/Facebook tidak didukung. Bahasa audio dideteksi provider; audio Inggris kemudian diterjemahkan oleh pipeline sebelum klasifikasi IndoBERT.
 
 `ffprobe` bersifat opsional dan tidak dipasang sebagai dependency wajib image. Jika binary tersedia melalui `FFPROBE_BINARY`, media di atas 300 detik ditolak. Tanpa `ffprobe`, pemeriksaan durasi dilewati; validasi ukuran, extension, MIME, dan signature tetap dijalankan. Hierarki timeout default adalah provider 90 detik, job 150 detik, worker 180 detik, dan Redis `retry_after` 1800 detik.
+
+`clamdscan` juga opsional sebagai defense-in-depth. Jika tersedia, upload dipindai dengan ClamAV. Tanpanya, pemeriksaan pola berbahaya dasar dan validasi upload lainnya tetap berjalan.
 
 Untuk mengaktifkannya, isi nilai berikut di file `.env` yang dibuat oleh setup:
 
@@ -66,7 +68,7 @@ OPENAI_API_KEY=
 Jangan memasukkan `.env` ke Git. Setelah memperbarui key, terapkan konfigurasi baru tanpa menampilkan nilainya:
 
 ```console
-docker compose up -d --force-recreate app queue
+docker compose up -d --force-recreate app queue scheduler
 ```
 
 ## Verifikasi
@@ -76,7 +78,7 @@ docker compose ps
 docker compose exec app php artisan hoaxlin:doctor
 ```
 
-Service `app`, `mysql`, `redis`, dan `bert` harus berstatus healthy; `queue` harus running. Command doctor harus selesai dengan exit code `0`. Jika OpenAI belum dikonfigurasi, doctor menampilkan peringatan, tetapi dependency utama tetap dapat dinyatakan siap.
+Service `app`, `mysql`, `redis`, dan `bert` harus berstatus healthy; `queue` dan `scheduler` harus healthy/running. Command doctor harus selesai dengan exit code `0`. Jika OpenAI belum dikonfigurasi, doctor menampilkan peringatan, tetapi dependency utama tetap dapat dinyatakan siap.
 
 Uji endpoint aplikasi:
 
@@ -121,7 +123,7 @@ bash scripts/docker-setup.sh --rebuild-app
 
 ## Data persistence
 
-MySQL menggunakan named volume `mysql_data`. File Laravel yang perlu dibagi antara `app` dan `queue` menggunakan named volume `laravel_storage`.
+MySQL menggunakan named volume `mysql_data`. File Laravel yang perlu dibagi antara `app`, `queue`, dan `scheduler` menggunakan named volume `laravel_storage`.
 
 `docker compose down` menghentikan container dan network, tetapi tidak menghapus kedua volume tersebut. Karena itu database dan storage tetap tersedia saat environment dijalankan kembali.
 
@@ -147,7 +149,7 @@ docker image inspect hoaxlin-bert:v1.0.0
 
 ### OpenAI key kosong
 
-Bootstrap tetap dapat selesai, tetapi OCR, transkripsi, terjemahan, dan explanation tidak akan bekerja. Isi `OPENAI_API_KEY` di `.env`, lalu recreate service `app` dan `queue` seperti dijelaskan pada bagian OpenAI.
+Bootstrap tetap dapat selesai, tetapi OCR, transkripsi, terjemahan, dan explanation yang membutuhkan provider tidak akan bekerja. Isi `OPENAI_API_KEY` di `.env`, lalu recreate service `app`, `queue`, dan `scheduler` seperti dijelaskan pada bagian OpenAI.
 
 ### Port Laravel bentrok
 
@@ -174,7 +176,7 @@ docker compose logs --tail=100 <service>
 docker compose exec app php artisan hoaxlin:doctor
 ```
 
-Nama service yang tersedia adalah `app`, `queue`, `mysql`, `redis`, dan `bert`. Setelah penyebabnya diperbaiki, service tertentu dapat dimulai ulang dengan `docker compose restart <service>`.
+Nama service yang tersedia adalah `app`, `queue`, `scheduler`, `mysql`, `redis`, dan `bert`. Setelah penyebabnya diperbaiki, service tertentu dapat dimulai ulang dengan `docker compose restart <service>`.
 
 ## Batasan
 
@@ -182,3 +184,14 @@ Nama service yang tersedia adalah `app`, `queue`, `mysql`, `redis`, dan `bert`. 
 - Redistribusi publik model fine-tuned belum terverifikasi. Archive dan image BERT harus dipindahkan melalui kanal private/controlled.
 - Fitur OpenAI memerlukan koneksi internet dan API key yang valid.
 - Bootstrap/build pertama mungkin memerlukan internet untuk mengambil base image dan dependency yang belum tersedia di cache Docker.
+
+## Scheduler dan retensi media
+
+Service `scheduler` menjalankan `php artisan schedule:work` tanpa port host. Schedule Laravel menjalankan stale-processing recovery setiap lima menit dan `media:prune` setiap menit, masing-masing dengan overlap protection.
+
+Retensi default media asli adalah 24 jam setelah `processing_completed_at` untuk submission terminal `completed` atau `failed`. Submission processing tidak disentuh dan data teks/result/history tetap dipertahankan. Pemeriksaan manual:
+
+```console
+docker compose exec app php artisan media:prune --hours=24 --dry-run
+docker compose exec app php artisan submissions:recover-stale --dry-run
+```

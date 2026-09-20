@@ -272,8 +272,10 @@ done
 "${compose[@]}" exec -T app php artisan migrate --force
 step PASS 'Database migration complete'
 
-"${compose[@]}" up -d queue
-wait_service queue healthy,running
+"${compose[@]}" up -d queue scheduler
+for service in queue scheduler; do
+    wait_service "$service" healthy,running
+done
 
 printf '\n'
 "${compose[@]}" ps

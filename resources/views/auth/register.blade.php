@@ -22,7 +22,7 @@
 
             <!-- Benefits Pills -->
             <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; margin-bottom:2rem;" aria-label="Manfaat mendaftar">
-                @foreach(['🕐 Simpan Riwayat', '📊 Lihat Statistik', '💬 Beri Umpan Balik', '🔔 Notifikasi Hasil'] as $benefit)
+                @foreach(['🕐 Simpan Riwayat', '📊 Lihat Statistik', '💬 Beri Umpan Balik', '📎 Input URL & Media'] as $benefit)
                 <span style="padding:0.25rem 0.75rem; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.15); border-radius:2rem; color:var(--color-text-secondary); font-size:0.78125rem;">
                     {{ $benefit }}
                 </span>

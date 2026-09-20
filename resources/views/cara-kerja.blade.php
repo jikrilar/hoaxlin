@@ -38,13 +38,13 @@
                 </div>
                 <h2 style="font-size:1.375rem; font-weight:700; margin-bottom:0.75rem;">Penerimaan Input</h2>
                 <p style="color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.75; margin-bottom:1.25rem;">
-                    Sistem menerima berita dalam empat format berbeda. Masing-masing format ditangani secara berbeda sebelum masuk ke tahap analisis BERT.
+                    Sistem mendukung empat format. Guest hanya dapat mengirim teks; URL, gambar, video, dan direct media URL tersedia setelah login.
                 </p>
                 <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:0.75rem;">
                     @foreach([
                         ['icon'=>'🔤', 'name'=>'Teks Langsung', 'desc'=>'Input paling cepat. Langsung ke tokenisasi.'],
                         ['icon'=>'🖼️', 'name'=>'Gambar / OCR', 'desc'=>'Ekstraksi teks via OpenAI Vision API.'],
-                        ['icon'=>'🎬', 'name'=>'Video / Transkripsi', 'desc'=>'Audio diekstrak, lalu di-transkripsi Whisper.'],
+                        ['icon'=>'🎬', 'name'=>'Video / Transkripsi', 'desc'=>'Upload atau direct media URL; halaman platform tidak didukung.'],
                         ['icon'=>'🔗', 'name'=>'Tautan URL', 'desc'=>'Artikel di-scraping, konten diekstrak.'],
                     ] as $inp)
                     <div style="padding:0.875rem; background:rgba(13,17,23,0.6); border:1px solid var(--color-border); border-radius:0.75rem;">
@@ -71,12 +71,13 @@
                 </div>
                 <h2 style="font-size:1.375rem; font-weight:700; margin-bottom:0.75rem;">Pra-pemrosesan Teks</h2>
                 <p style="color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.75; margin-bottom:1.25rem;">
-                    Sebelum masuk ke model BERT, teks dibersihkan dan dinormalisasi agar analisis lebih akurat.
+                    Setelah teks diekstrak, bahasa dideteksi. Teks Indonesia diteruskan; teks Inggris diterjemahkan ke Indonesia sebelum masuk ke IndoBERT.
                 </p>
                 <div style="display:flex; flex-direction:column; gap:0.625rem;">
                     @foreach([
                         'Penghapusan tag HTML, URL, dan karakter non-standar',
-                        'Normalisasi teks — singkatan umum, typo, dan ejaan',
+                        'Deteksi bahasa sumber pada hasil ekstraksi atau transkripsi',
+                        'Terjemahan Inggris ke Indonesia sebelum klasifikasi',
                         'Tokenisasi menggunakan WordPiece tokenizer BERT',
                         'Pemotongan teks bila melebihi panjang maksimum (512 token)',
                     ] as $step)
@@ -147,13 +148,13 @@
                 </div>
                 <h2 style="font-size:1.375rem; font-weight:700; margin-bottom:0.75rem;">Hasil & Penjelasan</h2>
                 <p style="color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.75; margin-bottom:1.25rem;">
-                    Output BERT (label + confidence score) dikirim ke OpenAI API untuk disusun menjadi penjelasan naratif yang mudah dipahami masyarakat umum.
+                    Output BERT (label + confidence score) adalah hasil inti. OpenAI dapat menyusun penjelasan naratif; jika layanan penjelasan tidak tersedia, hasil BERT tetap final dan status tersebut ditampilkan secara jujur.
                 </p>
                 <div style="display:flex; flex-direction:column; gap:0.625rem;">
                     @foreach([
                         ['icon'=>'🏷️', 'text'=>'Label klasifikasi: Valid, Hoax, atau Meragukan'],
                         ['icon'=>'📈', 'text'=>'Confidence score — seberapa yakin model terhadap prediksinya'],
-                        ['icon'=>'🤖', 'text'=>'Narasi penjelasan dalam bahasa Indonesia yang mudah dipahami'],
+                        ['icon'=>'🤖', 'text'=>'Narasi penjelasan bila tersedia; tidak dibuat-buat saat layanan unavailable'],
                         ['icon'=>'💾', 'text'=>'Riwayat tersimpan untuk pengguna yang sudah login'],
                     ] as $out)
                     <div style="display:flex; gap:0.75rem; align-items:center; padding:0.625rem 0.875rem; background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.12); border-radius:0.625rem;">
