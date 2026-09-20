@@ -56,10 +56,10 @@ class OpenAiTranslator implements Translator
             );
         }
 
-        $this->quota->ensureAvailable();
+        $this->breaker->check();
+        $reservation = $this->quota->reserve('translation');
 
         try {
-            $this->breaker->check();
             $response = Http::withToken($config['key'])
                 ->withHeaders(array_filter([
                     'OpenAI-Organization' => $config['organization'] ?? null,
@@ -93,6 +93,7 @@ class OpenAiTranslator implements Translator
                     ],
                 ]);
         } catch (ConnectionException $exception) {
+            $this->quota->release($reservation);
             $this->breaker->recordFailure();
 
             throw AiServiceException::transient(
@@ -100,72 +101,84 @@ class OpenAiTranslator implements Translator
                 'Layanan terjemahan OpenAI tidak dapat dihubungi.',
                 previous: $exception,
             );
-        }
-
-        $this->guardAgainstFailure($response);
-        $this->breaker->recordSuccess();
-
-        $payload = $response->json();
-        $outputText = $this->outputText($payload);
-
-        if ($outputText === null || trim($outputText) === '') {
-            throw AiServiceException::permanent(
-                self::SERVICE,
-                'Respons terjemahan OpenAI tidak berisi teks yang dapat dianalisis.',
-                $response->status(),
-            );
+        } catch (\Throwable $exception) {
+            $this->quota->release($reservation);
+            throw $exception;
         }
 
         try {
-            $translationPayload = json_decode($outputText, true, flags: JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
-            throw AiServiceException::permanent(
-                self::SERVICE,
-                'Respons terjemahan OpenAI tidak sesuai format terstruktur.',
-                $response->status(),
-                $exception,
+            $this->guardAgainstFailure($response);
+            $this->breaker->recordSuccess();
+
+            $payload = $response->json();
+            $outputText = $this->outputText($payload);
+
+            if ($outputText === null || trim($outputText) === '') {
+                throw AiServiceException::permanent(
+                    self::SERVICE,
+                    'Respons terjemahan OpenAI tidak berisi teks yang dapat dianalisis.',
+                    $response->status(),
+                );
+            }
+
+            try {
+                $translationPayload = json_decode($outputText, true, flags: JSON_THROW_ON_ERROR);
+            } catch (\JsonException $exception) {
+                throw AiServiceException::permanent(
+                    self::SERVICE,
+                    'Respons terjemahan OpenAI tidak sesuai format terstruktur.',
+                    $response->status(),
+                    $exception,
+                );
+            }
+
+            $detectedLanguage = $translationPayload['source_language'] ?? null;
+            $translated = $translationPayload['translated'] ?? null;
+            $indonesianText = $translationPayload['indonesian_text'] ?? null;
+            if (! in_array($detectedLanguage, ['en', 'id'], true)
+                || ! is_bool($translated)
+                || ! is_string($indonesianText)
+                || trim($indonesianText) === ''
+                || ($detectedLanguage === 'en' && ! $translated)) {
+                throw AiServiceException::permanent(
+                    self::SERVICE,
+                    'Respons terjemahan OpenAI tidak sesuai kontrak.',
+                    $response->status(),
+                );
+            }
+
+            $inputTokens = (int) data_get($payload, 'usage.input_tokens', 0);
+            $outputTokens = (int) data_get($payload, 'usage.output_tokens', 0);
+            $usageAvailable = is_numeric(data_get($payload, 'usage.input_tokens'))
+                || is_numeric(data_get($payload, 'usage.output_tokens'));
+            $cost = $usageAvailable
+                ? $this->quota->estimateCost($model, $inputTokens, $outputTokens)
+                : $reservation->reservedMicrousd / 1_000_000;
+            $this->quota->finalize($reservation, $inputTokens, $outputTokens, $cost);
+
+            $translation = new Translation(
+                text: trim($indonesianText),
+                sourceLanguage: $detectedLanguage,
+                translated: $translated,
+                provider: 'openai',
+                model: $model,
+                inputTokens: $inputTokens,
+                outputTokens: $outputTokens,
+                estimatedCostUsd: $cost,
             );
+
+            Cache::put($cacheKey, [
+                'text' => $translation->text,
+                'source_language' => $translation->sourceLanguage,
+                'translated' => $translation->translated,
+                'model' => $translation->model,
+            ], (int) $config['cache_ttl']);
+
+            return $translation;
+        } catch (\Throwable $exception) {
+            $this->quota->release($reservation);
+            throw $exception;
         }
-
-        $detectedLanguage = $translationPayload['source_language'] ?? null;
-        $translated = $translationPayload['translated'] ?? null;
-        $indonesianText = $translationPayload['indonesian_text'] ?? null;
-        if (! in_array($detectedLanguage, ['en', 'id'], true)
-            || ! is_bool($translated)
-            || ! is_string($indonesianText)
-            || trim($indonesianText) === ''
-            || ($detectedLanguage === 'en' && ! $translated)) {
-            throw AiServiceException::permanent(
-                self::SERVICE,
-                'Respons terjemahan OpenAI tidak sesuai kontrak.',
-                $response->status(),
-            );
-        }
-
-        $inputTokens = (int) data_get($payload, 'usage.input_tokens', 0);
-        $outputTokens = (int) data_get($payload, 'usage.output_tokens', 0);
-        $cost = $this->quota->estimateCost($model, $inputTokens, $outputTokens);
-        $this->quota->recordUsage($inputTokens, $outputTokens, $cost);
-
-        $translation = new Translation(
-            text: trim($indonesianText),
-            sourceLanguage: $detectedLanguage,
-            translated: $translated,
-            provider: 'openai',
-            model: $model,
-            inputTokens: $inputTokens,
-            outputTokens: $outputTokens,
-            estimatedCostUsd: $cost,
-        );
-
-        Cache::put($cacheKey, [
-            'text' => $translation->text,
-            'source_language' => $translation->sourceLanguage,
-            'translated' => $translation->translated,
-            'model' => $translation->model,
-        ], (int) $config['cache_ttl']);
-
-        return $translation;
     }
 
     /** @param array<string, mixed> $payload */

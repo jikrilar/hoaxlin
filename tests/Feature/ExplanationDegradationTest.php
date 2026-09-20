@@ -55,7 +55,7 @@ class ExplanationDegradationTest extends TestCase
             'completion_tokens' => 8,
         ]);
         $quota = Mockery::mock(OpenAiQuota::class);
-        $quota->shouldNotReceive('ensureAvailable');
+        $quota->shouldNotReceive('reserve');
         $breaker = Mockery::mock(CircuitBreaker::class);
         $breaker->shouldNotReceive('check');
         Http::preventStrayRequests();

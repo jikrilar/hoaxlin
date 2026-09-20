@@ -9,12 +9,13 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\DeteksiController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\SubmissionController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', HomeController::class)->name('home');
 Route::view('/cara-kerja', 'cara-kerja')->name('cara-kerja');
 Route::view('/tentang', 'tentang')->name('tentang');
 Route::view('/kebijakan-privasi', 'kebijakan-privasi')->name('kebijakan-privasi');

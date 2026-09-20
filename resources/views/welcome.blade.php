@@ -3,14 +3,6 @@
 @section('title', 'hoaxlin.id — Deteksi Berita Hoax dengan AI BERT')
 @section('description', 'Periksa kebenaran berita dengan teknologi AI BERT. Deteksi hoax dari teks, gambar, video, atau tautan berita secara instan dan akurat.')
 
-@php
-  // Simple math CAPTCHA for C17 — stored in session, validated in StoreSubmissionRequest
-  $captchaA = random_int(1, 9);
-  $captchaB = random_int(1, 9);
-  session(['captcha_answer' => $captchaA + $captchaB]);
-  $captchaQuestion = "$captchaA + $captchaB = ?";
-@endphp
-
 @section('content')
 
 <!-- ═══════════════════════════════════════════════

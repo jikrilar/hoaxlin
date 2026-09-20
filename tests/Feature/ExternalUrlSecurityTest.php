@@ -13,6 +13,7 @@ use App\Services\Network\SafeExternalHttpClient;
 use App\Services\OpenAI\OpenAiQuota;
 use App\Services\Resilience\CircuitBreaker;
 use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -21,6 +22,8 @@ use Tests\TestCase;
 
 class ExternalUrlSecurityTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_public_https_url_is_accepted(): void
     {
         $guard = $this->guard(['news.test' => ['8.8.8.8', '2606:4700:4700::1111']]);

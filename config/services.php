@@ -88,6 +88,14 @@ return [
         'cache_ttl' => (int) env('OPENAI_CACHE_TTL', 2592000),
         'rate_limit_per_minute' => (int) env('OPENAI_RATE_LIMIT_PER_MINUTE', 60),
         'monthly_quota_usd' => (float) env('OPENAI_MONTHLY_QUOTA_USD', 25.0),
+        // Upper-bound reservations prevent concurrent calls from collectively
+        // exceeding the durable monthly budget before actual usage is known.
+        'reservation_usd' => [
+            'ocr' => (float) env('OPENAI_OCR_RESERVATION_USD', 1.0),
+            'translation' => (float) env('OPENAI_TRANSLATION_RESERVATION_USD', 0.25),
+            'transcription' => (float) env('OPENAI_TRANSCRIPTION_RESERVATION_USD', 0.05),
+            'explanation' => (float) env('OPENAI_EXPLANATION_RESERVATION_USD', 0.25),
+        ],
         'prompt_version' => env('OPENAI_PROMPT_VERSION', '1.0'),
     ],
 

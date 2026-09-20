@@ -77,10 +77,11 @@ class OpenAiVideoExtractor implements TextExtractor
         }
 
         $config = config('services.openai');
-        $this->quota->ensureAvailable();
+        $reservation = null;
 
         try {
             $this->breaker->check();
+            $reservation = $this->quota->reserve('transcription');
             $response = Http::withToken($config['key'])
                 ->connectTimeout($config['connect_timeout'])
                 ->timeout((int) config('media.transcription.provider_timeout_seconds', 90))
@@ -90,11 +91,16 @@ class OpenAiVideoExtractor implements TextExtractor
                     'response_format' => 'json',
                 ]);
         } catch (ConnectionException $exception) {
+            $this->quota->release($reservation);
             $this->breaker->recordFailure();
             throw AiServiceException::transient('openai', 'Layanan transkripsi tidak dapat dihubungi.', previous: $exception);
+        } catch (\Throwable $exception) {
+            $this->quota->release($reservation);
+            throw $exception;
         }
 
         if ($response->failed()) {
+            $this->quota->release($reservation);
             $transient = $response->serverError() || in_array($response->status(), [408, 429], true);
             if ($transient) {
                 $this->breaker->recordFailure();
@@ -108,12 +114,25 @@ class OpenAiVideoExtractor implements TextExtractor
         $this->breaker->recordSuccess();
         $text = $response->json('text');
         if (! is_string($text) || trim($text) === '') {
+            $this->quota->release($reservation);
             throw AiServiceException::permanent('openai', 'Transkripsi tidak menghasilkan teks.');
         }
 
-        $minutes = max(1, strlen($bytes) / (1024 * 1024));
-        $cost = $this->quota->estimateCost($config['transcribe_model'], (int) $minutes * 100, (int) $minutes * 100);
-        $this->quota->recordUsage((int) $minutes * 100, (int) $minutes * 100, $cost);
+        // Whisper is billed by audio minute, not by the downloaded byte count.
+        // When ffprobe is unavailable, use the contract's maximum duration as a
+        // conservative accounting bound instead of allowing a byte-size proxy
+        // to exceed the monthly reservation unexpectedly.
+        $accountingSeconds = $duration !== null
+            ? (int) ceil($duration)
+            : (int) $this->contract()->maxDurationSeconds();
+        $accountingSeconds = max(1, min($accountingSeconds, (int) $this->contract()->maxDurationSeconds()));
+        $cost = $this->quota->estimateCost($config['transcribe_model'], $accountingSeconds, 0);
+        try {
+            $this->quota->finalize($reservation, $accountingSeconds, 0, $cost);
+        } catch (\Throwable $exception) {
+            $this->quota->release($reservation);
+            throw $exception;
+        }
         Cache::put($key, trim($text), $config['cache_ttl']);
 
         return new ExtractedText(trim($text), InputType::Video, 'openai');

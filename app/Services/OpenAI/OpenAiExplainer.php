@@ -45,7 +45,7 @@ class OpenAiExplainer implements Explainer
         }
 
         try {
-            $this->quota->ensureAvailable();
+            $this->breaker->check();
         } catch (AiServiceException $exception) {
             if ($this->isNonCriticalProviderFailure($exception)) {
                 return Explanation::unavailable();
@@ -55,7 +55,7 @@ class OpenAiExplainer implements Explainer
         }
 
         try {
-            $this->breaker->check();
+            $reservation = $this->quota->reserve('explanation');
         } catch (AiServiceException $exception) {
             if ($this->isNonCriticalProviderFailure($exception)) {
                 return Explanation::unavailable();
@@ -83,12 +83,17 @@ class OpenAiExplainer implements Explainer
                     ],
                 ]);
         } catch (ConnectionException $exception) {
+            $this->quota->release($reservation);
             $this->breaker->recordFailure();
 
             return Explanation::unavailable();
+        } catch (\Throwable $exception) {
+            $this->quota->release($reservation);
+            throw $exception;
         }
 
         if ($response->failed()) {
+            $this->quota->release($reservation);
             if ($response->serverError() || in_array($response->status(), [408, 429], true)) {
                 $this->breaker->recordFailure();
 
@@ -107,6 +112,7 @@ class OpenAiExplainer implements Explainer
         $narrative = data_get($payload, 'choices.0.message.content');
 
         if (! is_string($narrative) || trim($narrative) === '') {
+            $this->quota->release($reservation);
             $this->breaker->recordFailure();
 
             return Explanation::unavailable();
@@ -116,8 +122,17 @@ class OpenAiExplainer implements Explainer
         $usage = $payload['usage'] ?? [];
         $promptTokens = (int) ($usage['prompt_tokens'] ?? 0);
         $completionTokens = (int) ($usage['completion_tokens'] ?? 0);
-        $cost = $this->quota->estimateCost($config['chat_model'], $promptTokens, $completionTokens);
-        $this->quota->recordUsage($promptTokens, $completionTokens, $cost);
+        $usageAvailable = is_numeric($usage['prompt_tokens'] ?? null)
+            || is_numeric($usage['completion_tokens'] ?? null);
+        $cost = $usageAvailable
+            ? $this->quota->estimateCost($config['chat_model'], $promptTokens, $completionTokens)
+            : $reservation->reservedMicrousd / 1_000_000;
+        try {
+            $this->quota->finalize($reservation, $promptTokens, $completionTokens, $cost);
+        } catch (\Throwable $exception) {
+            $this->quota->release($reservation);
+            throw $exception;
+        }
         $result = Explanation::ready(
             narrative: trim($narrative),
             model: $config['chat_model'],

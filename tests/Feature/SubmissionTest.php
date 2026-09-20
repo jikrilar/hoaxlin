@@ -16,15 +16,21 @@ class SubmissionTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->get(route('home'));
+    }
+
     public function test_guest_can_submit_text_and_receives_a_session_bound_capability(): void
     {
         Queue::fake();
         $text = str_repeat('Berita guest yang akan diperiksa. ', 3);
 
-        $response = $this->post(route('deteksi'), [
+        $response = $this->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'text',
             'raw_input' => $text,
-        ]);
+        ]));
 
         $submission = Submission::sole();
         $sessionKey = SubmissionAccess::sessionKey($submission);
@@ -45,10 +51,10 @@ class SubmissionTest extends TestCase
         $user = User::factory()->create();
         $text = str_repeat('Berita yang akan diperiksa. ', 3);
 
-        $response = $this->actingAs($user)->post(route('deteksi'), [
+        $response = $this->actingAs($user)->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'text',
             'raw_input' => $text,
-        ]);
+        ]));
 
         $submission = Submission::sole();
         $response->assertRedirect(route('hasil', $submission));
@@ -67,10 +73,10 @@ class SubmissionTest extends TestCase
         Queue::fake();
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route('deteksi'), [
+        $this->actingAs($user)->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'image',
             'media_file' => UploadedFile::fake()->image('berita.jpg'),
-        ])->assertRedirect();
+        ]))->assertRedirect();
 
         $submission = Submission::sole();
         $this->assertSame('image', $submission->input_type);
@@ -84,10 +90,10 @@ class SubmissionTest extends TestCase
         Queue::fake();
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route('deteksi'), [
+        $this->actingAs($user)->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video',
             'media_file' => UploadedFile::fake()->create('berita.mp4', 1024, 'video/mp4'),
-        ])->assertRedirect();
+        ]))->assertRedirect();
 
         $submission = Submission::sole();
         $this->assertSame('video', $submission->input_type);
@@ -100,10 +106,10 @@ class SubmissionTest extends TestCase
         Queue::fake();
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route('deteksi'), [
+        $this->actingAs($user)->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'url',
             'source_url' => 'https://example.com/berita',
-        ])->assertRedirect();
+        ]))->assertRedirect();
 
         $submission = Submission::sole();
         $this->assertSame('url', $submission->input_type);
@@ -116,10 +122,10 @@ class SubmissionTest extends TestCase
         Queue::fake();
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route('deteksi'), [
+        $this->actingAs($user)->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video_url',
             'source_url' => 'https://example.com/video/1.mp4',
-        ])->assertRedirect();
+        ]))->assertRedirect();
 
         $submission = Submission::sole();
         $this->assertSame('video', $submission->input_type);
@@ -163,10 +169,10 @@ class SubmissionTest extends TestCase
     {
         Queue::fake();
 
-        $this->from(route('home'))->post(route('deteksi'), [
+        $this->from(route('home'))->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'text',
             'raw_input' => 'Terlalu pendek',
-        ])->assertRedirect(route('home'))->assertSessionHasErrors('raw_input');
+        ]))->assertRedirect(route('home'))->assertSessionHasErrors('raw_input');
 
         $this->assertDatabaseEmpty('submissions');
         Queue::assertNothingPushed();
@@ -182,5 +188,11 @@ class SubmissionTest extends TestCase
 
         $this->assertDatabaseEmpty('submissions');
         Queue::assertNothingPushed();
+    }
+
+    /** @param array<string, mixed> $payload */
+    private function withCaptcha(array $payload): array
+    {
+        return [...$payload, 'captcha_answer' => (int) session('submission_captcha.answer')];
     }
 }
