@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ProcessingStage;
 use App\Models\Submission;
+use App\Services\Export\SubmissionCsvExporter;
 use App\Services\Pipeline\PipelineFailureReporter;
 use App\Services\SubmissionAccess;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -17,6 +18,7 @@ class DeteksiController extends Controller
     public function __construct(
         private readonly SubmissionAccess $access,
         private readonly PipelineFailureReporter $failures,
+        private readonly SubmissionCsvExporter $csvExporter,
     ) {}
 
     // ── Show Results Page ─────────────────────────────────────────────────────
@@ -101,34 +103,23 @@ class DeteksiController extends Controller
             abort(401);
         }
 
-        $submissions = Submission::with('detectionResult')
-            ->forUser($user)
-            ->latest()
-            ->get();
-
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="hoaxlin-riwayat-'.now()->format('Ymd').'.csv"',
         ];
 
-        $callback = function () use ($submissions) {
+        $callback = function () use ($user): void {
             $out = fopen('php://output', 'w');
-            // BOM for Excel
-            fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['ID', 'Tipe', 'Status', 'Label', 'Confidence', 'Model', 'Dibuat', 'Teks/URL']);
-            foreach ($submissions as $s) {
-                fputcsv($out, [
-                    $s->id,
-                    $s->input_type,
-                    $s->status,
-                    $s->detectionResult?->label ?? '-',
-                    $s->detectionResult?->confidence_score ?? '-',
-                    $s->detectionResult?->model_version ?? '-',
-                    $s->created_at?->format('Y-m-d H:i'),
-                    mb_substr($s->raw_input ?? $s->source_url ?? '', 0, 200),
-                ]);
+
+            if ($out === false) {
+                throw new \RuntimeException('Unable to open the CSV output stream.');
             }
-            fclose($out);
+
+            try {
+                $this->csvExporter->write($user, $out);
+            } finally {
+                fclose($out);
+            }
         };
 
         return response()->stream($callback, 200, $headers);
