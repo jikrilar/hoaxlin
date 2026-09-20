@@ -39,10 +39,11 @@ class OpenAiImageExtractor implements TextExtractor
         }
 
         $config = config('services.openai');
-        $this->quota->ensureAvailable();
+        $reservation = null;
 
         try {
             $this->breaker->check();
+            $reservation = $this->quota->reserve('ocr');
             $response = Http::withToken($config['key'])
                 ->connectTimeout($config['connect_timeout'])
                 ->timeout($config['timeout'])
@@ -58,11 +59,16 @@ class OpenAiImageExtractor implements TextExtractor
                     ]],
                 ]);
         } catch (ConnectionException $exception) {
+            $this->quota->release($reservation);
             $this->breaker->recordFailure();
             throw AiServiceException::transient('openai', 'Layanan OCR tidak dapat dihubungi.', previous: $exception);
+        } catch (\Throwable $exception) {
+            $this->quota->release($reservation);
+            throw $exception;
         }
 
         if ($response->failed()) {
+            $this->quota->release($reservation);
             if ($response->serverError() || $response->status() === 429) {
                 $this->breaker->recordFailure();
             }
@@ -75,12 +81,22 @@ class OpenAiImageExtractor implements TextExtractor
         $payload = $response->json();
         $text = data_get($payload, 'choices.0.message.content');
         if (! is_string($text) || trim($text) === '') {
+            $this->quota->release($reservation);
             throw AiServiceException::permanent('openai', 'OCR tidak menemukan teks yang dapat dianalisis.');
         }
 
         $usage = $payload['usage'] ?? [];
-        $cost = $this->quota->estimateCost($config['vision_model'], (int) ($usage['prompt_tokens'] ?? 0), (int) ($usage['completion_tokens'] ?? 0));
-        $this->quota->recordUsage((int) ($usage['prompt_tokens'] ?? 0), (int) ($usage['completion_tokens'] ?? 0), $cost);
+        $usageAvailable = is_numeric($usage['prompt_tokens'] ?? null)
+            || is_numeric($usage['completion_tokens'] ?? null);
+        $cost = $usageAvailable
+            ? $this->quota->estimateCost($config['vision_model'], (int) ($usage['prompt_tokens'] ?? 0), (int) ($usage['completion_tokens'] ?? 0))
+            : $reservation->reservedMicrousd / 1_000_000;
+        try {
+            $this->quota->finalize($reservation, (int) ($usage['prompt_tokens'] ?? 0), (int) ($usage['completion_tokens'] ?? 0), $cost);
+        } catch (\Throwable $exception) {
+            $this->quota->release($reservation);
+            throw $exception;
+        }
         Cache::put($key, trim($text), $config['cache_ttl']);
 
         return new ExtractedText(trim($text), InputType::Image, 'openai');

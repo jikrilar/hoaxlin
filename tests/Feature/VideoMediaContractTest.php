@@ -50,6 +50,8 @@ class VideoMediaContractTest extends TestCase
             'services.openai.translation_prompt_version' => 'media-contract-test',
         ]);
 
+        $this->get(route('home'));
+
         $probe = Mockery::mock(MediaDurationProbe::class);
         $probe->shouldReceive('probePath')->andReturnNull()->byDefault();
         $probe->shouldReceive('probeBytes')->andReturnNull()->byDefault();
@@ -60,10 +62,10 @@ class VideoMediaContractTest extends TestCase
     {
         Queue::fake();
 
-        $this->actingAs(User::factory()->create())->post(route('deteksi'), [
+        $this->actingAs(User::factory()->create())->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video',
             'media_file' => UploadedFile::fake()->create('berita.mp4', 1024, 'video/mp4'),
-        ])->assertRedirect();
+        ]))->assertRedirect();
 
         $submission = Submission::sole();
         $this->assertSame('video', $submission->input_type);
@@ -75,10 +77,10 @@ class VideoMediaContractTest extends TestCase
         Queue::fake();
         config(['media.transcription.max_bytes' => 1024]);
 
-        $this->actingAs(User::factory()->create())->post(route('deteksi'), [
+        $this->actingAs(User::factory()->create())->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video',
             'media_file' => UploadedFile::fake()->create('besar.mp4', 2, 'video/mp4'),
-        ])->assertSessionHasErrors('media_file');
+        ]))->assertSessionHasErrors('media_file');
 
         $this->assertDatabaseEmpty('submissions');
     }
@@ -88,10 +90,10 @@ class VideoMediaContractTest extends TestCase
     {
         Queue::fake();
 
-        $this->actingAs(User::factory()->create())->post(route('deteksi'), [
+        $this->actingAs(User::factory()->create())->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video',
             'media_file' => UploadedFile::fake()->create($filename, 1024, $mime),
-        ])->assertSessionHasErrors('media_file');
+        ]))->assertSessionHasErrors('media_file');
     }
 
     /** @return array<string, array{string, string}> */
@@ -110,10 +112,10 @@ class VideoMediaContractTest extends TestCase
         $probe->shouldReceive('probePath')->once()->andReturn(301.0);
         $this->app->instance(MediaDurationProbe::class, $probe);
 
-        $this->actingAs(User::factory()->create())->post(route('deteksi'), [
+        $this->actingAs(User::factory()->create())->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video',
             'media_file' => UploadedFile::fake()->create('panjang.mp4', 1024, 'video/mp4'),
-        ])->assertSessionHasErrors('media_file');
+        ]))->assertSessionHasErrors('media_file');
     }
 
     public function test_missing_ffprobe_does_not_reject_an_otherwise_valid_upload(): void
@@ -122,10 +124,10 @@ class VideoMediaContractTest extends TestCase
         config(['media.transcription.ffprobe_binary' => 'definitely-missing-ffprobe-binary']);
         $this->app->forgetInstance(MediaDurationProbe::class);
 
-        $this->actingAs(User::factory()->create())->post(route('deteksi'), [
+        $this->actingAs(User::factory()->create())->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video',
             'media_file' => UploadedFile::fake()->create('berita.webm', 1024, 'video/webm'),
-        ])->assertRedirect();
+        ]))->assertRedirect();
     }
 
     #[DataProvider('validRemoteMedia')]
@@ -428,6 +430,12 @@ class VideoMediaContractTest extends TestCase
     private static function webmBytes(): string
     {
         return "\x1A\x45\xDF\xA3".str_repeat("\0", 2044);
+    }
+
+    /** @param array<string, mixed> $payload */
+    private function withCaptcha(array $payload): array
+    {
+        return [...$payload, 'captcha_answer' => (int) session('submission_captcha.answer')];
     }
 }
 

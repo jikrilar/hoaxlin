@@ -206,7 +206,7 @@ Verifikasi:
 
 Lulus 26 test kontrak media dengan 50 assertions dan targeted regression P0/P1 sebanyak 109 test dengan 491 assertions. Full Docker suite lulus 180 test dengan 765 assertions, 4 real-BERT test di-skip pada suite terisolasi, dan 0 failed. Integrasi real BERT terpisah lulus 4 test dengan 25 assertions. `docker compose config --quiet`, Pint untuk seluruh file PHP yang disentuh, dan `git diff --check` lulus.
 
-### [ ] P1.4 CAPTCHA dan quota yang atomik
+### [x] P1.4 CAPTCHA dan quota yang atomik
 
 Masalah:
 
@@ -218,15 +218,21 @@ Wajibkan challenge CAPTCHA sesuai scope dan gunakan limiter atomik dengan expiry
 
 Acceptance criteria:
 
-- [ ] Request yang wajib CAPTCHA tidak lolos tanpa challenge valid.
-- [ ] CAPTCHA tidak dapat digunakan ulang setelah submission berhasil.
-- [ ] Limit IP, account, dan OpenAI tetap benar pada request paralel.
-- [ ] Seluruh key limiter memiliki expiry.
-- [ ] Hard monthly quota menggunakan pencatatan yang durable.
+- [x] Request yang wajib CAPTCHA tidak lolos tanpa challenge valid.
+- [x] CAPTCHA tidak dapat digunakan ulang setelah submission berhasil.
+- [x] Limit IP, account, dan OpenAI tetap benar pada request paralel.
+- [x] Seluruh key limiter memiliki expiry.
+- [x] Hard monthly quota menggunakan pencatatan yang durable.
 
 Verifikasi:
 
-Jalankan test direct POST, CAPTCHA salah/replay, concurrency limiter, TTL, dan rollover quota bulanan.
+Test P1.4 lulus 11 test dengan 52 assertions untuk direct POST, challenge
+missing/wrong/replay, reservation satu-kali, kegagalan internal, quota IP/account,
+TTL/rollover harian, limiter OpenAI per menit, serta reservation/release ledger.
+Full Docker suite lulus 191 test dengan 817 assertions, 4 real-BERT test di-skip
+karena service tidak tersedia, dan 0 failed. Fresh migration SQLite membuat tabel
+ledger OpenAI berhasil; `docker compose config --quiet`, Pint untuk file tersentuh,
+dan `git diff --check` lulus.
 
 ### [ ] P1.5 Keamanan dan skalabilitas CSV
 
