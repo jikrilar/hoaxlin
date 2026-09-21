@@ -18,6 +18,9 @@ final class SubmissionCsvExporter
         'Label',
         'Confidence',
         'Model',
+        'Bahasa Sumber',
+        'Provider Terjemahan',
+        'Model Terjemahan',
         'Dibuat',
         'Teks/URL',
     ];
@@ -40,6 +43,9 @@ final class SubmissionCsvExporter
                 'status',
                 'raw_input',
                 'source_url',
+                'source_language',
+                'translation_provider',
+                'translation_model',
                 'created_at',
             ])
             ->with(['detectionResult:id,submission_id,label,confidence_score,model_version'])
@@ -57,6 +63,9 @@ final class SubmissionCsvExporter
                         $result?->label ?? '-',
                         $result?->confidence_score ?? '-',
                         $result?->model_version ?? '-',
+                        $submission->source_language ?? '-',
+                        $submission->translation_provider ?? '-',
+                        $submission->translation_model ?? '-',
                         $submission->created_at?->format('Y-m-d H:i') ?? '',
                         mb_substr($submission->raw_input ?? $submission->source_url ?? '', 0, 200),
                     ]);

@@ -353,7 +353,7 @@ healthy, `hoaxlin:doctor` PASS, link dokumen lokal valid, `docker compose config
 
 ## P2
 
-### [ ] P2.1 Metadata translation pada export dan test authorization
+### [x] P2.1 Metadata translation pada export dan test authorization
 
 Masalah:
 
@@ -365,14 +365,26 @@ Tetapkan provenance translation minimum pada export dan lengkapi regression test
 
 Acceptance criteria:
 
-- [ ] PDF/CSV menyertakan source language serta provider/model ketika translation terjadi.
-- [ ] Field cost/token internal hanya diekspor bila memang ditujukan kepada user/admin.
-- [ ] Guest, owner, non-owner, dan admin memiliki hasil authorization yang teruji.
-- [ ] Export processing/failed tidak menyajikan result sebagai final.
+- [x] PDF/CSV menyertakan source language serta provider/model ketika translation terjadi.
+- [x] Field cost/token internal hanya diekspor bila memang ditujukan kepada user/admin.
+- [x] Guest, owner, non-owner, dan admin memiliki hasil authorization yang teruji.
+- [x] Export processing/failed tidak menyajikan result sebagai final.
 
 Verifikasi:
 
-Jalankan test export metadata dan seluruh matriks authorization endpoint hasil.
+Test export/provenance dan matriks authorization lulus 20 test dengan 134
+assertions. CSV tetap memakai BOM UTF-8, CRLF, `fputcsv`, `chunkByIdDesc`, eager
+loading berbatas, formula sanitization, strict ownership, dan tidak mengekspor
+token/cost internal. PDF hanya menampilkan source language/provider/model dengan
+fallback aman ketika tidak ada translation.
+
+Full Laravel suite lokal lulus 246 test dengan 1057 assertions, dengan 4 test
+real-BERT ter-skip jika service tidak tersedia. Image Docker target `test`
+berhasil dibuild dan full suite di Docker lulus 246 test dengan 1057 assertions,
+4 real-BERT test ter-skip, dan 0 failed. Regression real-BERT pada network Compose
+lulus 4 test dengan 25 assertions. `docker compose config --quiet`, `docker compose
+ps` (app, queue, scheduler, mysql, redis, bert healthy), Pint untuk file PHP yang
+disentuh, dan `git diff --check` lulus.
 
 ### [ ] P2.2 Perbaikan boundary statistik bulanan
 
