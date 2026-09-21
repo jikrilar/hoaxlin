@@ -29,10 +29,10 @@ from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
-from urllib.parse import quote, urljoin, urlparse
+from urllib.parse import urljoin, urlparse
 
 import httpx
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 
 BERT_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = BERT_ROOT.parent
@@ -66,12 +66,12 @@ CSV_FIELDS = [
 ]
 REJECTED_FIELDS = CSV_FIELDS + ["rejection_reason", "similarity", "matched_id"]
 
-SOURCE_ORDER = ["turnbackhoax", "cekfakta", "afp", "bps", "bank_indonesia", "bmkg"]
+SOURCE_ORDER = ["turnbackhoax", "cekfakta", "afp", "kemkes", "bank_indonesia", "bmkg"]
 SOURCE_NAMES = {
     "turnbackhoax": "TurnBackHoax / MAFINDO",
     "cekfakta": "CekFakta",
     "afp": "AFP Fact Check Indonesia",
-    "bps": "BPS",
+    "kemkes": "Kementerian Kesehatan RI",
     "bank_indonesia": "Bank Indonesia",
     "bmkg": "BMKG",
 }
@@ -79,7 +79,7 @@ SOURCE_LABELS = {
     "turnbackhoax": "hoax",
     "cekfakta": "hoax",
     "afp": "hoax",
-    "bps": "valid",
+    "kemkes": "valid",
     "bank_indonesia": "valid",
     "bmkg": "valid",
 }
@@ -122,6 +122,12 @@ AFP_EVIDENCE_RE = re.compile(
 )
 AFP_NON_CLAIM_RE = re.compile(
     r"^(?:selamat pagi\b|semoga\b|mohon doanya\b)",
+    re.IGNORECASE,
+)
+KEMKES_NONFACTUAL_RE = re.compile(
+    r"\b(?:diperkirakan|diprediksi|berpotensi|diharapkan|akan terus|"
+    r"mengajak|mengimbau|imbau|menyerukan|meminta masyarakat|"
+    r"menargetkan|berharap|jangan)\b",
     re.IGNORECASE,
 )
 
@@ -626,118 +632,99 @@ def collect_afp(
     return candidates
 
 
-def parse_rsc_payload(text: str) -> tuple[dict[str, Any], dict[str, str]]:
-    chunks: dict[str, str] = {}
-    marker_re = re.compile(r"(\d+):T[0-9a-fA-F]+,")
-    matches = list(marker_re.finditer(text))
-    json_start = text.rfind('1:{"status"')
-    for index, match in enumerate(matches):
-        end = matches[index + 1].start() if index + 1 < len(matches) else json_start
-        if end > match.end():
-            chunks[match.group(1)] = text[match.end() : end]
-    if json_start < 0:
-        raise ValueError("BPS server action did not return a JSON payload")
-    payload = json.loads(text[json_start + 2 :])
-    return payload, chunks
+def kemkes_fact_text(paragraphs: Iterable[str]) -> str:
+    selected: list[str] = []
+    for paragraph in paragraphs:
+        paragraph = normalized_text(paragraph)
+        paragraph = re.sub(
+            r"^(?:Jakarta|Indonesia),?\s+\d{1,2}\s+[A-Za-z]+\s+\d{4}\s+",
+            "",
+            paragraph,
+            flags=re.IGNORECASE,
+        )
+        if not paragraph or re.fullmatch(r"(?:Jakarta|Indonesia),?\s+\d{1,2}\s+\w+\s+\d{4}", paragraph):
+            continue
+        for sentence in re.split(r"(?<=[.!?])\s+", paragraph):
+            sentence = normalized_text(sentence)
+            if len(sentence) < 45 or len(sentence) > 650:
+                continue
+            if BOILERPLATE_RE.search(sentence) or FORECAST_RE.search(sentence):
+                continue
+            if KEMKES_NONFACTUAL_RE.search(sentence) and not re.search(
+                r"\d|%|tercatat|ditemukan|mengalami|berjumlah|sebanyak|mencapai|menewaskan|terjadi|dilakukan",
+                sentence,
+                re.IGNORECASE,
+            ):
+                continue
+            selected.append(sentence)
+            if len(selected) >= 2:
+                break
+        if len(selected) >= 2:
+            break
+    return normalized_text(". ".join(selected))[:1600]
 
 
-def bps_slug(title: str) -> str:
-    value = title.lower().replace("%", "-persen")
-    value = re.sub(r"[^a-z0-9]", "-", value)
-    return value
-
-
-def collect_bps(
+def collect_kemkes(
     client: PoliteClient, stats: SourceStats, *, desired_pool: int, max_pages: int
 ) -> list[Candidate]:
-    listing_url = "https://www.bps.go.id/id/pressrelease"
-    try:
-        listing = client.get(listing_url)
-        soup = BeautifulSoup(listing.text, "html.parser")
-        chunk_src = next(
-            (
-                script.get("src")
-                for script in soup.select("script[src]")
-                if "/pressrelease/page-" in str(script.get("src"))
-            ),
-            None,
-        )
-        if not chunk_src:
-            raise ValueError("pressrelease JavaScript chunk not found")
-        chunk_url = urljoin(listing_url, str(chunk_src))
-        chunk = client.get(chunk_url).text
-        action_match = re.search(
-            r'createServerReference\)\("([0-9a-f]{40})".{0,250}"getListPressrelease"',
-            chunk,
-        )
-        if not action_match:
-            raise ValueError("getListPressrelease action id not found")
-        action_id = action_match.group(1)
-    except Exception as exc:  # noqa: BLE001
-        stats.fail(listing_url, str(exc))
-        return []
+    category_base = "https://kemkes.go.id/id/category/rilis-berita"
+    article_urls: list[tuple[str, date | None]] = []
+    seen_urls: set[str] = set()
+    for page in range(0, max_pages):
+        listing_url = category_base if page == 0 else f"{category_base}/{page + 1}"
+        try:
+            response = client.get(listing_url, headers={"Referer": "https://kemkes.go.id/id/home"})
+            soup = BeautifulSoup(response.text, "html.parser")
+        except Exception as exc:  # noqa: BLE001
+            stats.fail(listing_url, str(exc))
+            continue
+        found = []
+        for anchor in soup.select("a.link"):
+            href = str(anchor.get("href") or "")
+            if not href.startswith("/id/") or "/category/" in href:
+                continue
+            url = urljoin(listing_url, href).split("#", 1)[0]
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+            found.append((url, parse_date(anchor.get_text(" ", strip=True))))
+        article_urls.extend(found)
+    stats.discovered = len(article_urls)
+    article_urls.sort(key=lambda item: (item[1] is not None, item[1] or date.min), reverse=True)
 
     candidates: list[Candidate] = []
-    seen_ids: set[str] = set()
-    headers = {
-        "Accept": "text/x-component",
-        "Next-Action": action_id,
-        "Content-Type": "text/plain;charset=UTF-8",
-        "Origin": "https://www.bps.go.id",
-        "Referer": listing_url,
-    }
-    for page in range(1, max_pages + 1):
+    for url, listing_date in article_urls:
+        if len(candidates) >= desired_pool:
+            break
         try:
-            response = client.post(
-                listing_url,
-                headers=headers,
-                content=json.dumps(["id", {"page": page, "sort": "latest"}]),
-            )
-            payload, chunks = parse_rsc_payload(response.text)
-            api_response = payload.get("response") or {}
-            data = api_response.get("data") or []
-            rows = data[1] if len(data) > 1 and isinstance(data[1], list) else []
-        except Exception as exc:  # noqa: BLE001
-            stats.fail(f"{listing_url}?page={page}", str(exc))
-            break
-        if not rows:
-            break
-        stats.discovered += len(rows)
-        for row in rows:
-            record_id = str(row.get("brs_id") or "")
-            if not record_id or record_id in seen_ids:
-                continue
-            seen_ids.add(record_id)
+            response = client.get(url, headers={"Referer": category_base})
             stats.fetched += 1
-            title = normalized_text(str(row.get("title") or ""))
-            abstract = str(row.get("abstract") or "")
-            if re.fullmatch(r"\$\d+", abstract):
-                abstract = chunks.get(abstract[1:], "")
-            body = BeautifulSoup(abstract, "html.parser").get_text(" ", strip=True)
-            text = factual_text(title, body)
-            published = parse_date(str(row.get("rl_date") or ""))
-            if not text or not published:
-                stats.fail(listing_url, f"BPS record {record_id} missing factual text or release date")
-                continue
-            source_url = (
-                f"https://www.bps.go.id/id/pressrelease/{published:%Y/%m/%d}/"
-                f"{record_id}/{quote(bps_slug(title))}.html"
-            )
+            soup = BeautifulSoup(response.text, "html.parser")
+            headings = soup.find_all("h1")
+            title = normalized_text(headings[-1].get_text(" ", strip=True) if headings else "")
+            content = soup.select_one(".content-wrapper")
+            paragraphs = [p.get_text(" ", strip=True) for p in content.find_all("p")] if content else []
+            times = [parse_date(str(time.get("datetime") or time.get_text(" ", strip=True))) for time in soup.select("time")]
+            published = next((value for value in times if value), listing_date)
+            text = kemkes_fact_text(paragraphs)
+            if not title or not text or not published:
+                raise ValueError("missing factual statement or publication date")
+            record_id = url.rstrip("/").rsplit("/", 1)[-1]
             candidates.append(
                 make_candidate(
-                    source_key="bps",
+                    source_key="kemkes",
                     record_id=record_id,
                     text=text,
-                    text_source="headline_and_primary_statement",
-                    evidence_url=source_url,
+                    text_source="primary_factual_statement",
+                    evidence_url=url,
                     published_at=published,
-                    topic=infer_topic(str(row.get("subj") or ""), text),
-                    notes="Official BPS press release; requires manual review",
+                    topic=infer_topic(title, text),
+                    notes="Official Kementerian Kesehatan RI release; requires manual review",
                 )
             )
             stats.parsed += 1
-        if len(candidates) >= desired_pool:
-            break
+        except Exception as exc:  # noqa: BLE001
+            stats.fail(url, str(exc))
     return candidates
 
 
@@ -1064,6 +1051,105 @@ def write_csv(path: Path, rows: Iterable[dict[str, Any]], fields: list[str]) -> 
         writer.writerows(rows)
 
 
+SOURCE_KEYS_BY_NAME = {name: key for key, name in SOURCE_NAMES.items()}
+
+
+def candidate_from_csv_row(row: dict[str, str]) -> Candidate:
+    source_key = SOURCE_KEYS_BY_NAME.get(row.get("evidence_source", ""))
+    if source_key is None:
+        raise ValueError(f"unknown evidence source: {row.get('evidence_source', '')}")
+    return Candidate(
+        id=row["id"],
+        text=row["text"],
+        label=row["label"],
+        text_source=row["text_source"],
+        evidence_source=row["evidence_source"],
+        evidence_url=row["evidence_url"],
+        published_at=row["published_at"],
+        topic=row["topic"],
+        verification_method=row["verification_method"],
+        notes=row["notes"],
+        approved=int(row.get("approved") or 0),
+        source_key=source_key,
+    )
+
+
+def rejected_from_csv_row(row: dict[str, str]) -> RejectedCandidate:
+    similarity_value = row.get("similarity") or ""
+    candidate = candidate_from_csv_row(row)
+    return RejectedCandidate(
+        candidate=candidate,
+        rejection_reason=row.get("rejection_reason", "legacy_rejection"),
+        similarity=float(similarity_value) if similarity_value else None,
+        matched_id=row.get("matched_id", ""),
+    )
+
+
+def load_previous_source_stats(report_path: Path, stats: dict[str, SourceStats]) -> None:
+    if not report_path.is_file():
+        return
+    try:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return
+    for source_key, values in (report.get("sources") or {}).items():
+        if source_key not in stats or not isinstance(values, dict):
+            continue
+        stats[source_key] = SourceStats(
+            discovered=int(values.get("discovered") or 0),
+            fetched=int(values.get("fetched") or 0),
+            parsed=int(values.get("parsed") or 0),
+            failures=list(values.get("failures") or []),
+        )
+
+
+def append_kemkes_candidates(
+    existing: list[Candidate],
+    additions: list[Candidate],
+    corpus: CorpusSimilarityIndex,
+    previous_rejected: list[RejectedCandidate],
+    *,
+    threshold: float,
+    target_per_source: int,
+    cutoff: date,
+) -> tuple[list[Candidate], list[RejectedCandidate]]:
+    rejected: list[RejectedCandidate] = list(previous_rejected)
+    known_keys = {normalize_key(candidate.text) for candidate in existing}
+    existing_ids = {candidate.id for candidate in existing}
+    accepted = list(existing)
+    source_count = Counter(candidate.source_key for candidate in existing)
+    for candidate in sorted(additions, key=lambda item: candidate_sort_key(item, cutoff), reverse=True):
+        if candidate.id in existing_ids:
+            rejected.append(RejectedCandidate(candidate, "exact_duplicate"))
+            continue
+        key = normalize_key(candidate.text)
+        if not key or key in known_keys:
+            rejected.append(RejectedCandidate(candidate, "exact_duplicate"))
+            continue
+        score, matched_id = corpus.closest(candidate.text)
+        if score >= threshold:
+            rejected.append(RejectedCandidate(candidate, "near_duplicate_training", score, matched_id))
+            continue
+        if source_count[candidate.source_key] >= target_per_source:
+            rejected.append(RejectedCandidate(candidate, "source_quota_exceeded"))
+            continue
+        closest_score = 0.0
+        closest_id = ""
+        for current in accepted:
+            current_score = similarity(candidate.text, current.text)
+            if current_score > closest_score:
+                closest_score = current_score
+                closest_id = current.id
+        if closest_score >= threshold:
+            rejected.append(RejectedCandidate(candidate, "near_duplicate_challenge", closest_score, closest_id))
+            continue
+        accepted.append(candidate)
+        existing_ids.add(candidate.id)
+        known_keys.add(key)
+        source_count[candidate.source_key] += 1
+    return accepted, rejected
+
+
 def build_report(
     *,
     candidates: list[Candidate],
@@ -1137,7 +1223,126 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--delay", type=float, default=0.5, help="minimum seconds between HTTP requests")
     parser.add_argument("--timeout", type=float, default=30.0)
     parser.add_argument("--max-pages", type=int, default=8)
+    parser.add_argument(
+        "--append-kemkes",
+        action="store_true",
+        help="preserve existing candidates.csv and collect only Kementerian Kesehatan RI",
+    )
     return parser.parse_args()
+
+
+def run_append_kemkes(
+    args: argparse.Namespace, training_records: list[tuple[str, str]], corpus_index: CorpusSimilarityIndex
+) -> int:
+    output_dir = args.output_dir.resolve()
+    candidates_path = output_dir / "candidates.csv"
+    rejected_path = output_dir / "rejected.csv"
+    report_path = output_dir / "collection_report.json"
+    if not candidates_path.is_file():
+        raise SystemExit(f"existing candidates.csv not found: {candidates_path}")
+
+    with candidates_path.open("r", encoding="utf-8-sig", newline="") as handle:
+        existing_rows = list(csv.DictReader(handle))
+    if len(existing_rows) not in (100, 120):
+        raise SystemExit(
+            f"--append-kemkes requires the existing 100 candidates or a 120-record Kemenkes refresh; found {len(existing_rows)}"
+        )
+    refreshing_existing_kemkes = len(existing_rows) == 120
+    existing = [
+        candidate_from_csv_row(row)
+        for row in existing_rows
+        if row.get("evidence_source") != SOURCE_NAMES["kemkes"]
+    ]
+    previous_rejected: list[RejectedCandidate] = []
+    if rejected_path.is_file():
+        with rejected_path.open("r", encoding="utf-8-sig", newline="") as handle:
+            previous_rejected = [
+                rejected_from_csv_row(row)
+                for row in csv.DictReader(handle)
+                if row.get("evidence_source") != SOURCE_NAMES["kemkes"]
+            ]
+
+    stats = {source: SourceStats() for source in SOURCE_ORDER}
+    load_previous_source_stats(report_path, stats)
+    if refreshing_existing_kemkes:
+        additions = [
+            candidate_from_csv_row(row)
+            for row in existing_rows
+            if row.get("evidence_source") == SOURCE_NAMES["kemkes"]
+        ]
+        stats["kemkes"] = SourceStats(
+            discovered=len(additions),
+            fetched=len(additions),
+            parsed=len(additions),
+        )
+        print(
+            f"[challenge] reusing existing Kementerian Kesehatan RI candidates: {len(additions)}",
+            flush=True,
+        )
+    else:
+        desired_pool = args.target_per_source + 10
+        with PoliteClient(delay=args.delay, timeout=args.timeout) as client:
+            print("[challenge] collecting Kementerian Kesehatan RI...", flush=True)
+            kemkes_stats = stats["kemkes"]
+            additions = collect_kemkes(
+                client,
+                kemkes_stats,
+                desired_pool=desired_pool,
+                max_pages=args.max_pages,
+            )
+        print(
+            f"[challenge] Kementerian Kesehatan RI: discovered={stats['kemkes'].discovered} "
+            f"parsed={len(additions)} failures={len(stats['kemkes'].failures)}",
+            flush=True,
+        )
+
+    normalized_additions: list[Candidate] = []
+    new_rejections: list[RejectedCandidate] = []
+    for candidate in additions:
+        candidate.text = normalized_text(candidate.text)
+        if len(candidate.text) < 25:
+            new_rejections.append(RejectedCandidate(candidate, "text_too_short_after_normalization"))
+        else:
+            normalized_additions.append(candidate)
+    selected, append_rejections = append_kemkes_candidates(
+        existing,
+        normalized_additions,
+        corpus_index,
+        previous_rejected,
+        threshold=args.similarity_threshold,
+        target_per_source=args.target_per_source,
+        cutoff=args.cutoff,
+    )
+    rejected = new_rejections + append_rejections
+    rejected.sort(key=lambda item: (item.rejection_reason, item.candidate.id))
+    write_csv(candidates_path, (candidate.csv_row() for candidate in selected), CSV_FIELDS)
+    write_csv(rejected_path, (item.csv_row() for item in rejected), REJECTED_FIELDS)
+    report = build_report(
+        candidates=selected,
+        rejected=rejected,
+        stats=stats,
+        corpus_path=args.corpus.resolve(),
+        corpus_records=len(training_records),
+        threshold=args.similarity_threshold,
+        cutoff=args.cutoff,
+        target_per_source=args.target_per_source,
+    )
+    report_path.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    print("[challenge] final candidates by source:", flush=True)
+    for source_key in SOURCE_ORDER:
+        count = report["result"]["by_source"].get(source_key, 0)
+        print(f"  - {SOURCE_NAMES[source_key]}: {count}/{args.target_per_source}", flush=True)
+    print(
+        f"[challenge] candidates={len(selected)} rejected={len(rejected)} "
+        f"target_met={report['result']['target_met']}",
+        flush=True,
+    )
+    print(f"[challenge] wrote {candidates_path}", flush=True)
+    print(f"[challenge] wrote {rejected_path}", flush=True)
+    print(f"[challenge] wrote {report_path}", flush=True)
+    return 0
 
 
 def main() -> int:
@@ -1154,6 +1359,9 @@ def main() -> int:
     training_records = load_training_corpus(args.corpus)
     corpus_index = CorpusSimilarityIndex(training_records)
     print(f"[challenge] indexed {len(training_records)} training records", flush=True)
+
+    if args.append_kemkes:
+        return run_append_kemkes(args, training_records, corpus_index)
 
     with PoliteClient(delay=args.delay, timeout=args.timeout) as client:
         collectors = [
@@ -1182,10 +1390,10 @@ def main() -> int:
                 ),
             ),
             (
-                "bps",
-                lambda: collect_bps(
+                "kemkes",
+                lambda: collect_kemkes(
                     client,
-                    stats["bps"],
+                    stats["kemkes"],
                     desired_pool=desired_pool,
                     max_pages=args.max_pages,
                 ),

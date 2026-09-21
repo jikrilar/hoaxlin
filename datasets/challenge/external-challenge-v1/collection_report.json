@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-09-21T07:09:49.684658+00:00",
+  "generated_at": "2026-09-21T08:13:13.075436+00:00",
   "ground_truth_policy": "explicit fact-check verdict or first-party primary source; no LLM",
   "manual_review_required": true,
   "approved_default": 0,
@@ -11,7 +11,7 @@
       "turnbackhoax": 20,
       "cekfakta": 20,
       "afp": 20,
-      "bps": 20,
+      "kemkes": 20,
       "bank_indonesia": 20,
       "bmkg": 20
     },
@@ -21,28 +21,29 @@
     }
   },
   "result": {
-    "total_candidates": 100,
+    "total_candidates": 120,
     "total_rejected": 129,
     "by_source": {
       "turnbackhoax": 20,
       "cekfakta": 20,
       "afp": 20,
       "bank_indonesia": 20,
-      "bmkg": 20
+      "bmkg": 20,
+      "kemkes": 20
     },
     "by_label": {
       "hoax": 60,
-      "valid": 40
+      "valid": 60
     },
     "gaps_by_source": {
       "turnbackhoax": 0,
       "cekfakta": 0,
       "afp": 0,
-      "bps": 20,
+      "kemkes": 0,
       "bank_indonesia": 0,
       "bmkg": 0
     },
-    "target_met": false,
+    "target_met": true,
     "rejections_by_reason": {
       "exact_duplicate": 36,
       "source_quota_exceeded": 93
@@ -156,21 +157,16 @@
       "target": 20,
       "gap": 0
     },
-    "bps": {
-      "discovered": 0,
-      "fetched": 0,
-      "parsed": 0,
-      "failures": [
-        {
-          "url": "https://www.bps.go.id/id/pressrelease",
-          "reason": "HTTP 403"
-        }
-      ],
-      "name": "BPS",
+    "kemkes": {
+      "discovered": 20,
+      "fetched": 20,
+      "parsed": 20,
+      "failures": [],
+      "name": "Kementerian Kesehatan RI",
       "label": "valid",
-      "candidates_kept": 0,
+      "candidates_kept": 20,
       "target": 20,
-      "gap": 20
+      "gap": 0
     },
     "bank_indonesia": {
       "discovered": 21,
