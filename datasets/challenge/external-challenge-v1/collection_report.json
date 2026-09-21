@@ -1,0 +1,198 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-21T07:09:49.684658+00:00",
+  "ground_truth_policy": "explicit fact-check verdict or first-party primary source; no LLM",
+  "manual_review_required": true,
+  "approved_default": 0,
+  "cutoff_priority": "2026-08-20",
+  "target": {
+    "total": 120,
+    "by_source": {
+      "turnbackhoax": 20,
+      "cekfakta": 20,
+      "afp": 20,
+      "bps": 20,
+      "bank_indonesia": 20,
+      "bmkg": 20
+    },
+    "by_label": {
+      "hoax": 60,
+      "valid": 60
+    }
+  },
+  "result": {
+    "total_candidates": 100,
+    "total_rejected": 129,
+    "by_source": {
+      "turnbackhoax": 20,
+      "cekfakta": 20,
+      "afp": 20,
+      "bank_indonesia": 20,
+      "bmkg": 20
+    },
+    "by_label": {
+      "hoax": 60,
+      "valid": 40
+    },
+    "gaps_by_source": {
+      "turnbackhoax": 0,
+      "cekfakta": 0,
+      "afp": 0,
+      "bps": 20,
+      "bank_indonesia": 0,
+      "bmkg": 0
+    },
+    "target_met": false,
+    "rejections_by_reason": {
+      "exact_duplicate": 36,
+      "source_quota_exceeded": 93
+    }
+  },
+  "deduplication": {
+    "normalization": "dataset.normalize.normalize_key",
+    "shingling": "word trigram",
+    "metric": "Jaccard",
+    "threshold": 0.65,
+    "training_corpus": "C:\\xampp\\htdocs\\hoax-detector\\datasets\\processed\\komdigi-antara-v1\\all.jsonl",
+    "training_records": 7816
+  },
+  "sources": {
+    "turnbackhoax": {
+      "discovered": 80,
+      "fetched": 60,
+      "parsed": 60,
+      "failures": [],
+      "name": "TurnBackHoax / MAFINDO",
+      "label": "hoax",
+      "candidates_kept": 20,
+      "target": 20,
+      "gap": 0
+    },
+    "cekfakta": {
+      "discovered": 76,
+      "fetched": 68,
+      "parsed": 60,
+      "failures": [
+        {
+          "url": "https://cekfakta.com/focus/36779",
+          "reason": "publisher text explicitly prohibits automated AI collection"
+        },
+        {
+          "url": "https://cekfakta.com/focus/36778",
+          "reason": "publisher text explicitly prohibits automated AI collection"
+        },
+        {
+          "url": "https://cekfakta.com/focus/36711",
+          "reason": "publisher text explicitly prohibits automated AI collection"
+        },
+        {
+          "url": "https://cekfakta.com/focus/36710",
+          "reason": "publisher text explicitly prohibits automated AI collection"
+        },
+        {
+          "url": "https://cekfakta.com/focus/36709",
+          "reason": "publisher text explicitly prohibits automated AI collection"
+        },
+        {
+          "url": "https://cekfakta.com/focus/36678",
+          "reason": "publisher text explicitly prohibits automated AI collection"
+        },
+        {
+          "url": "https://cekfakta.com/focus/36677",
+          "reason": "publisher text explicitly prohibits automated AI collection"
+        },
+        {
+          "url": "https://cekfakta.com/focus/36676",
+          "reason": "publisher text explicitly prohibits automated AI collection"
+        }
+      ],
+      "name": "CekFakta",
+      "label": "hoax",
+      "candidates_kept": 20,
+      "target": 20,
+      "gap": 0
+    },
+    "afp": {
+      "discovered": 48,
+      "fetched": 48,
+      "parsed": 40,
+      "failures": [
+        {
+          "url": "https://periksafakta.afp.com/doc.afp.com.C6VM9KE",
+          "reason": "Indonesian claim cannot be separated safely from verdict/evidence"
+        },
+        {
+          "url": "https://periksafakta.afp.com/doc.afp.com.C3JM4T3",
+          "reason": "article does not state a clear false verdict"
+        },
+        {
+          "url": "https://periksafakta.afp.com/doc.afp.com.B8VB29E",
+          "reason": "article does not state a clear false verdict"
+        },
+        {
+          "url": "https://periksafakta.afp.com/doc.afp.com.B7U8868",
+          "reason": "article does not state a clear false verdict"
+        },
+        {
+          "url": "https://periksafakta.afp.com/doc.afp.com.B7ME8KE",
+          "reason": "article does not state a clear false verdict"
+        },
+        {
+          "url": "https://periksafakta.afp.com/doc.afp.com.B7GN7WE",
+          "reason": "article does not state a clear false verdict"
+        },
+        {
+          "url": "https://periksafakta.afp.com/doc.afp.com.B7GP4KH",
+          "reason": "article does not state a clear false verdict"
+        },
+        {
+          "url": "https://periksafakta.afp.com/doc.afp.com.B73Y966",
+          "reason": "article does not state a clear false verdict"
+        }
+      ],
+      "name": "AFP Fact Check Indonesia",
+      "label": "hoax",
+      "candidates_kept": 20,
+      "target": 20,
+      "gap": 0
+    },
+    "bps": {
+      "discovered": 0,
+      "fetched": 0,
+      "parsed": 0,
+      "failures": [
+        {
+          "url": "https://www.bps.go.id/id/pressrelease",
+          "reason": "HTTP 403"
+        }
+      ],
+      "name": "BPS",
+      "label": "valid",
+      "candidates_kept": 0,
+      "target": 20,
+      "gap": 20
+    },
+    "bank_indonesia": {
+      "discovered": 21,
+      "fetched": 21,
+      "parsed": 21,
+      "failures": [],
+      "name": "Bank Indonesia",
+      "label": "valid",
+      "candidates_kept": 20,
+      "target": 20,
+      "gap": 0
+    },
+    "bmkg": {
+      "discovered": 48,
+      "fetched": 48,
+      "parsed": 48,
+      "failures": [],
+      "name": "BMKG",
+      "label": "valid",
+      "candidates_kept": 20,
+      "target": 20,
+      "gap": 0
+    }
+  }
+}
