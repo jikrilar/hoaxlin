@@ -1,0 +1,96 @@
+{
+  "dataset_name": "external-challenge",
+  "version": "1.0.0",
+  "created_at": "2026-09-21T10:43:51.310651+00:00",
+  "rows": 120,
+  "labels": {
+    "hoax": 60,
+    "valid": 60
+  },
+  "sources": {
+    "TurnBackHoax / MAFINDO": 20,
+    "CekFakta": 20,
+    "AFP Fact Check Indonesia": 20,
+    "Bank Indonesia": 20,
+    "BMKG": 20,
+    "Kementerian Kesehatan RI": 20
+  },
+  "date_range": {
+    "min": "2026-07-30",
+    "max": "2026-09-21"
+  },
+  "temporal": {
+    "reference_date": "2026-08-20",
+    "count_strictly_after": 112,
+    "count_on_or_after": 114,
+    "note": "Samples were prioritized after the training-dataset creation date; not all records are a strict temporal holdout."
+  },
+  "file": {
+    "name": "challenge.csv",
+    "path": "datasets/challenge/external-challenge-v1/challenge.csv",
+    "sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708",
+    "encoding": "UTF-8 with BOM",
+    "newline": "CRLF",
+    "columns": [
+      "id",
+      "text",
+      "label",
+      "text_source",
+      "evidence_source",
+      "evidence_url",
+      "published_at",
+      "topic",
+      "verification_method",
+      "notes",
+      "approved"
+    ]
+  },
+  "quality": {
+    "exact_duplicates": 0,
+    "near_duplicate_threshold": 0.65,
+    "training_overlap_at_or_above_threshold": 0,
+    "challenge_overlap_at_or_above_threshold": 0,
+    "max_similarity_vs_training": {
+      "similarity": 0.14893617021276595,
+      "candidate_id": "afp-C4AR4CR",
+      "training_id": "komdigi:64813"
+    },
+    "max_similarity_inside_challenge": {
+      "similarity": 0.5714285714285714,
+      "left_id": "bank_indonesia-sp_2818126",
+      "right_id": "bank_indonesia-sp_2817626"
+    },
+    "missing_required_fields": 0,
+    "verdict_leakage": 0,
+    "unique_ids": true
+  },
+  "collection_review": {
+    "source_discovered_records": 293,
+    "source_fetched_records": 265,
+    "source_parsed_records": 249,
+    "candidate_rows": 120,
+    "rejected_rows": 129,
+    "approved_rows": 120,
+    "rejections_by_reason": {
+      "exact_duplicate": 36,
+      "source_quota_exceeded": 88,
+      "semantic_duplicate_manual": 5
+    },
+    "review_status": {
+      "approved": true,
+      "approved_count": 120,
+      "unapproved_ids": [],
+      "basis": "explicit fact-check verdict for hoax and official primary source for valid; final quality validation passed"
+    }
+  },
+  "source_snapshot": {
+    "path": "datasets/challenge/external-challenge-v1/candidates.csv",
+    "filter": "approved == 1",
+    "selected_rows": 120,
+    "text_and_labels_changed": false
+  },
+  "usage_policy": {
+    "evaluation_only": true,
+    "statement": "This frozen dataset is for external evaluation only. It is not used for training, validation, calibration, or threshold tuning. Do not modify it after model results are observed."
+  }
+}
