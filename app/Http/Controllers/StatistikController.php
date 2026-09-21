@@ -3,21 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Submission;
-use Illuminate\View\View;
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class StatistikController extends Controller
 {
     public function index(): View
     {
-        $trend = collect(range(11, 0))->map(function ($m) {
-            $date = now()->subMonths($m)->startOfMonth();
-            $next = $date->copy()->addMonth();
+        $timezone = config('app.timezone');
+
+        $trend = collect(range(11, 0))->map(function ($m) use ($timezone) {
+            $date = now($timezone)->toImmutable()->subMonths($m)->startOfMonth();
+            $next = $date->addMonth();
+
             return [
                 'label' => $date->format('M Y'),
-                'total' => Submission::whereBetween('created_at', [$date, $next])->count(),
-                'hoax' => Submission::whereBetween('created_at', [$date, $next])->whereHas('detectionResult', fn ($q) => $q->where('label', 'hoax'))->count(),
-                'valid' => Submission::whereBetween('created_at', [$date, $next])->whereHas('detectionResult', fn ($q) => $q->where('label', 'valid'))->count(),
+                'total' => $this->submissionsInMonth($date, $next)->count(),
+                'hoax' => $this->submissionsInMonth($date, $next)
+                    ->whereHas('detectionResult', fn ($q) => $q->where('label', 'hoax'))
+                    ->count(),
+                'valid' => $this->submissionsInMonth($date, $next)
+                    ->whereHas('detectionResult', fn ($q) => $q->where('label', 'valid'))
+                    ->count(),
             ];
         });
 
@@ -29,5 +38,17 @@ class StatistikController extends Controller
             ->all();
 
         return view('statistik', compact('trend', 'byTopic'));
+    }
+
+    /**
+     * Build a half-open monthly range so the next month's first instant is
+     * never counted in both buckets. Boundaries are calculated in the
+     * application timezone configured for the deployment.
+     */
+    private function submissionsInMonth(CarbonImmutable $monthStart, CarbonImmutable $nextMonthStart): Builder
+    {
+        return Submission::query()
+            ->where('created_at', '>=', $monthStart)
+            ->where('created_at', '<', $nextMonthStart);
     }
 }
