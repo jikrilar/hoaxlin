@@ -1,0 +1,662 @@
+{
+  "dataset": {
+    "name": "external-challenge",
+    "version": "1.0.0",
+    "sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708",
+    "rows": 120,
+    "evaluation_only": true
+  },
+  "model": {
+    "version": "v1.0.0",
+    "serving_threshold": 0.99
+  },
+  "source_evaluation_time": "2026-09-21T11:25:21.913929+00:00",
+  "total": 120,
+  "correct": 61,
+  "incorrect": 59,
+  "confusion": {
+    "true_positive": 55,
+    "false_positive": 54,
+    "true_negative": 6,
+    "false_negative": 5
+  },
+  "per_label": {
+    "valid": {
+      "total": 60,
+      "correct": 6,
+      "incorrect": 54,
+      "accuracy_recall": 0.1,
+      "mean_confidence": 0.9789607117572999,
+      "median_confidence": 0.997250854969,
+      "abstained": 10
+    },
+    "hoax": {
+      "total": 60,
+      "correct": 55,
+      "incorrect": 5,
+      "accuracy_recall": 0.9166666666666666,
+      "mean_confidence": 0.9557278603314834,
+      "median_confidence": 0.9933907389645,
+      "abstained": 25
+    }
+  },
+  "per_source": {
+    "AFP Fact Check Indonesia": {
+      "total": 20,
+      "correct": 15,
+      "incorrect": 5,
+      "accuracy": 0.75,
+      "predicted_valid": 5,
+      "predicted_hoax": 15,
+      "abstained": 15,
+      "abstention_rate": 0.75,
+      "mean_confidence": 0.88922316432
+    },
+    "BMKG": {
+      "total": 20,
+      "correct": 0,
+      "incorrect": 20,
+      "accuracy": 0.0,
+      "predicted_valid": 0,
+      "predicted_hoax": 20,
+      "abstained": 0,
+      "abstention_rate": 0.0,
+      "mean_confidence": 0.9979648411273001
+    },
+    "Bank Indonesia": {
+      "total": 20,
+      "correct": 0,
+      "incorrect": 20,
+      "accuracy": 0.0,
+      "predicted_valid": 0,
+      "predicted_hoax": 20,
+      "abstained": 2,
+      "abstention_rate": 0.1,
+      "mean_confidence": 0.9801426440478
+    },
+    "CekFakta": {
+      "total": 20,
+      "correct": 20,
+      "incorrect": 0,
+      "accuracy": 1.0,
+      "predicted_valid": 0,
+      "predicted_hoax": 20,
+      "abstained": 3,
+      "abstention_rate": 0.15,
+      "mean_confidence": 0.9916117519139499
+    },
+    "Kementerian Kesehatan RI": {
+      "total": 20,
+      "correct": 6,
+      "incorrect": 14,
+      "accuracy": 0.3,
+      "predicted_valid": 6,
+      "predicted_hoax": 14,
+      "abstained": 8,
+      "abstention_rate": 0.4,
+      "mean_confidence": 0.9587746500968001
+    },
+    "TurnBackHoax / MAFINDO": {
+      "total": 20,
+      "correct": 20,
+      "incorrect": 0,
+      "accuracy": 1.0,
+      "predicted_valid": 0,
+      "predicted_hoax": 20,
+      "abstained": 7,
+      "abstention_rate": 0.35,
+      "mean_confidence": 0.9863486647605001
+    }
+  },
+  "per_topic": {
+    "bantuan_sosial": {
+      "total": 6,
+      "correct": 6,
+      "incorrect": 0,
+      "accuracy": 1.0,
+      "abstained": 0
+    },
+    "bencana_cuaca": {
+      "total": 26,
+      "correct": 10,
+      "incorrect": 16,
+      "accuracy": 0.38461538461538464,
+      "abstained": 11
+    },
+    "ekonomi": {
+      "total": 21,
+      "correct": 2,
+      "incorrect": 19,
+      "accuracy": 0.09523809523809523,
+      "abstained": 4
+    },
+    "keamanan": {
+      "total": 1,
+      "correct": 1,
+      "incorrect": 0,
+      "accuracy": 1.0,
+      "abstained": 0
+    },
+    "kesehatan": {
+      "total": 5,
+      "correct": 4,
+      "incorrect": 1,
+      "accuracy": 0.8,
+      "abstained": 4
+    },
+    "lainnya": {
+      "total": 19,
+      "correct": 18,
+      "incorrect": 1,
+      "accuracy": 0.9473684210526315,
+      "abstained": 5
+    },
+    "politik": {
+      "total": 29,
+      "correct": 10,
+      "incorrect": 19,
+      "accuracy": 0.3448275862068966,
+      "abstained": 9
+    },
+    "teknologi": {
+      "total": 13,
+      "correct": 10,
+      "incorrect": 3,
+      "accuracy": 0.7692307692307693,
+      "abstained": 2
+    }
+  },
+  "confidence": {
+    "correct": {
+      "count": 61,
+      "mean": 0.9708442326451311,
+      "median": 0.993688821793,
+      "min": 0.566425859928,
+      "max": 0.999928951263
+    },
+    "incorrect": {
+      "count": 59,
+      "mean": 0.963725697186,
+      "median": 0.997197270393,
+      "min": 0.520372867584,
+      "max": 0.999287903309
+    },
+    "false_positive": {
+      "count": 54,
+      "mean": 0.981302150973537,
+      "median": 0.997511357069,
+      "min": 0.520372867584,
+      "max": 0.999287903309
+    },
+    "false_negative": {
+      "count": 5,
+      "mean": 0.7738999962806,
+      "median": 0.793544352055,
+      "min": 0.579961657524,
+      "max": 0.86749792099
+    },
+    "valid": {
+      "count": 60,
+      "mean": 0.9789607117572999,
+      "median": 0.997250854969,
+      "min": 0.520372867584,
+      "max": 0.999334990978
+    },
+    "hoax": {
+      "count": 60,
+      "mean": 0.9557278603314834,
+      "median": 0.9933907389645,
+      "min": 0.566425859928,
+      "max": 0.999928951263
+    }
+  },
+  "text_length": {
+    "correct": {
+      "count": 61,
+      "mean": 77.55737704918033,
+      "median": 55,
+      "min": 25,
+      "max": 293
+    },
+    "incorrect": {
+      "count": 59,
+      "mean": 107.86440677966101,
+      "median": 88,
+      "min": 31,
+      "max": 296
+    },
+    "valid_correct": {
+      "count": 6,
+      "mean": 221.0,
+      "median": 224.0,
+      "min": 145,
+      "max": 293
+    },
+    "valid_incorrect": {
+      "count": 54,
+      "mean": 107.5925925925926,
+      "median": 85.0,
+      "min": 31,
+      "max": 296
+    },
+    "hoax_correct": {
+      "count": 55,
+      "mean": 61.90909090909091,
+      "median": 53,
+      "min": 25,
+      "max": 220
+    },
+    "hoax_incorrect": {
+      "count": 5,
+      "mean": 110.8,
+      "median": 110,
+      "min": 86,
+      "max": 152
+    },
+    "abstained": {
+      "count": 35,
+      "mean": 104.14285714285714,
+      "median": 83,
+      "min": 25,
+      "max": 234
+    },
+    "covered": {
+      "count": 85,
+      "mean": 87.6470588235294,
+      "median": 70,
+      "min": 31,
+      "max": 296
+    }
+  },
+  "abstention": {
+    "threshold": 0.99,
+    "total_abstained": 35,
+    "true_label_distribution": {
+      "hoax": 25,
+      "valid": 10
+    },
+    "binary_correct_abstained": 25,
+    "binary_incorrect_abstained": 10,
+    "binary_correct_covered": 36,
+    "binary_incorrect_covered": 49,
+    "source_distribution": {
+      "TurnBackHoax / MAFINDO": 7,
+      "CekFakta": 3,
+      "AFP Fact Check Indonesia": 15,
+      "Bank Indonesia": 2,
+      "Kementerian Kesehatan RI": 8
+    },
+    "topic_distribution": {
+      "bencana_cuaca": 11,
+      "lainnya": 5,
+      "ekonomi": 4,
+      "teknologi": 2,
+      "kesehatan": 4,
+      "politik": 9
+    }
+  },
+  "high_confidence_errors": {
+    "false_positive": [
+      {
+        "id": "bmkg-bmkg-sampaikan-pendalaman-rka-k-l-2027-dalam-rdp-bersama-dpr-ri",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.999287903309,
+        "prob_valid": 0.000712153444,
+        "prob_hoax": 0.999287903309,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "BMKG",
+        "topic": "politik",
+        "text_length": 64
+      },
+      {
+        "id": "bmkg-bmkg-tekankan-pentingnya-informasi-iklim-dalam-perencanaan-produksi-dan-distribusi-pupuk-nasional",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.999152779579,
+        "prob_valid": 0.000847225427,
+        "prob_hoax": 0.999152779579,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "BMKG",
+        "topic": "bencana_cuaca",
+        "text_length": 98
+      },
+      {
+        "id": "kemkes-kemenkes-perkuat-pemantauan-kualitas-udara-hadapi-dampak-erupsi-anak-krakatau",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.999062478542,
+        "prob_valid": 0.000937485136,
+        "prob_hoax": 0.999062478542,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "Kementerian Kesehatan RI",
+        "topic": "politik",
+        "text_length": 178
+      },
+      {
+        "id": "bmkg-bmkg-dan-pemkab-natuna-perkuat-observasi-maritim-untuk-dukung-keselamatan-di-wilayah-perbatasan",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.998998463154,
+        "prob_valid": 0.001001600293,
+        "prob_hoax": 0.998998463154,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "BMKG",
+        "topic": "politik",
+        "text_length": 96
+      },
+      {
+        "id": "bmkg-forum-konsultasi-publik-ptsp-bmkg-wujudkan-kemudahan-layanan-dan-tata-kelola-pnbp",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.998951554298,
+        "prob_valid": 0.001048448379,
+        "prob_hoax": 0.998951554298,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "BMKG",
+        "topic": "bencana_cuaca",
+        "text_length": 83
+      },
+      {
+        "id": "bmkg-bmkg-laksanakan-survei-meteo-oseanografi-terpadu-di-selat-sunda-untuk-perkuat-akurasi-layanan-maritim",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.998930633068,
+        "prob_valid": 0.001069299411,
+        "prob_hoax": 0.998930633068,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "BMKG",
+        "topic": "bencana_cuaca",
+        "text_length": 102
+      },
+      {
+        "id": "bmkg-dampak-el-nino-masih-perlu-diwaspadai-bmkg-perkuat-dukungan-pengendalian-karhutla",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.998856782913,
+        "prob_valid": 0.00114323874,
+        "prob_hoax": 0.998856782913,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "BMKG",
+        "topic": "bencana_cuaca",
+        "text_length": 83
+      },
+      {
+        "id": "bmkg-bmkg-hadiri-rdp-komisi-v-dpr-ri-bahas-evaluasi-dan-penyesuaian-anggaran-2026-serta-penetapan-rka-k-l-2027",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.998752117157,
+        "prob_valid": 0.001247862121,
+        "prob_hoax": 0.998752117157,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "BMKG",
+        "topic": "politik",
+        "text_length": 107
+      },
+      {
+        "id": "bmkg-bmkg-dan-bakamla-ri-berkolaborasi-dalam-mendukung-keselamatan-dan-keamanan-maritim",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.998741447926,
+        "prob_valid": 0.001258533332,
+        "prob_hoax": 0.998741447926,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "BMKG",
+        "topic": "bencana_cuaca",
+        "text_length": 83
+      },
+      {
+        "id": "kemkes-lawan-hoaks-kesehatan-kemenkes-bangun-sistem-dan-kolaborasi-respons-cepat-",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "error_type": "false_positive",
+        "confidence": 0.9987372756,
+        "prob_valid": 0.001262759324,
+        "prob_hoax": 0.9987372756,
+        "served_label": "hoax",
+        "abstained": false,
+        "evidence_source": "Kementerian Kesehatan RI",
+        "topic": "politik",
+        "text_length": 147
+      }
+    ],
+    "false_negative": [
+      {
+        "id": "afp-C7HH4KE",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "error_type": "false_negative",
+        "confidence": 0.86749792099,
+        "prob_valid": 0.86749792099,
+        "prob_hoax": 0.132502049208,
+        "served_label": "meragukan",
+        "abstained": true,
+        "evidence_source": "AFP Fact Check Indonesia",
+        "topic": "politik",
+        "text_length": 110
+      },
+      {
+        "id": "afp-C67B39E",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "error_type": "false_negative",
+        "confidence": 0.837511718273,
+        "prob_valid": 0.837511718273,
+        "prob_hoax": 0.162488237023,
+        "served_label": "meragukan",
+        "abstained": true,
+        "evidence_source": "AFP Fact Check Indonesia",
+        "topic": "bencana_cuaca",
+        "text_length": 95
+      },
+      {
+        "id": "afp-C7VL29F",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "error_type": "false_negative",
+        "confidence": 0.793544352055,
+        "prob_valid": 0.793544352055,
+        "prob_hoax": 0.206455633044,
+        "served_label": "meragukan",
+        "abstained": true,
+        "evidence_source": "AFP Fact Check Indonesia",
+        "topic": "bencana_cuaca",
+        "text_length": 152
+      },
+      {
+        "id": "afp-C63B8NR",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "error_type": "false_negative",
+        "confidence": 0.790984332561,
+        "prob_valid": 0.790984332561,
+        "prob_hoax": 0.209015637636,
+        "served_label": "meragukan",
+        "abstained": true,
+        "evidence_source": "AFP Fact Check Indonesia",
+        "topic": "kesehatan",
+        "text_length": 111
+      },
+      {
+        "id": "afp-C7868T3",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "error_type": "false_negative",
+        "confidence": 0.579961657524,
+        "prob_valid": 0.579961657524,
+        "prob_hoax": 0.420038372278,
+        "served_label": "meragukan",
+        "abstained": true,
+        "evidence_source": "AFP Fact Check Indonesia",
+        "topic": "teknologi",
+        "text_length": 86
+      }
+    ]
+  },
+  "low_confidence_correct_predictions": [
+    {
+      "id": "afp-C7DR9ZT",
+      "true_label": "hoax",
+      "predicted_binary_label": "hoax",
+      "error_type": "correct",
+      "confidence": 0.566425859928,
+      "prob_valid": 0.433574140072,
+      "prob_hoax": 0.566425859928,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "AFP Fact Check Indonesia",
+      "topic": "bencana_cuaca",
+      "text_length": 42
+    },
+    {
+      "id": "afp-C7RB2CQ",
+      "true_label": "hoax",
+      "predicted_binary_label": "hoax",
+      "error_type": "correct",
+      "confidence": 0.775592029095,
+      "prob_valid": 0.224408015609,
+      "prob_hoax": 0.775592029095,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "AFP Fact Check Indonesia",
+      "topic": "bencana_cuaca",
+      "text_length": 138
+    },
+    {
+      "id": "kemkes-kemenkes-luncurkan-seleksi-25-prodi-baru-rsppu-dan-serah-terima-54-ppds-batch-iv",
+      "true_label": "valid",
+      "predicted_binary_label": "valid",
+      "error_type": "correct",
+      "confidence": 0.827334880829,
+      "prob_valid": 0.827334880829,
+      "prob_hoax": 0.172665134072,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "Kementerian Kesehatan RI",
+      "topic": "politik",
+      "text_length": 234
+    },
+    {
+      "id": "afp-C4AR4CR",
+      "true_label": "hoax",
+      "predicted_binary_label": "hoax",
+      "error_type": "correct",
+      "confidence": 0.889236390591,
+      "prob_valid": 0.110763601959,
+      "prob_hoax": 0.889236390591,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "AFP Fact Check Indonesia",
+      "topic": "politik",
+      "text_length": 105
+    },
+    {
+      "id": "cekfakta-36727",
+      "true_label": "hoax",
+      "predicted_binary_label": "hoax",
+      "error_type": "correct",
+      "confidence": 0.9041659832,
+      "prob_valid": 0.0958340168,
+      "prob_hoax": 0.9041659832,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "CekFakta",
+      "topic": "bencana_cuaca",
+      "text_length": 59
+    },
+    {
+      "id": "afp-C6L8869",
+      "true_label": "hoax",
+      "predicted_binary_label": "hoax",
+      "error_type": "correct",
+      "confidence": 0.927433669567,
+      "prob_valid": 0.07256629318,
+      "prob_hoax": 0.927433669567,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "AFP Fact Check Indonesia",
+      "topic": "kesehatan",
+      "text_length": 125
+    },
+    {
+      "id": "afp-C6YK89E",
+      "true_label": "hoax",
+      "predicted_binary_label": "hoax",
+      "error_type": "correct",
+      "confidence": 0.936214148998,
+      "prob_valid": 0.063785836101,
+      "prob_hoax": 0.936214148998,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "AFP Fact Check Indonesia",
+      "topic": "bencana_cuaca",
+      "text_length": 83
+    },
+    {
+      "id": "afp-C3JA6TA",
+      "true_label": "hoax",
+      "predicted_binary_label": "hoax",
+      "error_type": "correct",
+      "confidence": 0.938378274441,
+      "prob_valid": 0.061621788889,
+      "prob_hoax": 0.938378274441,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "AFP Fact Check Indonesia",
+      "topic": "kesehatan",
+      "text_length": 25
+    },
+    {
+      "id": "afp-C4YU8NR",
+      "true_label": "hoax",
+      "predicted_binary_label": "hoax",
+      "error_type": "correct",
+      "confidence": 0.955123186111,
+      "prob_valid": 0.044876880944,
+      "prob_hoax": 0.955123186111,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "AFP Fact Check Indonesia",
+      "topic": "bencana_cuaca",
+      "text_length": 74
+    },
+    {
+      "id": "turnbackhoax-36680",
+      "true_label": "hoax",
+      "predicted_binary_label": "hoax",
+      "error_type": "correct",
+      "confidence": 0.956246137619,
+      "prob_valid": 0.043753858656,
+      "prob_hoax": 0.956246137619,
+      "served_label": "meragukan",
+      "abstained": true,
+      "evidence_source": "TurnBackHoax / MAFINDO",
+      "topic": "lainnya",
+      "text_length": 32
+    }
+  ],
+  "performance_context": {
+    "internal_held_out_accuracy": 1.0,
+    "internal_held_out_macro_f1": 1.0,
+    "external_accuracy": 0.5083333333333333,
+    "external_macro_f1": 0.40995082923576964
+  }
+}
