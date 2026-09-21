@@ -31,6 +31,7 @@ class RecoverFailedSubmissions extends Command
 
         if ($this->option('dry-run')) {
             $this->info('Dry run — no jobs dispatched.');
+
             return self::SUCCESS;
         }
 

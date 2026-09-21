@@ -14,6 +14,7 @@ class SubmissionTrendChart extends ChartWidget
     {
         $days = collect(range(29, 0))->map(function ($d) {
             $date = Carbon::today()->subDays($d);
+
             return [
                 'label' => $date->format('d M'),
                 'total' => Submission::whereDate('created_at', $date)->count(),

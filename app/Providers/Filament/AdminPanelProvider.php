@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\ModelVersionWidget;
+use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\SubmissionTrendChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -40,9 +43,9 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
-                \App\Filament\Widgets\StatsOverview::class,
-                \App\Filament\Widgets\SubmissionTrendChart::class,
-                \App\Filament\Widgets\ModelVersionWidget::class,
+                StatsOverview::class,
+                SubmissionTrendChart::class,
+                ModelVersionWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

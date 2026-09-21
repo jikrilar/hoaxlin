@@ -4,11 +4,10 @@ namespace Tests\Feature;
 
 use App\Jobs\ClassifySubmission;
 use App\Jobs\ExtractSubmissionText;
-use App\Jobs\GenerateSubmissionExplanation;
 use App\Jobs\ProcessSubmission;
 use App\Models\Submission;
-use App\Services\Extraction\TextInputExtractor;
 use App\Services\Extraction\TextExtractorResolver;
+use App\Services\Extraction\TextInputExtractor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
