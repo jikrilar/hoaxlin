@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-09-21T08:13:13.075436+00:00",
+  "generated_at": "2026-09-21T09:15:10.409700+00:00",
   "ground_truth_policy": "explicit fact-check verdict or first-party primary source; no LLM",
-  "manual_review_required": true,
+  "manual_review_required": false,
   "approved_default": 0,
   "cutoff_priority": "2026-08-20",
   "target": {
@@ -27,9 +27,9 @@
       "turnbackhoax": 20,
       "cekfakta": 20,
       "afp": 20,
+      "kemkes": 20,
       "bank_indonesia": 20,
-      "bmkg": 20,
-      "kemkes": 20
+      "bmkg": 20
     },
     "by_label": {
       "hoax": 60,
@@ -46,16 +46,21 @@
     "target_met": true,
     "rejections_by_reason": {
       "exact_duplicate": 36,
-      "source_quota_exceeded": 93
+      "source_quota_exceeded": 88,
+      "semantic_duplicate_manual": 5
     }
   },
   "deduplication": {
-    "normalization": "dataset.normalize.normalize_key",
+    "normalization": "HTML-unescape, zero-width removal, whitespace/punctuation normalization, then dataset.normalize.normalize_key",
     "shingling": "word trigram",
     "metric": "Jaccard",
     "threshold": 0.65,
     "training_corpus": "C:\\xampp\\htdocs\\hoax-detector\\datasets\\processed\\komdigi-antara-v1\\all.jsonl",
-    "training_records": 7816
+    "training_records": 7816,
+    "challenge_metric": "normalized token-set Jaccard",
+    "challenge_threshold": 0.65,
+    "training_metric": "word trigram Jaccard",
+    "training_threshold": 0.65
   },
   "sources": {
     "turnbackhoax": {
@@ -190,5 +195,124 @@
       "target": 20,
       "gap": 0
     }
+  },
+  "approval": {
+    "approved": true,
+    "approved_count": 120,
+    "unapproved_ids": [],
+    "basis": "explicit fact-check verdict for hoax and official primary source for valid; final quality validation passed"
+  },
+  "replacements": [
+    {
+      "removed_id": "turnbackhoax-36700",
+      "kept_id": "cekfakta-36700",
+      "replacement_id": "turnbackhoax-36520",
+      "replacement_source": "TurnBackHoax / MAFINDO"
+    },
+    {
+      "removed_id": "turnbackhoax-36727",
+      "kept_id": "cekfakta-36727",
+      "replacement_id": "turnbackhoax-36590",
+      "replacement_source": "TurnBackHoax / MAFINDO"
+    },
+    {
+      "removed_id": "cekfakta-36764",
+      "kept_id": "turnbackhoax-36731",
+      "replacement_id": "cekfakta-36763",
+      "replacement_source": "CekFakta"
+    },
+    {
+      "removed_id": "turnbackhoax-36775",
+      "kept_id": "cekfakta-36773",
+      "replacement_id": "turnbackhoax-36596",
+      "replacement_source": "TurnBackHoax / MAFINDO"
+    },
+    {
+      "removed_id": "cekfakta-36728",
+      "kept_id": "cekfakta-36773",
+      "replacement_id": "cekfakta-36674",
+      "replacement_source": "CekFakta"
+    }
+  ],
+  "quality_control": {
+    "cutoff": "2026-08-20",
+    "after_cutoff_count": 112,
+    "on_or_after_cutoff_count": 114,
+    "exact_duplicate_count": 0,
+    "exact_duplicate_ids": [],
+    "challenge_duplicate_count": 0,
+    "challenge_duplicates": [],
+    "maximum_challenge_similarity": {
+      "similarity": 0.5714285714285714,
+      "left_id": "bank_indonesia-sp_2818126",
+      "right_id": "bank_indonesia-sp_2817626"
+    },
+    "training_overlap_count": 0,
+    "training_overlaps": [],
+    "maximum_training_similarity": {
+      "similarity": 0.14893617021276595,
+      "candidate_id": "afp-C4AR4CR",
+      "training_id": "komdigi:64813"
+    },
+    "verdict_leakage_count": 0,
+    "verdict_leakage_ids": [],
+    "domain_mismatch_count": 0,
+    "domain_mismatches": [],
+    "verification_method_mismatch_count": 0,
+    "verification_method_mismatch_ids": [],
+    "label_mismatch_count": 0,
+    "label_mismatch_ids": [],
+    "duplicate_id_count": 0,
+    "duplicate_ids": [],
+    "missing_field_count": 0,
+    "missing_fields": [],
+    "text_length_statistics": {
+      "hoax": {
+        "count": 60,
+        "mean": 65.98,
+        "median": 55.0,
+        "min": 25,
+        "max": 220
+      },
+      "valid": {
+        "count": 60,
+        "mean": 118.93,
+        "median": 93.5,
+        "min": 31,
+        "max": 296
+      }
+    },
+    "approved_counts": {
+      "1": 120
+    },
+    "approved_by_label": {
+      "hoax": {
+        "1": 60
+      },
+      "valid": {
+        "1": 60
+      }
+    },
+    "approved_by_source": {
+      "TurnBackHoax / MAFINDO": {
+        "1": 20
+      },
+      "CekFakta": {
+        "1": 20
+      },
+      "AFP Fact Check Indonesia": {
+        "1": 20
+      },
+      "Kementerian Kesehatan RI": {
+        "1": 20
+      },
+      "Bank Indonesia": {
+        "1": 20
+      },
+      "BMKG": {
+        "1": 20
+      }
+    },
+    "validation_passed": true
   }
 }
