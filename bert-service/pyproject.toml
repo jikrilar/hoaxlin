@@ -16,6 +16,7 @@ dev = [
     "datasets>=3.0",
     "accelerate>=1.0",
     "matplotlib>=3.8",
+    "scikit-learn==1.8.0",
 ]
 train = [
     "datasets>=3.0",
