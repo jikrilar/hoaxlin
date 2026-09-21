@@ -48,10 +48,10 @@ class CsvExportTest extends TestCase
         $rows = $this->rowsById($this->download($user));
 
         foreach ($submissions as $id => $value) {
-            $this->assertSame("'{$value}", $rows[$id][7]);
+            $this->assertSame("'{$value}", $rows[$id][10]);
         }
 
-        $this->assertSame("'=HYPERLINK(\"https://evil.test\",\"klik\")", $rows[$urlSubmission->id][7]);
+        $this->assertSame("'=HYPERLINK(\"https://evil.test\",\"klik\")", $rows[$urlSubmission->id][10]);
     }
 
     public function test_csv_preserves_normal_quoted_multiline_and_unicode_text(): void
@@ -67,8 +67,12 @@ class CsvExportTest extends TestCase
         $rows = $this->rowsById($content);
 
         $this->assertStringStartsWith("\xEF\xBB\xBF", $content);
-        $this->assertSame($text, $rows[$submission->id][7]);
-        $this->assertSame(['ID', 'Tipe', 'Status', 'Label', 'Confidence', 'Model', 'Dibuat', 'Teks/URL'], $this->parseCsv($content)[0]);
+        $this->assertSame($text, $rows[$submission->id][10]);
+        $this->assertSame([
+            'ID', 'Tipe', 'Status', 'Label', 'Confidence', 'Model',
+            'Bahasa Sumber', 'Provider Terjemahan', 'Model Terjemahan',
+            'Dibuat', 'Teks/URL',
+        ], $this->parseCsv($content)[0]);
     }
 
     public function test_csv_is_strictly_scoped_to_the_authenticated_user_even_for_admins(): void
@@ -114,6 +118,44 @@ class CsvExportTest extends TestCase
         $this->assertSame('meragukan', $rows[$completed->id][3]);
         $this->assertSame('0.8123', $rows[$completed->id][4]);
         $this->assertSame('indobert-export-test', $rows[$completed->id][5]);
+    }
+
+    public function test_csv_includes_translation_provenance_without_internal_accounting(): void
+    {
+        $user = User::factory()->create();
+        $translated = Submission::factory()->create([
+            'user_id' => $user->id,
+            'status' => 'completed',
+            'source_language' => 'en',
+            'translated_text' => 'Berita yang telah diterjemahkan.',
+            'translation_provider' => 'openai',
+            'translation_model' => 'gpt-4o-mini',
+            'translation_cached' => false,
+            'translation_input_tokens' => 123,
+            'translation_output_tokens' => 45,
+            'translation_estimated_cost_usd' => 0.012345,
+        ]);
+        $untranslated = Submission::factory()->create([
+            'user_id' => $user->id,
+            'status' => 'completed',
+            'source_language' => 'id',
+        ]);
+
+        $content = $this->download($user);
+        $rows = $this->rowsById($content);
+        $header = implode(',', $this->parseCsv($content)[0]);
+
+        $this->assertSame('en', $rows[$translated->id][6]);
+        $this->assertSame('openai', $rows[$translated->id][7]);
+        $this->assertSame('gpt-4o-mini', $rows[$translated->id][8]);
+        $this->assertSame('id', $rows[$untranslated->id][6]);
+        $this->assertSame('-', $rows[$untranslated->id][7]);
+        $this->assertSame('-', $rows[$untranslated->id][8]);
+        $this->assertStringNotContainsString('translation_input_tokens', $header);
+        $this->assertStringNotContainsString('translation_output_tokens', $header);
+        $this->assertStringNotContainsString('translation_estimated_cost_usd', $header);
+        $this->assertStringNotContainsString('123', $content);
+        $this->assertStringNotContainsString('0.012345', $content);
     }
 
     public function test_large_export_is_chunked_and_eager_loads_results_per_chunk(): void

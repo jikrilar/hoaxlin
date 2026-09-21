@@ -37,6 +37,9 @@
   <tr><th>Status</th><td>{{ ucfirst($submission->status) }} ({{ $submission->processing_stage }})</td></tr>
   <tr><th>Dibuat</th><td>{{ $submission->created_at?->format('d M Y H:i') }} WIB</td></tr>
   <tr><th>Sumber</th><td class="mono">{{ $submission->raw_input ?? $submission->source_url ?? $submission->media_path ?? '-' }}</td></tr>
+  <tr><th>Bahasa Sumber</th><td>{{ $submission->source_language ?: '—' }}</td></tr>
+  <tr><th>Provider Terjemahan</th><td>{{ $submission->translation_provider ?: 'Tidak diterjemahkan' }}</td></tr>
+  <tr><th>Model Terjemahan</th><td>{{ $submission->translation_model ?: 'Tidak diterjemahkan' }}</td></tr>
   @if($submission->extracted_text && $submission->input_type !== 'text')
     <tr><th>Teks Terekstraksi</th><td>{{ mb_substr($submission->extracted_text, 0, 800) }}</td></tr>
   @endif
