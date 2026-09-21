@@ -1,0 +1,61 @@
+{
+  "dataset": {
+    "name": "external-challenge",
+    "version": "1.0.0",
+    "sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708",
+    "rows": 120,
+    "evaluation_only": true
+  },
+  "model": {
+    "version": "v1.0.0",
+    "relative_path": "models/indobert-hoax/v1.0.0",
+    "label_mapping": {
+      "0": "valid",
+      "1": "hoax"
+    },
+    "threshold": 0.99,
+    "release_metadata": {
+      "version": "1.0.0",
+      "exported_at": "2026-08-21T01:03:52.509812+00:00",
+      "threshold": 0.99,
+      "eval_accuracy": 1.0,
+      "eval_macro_f1": 1.0
+    }
+  },
+  "threshold_applied": false,
+  "evaluated_at": "2026-09-21T11:25:21.913929+00:00",
+  "samples": 120,
+  "accuracy": 0.5083333333333333,
+  "macro_precision": 0.525020850708924,
+  "macro_recall": 0.5083333333333333,
+  "macro_f1": 0.40995082923576964,
+  "per_class": {
+    "valid": {
+      "precision": 0.5454545454545454,
+      "recall": 0.1,
+      "f1": 0.16901408450704225,
+      "support": 60
+    },
+    "hoax": {
+      "precision": 0.5045871559633027,
+      "recall": 0.9166666666666666,
+      "f1": 0.650887573964497,
+      "support": 60
+    }
+  },
+  "confusion_matrix": [
+    [
+      6,
+      54
+    ],
+    [
+      5,
+      55
+    ]
+  ],
+  "label_order": [
+    "valid",
+    "hoax"
+  ],
+  "zero_division_policy": "undefined precision/recall/F1 is recorded as 0.0"
+}
