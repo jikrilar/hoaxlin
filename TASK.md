@@ -386,7 +386,7 @@ lulus 4 test dengan 25 assertions. `docker compose config --quiet`, `docker comp
 ps` (app, queue, scheduler, mysql, redis, bert healthy), Pint untuk file PHP yang
 disentuh, dan `git diff --check` lulus.
 
-### [ ] P2.2 Perbaikan boundary statistik bulanan
+### [x] P2.2 Perbaikan boundary statistik bulanan
 
 Masalah:
 
@@ -398,14 +398,20 @@ Gunakan interval setengah terbuka (`>= start`, `< next`) atau agregasi year/mont
 
 Acceptance criteria:
 
-- [ ] Record pada awal bulan hanya dihitung satu kali.
-- [ ] Total, hoax, dan valid memakai boundary yang sama.
-- [ ] Timezone statistik eksplisit dan konsisten.
-- [ ] Pergantian bulan dan tahun tercakup test.
+- [x] Record pada awal bulan hanya dihitung satu kali.
+- [x] Total, hoax, dan valid memakai boundary yang sama.
+- [x] Timezone statistik eksplisit dan konsisten.
+- [x] Pergantian bulan dan tahun tercakup test.
 
 Verifikasi:
 
-Jalankan test statistik dengan waktu dibekukan pada akhir bulan, awal bulan, dan pergantian tahun.
+`MonthlyStatisticsBoundaryTest` lulus 4 test dengan 25 assertions untuk boundary awal/akhir
+bulan, pergantian Desember-Januari, timezone `Asia/Jakarta`, dan urutan 12 bulan.
+Regression P2.1/P1.7/P0.1-P0.2 lulus 49 test dengan 281 assertions. Full Laravel suite
+lokal dan Docker sama-sama lulus 250 test dengan 1.082 assertions, 4 real-BERT test
+ter-skip pada suite umum, dan 0 failed. Integrasi real-BERT terpisah lulus 4 test dengan
+25 assertions. `docker compose config --quiet`, `docker compose ps` (app, queue,
+scheduler, mysql, redis, bert healthy), Pint, dan `git diff --check` lulus.
 
 ## Requirement Dihapus dari Scope
 
