@@ -194,6 +194,41 @@ class VideoMediaContractTest extends TestCase
         ];
     }
 
+    public function test_all_supported_remote_extensions_pass_direct_url_prevalidation(): void
+    {
+        $media = app(TranscriptionMediaContract::class);
+
+        foreach (['flac', 'mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'ogg', 'wav', 'webm'] as $extension) {
+            $this->assertNull($media->directUrlError("https://media.test/news.{$extension}"), $extension);
+        }
+
+        $this->assertNull($media->directUrlError('https://media.test/path/youtube.com/video.mp4?source=youtube.com'));
+    }
+
+    #[DataProvider('blockedPlatformUrls')]
+    public function test_blocked_platform_hosts_receive_a_clear_validation_message(string $url): void
+    {
+        $this->assertSame(
+            'Platform video tidak didukung. Gunakan URL langsung ke file audio/video.',
+            app(TranscriptionMediaContract::class)->directUrlError($url),
+        );
+    }
+
+    /** @return array<string, array{string}> */
+    public static function blockedPlatformUrls(): array
+    {
+        return [
+            'youtube' => ['https://youtube.com/watch?v=abc'],
+            'youtube subdomain' => ['https://m.youtube.com/watch?v=abc'],
+            'youtube www' => ['https://www.youtube.com/watch?v=abc'],
+            'youtu.be' => ['https://youtu.be/abc'],
+            'instagram' => ['https://instagram.com/reel/abc'],
+            'tiktok' => ['https://tiktok.com/@news/video/abc'],
+            'facebook' => ['https://facebook.com/watch?v=abc'],
+            'fb.watch' => ['https://fb.watch/abc'],
+        ];
+    }
+
     public function test_transcription_does_not_force_language_and_english_enters_translation_pipeline(): void
     {
         $url = 'https://media.test/english.mp3';

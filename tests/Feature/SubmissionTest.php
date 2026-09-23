@@ -133,6 +133,56 @@ class SubmissionTest extends TestCase
         Queue::assertPushed(ProcessSubmission::class);
     }
 
+    public function test_blocked_video_platform_url_shows_error_and_restores_video_url_form(): void
+    {
+        Queue::fake();
+        $this->actingAs(User::factory()->create())->get(route('home'))->assertOk();
+        $sourceUrl = 'https://m.youtube.com/watch?v=abc';
+
+        $this->from(route('home'))->post(route('deteksi'), $this->withCaptcha([
+            'input_type' => 'video_url',
+            'source_url' => $sourceUrl,
+        ]))->assertRedirect(route('home'))
+            ->assertSessionHasErrors(['source_url' => 'Platform video tidak didukung. Gunakan URL langsung ke file audio/video.'])
+            ->assertSessionHasInput('input_type', 'video_url')
+            ->assertSessionHasInput('source_url', $sourceUrl);
+
+        $this->assertArrayNotHasKey('captcha_answer', session('_old_input', []));
+        $this->assertDatabaseEmpty('submissions');
+        Queue::assertNothingPushed();
+
+        $page = $this->get(route('home'))->assertOk()
+            ->assertSee('id="submission-errors" role="alert"', false)
+            ->assertSee('Platform video tidak didukung. Gunakan URL langsung ke file audio/video.')
+            ->assertSee('id="tab-video" class="input-tab active" role="tab" aria-selected="true"', false)
+            ->assertSee('id="panel-video" class="tab-content active"', false)
+            ->assertSee('id="video-input-type" value="video_url"', false)
+            ->assertSee('value="'.$sourceUrl.'"', false)
+            ->assertDontSee('validation.');
+
+        $this->assertMatchesRegularExpression('/id="video-tab-url"[^>]*aria-pressed="true"/', $page->getContent());
+
+        $this->from(route('home'))->post(route('deteksi'), $this->withCaptcha([
+            'input_type' => 'video_url',
+            'source_url' => $sourceUrl,
+            'website' => 'honeypot',
+        ]))->assertSessionHasErrors('source_url');
+
+        $this->assertArrayNotHasKey('website', session('_old_input', []));
+        $this->assertDatabaseEmpty('submissions');
+    }
+
+    public function test_blocked_video_hosts_are_rendered_from_media_configuration(): void
+    {
+        config(['media.transcription.blocked_platform_hosts' => ['custom.example']]);
+        $this->actingAs(User::factory()->create());
+
+        $page = $this->get(route('home'))->assertOk()
+            ->assertSee('id="video-url-platform-error" role="alert" hidden', false);
+
+        $this->assertMatchesRegularExpression('/const blockedVideoHosts = [^\r\n]*custom\.example[^\r\n]*;/', $page->getContent());
+    }
+
     public function test_guest_cannot_submit_article_url(): void
     {
         $this->assertGuestSubmissionTypeIsForbidden('url', [
