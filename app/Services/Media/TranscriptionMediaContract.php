@@ -40,6 +40,21 @@ class TranscriptionMediaContract
         return intdiv($this->maxBytes(), 1024);
     }
 
+    public function maxSizeLabel(): string
+    {
+        $bytes = $this->maxBytes();
+
+        if ($bytes % 1048576 === 0) {
+            return intdiv($bytes, 1048576).' MiB';
+        }
+
+        if ($bytes % 1024 === 0) {
+            return intdiv($bytes, 1024).' KiB';
+        }
+
+        return $bytes.' byte';
+    }
+
     public function maxDurationSeconds(): int
     {
         return max(1, (int) config('media.transcription.max_duration_seconds'));

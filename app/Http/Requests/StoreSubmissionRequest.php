@@ -88,8 +88,8 @@ class StoreSubmissionRequest extends FormRequest
             }
 
             if ($this->input('input_type') === 'video') {
-                if ($file->getSize() > $media->maxBytes()) {
-                    $validator->errors()->add('media_file', 'Ukuran media melebihi batas transkripsi.');
+                if ($file->getSize() > $media->maxBytes() && ! $validator->errors()->has('media_file')) {
+                    $validator->errors()->add('media_file', $this->videoSizeMessage($media));
                 }
 
                 $mimeType = $file->getMimeType() ?: $file->getClientMimeType();
@@ -107,6 +107,8 @@ class StoreSubmissionRequest extends FormRequest
 
     public function messages(): array
     {
+        $media = app(TranscriptionMediaContract::class);
+
         return [
             'input_type.required' => 'Jenis input wajib dipilih.',
             'input_type.in' => 'Jenis input tidak didukung.',
@@ -119,11 +121,18 @@ class StoreSubmissionRequest extends FormRequest
             'media_file.mimes' => 'Format file tidak didukung.',
             'media_file.mimetypes' => 'MIME file tidak didukung.',
             'media_file.extensions' => 'Extension file tidak didukung.',
-            'media_file.max' => 'Ukuran file melebihi batas yang diizinkan.',
+            'media_file.max' => $this->input('input_type') === 'video'
+                ? $this->videoSizeMessage($media)
+                : 'Ukuran file melebihi batas yang diizinkan.',
             'media_file.dimensions' => 'Dimensi gambar melebihi batas yang diizinkan.',
             'source_url.required' => 'Tautan URL wajib diisi.',
             'source_url.url' => 'URL harus valid dan menggunakan protokol HTTP atau HTTPS.',
             'source_url.max' => 'Tautan URL terlalu panjang.',
         ];
+    }
+
+    private function videoSizeMessage(TranscriptionMediaContract $media): string
+    {
+        return 'Ukuran video melebihi batas '.$media->maxSizeLabel().'.';
     }
 }

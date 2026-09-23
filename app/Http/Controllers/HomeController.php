@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DetectionResult;
 use App\Services\Bert\BertRuntimeMetadata;
+use App\Services\Media\TranscriptionMediaContract;
 use App\Services\Security\CaptchaChallenge;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class HomeController extends Controller
         Request $request,
         CaptchaChallenge $captcha,
         BertRuntimeMetadata $runtimeMetadata,
+        TranscriptionMediaContract $media,
     ): View {
         $challenge = $captcha->issue($request);
         $runtime = $runtimeMetadata->fetch();
@@ -53,6 +55,8 @@ class HomeController extends Controller
         return view('welcome', [
             'captchaQuestion' => $challenge['question'],
             'modelStatistics' => $modelStatistics,
+            'videoMaxBytes' => $media->maxBytes(),
+            'videoMaxLabel' => $media->maxSizeLabel(),
         ]);
     }
 

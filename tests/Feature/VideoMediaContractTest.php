@@ -72,17 +72,56 @@ class VideoMediaContractTest extends TestCase
         Storage::disk('local')->assertExists($submission->media_path);
     }
 
-    public function test_oversized_video_upload_is_rejected(): void
+    public function test_video_upload_at_the_exact_size_limit_is_accepted(): void
     {
         Queue::fake();
-        config(['media.transcription.max_bytes' => 1024]);
+        $media = app(TranscriptionMediaContract::class);
 
         $this->actingAs(User::factory()->create())->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video',
-            'media_file' => UploadedFile::fake()->create('besar.mp4', 2, 'video/mp4'),
-        ]))->assertSessionHasErrors('media_file');
+            'media_file' => UploadedFile::fake()->create('batas.mp4', $media->maxKilobytes(), 'video/mp4'),
+        ]))->assertRedirect();
+
+        $this->assertDatabaseCount('submissions', 1);
+    }
+
+    public function test_oversized_video_upload_is_rejected(): void
+    {
+        Queue::fake();
+        $media = app(TranscriptionMediaContract::class);
+
+        $this->actingAs(User::factory()->create())->post(route('deteksi'), $this->withCaptcha([
+            'input_type' => 'video',
+            'media_file' => UploadedFile::fake()->create('besar.mp4', $media->maxKilobytes() + 1, 'video/mp4'),
+        ]))->assertSessionHasErrors(['media_file' => 'Ukuran video melebihi batas 24 MiB.']);
 
         $this->assertDatabaseEmpty('submissions');
+        Queue::assertNothingPushed();
+    }
+
+    public function test_video_limit_and_docker_upload_headroom_are_consistent(): void
+    {
+        $media = app(TranscriptionMediaContract::class);
+        $this->assertSame(24 * 1024 * 1024, $media->maxBytes());
+        $this->assertSame(24 * 1024, $media->maxKilobytes());
+        $this->assertSame('24 MiB', $media->maxSizeLabel());
+
+        $limits = parse_ini_file(base_path('docker/php/uploads.ini'));
+        $this->assertMatchesRegularExpression('/^\d+M$/', $limits['upload_max_filesize']);
+        $this->assertMatchesRegularExpression('/^\d+M$/', $limits['post_max_size']);
+        $this->assertGreaterThan(24, (int) $limits['upload_max_filesize']);
+        $this->assertGreaterThan((int) $limits['upload_max_filesize'], (int) $limits['post_max_size']);
+    }
+
+    public function test_video_upload_ui_uses_the_configured_limit(): void
+    {
+        config(['media.transcription.max_bytes' => 2 * 1024 * 1024]);
+
+        $this->actingAs(User::factory()->create())->get(route('home'))
+            ->assertOk()
+            ->assertSee('data-video-max-bytes="2097152"', false)
+            ->assertSee('id="video-size-error" role="alert" hidden', false)
+            ->assertSee('Ukuran video melebihi batas 2 MiB. Pilih file yang lebih kecil.');
     }
 
     #[DataProvider('unsupportedUploads')]
