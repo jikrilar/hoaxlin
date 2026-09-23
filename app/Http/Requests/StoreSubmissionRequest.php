@@ -108,17 +108,22 @@ class StoreSubmissionRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'input_type.required' => 'Jenis input wajib dipilih.',
             'input_type.in' => 'Jenis input tidak didukung.',
             'raw_input.required' => 'Teks berita wajib diisi.',
+            'raw_input.string' => 'Teks berita harus berupa teks.',
             'raw_input.min' => 'Teks minimal 50 karakter.',
             'raw_input.max' => 'Teks maksimal 50.000 karakter.',
             'media_file.required' => 'File wajib diunggah.',
+            'media_file.file' => 'Unggah file yang valid.',
             'media_file.mimes' => 'Format file tidak didukung.',
             'media_file.mimetypes' => 'MIME file tidak didukung.',
             'media_file.extensions' => 'Extension file tidak didukung.',
             'media_file.max' => 'Ukuran file melebihi batas yang diizinkan.',
+            'media_file.dimensions' => 'Dimensi gambar melebihi batas yang diizinkan.',
             'source_url.required' => 'Tautan URL wajib diisi.',
             'source_url.url' => 'URL harus valid dan menggunakan protokol HTTP atau HTTPS.',
+            'source_url.max' => 'Tautan URL terlalu panjang.',
         ];
     }
 }
