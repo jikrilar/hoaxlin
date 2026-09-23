@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
@@ -18,6 +20,11 @@ class AuthenticationTest extends TestCase
     public function test_user_can_register_and_receives_verification_email(): void
     {
         Notification::fake();
+        config([
+            'mail.default' => 'smtp',
+            'mail.mailers.smtp.host' => 'smtp.gmail.com',
+            'mail.mailers.smtp.port' => 587,
+        ]);
 
         $response = $this->post(route('register.store'), [
             'name' => 'Budi Santoso',
@@ -31,6 +38,7 @@ class AuthenticationTest extends TestCase
 
         $response->assertRedirect(route('verification.notice'));
         $this->assertAuthenticatedAs($user);
+        $this->assertNull($user->email_verified_at);
         Notification::assertSentTo($user, VerifyEmail::class);
     }
 
@@ -72,7 +80,9 @@ class AuthenticationTest extends TestCase
 
     public function test_user_can_verify_email_using_signed_url(): void
     {
+        Event::fake([Verified::class]);
         $user = User::factory()->unverified()->create();
+        $this->assertNull($user->email_verified_at);
         $url = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
@@ -82,6 +92,22 @@ class AuthenticationTest extends TestCase
         $this->actingAs($user)->get($url)->assertRedirect(route('home'));
 
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
+        $this->assertNotNull($user->fresh()->email_verified_at);
+        $this->get($url)->assertRedirect(route('home'));
+        Event::assertDispatchedTimes(Verified::class, 1);
+    }
+
+    public function test_invalid_or_expired_verification_link_cannot_verify_email(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $parameters = ['id' => $user->id, 'hash' => sha1($user->email)];
+        $url = URL::temporarySignedRoute('verification.verify', now()->addMinutes(60), $parameters);
+        $expiredUrl = URL::temporarySignedRoute('verification.verify', now()->subMinute(), $parameters);
+
+        $this->actingAs($user)->get($url.'&tampered=1')->assertForbidden();
+        $this->get($expiredUrl)->assertForbidden();
+
+        $this->assertNull($user->fresh()->email_verified_at);
     }
 
     public function test_user_can_request_and_complete_password_reset(): void
@@ -110,9 +136,24 @@ class AuthenticationTest extends TestCase
         Notification::fake();
         $user = User::factory()->unverified()->create();
 
+        $this->actingAs($user)->get(route('verification.notice'))->assertOk()
+            ->assertSee('folder spam')
+            ->assertSee('Kirim Ulang Email Verifikasi');
+
         $this->actingAs($user)->post(route('verification.send'))
             ->assertSessionHas('status', 'verification-link-sent');
 
         Notification::assertSentTo($user, VerifyEmail::class);
+    }
+
+    public function test_verified_user_does_not_receive_another_verification_email(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('verification.send'))->assertRedirect(route('home'));
+
+        Notification::assertNothingSent();
+        $this->assertTrue($user->fresh()->hasVerifiedEmail());
     }
 }
