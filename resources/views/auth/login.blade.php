@@ -4,7 +4,7 @@
 @section('description', 'Masuk ke akun hoaxlin.id untuk mengakses riwayat pengecekan berita.')
 
 @section('content')
-<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem; width:100%; box-sizing:border-box;">
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem; width:100%; box-sizing:border-box; position:relative; overflow-x:clip;">
 
     <!-- Background decoration -->
     <div class="glow-orb glow-orb-1" style="opacity:0.5;" aria-hidden="true"></div>

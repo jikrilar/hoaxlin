@@ -4,7 +4,7 @@
 @section('description', 'Buat akun gratis di hoaxlin.id untuk menyimpan riwayat pengecekan berita.')
 
 @section('content')
-<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem; width:100%; box-sizing:border-box;">
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem; width:100%; box-sizing:border-box; position:relative; overflow-x:clip;">
 
     <div class="glow-orb glow-orb-1" style="opacity:0.5;" aria-hidden="true"></div>
     <div class="glow-orb glow-orb-2" style="opacity:0.4;" aria-hidden="true"></div>
