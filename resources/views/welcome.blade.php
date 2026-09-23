@@ -278,8 +278,9 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                         <label for="video-url-input" style="display:block; color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; margin-bottom:0.625rem;">URL Langsung File Audio/Video</label>
                         <input type="url" id="video-url-input" name="source_url" class="form-input"
                                placeholder="https://cdn.example.com/rekaman.mp4"
-                               aria-label="URL video berita" value="{{ $previousInputType === 'video_url' ? $previousSourceUrl : '' }}" @if ($videoUrlActive) required @endif>
-                        <p style="color:var(--color-text-muted); font-size:0.75rem; margin-top:0.5rem;">Mendukung FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, dan WEBM hingga {{ $videoMaxLabel }}. Halaman YouTube atau platform sosial tidak didukung.</p>
+                               aria-describedby="video-url-hint video-url-platform-error" value="{{ $previousInputType === 'video_url' ? $previousSourceUrl : '' }}" @if ($videoUrlActive) required @endif>
+                        <p id="video-url-hint" style="color:var(--color-text-muted); font-size:0.75rem; margin-top:0.5rem;">Gunakan tautan langsung ke file, bukan halaman YouTube atau media sosial. Mendukung FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, dan WEBM hingga {{ $videoMaxLabel }}.</p>
+                        <p id="video-url-platform-error" role="alert" hidden style="color:#f87171; font-size:0.875rem; margin-top:0.625rem;">Platform video tidak didukung. Gunakan URL langsung ke file audio/video.</p>
                     </div>
 
                     <div class="warning-box" style="margin-top:1rem;" role="note">
@@ -602,6 +603,32 @@ function switchTab(tabName) {
 }
 
 // ── Video Sub-tabs ──
+const blockedVideoHosts = @js($blockedVideoHosts);
+const videoUrlInput = document.getElementById('video-url-input');
+
+function validateVideoUrlHost() {
+    let blocked = false;
+    try {
+        const host = new URL(videoUrlInput.value.trim()).hostname.toLowerCase();
+        blocked = blockedVideoHosts.some(blockedHost => host === blockedHost || host.endsWith('.' + blockedHost));
+    } catch {
+        // Native URL validation and the server handle malformed URLs.
+    }
+
+    document.getElementById('video-url-platform-error').hidden = !blocked;
+    if (blocked) {
+        videoUrlInput.setAttribute('aria-invalid', 'true');
+    } else {
+        videoUrlInput.removeAttribute('aria-invalid');
+    }
+
+    return !blocked;
+}
+
+if (videoUrlInput) {
+    videoUrlInput.addEventListener('input', validateVideoUrlHost);
+}
+
 function switchVideoTab(type) {
     const isUpload = type === 'upload';
     document.getElementById('video-upload-panel').style.display = isUpload ? 'block' : 'none';
@@ -727,6 +754,12 @@ function submitForm(event, type) {
     if (type === 'video' && document.getElementById('video-input-type').value === 'video'
         && !validateVideoFile(document.getElementById('video-file-input').files[0])) {
         event.preventDefault();
+        return;
+    }
+    if (type === 'video' && document.getElementById('video-input-type').value === 'video_url'
+        && !validateVideoUrlHost()) {
+        event.preventDefault();
+        videoUrlInput.focus();
         return;
     }
 

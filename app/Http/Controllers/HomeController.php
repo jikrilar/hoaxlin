@@ -57,6 +57,7 @@ class HomeController extends Controller
             'modelStatistics' => $modelStatistics,
             'videoMaxBytes' => $media->maxBytes(),
             'videoMaxLabel' => $media->maxSizeLabel(),
+            'blockedVideoHosts' => (array) config('media.transcription.blocked_platform_hosts', []),
         ]);
     }
 
