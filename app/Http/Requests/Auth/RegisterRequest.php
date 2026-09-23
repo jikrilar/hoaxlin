@@ -21,4 +21,11 @@ class RegisterRequest extends FormRequest
             'terms' => ['accepted'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'Email sudah terdaftar. Silakan masuk atau gunakan alamat email lain.',
+        ];
+    }
 }
