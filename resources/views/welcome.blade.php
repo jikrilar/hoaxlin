@@ -236,7 +236,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
 
             <!-- ── Panel: Video ── -->
             <div id="panel-video" class="tab-content {{ $activeTab === 'video' ? 'active' : '' }}" role="tabpanel" aria-labelledby="tab-video">
-                <form id="form-video" action="{{ url('/deteksi') }}" method="POST" enctype="multipart/form-data" onsubmit="submitForm(event, 'video')">
+                <form id="form-video" action="{{ url('/deteksi') }}" method="POST" enctype="multipart/form-data" data-video-max-bytes="{{ $videoMaxBytes }}" onsubmit="submitForm(event, 'video')">
                     @csrf
                     <input type="hidden" name="input_type" id="video-input-type" value="{{ $videoUrlActive ? 'video_url' : 'video' }}">
 
@@ -261,15 +261,16 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                              ondragover="event.preventDefault(); this.classList.add('dragover')"
                              ondragleave="this.classList.remove('dragover')"
                              ondrop="handleFileDrop(event, 'video')">
-                            <input type="file" id="video-file-input" name="media_file" accept="video/mp4,video/mpeg,video/webm,.mp4,.mpeg,.webm" onchange="previewFile(event, 'video')" @if (! $videoUrlActive) required @endif>
+                            <input type="file" id="video-file-input" name="media_file" accept="video/mp4,video/mpeg,video/webm,.mp4,.mpeg,.webm" onchange="previewFile(event, 'video')" aria-describedby="video-size-error" @if (! $videoUrlActive) required @endif>
                             <div class="upload-zone-icon" aria-hidden="true">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
                             </div>
                             <div id="video-preview-label">
                                 <div class="upload-zone-title">Klik atau Seret Video ke Sini</div>
-                                <div class="upload-zone-subtitle">MP4, MPEG, atau WEBM hingga 24 MiB</div>
+                                <div class="upload-zone-subtitle">MP4, MPEG, atau WEBM hingga {{ $videoMaxLabel }}</div>
                             </div>
                         </div>
+                        <p id="video-size-error" role="alert" hidden style="color:#f87171; font-size:0.875rem; margin-top:0.625rem;">Ukuran video melebihi batas {{ $videoMaxLabel }}. Pilih file yang lebih kecil.</p>
                     </div>
 
                     <!-- URL Video -->
@@ -278,7 +279,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                         <input type="url" id="video-url-input" name="source_url" class="form-input"
                                placeholder="https://cdn.example.com/rekaman.mp4"
                                aria-label="URL video berita" value="{{ $previousInputType === 'video_url' ? $previousSourceUrl : '' }}" @if ($videoUrlActive) required @endif>
-                        <p style="color:var(--color-text-muted); font-size:0.75rem; margin-top:0.5rem;">Mendukung FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, dan WEBM hingga 24 MiB. Halaman YouTube atau platform sosial tidak didukung.</p>
+                        <p style="color:var(--color-text-muted); font-size:0.75rem; margin-top:0.5rem;">Mendukung FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, dan WEBM hingga {{ $videoMaxLabel }}. Halaman YouTube atau platform sosial tidak didukung.</p>
                     </div>
 
                     <div class="warning-box" style="margin-top:1rem;" role="note">
@@ -624,6 +625,7 @@ function switchVideoTab(type) {
         document.getElementById('video-url-input').removeAttribute('required');
         document.getElementById('video-file-input').setAttribute('required', '');
     } else {
+        document.getElementById('video-size-error').hidden = true;
         document.getElementById('video-file-input').removeAttribute('required');
         document.getElementById('video-url-input').setAttribute('required', '');
     }
@@ -642,9 +644,32 @@ if (tekstInput) {
 }
 
 // ── File Preview ──
+const defaultVideoPreview = document.getElementById('video-preview-label')?.innerHTML;
+
+function validateVideoFile(file) {
+    if (!file) return true;
+
+    const input = document.getElementById('video-file-input');
+    const error = document.getElementById('video-size-error');
+    const maxBytes = Number(document.getElementById('form-video').dataset.videoMaxBytes);
+
+    if (file.size > maxBytes) {
+        input.value = '';
+        document.getElementById('video-preview-label').innerHTML = defaultVideoPreview;
+        input.setAttribute('aria-invalid', 'true');
+        error.hidden = false;
+        return false;
+    }
+
+    input.removeAttribute('aria-invalid');
+    error.hidden = true;
+    return true;
+}
+
 function previewFile(event, type) {
     const file = event.target.files[0];
     if (!file) return;
+    if (type === 'video' && !validateVideoFile(file)) return;
     if (type === 'gambar') {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -657,7 +682,7 @@ function previewFile(event, type) {
         reader.readAsDataURL(file);
     } else if (type === 'video') {
         const label = document.getElementById('video-preview-label');
-        label.innerHTML = `<div class="upload-zone-title">🎬 ${file.name}</div><div class="upload-zone-subtitle">${(file.size/1024/1024).toFixed(2)} MB</div>`;
+        label.innerHTML = `<div class="upload-zone-title">🎬 ${file.name}</div><div class="upload-zone-subtitle">${(file.size/1024/1024).toFixed(2)} MiB</div>`;
     }
 }
 
@@ -667,6 +692,7 @@ function handleFileDrop(event, type) {
     event.currentTarget.classList.remove('dragover');
     const file = event.dataTransfer.files[0];
     if (!file) return;
+    if (type === 'video' && !validateVideoFile(file)) return;
     const inputId = type === 'gambar' ? 'gambar-input' : 'video-file-input';
     const input = document.getElementById(inputId);
     const dt = new DataTransfer();
@@ -698,6 +724,12 @@ if (urlInput) {
 // ── Form Submission with Loading ──
 function submitForm(event, type) {
     const form = event.target;
+    if (type === 'video' && document.getElementById('video-input-type').value === 'video'
+        && !validateVideoFile(document.getElementById('video-file-input').files[0])) {
+        event.preventDefault();
+        return;
+    }
+
     const submitBtn = form.querySelector('button[type="submit"]');
     const overlay = document.getElementById('loading-overlay');
 
