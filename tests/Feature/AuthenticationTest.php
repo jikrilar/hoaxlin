@@ -34,6 +34,27 @@ class AuthenticationTest extends TestCase
         Notification::assertSentTo($user, VerifyEmail::class);
     }
 
+    public function test_user_cannot_register_with_an_existing_email(): void
+    {
+        $user = User::factory()->create(['email' => 'budi@example.com']);
+
+        $response = $this->post(route('register.store'), [
+            'name' => 'Budi Lain',
+            'email' => $user->email,
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'terms' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('email');
+        $response->assertSessionHasErrors([
+            'email' => 'Email sudah terdaftar. Silakan masuk atau gunakan alamat email lain.',
+        ]);
+        $this->assertNotSame('validation.unique', session('errors')->first('email'));
+        $this->assertDatabaseCount('users', 1);
+    }
+
     public function test_user_can_login_and_logout(): void
     {
         $user = User::factory()->create(['password' => 'password']);
