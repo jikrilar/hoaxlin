@@ -71,6 +71,21 @@
 
         <div class="glass-card" style="padding:2.5rem;" role="main">
 
+            @php
+                $previousInputType = old('input_type');
+                $activeTab = auth()->check() ? match ($previousInputType) {
+                    'image' => 'gambar',
+                    'video', 'video_url' => 'video',
+                    'url' => 'url',
+                    default => 'teks',
+                } : 'teks';
+                $videoUrlActive = $activeTab === 'video' && $previousInputType === 'video_url';
+                $previousRawInput = old('raw_input');
+                $previousRawInput = is_string($previousRawInput) ? $previousRawInput : '';
+                $previousSourceUrl = old('source_url');
+                $previousSourceUrl = is_string($previousSourceUrl) ? $previousSourceUrl : '';
+            @endphp
+
             <!-- Form Header -->
             <div style="margin-bottom:2rem;">
                 <h2 style="font-size:1.625rem; font-weight:700; margin-bottom:0.5rem;">
@@ -81,22 +96,36 @@
                 </p>
             </div>
 
+            @if ($errors->any())
+                <div id="submission-errors" role="alert" tabindex="-1" style="padding:1rem 1.25rem; margin-bottom:1.5rem; border:1px solid rgba(239,68,68,0.5); border-radius:0.75rem; background:rgba(239,68,68,0.1);">
+                    <h3 style="font-size:1rem; font-weight:700; margin-bottom:0.5rem;">Periksa kembali input kamu:</h3>
+                    <ul style="padding-left:1.25rem; margin:0; line-height:1.6;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    @if (in_array($previousInputType, ['image', 'video'], true))
+                        <p style="font-size:0.8125rem; margin-top:0.75rem;">File unggahan perlu dipilih ulang.</p>
+                    @endif
+                </div>
+            @endif
+
             <!-- Input Type Tabs -->
             <div class="input-tabs" role="tablist" aria-label="Jenis input berita" style="margin-bottom:1.75rem;">
-                <button id="tab-teks" class="input-tab active" role="tab" aria-selected="true" aria-controls="panel-teks" onclick="switchTab('teks')">
+                <button id="tab-teks" class="input-tab {{ $activeTab === 'teks' ? 'active' : '' }}" role="tab" aria-selected="{{ $activeTab === 'teks' ? 'true' : 'false' }}" aria-controls="panel-teks" onclick="switchTab('teks')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                     Teks
                 </button>
                 @auth
-                <button id="tab-gambar" class="input-tab" role="tab" aria-selected="false" aria-controls="panel-gambar" onclick="switchTab('gambar')">
+                <button id="tab-gambar" class="input-tab {{ $activeTab === 'gambar' ? 'active' : '' }}" role="tab" aria-selected="{{ $activeTab === 'gambar' ? 'true' : 'false' }}" aria-controls="panel-gambar" onclick="switchTab('gambar')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                     Gambar
                 </button>
-                <button id="tab-video" class="input-tab" role="tab" aria-selected="false" aria-controls="panel-video" onclick="switchTab('video')">
+                <button id="tab-video" class="input-tab {{ $activeTab === 'video' ? 'active' : '' }}" role="tab" aria-selected="{{ $activeTab === 'video' ? 'true' : 'false' }}" aria-controls="panel-video" onclick="switchTab('video')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
                     Video
                 </button>
-                <button id="tab-url" class="input-tab" role="tab" aria-selected="false" aria-controls="panel-url" onclick="switchTab('url')">
+                <button id="tab-url" class="input-tab {{ $activeTab === 'url' ? 'active' : '' }}" role="tab" aria-selected="{{ $activeTab === 'url' ? 'true' : 'false' }}" aria-controls="panel-url" onclick="switchTab('url')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
                     Tautan URL
                 </button>
@@ -110,7 +139,7 @@
             @endguest
 
             <!-- ── Panel: Teks ── -->
-            <div id="panel-teks" class="tab-content active" role="tabpanel" aria-labelledby="tab-teks">
+            <div id="panel-teks" class="tab-content {{ $activeTab === 'teks' ? 'active' : '' }}" role="tabpanel" aria-labelledby="tab-teks">
                 <form id="form-teks" action="{{ url('/deteksi') }}" method="POST" onsubmit="submitForm(event, 'teks')">
                     @csrf
                     <input type="hidden" name="input_type" value="text">
@@ -129,7 +158,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                         required
                         minlength="50"
                         aria-describedby="teks-hint"
-                    ></textarea>
+                    >{{ $previousRawInput }}</textarea>
 
                     <div id="teks-hint" style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
                         <span style="color:var(--color-text-muted); font-size:0.8125rem;">Minimal 50 karakter untuk analisis yang akurat</span>
@@ -157,7 +186,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
 
             <!-- ── Panel: Gambar ── -->
             @auth
-            <div id="panel-gambar" class="tab-content" role="tabpanel" aria-labelledby="tab-gambar">
+            <div id="panel-gambar" class="tab-content {{ $activeTab === 'gambar' ? 'active' : '' }}" role="tabpanel" aria-labelledby="tab-gambar">
                 <form id="form-gambar" action="{{ url('/deteksi') }}" method="POST" enctype="multipart/form-data" onsubmit="submitForm(event, 'gambar')">
                     @csrf
                     <input type="hidden" name="input_type" value="image">
@@ -206,33 +235,33 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
             </div>
 
             <!-- ── Panel: Video ── -->
-            <div id="panel-video" class="tab-content" role="tabpanel" aria-labelledby="tab-video">
+            <div id="panel-video" class="tab-content {{ $activeTab === 'video' ? 'active' : '' }}" role="tabpanel" aria-labelledby="tab-video">
                 <form id="form-video" action="{{ url('/deteksi') }}" method="POST" enctype="multipart/form-data" onsubmit="submitForm(event, 'video')">
                     @csrf
-                    <input type="hidden" name="input_type" id="video-input-type" value="video">
+                    <input type="hidden" name="input_type" id="video-input-type" value="{{ $videoUrlActive ? 'video_url' : 'video' }}">
 
                     <!-- Video sub-tabs -->
                     <div style="display:flex; gap:0.5rem; margin-bottom:1.25rem;" role="group" aria-label="Jenis input video">
                         <button type="button" id="video-tab-upload" onclick="switchVideoTab('upload')"
-                            style="padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid rgba(99,102,241,0.3); background:rgba(99,102,241,0.15); color:var(--color-primary-light); font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s;"
-                            aria-pressed="true">
+                            style="padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid {{ $videoUrlActive ? 'var(--color-border)' : 'rgba(99,102,241,0.3)' }}; background:{{ $videoUrlActive ? 'transparent' : 'rgba(99,102,241,0.15)' }}; color:{{ $videoUrlActive ? 'var(--color-text-muted)' : 'var(--color-primary-light)' }}; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s;"
+                            aria-pressed="{{ $videoUrlActive ? 'false' : 'true' }}">
                             Unggah File Video
                         </button>
                         <button type="button" id="video-tab-url" onclick="switchVideoTab('url')"
-                            style="padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid var(--color-border); background:transparent; color:var(--color-text-muted); font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s;"
-                            aria-pressed="false">
+                            style="padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid {{ $videoUrlActive ? 'rgba(99,102,241,0.3)' : 'var(--color-border)' }}; background:{{ $videoUrlActive ? 'rgba(99,102,241,0.15)' : 'transparent' }}; color:{{ $videoUrlActive ? 'var(--color-primary-light)' : 'var(--color-text-muted)' }}; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s;"
+                            aria-pressed="{{ $videoUrlActive ? 'true' : 'false' }}">
                             Tautan Video
                         </button>
                     </div>
 
                     <!-- Upload Video -->
-                    <div id="video-upload-panel">
+                    <div id="video-upload-panel" @if ($videoUrlActive) style="display:none;" @endif>
                         <label for="video-file-input" style="display:block; color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; margin-bottom:0.625rem;">File Video</label>
                         <div class="upload-zone" onclick="document.getElementById('video-file-input').click()" role="button" tabindex="0" aria-label="Klik atau seret file video ke sini"
                              ondragover="event.preventDefault(); this.classList.add('dragover')"
                              ondragleave="this.classList.remove('dragover')"
                              ondrop="handleFileDrop(event, 'video')">
-                            <input type="file" id="video-file-input" name="media_file" accept="video/mp4,video/mpeg,video/webm,.mp4,.mpeg,.webm" onchange="previewFile(event, 'video')">
+                            <input type="file" id="video-file-input" name="media_file" accept="video/mp4,video/mpeg,video/webm,.mp4,.mpeg,.webm" onchange="previewFile(event, 'video')" @if (! $videoUrlActive) required @endif>
                             <div class="upload-zone-icon" aria-hidden="true">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
                             </div>
@@ -244,11 +273,11 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                     </div>
 
                     <!-- URL Video -->
-                    <div id="video-url-panel" style="display:none;">
+                    <div id="video-url-panel" @if (! $videoUrlActive) style="display:none;" @endif>
                         <label for="video-url-input" style="display:block; color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; margin-bottom:0.625rem;">URL Langsung File Audio/Video</label>
                         <input type="url" id="video-url-input" name="source_url" class="form-input"
                                placeholder="https://cdn.example.com/rekaman.mp4"
-                               aria-label="URL video berita">
+                               aria-label="URL video berita" value="{{ $previousInputType === 'video_url' ? $previousSourceUrl : '' }}" @if ($videoUrlActive) required @endif>
                         <p style="color:var(--color-text-muted); font-size:0.75rem; margin-top:0.5rem;">Mendukung FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, dan WEBM hingga 24 MiB. Halaman YouTube atau platform sosial tidak didukung.</p>
                     </div>
 
@@ -276,7 +305,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
             </div>
 
             <!-- ── Panel: URL ── -->
-            <div id="panel-url" class="tab-content" role="tabpanel" aria-labelledby="tab-url">
+            <div id="panel-url" class="tab-content {{ $activeTab === 'url' ? 'active' : '' }}" role="tabpanel" aria-labelledby="tab-url">
                 <form id="form-url" action="{{ url('/deteksi') }}" method="POST" onsubmit="submitForm(event, 'url')">
                     @csrf
                     <input type="hidden" name="input_type" value="url">
@@ -290,6 +319,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                         name="source_url"
                         class="form-input"
                         placeholder="https://www.detik.com/berita/..."
+                        value="{{ $previousInputType === 'url' ? $previousSourceUrl : '' }}"
                         required
                         aria-describedby="url-hint"
                     >
@@ -545,6 +575,12 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
 
 @push('scripts')
 <script>
+@if ($errors->any())
+const submissionErrors = document.getElementById('submission-errors');
+submissionErrors.focus({ preventScroll: true });
+submissionErrors.scrollIntoView({ block: 'center' });
+@endif
+
 // ── Tab Switching ──
 function switchTab(tabName) {
     // Update tab buttons
@@ -602,6 +638,7 @@ if (tekstInput) {
         teksCount.textContent = len + ' karakter';
         teksCount.style.color = len >= 50 ? 'var(--color-success)' : 'var(--color-text-muted)';
     });
+    tekstInput.dispatchEvent(new Event('input'));
 }
 
 // ── File Preview ──
@@ -655,6 +692,7 @@ if (urlInput) {
             preview.style.display = 'none';
         }
     });
+    urlInput.dispatchEvent(new Event('input'));
 }
 
 // ── Form Submission with Loading ──

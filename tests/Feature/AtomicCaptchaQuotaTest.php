@@ -60,6 +60,40 @@ class AtomicCaptchaQuotaTest extends TestCase
         $this->assertDatabaseCount('submissions', 1);
     }
 
+    public function test_wrong_answer_redirect_replaces_the_session_challenge_without_flashing_the_old_answer(): void
+    {
+        $answer = $this->issueCaptcha();
+        $oldChallengeId = session(CaptchaChallenge::SESSION_KEY.'.id');
+        $payload = $this->textPayload($answer + 1);
+
+        $this->post(route('deteksi'), $payload)
+            ->assertRedirect(route('home'))
+            ->assertSessionHasErrors(['captcha_answer' => 'Jawaban CAPTCHA salah.'])
+            ->assertSessionHasInput('input_type', 'text')
+            ->assertSessionHasInput('raw_input', trim($payload['raw_input']));
+
+        $this->assertArrayNotHasKey('captcha_answer', session('_old_input', []));
+        $this->assertArrayNotHasKey('website', session('_old_input', []));
+        $this->assertDatabaseCount('submissions', 0);
+
+        $page = $this->get(route('home'))->assertOk();
+        $newChallengeId = session(CaptchaChallenge::SESSION_KEY.'.id');
+        $newAnswer = session(CaptchaChallenge::SESSION_KEY.'.answer');
+
+        $this->assertNotSame($oldChallengeId, $newChallengeId);
+        $this->assertSame('issued', Cache::get('captcha:challenge:'.$newChallengeId)['state'] ?? null);
+        $page->assertSee('Jawaban CAPTCHA salah.')
+            ->assertSee(trim($payload['raw_input']))
+            ->assertSee('id="submission-errors" role="alert"', false)
+            ->assertSee('id="tab-teks" class="input-tab active"', false)
+            ->assertDontSee('validation.captcha_answer');
+        $this->assertDoesNotMatchRegularExpression('/name="captcha_answer"[^>]*value=/', $page->getContent());
+
+        $this->post(route('deteksi'), $this->textPayload($newAnswer))->assertRedirect();
+        $this->assertNull(Cache::get('captcha:challenge:'.$newChallengeId));
+        $this->assertDatabaseCount('submissions', 1);
+    }
+
     public function test_successful_submission_consumes_challenge_and_replay_is_rejected(): void
     {
         $answer = $this->issueCaptcha();
