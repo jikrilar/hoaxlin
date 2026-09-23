@@ -11,6 +11,7 @@
             <h1 style="font-size:1.5rem; font-weight:700; margin-bottom:0.75rem;">Verifikasi Alamat Email</h1>
             <p style="color:var(--color-text-muted); line-height:1.7; margin-bottom:1.5rem;">
                 Tautan verifikasi telah dikirim ke <strong style="color:var(--color-text-secondary);">{{ auth()->user()->email }}</strong>. Verifikasi email untuk mengakses riwayat dan mengirim umpan balik.
+                Jika belum terlihat, periksa kotak masuk dan folder spam, atau minta tautan baru di bawah.
             </p>
 
             @if (session('status') === 'verification-link-sent')

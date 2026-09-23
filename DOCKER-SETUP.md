@@ -71,6 +71,34 @@ Jangan memasukkan `.env` ke Git. Setelah memperbarui key, terapkan konfigurasi b
 docker compose up -d --force-recreate app queue scheduler
 ```
 
+## Email verifikasi melalui Gmail SMTP (opsional)
+
+Tanpa kredensial, `MAIL_MAILER=log` tetap aman untuk development. Docker memakai `LOG_CHANNEL=stderr`, sehingga email verifikasi pada mode ini dapat dilihat dengan `docker compose logs app`, bukan di `storage/logs/laravel.log`.
+
+Untuk mengirim ke inbox saat demo, isi `.env` pribadi dengan konfigurasi berikut dan nilai akun milik sendiri:
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_SCHEME=null
+MAIL_URL=null
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_EHLO_DOMAIN=null
+MAIL_FROM_ADDRESS=
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+Isi `MAIL_PASSWORD` dengan **Google App Password**, bukan password utama Gmail. Samakan alamat pengirim dengan akun SMTP yang digunakan. Jangan commit `.env`; gunakan `APP_DEBUG=false` saat demo agar detail kegagalan SMTP tidak tampil kepada pengguna.
+
+Setelah mengisi `.env`, terapkan environment baru dan periksa hanya nilai non-secret:
+
+```console
+docker compose up -d --force-recreate app queue scheduler
+docker compose exec app printenv MAIL_MAILER MAIL_HOST MAIL_PORT MAIL_FROM_ADDRESS
+```
+
 ## Verifikasi
 
 ```console
