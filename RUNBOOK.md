@@ -8,24 +8,26 @@ Pada Docker, gunakan service name internal untuk BERT:
 docker compose ps
 docker compose exec app php artisan hoaxlin:doctor
 docker compose exec app php artisan queue:failed
-docker compose logs --tail=100 app queue scheduler bert
+docker compose logs --tail=100 app queue scheduler bert rag
 ```
 
 Endpoint aplikasi adalah `GET /up`. BERT menyediakan `/health/live`, `/health/ready`, `/version`, dan `/metrics`. Metadata model aktif dan threshold berasal dari `/version`; ketidaktersediaan metadata ditampilkan sebagai `n/a`, bukan ditebak dari histori database.
 
 ## Queue
 
-Named queue wajib:
+Named queue yang harus dikonsumsi:
 
 ```text
-default, extract-text, extract-media, inference, explanation
+default, extract-text, extract-media, inference, retrieval, explanation
 ```
 
 Worker manual:
 
 ```console
-php artisan queue:work --queue=extract-text,extract-media,inference,explanation,default --tries=3
+php artisan queue:work --queue=default,extract-text,extract-media,inference,retrieval,explanation --tries=3
 ```
+
+Queue `retrieval` menjalankan `RetrieveSubmissionEvidence` setelah classification. Worker Docker juga mengonsumsi queue ini. Worker tidak bergantung pada readiness RAG untuk mulai; kegagalan retrieval dicatat sebagai degradation dan explanation tetap dicoba.
 
 Operasi failed job:
 
@@ -72,7 +74,32 @@ php artisan media:prune --hours=24
 
 ## Explanation unavailable
 
-Klasifikasi BERT adalah hasil inti. Gangguan OpenAI non-kritis pada stage explanation menghasilkan `explanation_status=unavailable` dan submission tetap `completed`. Jangan me-retry atau mengubah hasil BERT hanya untuk memaksa narasi tersedia. Kegagalan persistence/invariant internal tetap diperlakukan sebagai failure.
+Klasifikasi IndoBERT adalah hasil inti. Gangguan RAG tidak mengubah atau menghapus label dan confidence classifier; retrieval dapat berakhir tanpa evidence dan pipeline tetap meneruskan explanation. Gangguan OpenAI non-kritis pada stage explanation menghasilkan `explanation_status=unavailable` dan submission tetap `completed`. Jangan me-retry atau mengubah hasil classifier hanya untuk memaksa evidence atau narasi tersedia. Kegagalan persistence/invariant internal tetap diperlakukan sebagai failure.
+
+## RAG dan knowledge base
+
+Di Docker, Laravel memanggil `http://rag:8002` melalui network internal `hoaxlin`. Service `rag` tidak memiliki host port; healthcheck container menggunakan `/health/live`. Periksa kondisi service dengan:
+
+```console
+docker compose ps rag queue
+docker compose logs --tail=100 rag queue
+docker compose exec rag python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8002/health/live', timeout=3).read().decode())"
+docker compose exec rag python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8002/version', timeout=3).read().decode())"
+```
+
+Production knowledge base berada di `datasets/rag/knowledge-base-v1/` dan saat ini memiliki 0 dokumen. Karena itu `/health/ready` mengembalikan 503 `knowledge_base_empty`; ini bukan kegagalan liveness. Request retrieval yang valid mengembalikan daftar kosong dan tidak membuat sumber. `RAG_MIN_SCORE` production tetap kosong karena evaluasi kualitas belum dapat dilakukan.
+
+Validasi knowledge base dan jalankan regression evaluasi dari root repository:
+
+```powershell
+python scripts\validate_rag_knowledge_base.py
+python -m unittest discover -s tests\rag -p 'test_*.py'
+Set-Location rag-service
+.\.venv\Scripts\python.exe -m pytest tests
+Set-Location ..
+```
+
+Framework retrieval evaluation dijalankan dari root dengan `.\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py`. Report deterministik berada di `reports/rag-retrieval-evaluation-v1.json`. Saat KB masih kosong, report berstatus `blocked`, tidak berisi metric production, dan tidak menetapkan threshold. Rincian schema dan metric ada di [datasets/rag/README.md](datasets/rag/README.md).
 
 ## Docker lifecycle
 
@@ -82,7 +109,7 @@ docker compose ps
 docker compose down
 ```
 
-Service normal adalah `app`, `queue`, `scheduler`, `mysql`, `redis`, dan `bert`. `docker compose down` mempertahankan named volume. Jangan gunakan `docker compose down -v` sebagai operasi normal.
+Service normal adalah `app`, `queue`, `scheduler`, `mysql`, `redis`, `bert`, dan `rag`. `app` dan `queue` tidak menunggu RAG readiness; `queue` menunggu BERT healthy, lalu retrieval menangani RAG failure secara non-kritis. `docker compose down` mempertahankan named volume. Jangan gunakan `docker compose down -v` sebagai operasi normal.
 
 Setelah source Laravel berubah:
 

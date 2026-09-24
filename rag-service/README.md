@@ -99,3 +99,20 @@ python -m unittest discover -s ..\tests\rag -p 'test_*.py'
 
 Tests use synthetic fixtures in temporary directories and a deterministic
 test embedding backend. No test record is added to the production corpus.
+
+## Retrieval evaluation
+
+The versioned retrieval evaluation dataset, metric definitions, corpus binding,
+and current production status are documented in
+[`datasets/rag/README.md`](../datasets/rag/README.md). Run the evaluator from
+the repository root with:
+
+```powershell
+.\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py
+```
+
+The artifact is `reports/rag-retrieval-evaluation-v1.json`. At present the
+production KB is empty, so the evaluator writes `status: blocked`, leaves
+production metrics null, and does not choose `RAG_MIN_SCORE`. Synthetic
+corpora are used only in automated tests; they are not presented as production
+retrieval evaluation.

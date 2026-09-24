@@ -1,6 +1,6 @@
 # hoaxlin.id — Deteksi Hoaks Berbasis IndoBERT
 
-Hoaxlin adalah aplikasi Laravel 12 dengan layanan inferensi FastAPI. IndoBERT menentukan label inti `valid` atau `hoax`; `meragukan` adalah abstention ketika confidence tidak melewati threshold runtime. OpenAI mendukung OCR, transkripsi, terjemahan Inggris ke Indonesia, dan penjelasan naratif—bukan classifier.
+Hoaxlin adalah aplikasi Laravel 12 dengan layanan FastAPI terpisah untuk IndoBERT dan retrieval RAG. Classifier tetap menggunakan model frozen `indobert-hoax v1.0.0` untuk label training `valid` atau `hoax`; `meragukan` adalah abstention di serving layer ketika confidence di bawah threshold, bukan kelas training. Pada UI, label itu ditampilkan sebagai **Informasi belum terverifikasi oleh sumber terpercaya**. RAG mencari referensi dari knowledge base lokal dan tidak mengubah label classifier. OpenAI membuat explanation grounded dari hasil classification, excerpt, dan evidence; layanan OpenAI yang sama juga mendukung OCR, transkripsi, dan terjemahan EN→ID pada tahap input.
 
 ## Fitur dan batas akses
 
@@ -16,19 +16,28 @@ Hoaxlin adalah aplikasi Laravel 12 dengan layanan inferensi FastAPI. IndoBERT me
 |---|---|
 | Laravel | HTTP, autentikasi/otorisasi, validasi, penyimpanan, queue, admin Filament |
 | FastAPI/IndoBERT | Klasifikasi teks dan metadata runtime `/version` |
+| `rag-service` | Retrieval evidence lokal dengan embedding multilingual dan cosine similarity |
 | OpenAI | OCR, transkripsi, terjemahan EN→ID, dan penjelasan naratif |
 | MySQL | Data aplikasi dan ledger kuota OpenAI bulanan |
 | Redis | Queue, cache, session, lock, dan limiter sementara |
 
 ```text
-ProcessSubmission
-→ ExtractSubmissionText
-→ TranslateSubmissionText
-→ ClassifySubmission
-→ RetrieveSubmissionEvidence
-→ GenerateSubmissionExplanation
-→ completed | failed
+Input
+  ↓
+Extraction
+  ↓
+Translation
+  ↓
+IndoBERT Classification
+  ↓
+Evidence Retrieval
+  ↓
+Grounded Explanation
+  ↓
+Result
 ```
+
+Rangkaian job aktual dimulai dengan `ProcessSubmission`, yang dispatches `ExtractSubmissionText`; extraction melanjutkan ke `TranslateSubmissionText`, lalu tahap akhir berjalan sebagai `ClassifySubmission` -> `RetrieveSubmissionEvidence` -> `GenerateSubmissionExplanation`. Retrieval hanya berjalan setelah classification berhasil. Stage retrieval terpisah dari classification dan explanation, menggunakan queue `retrieval`, serta tidak dapat mengubah `DetectionResult.label` atau confidence classifier. Jika RAG gagal atau tidak menemukan evidence, explanation tetap dapat berjalan; sumber tidak dibuat sebagai pengganti evidence yang kosong. Skor similarity adalah relevansi retrieval, bukan confidence model atau bukti kebenaran.
 
 Stage progres adalah `queued → extracting → translating → classifying → retrieving → explaining → done`. Teks Indonesia melewati stage translation tanpa pemanggilan provider; teks Inggris diterjemahkan ke Indonesia sebelum IndoBERT. Retrieval evidence memakai queue `retrieval` dan tidak mengubah hasil classifier. `DetectionResult` parsial tidak dianggap final sebelum status submission `completed`.
 
@@ -58,6 +67,12 @@ Isi konfigurasi lokal dengan nilai sendiri; jangan commit credential:
 DB_DATABASE=hoax_detector
 BERT_SERVICE_URL=http://127.0.0.1:8001
 BERT_SERVICE_TOKEN=<generate-a-local-token>
+RAG_SERVICE_URL=http://127.0.0.1:8002
+RAG_SERVICE_CONNECT_TIMEOUT=3
+RAG_SERVICE_TIMEOUT=15
+RAG_SERVICE_TOKEN=
+RAG_TOP_K=3
+RAG_MIN_SCORE=
 OPENAI_API_KEY=
 ```
 
@@ -84,6 +99,19 @@ npm run dev
 ```
 
 Named queue yang harus dikonsumsi adalah `default`, `extract-text`, `extract-media`, `inference`, `retrieval`, dan `explanation`.
+
+### Menjalankan RAG secara lokal
+
+`composer run dev` tidak memulai `rag-service`; jalankan service ini di terminal terpisah bila ingin menguji retrieval lokal. Default `RAG_SERVICE_URL` pada `.env.example` adalah `http://127.0.0.1:8002`.
+
+```powershell
+Set-Location rag-service
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8002
+```
+
+Knowledge base saat ini berisi 0 dokumen. Dalam kondisi ini service tetap hidup, `/health/live` sukses, `/health/ready` mengembalikan 503 dengan alasan `knowledge_base_empty`, dan `/retrieve` mengembalikan hasil kosong. Model embedding tidak dimuat. Jika KB telah diisi dokumen terkurasi, siapkan model secara eksplisit sebelum menjalankan service dengan `python -m app.prepare_model`; langkah ini mengunduh revision model yang dipatok dan memerlukan jaringan.
 
 ## Kontrak media dan dependency opsional
 
@@ -132,12 +160,22 @@ Set-Location bert-service
 .\.venv\Scripts\python.exe -m pytest -q
 Set-Location ..
 
+Set-Location rag-service
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pytest tests
+Set-Location ..
+
+python scripts\validate_rag_knowledge_base.py
+python -m unittest discover -s tests\rag -p 'test_*.py'
+.\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py
+
 docker build --target test -t hoaxlin-app:test .
 docker run --rm -e APP_KEY="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" hoaxlin-app:test
 docker compose config --quiet
 ```
 
 Test real-BERT membutuhkan service dan artifact yang tersedia; test tersebut skip secara eksplisit jika dependency tidak tersedia.
+Evaluator RAG menulis artifact deterministik ke `reports/rag-retrieval-evaluation-v1.json`. Saat KB production kosong, hasilnya berstatus `blocked` tanpa metric production atau threshold.
 
 ## Docker
 
@@ -150,7 +188,7 @@ docker compose exec app php artisan hoaxlin:doctor
 docker compose down
 ```
 
-Compose menjalankan `app`, `queue`, `scheduler`, `mysql`, `redis`, dan `bert`. Hanya `app` mengekspos port host. `docker compose down` tidak menghapus named volume; jangan gunakan `down -v` sebagai operasi normal.
+Compose menjalankan `app`, `queue`, `scheduler`, `mysql`, `redis`, `bert`, dan `rag`. Laravel mengakses RAG melalui `http://rag:8002` pada network internal `hoaxlin`; port RAG tidak dipublikasikan ke host. Healthcheck container RAG memakai `/health/live`, karena readiness memang 503 selama KB kosong. Hanya `app` mengekspos port host. `docker compose down` tidak menghapus named volume; jangan gunakan `down -v` sebagai operasi normal.
 
 ## Privasi
 
@@ -164,5 +202,8 @@ Compose menjalankan `app`, `queue`, `scheduler`, `mysql`, `redis`, dan `bert`. H
 - [PRD.md](PRD.md) — ruang lingkup produk dan akademik
 - [DOCKER-SETUP.md](DOCKER-SETUP.md) — bootstrap Docker
 - [RUNBOOK.md](RUNBOOK.md) — operasi, recovery, dan retensi
+- [datasets/rag/README.md](datasets/rag/README.md) — schema KB dan evaluasi retrieval
+- [rag-service/README.md](rag-service/README.md) — service retrieval lokal
+- [TASK-RAG-HOAXLIN.md](TASK-RAG-HOAXLIN.md) — status implementasi R1–R12
 - [bert-service/README.md](bert-service/README.md) — serving, dataset, training, dan release BERT
 - [TASK.md](TASK.md) — backlog dan hasil verifikasi historis

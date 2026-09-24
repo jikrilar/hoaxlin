@@ -49,6 +49,10 @@ bash scripts/docker-setup.sh
 
 Setup dapat dijalankan ulang dengan aman. File `.env`, secret, database, dan storage yang sudah ada tetap dipertahankan.
 
+Compose menjalankan service internal `rag` pada port container `8002`; Laravel mengaksesnya melalui `http://rag:8002`. Port tersebut tidak dipetakan ke host. Image RAG menyiapkan embedding model pada build dari revision yang dipatok, sehingga build pertama memerlukan akses ke registry model. Runtime container menggunakan file model lokal/offline. Queue tidak menunggu readiness RAG untuk mulai; retrieval adalah dependency non-kritis dan pipeline menangani kegagalannya tanpa membuang hasil classifier.
+
+Environment RAG Docker di `.env.docker.example` memakai `RAG_SERVICE_URL=http://rag:8002`, connect timeout 3 detik, timeout 15 detik, `RAG_SERVICE_TOKEN` kosong, `RAG_TOP_K=3`, dan `RAG_MIN_SCORE` kosong. RAG service saat ini tidak menegakkan bearer-token auth; batas akses Docker adalah network internal dan tidak ada port host. Jangan menganggap `RAG_SERVICE_TOKEN` sebagai access control RAG atau mengisi threshold retrieval seolah-olah itu threshold classifier. Saat ini knowledge base kosong: container tetap sehat berdasarkan `/health/live`, sementara `/health/ready` melaporkan `knowledge_base_empty` dengan HTTP 503. Ini kondisi readiness yang diharapkan sampai dokumen terkurasi tersedia.
+
 ## OpenAI
 
 `OPENAI_API_KEY` bersifat opsional untuk bootstrap infrastruktur, tetapi diperlukan saat pipeline benar-benar memanggil OCR gambar, transkripsi video/audio, terjemahan Inggris ke Indonesia, atau explanation. Klasifikasi tetap dilakukan IndoBERT. Gangguan explanation yang non-kritis menghasilkan status explanation `unavailable` tanpa membatalkan hasil BERT yang valid.
@@ -106,7 +110,7 @@ docker compose ps
 docker compose exec app php artisan hoaxlin:doctor
 ```
 
-Service `app`, `mysql`, `redis`, dan `bert` harus berstatus healthy; `queue` dan `scheduler` harus healthy/running. Command doctor harus selesai dengan exit code `0`. Jika OpenAI belum dikonfigurasi, doctor menampilkan peringatan, tetapi dependency utama tetap dapat dinyatakan siap.
+Periksa `docker compose ps`: service `app`, `mysql`, `redis`, `bert`, dan `rag` harus berstatus healthy; `queue` dan `scheduler` harus healthy/running. Healthcheck RAG memakai `/health/live`, bukan `/health/ready`, sehingga KB kosong tidak membuat container dianggap mati. `php artisan hoaxlin:doctor` memeriksa dependency Laravel termasuk database, Redis, queue, storage, dan BERT, tetapi belum memeriksa RAG; command harus selesai dengan exit code `0` untuk dependency kritis yang diperiksanya. Jika OpenAI belum dikonfigurasi, doctor menampilkan peringatan, tetapi dependency utama tetap dapat dinyatakan siap.
 
 Uji endpoint aplikasi:
 
@@ -204,11 +208,18 @@ docker compose logs --tail=100 <service>
 docker compose exec app php artisan hoaxlin:doctor
 ```
 
-Nama service yang tersedia adalah `app`, `queue`, `scheduler`, `mysql`, `redis`, dan `bert`. Setelah penyebabnya diperbaiki, service tertentu dapat dimulai ulang dengan `docker compose restart <service>`.
+Nama service yang tersedia adalah `app`, `queue`, `scheduler`, `mysql`, `redis`, `bert`, dan `rag`. Untuk memeriksa liveness RAG dari dalam container:
+
+```console
+docker compose exec rag python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8002/health/live', timeout=3).read().decode())"
+docker compose exec rag python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8002/version', timeout=3).read().decode())"
+```
+
+Dengan KB kosong, `/health/ready` yang mengembalikan 503 `knowledge_base_empty` adalah kondisi yang diharapkan; periksa `docker compose logs rag` untuk error startup yang lain. Setelah penyebabnya diperbaiki, service tertentu dapat dimulai ulang dengan `docker compose restart <service>`.
 
 ## Batasan
 
-- Redis, MySQL, dan BERT hanya tersedia di network internal Docker; hanya Laravel yang dipublikasikan ke localhost secara default.
+- Redis, MySQL, BERT, dan RAG hanya tersedia di network internal Docker; hanya Laravel yang dipublikasikan ke localhost secara default.
 - Redistribusi publik model fine-tuned belum terverifikasi. Archive dan image BERT harus dipindahkan melalui kanal private/controlled.
 - Fitur OpenAI memerlukan koneksi internet dan API key yang valid.
 - Bootstrap/build pertama mungkin memerlukan internet untuk mengambil base image dan dependency yang belum tersedia di cache Docker.
