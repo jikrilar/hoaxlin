@@ -18,13 +18,14 @@ class DocumentationWorkflowContractTest extends TestCase
             'ExtractSubmissionText',
             'TranslateSubmissionText',
             'ClassifySubmission',
+            'RetrieveSubmissionEvidence',
             'GenerateSubmissionExplanation',
         ] as $stage) {
             $this->assertStringContainsString($stage, $readme);
         }
 
         $this->assertStringContainsString(
-            'extract-text,extract-media,inference,explanation,default',
+            'extract-text,extract-media,inference,retrieval,explanation,default',
             $readme,
         );
         $this->assertStringContainsString('MEDIA_RETENTION_HOURS', $docs);

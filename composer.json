@@ -54,7 +54,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74,#34d399\" \"php artisan serve\" \"php artisan queue:listen --queue=extract-text,extract-media,inference,explanation,default --tries=3\" \"php artisan pail --timeout=0\" \"npm run dev\" \".\\bert-service\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --app-dir bert-service --host 127.0.0.1 --port 8001\" --names=server,queue,logs,vite,bert"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74,#34d399\" \"php artisan serve\" \"php artisan queue:listen --queue=extract-text,extract-media,inference,retrieval,explanation,default --tries=3\" \"php artisan pail --timeout=0\" \"npm run dev\" \".\\bert-service\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --app-dir bert-service --host 127.0.0.1 --port 8001\" --names=server,queue,logs,vite,bert"
         ]
     },
     "extra": {

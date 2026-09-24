@@ -32,7 +32,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['extract-text', 'extract-media', 'inference', 'explanation', 'default'],
+            'queue' => ['extract-text', 'extract-media', 'inference', 'retrieval', 'explanation', 'default'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,
@@ -65,7 +65,7 @@ return [
             ],
             'supervisor-3' => [
                 'connection' => 'redis',
-                'queue' => ['explanation'],
+                'queue' => ['retrieval', 'explanation'],
                 'balance' => 'auto',
                 'processes' => 1,
                 'tries' => 3,
@@ -83,7 +83,7 @@ return [
         'local' => [
             'supervisor-1' => [
                 'connection' => 'redis',
-                'queue' => ['extract-text', 'extract-media', 'inference', 'explanation', 'default'],
+                'queue' => ['extract-text', 'extract-media', 'inference', 'retrieval', 'explanation', 'default'],
                 'balance' => 'auto',
                 'maxProcesses' => 3,
                 'tries' => 1,

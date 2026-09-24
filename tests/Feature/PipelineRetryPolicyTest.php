@@ -137,6 +137,7 @@ class PipelineRetryPolicyTest extends TestCase
             $classifier,
             app(ProcessingEventRecorder::class),
             app(SubmissionStateMachine::class),
+            app(PipelineFailureReporter::class),
         );
 
         $job->assertFailed();
@@ -166,6 +167,7 @@ class PipelineRetryPolicyTest extends TestCase
             $classifier,
             app(ProcessingEventRecorder::class),
             app(SubmissionStateMachine::class),
+            app(PipelineFailureReporter::class),
         );
 
         return [$job, $submission];

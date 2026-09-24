@@ -25,11 +25,12 @@ ProcessSubmission
 → ExtractSubmissionText
 → TranslateSubmissionText
 → ClassifySubmission
+→ RetrieveSubmissionEvidence
 → GenerateSubmissionExplanation
 → completed | failed
 ```
 
-Stage progres adalah `queued → extracting → translating → classifying → explaining → done`. Teks Indonesia melewati stage translation tanpa pemanggilan provider; teks Inggris diterjemahkan ke Indonesia sebelum IndoBERT. `DetectionResult` parsial tidak dianggap final sebelum status submission `completed`.
+Stage progres adalah `queued → extracting → translating → classifying → retrieving → explaining → done`. Teks Indonesia melewati stage translation tanpa pemanggilan provider; teks Inggris diterjemahkan ke Indonesia sebelum IndoBERT. Retrieval evidence memakai queue `retrieval` dan tidak mengubah hasil classifier. `DetectionResult` parsial tidak dianggap final sebelum status submission `completed`.
 
 ## Setup pengembangan
 
@@ -76,13 +77,13 @@ Jalankan masing-masing di terminal terpisah:
 
 ```powershell
 php artisan serve
-php artisan queue:work --queue=extract-text,extract-media,inference,explanation,default --tries=3
+php artisan queue:work --queue=extract-text,extract-media,inference,retrieval,explanation,default --tries=3
 php artisan pail --timeout=0
 npm run dev
 .\bert-service\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir bert-service --host 127.0.0.1 --port 8001
 ```
 
-Named queue yang harus dikonsumsi adalah `default`, `extract-text`, `extract-media`, `inference`, dan `explanation`.
+Named queue yang harus dikonsumsi adalah `default`, `extract-text`, `extract-media`, `inference`, `retrieval`, dan `explanation`.
 
 ## Kontrak media dan dependency opsional
 

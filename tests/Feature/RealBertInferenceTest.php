@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Contracts\EvidenceRetriever;
 use App\Jobs\ClassifySubmission;
 use App\Jobs\ExtractSubmissionText;
 use App\Jobs\ProcessSubmission;
 use App\Models\Submission;
 use App\Services\Extraction\TextExtractorResolver;
 use App\Services\Extraction\TextInputExtractor;
+use App\Services\Fakes\FakeEvidenceRetriever;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -27,6 +29,12 @@ use Tests\TestCase;
 class RealBertInferenceTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->app->instance(EvidenceRetriever::class, new FakeEvidenceRetriever);
+    }
 
     private function isBertServiceAvailable(): bool
     {
@@ -163,6 +171,7 @@ class RealBertInferenceTest extends TestCase
         // Process the queue synchronously for this test (database queue, run once)
         $this->artisan('queue:work', ['--once' => true, '--queue' => 'default'])->assertExitCode(0);
         $this->artisan('queue:work', ['--once' => true, '--queue' => 'inference'])->assertExitCode(0);
+        $this->artisan('queue:work', ['--once' => true, '--queue' => 'retrieval'])->assertExitCode(0);
         $this->artisan('queue:work', ['--once' => true, '--queue' => 'explanation'])->assertExitCode(0);
 
         $submission->refresh()->load('detectionResult');

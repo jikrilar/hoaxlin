@@ -6,8 +6,8 @@ use App\Enums\EventOutcome;
 use App\Enums\ProcessingStage;
 use App\Jobs\ClassifySubmission;
 use App\Jobs\ExtractSubmissionText;
-use App\Jobs\GenerateSubmissionExplanation;
 use App\Jobs\ProcessSubmission;
+use App\Jobs\RetrieveSubmissionEvidence;
 use App\Jobs\TranslateSubmissionText;
 use App\Models\Submission;
 use Illuminate\Database\Eloquent\Builder;
@@ -52,9 +52,9 @@ class StaleSubmissionRecovery
         if ($submission->detectionResult !== null) {
             return $this->dispatchRecovery(
                 $submission,
-                $stage ?? ProcessingStage::Classifying,
-                GenerateSubmissionExplanation::class,
-                'explanation',
+                ProcessingStage::Retrieving,
+                RetrieveSubmissionEvidence::class,
+                'retrieval',
             );
         }
 
@@ -72,7 +72,7 @@ class StaleSubmissionRecovery
                 ? $this->dispatchRecovery($submission, $stage, ClassifySubmission::class, 'inference')
                 : $this->dispatchRecovery($submission, $stage, TranslateSubmissionText::class, 'inference'),
             ProcessingStage::Classifying => $this->dispatchRecovery($submission, $stage, ClassifySubmission::class, 'inference'),
-            ProcessingStage::Explaining, ProcessingStage::Done, null => $this->failUnsafeRecovery(
+            ProcessingStage::Retrieving, ProcessingStage::Explaining, ProcessingStage::Done, null => $this->failUnsafeRecovery(
                 $submission,
                 $stage ?? ProcessingStage::Queued,
             ),

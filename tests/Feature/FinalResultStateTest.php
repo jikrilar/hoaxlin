@@ -142,6 +142,7 @@ class FinalResultStateTest extends TestCase
             'extracting' => ['processing', ProcessingStage::Extracting, 25],
             'translating' => ['processing', ProcessingStage::Translating, 45],
             'classifying' => ['processing', ProcessingStage::Classifying, 60],
+            'retrieving' => ['processing', ProcessingStage::Retrieving, 75],
             'explaining' => ['processing', ProcessingStage::Explaining, 85],
         ];
     }

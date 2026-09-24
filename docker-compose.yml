@@ -131,7 +131,7 @@ services:
       - artisan
       - queue:work
       - redis
-      - --queue=default,extract-text,extract-media,inference,explanation
+      - --queue=default,extract-text,extract-media,inference,retrieval,explanation
       - --tries=3
       - --timeout=${MEDIA_WORKER_TIMEOUT:-180}
       - --sleep=1
