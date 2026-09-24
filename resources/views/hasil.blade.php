@@ -113,23 +113,33 @@
             <!-- Label Badge & Score -->
             <div style="display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:1.5rem; margin-bottom:2rem;">
                 <div>
-                    <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.06em;">Hasil Deteksi</p>
+                    <h1 style="color:var(--color-text-primary); font-size:1.25rem; font-weight:700; margin-bottom:0.25rem;">Hasil Deteksi</h1>
+                    <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.06em;">Status Verifikasi</p>
                     @php
                         $label = $result->label ?? 'meragukan';
                         $labelLower = strtolower($label);
-                        $labelMap = ['valid' => 'Valid', 'hoax' => 'Hoax', 'meragukan' => 'Meragukan'];
+                        $labelMap = [
+                            'valid' => 'Valid',
+                            'hoax' => 'Hoax',
+                            'meragukan' => 'Informasi belum terverifikasi oleh sumber terpercaya',
+                        ];
                         $labelDisplay = $labelMap[$labelLower] ?? $label;
                         $icons = ['valid'=>'✅', 'hoax'=>'🚨', 'meragukan'=>'⚠️'];
                     @endphp
-                    <div class="result-badge {{ $labelLower }}" role="status" aria-label="Label: {{ $labelDisplay }}">
+                    <div class="result-badge {{ $labelLower }}" role="status" aria-label="{{ $labelDisplay }}">
                         <span aria-hidden="true">{{ $icons[$labelLower] ?? '❓' }}</span>
                         {{ $labelDisplay }}
                     </div>
+                    @if($labelLower === 'meragukan')
+                        <p style="max-width:32rem; margin:0.75rem 0 0; color:var(--color-text-secondary); font-size:0.8125rem; line-height:1.6;">
+                            Status ini berarti informasi belum terverifikasi oleh sumber terpercaya. Ini bukan bukti bahwa informasi benar atau palsu.
+                        </p>
+                    @endif
                 </div>
 
                 <!-- Confidence Score -->
                 <div style="text-align:right;">
-                    <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:0.375rem;">Tingkat Keyakinan Model</p>
+                    <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:0.375rem;">Skor Keyakinan Model</p>
                     @php $confidence = (float) ($result->confidence_score ?? 0); @endphp
                     <p style="font-family:var(--font-display); font-size:2.5rem; font-weight:800; line-height:1;" aria-label="{{ round($confidence * 100) }} persen">
                         <span class="gradient-text">{{ round($confidence * 100) }}%</span>
@@ -140,10 +150,10 @@
             <!-- Confidence Bar -->
             <div style="margin-bottom:2rem;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-                    <span style="color:var(--color-text-muted); font-size:0.8125rem;">Confidence Score</span>
+                    <span style="color:var(--color-text-muted); font-size:0.8125rem;">Skor Keyakinan Model</span>
                     <span style="color:var(--color-text-secondary); font-size:0.8125rem;">{{ round($confidence * 100) }} / 100</span>
                 </div>
-                <div class="confidence-bar-track" role="progressbar" aria-valuenow="{{ round($confidence * 100) }}" aria-valuemin="0" aria-valuemax="100" aria-label="Confidence score {{ round($confidence * 100) }} persen">
+                <div class="confidence-bar-track" role="progressbar" aria-valuenow="{{ round($confidence * 100) }}" aria-valuemin="0" aria-valuemax="100" aria-label="Skor Keyakinan Model {{ round($confidence * 100) }} persen">
                     <div class="confidence-bar-fill {{ $labelLower ?? 'meragukan' }}" id="confidence-fill" style="width:0%;"></div>
                 </div>
             </div>
@@ -208,6 +218,53 @@
                     @endif
                 </p>
             </div>
+
+            <!-- Retrieved evidence references -->
+            <section class="evidence-section" role="region" aria-labelledby="evidence-heading">
+                <h2 id="evidence-heading" style="font-size:1.0625rem; font-weight:700; margin-bottom:0.5rem;">Bukti/Rujukan Terkait</h2>
+                @if($submission->evidenceReferences->isEmpty())
+                    <p role="status" aria-live="polite" style="color:var(--color-text-muted); font-size:0.875rem; line-height:1.6;">
+                        Tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini.
+                    </p>
+                @else
+                    <ol class="evidence-list">
+                        @foreach($submission->evidenceReferences as $evidenceReference)
+                            @php
+                                $sourceUrl = $evidenceReference->source_url;
+                                $sourceUrlParts = is_string($sourceUrl) && ! preg_match('/\\s/u', $sourceUrl)
+                                    ? parse_url($sourceUrl)
+                                    : false;
+                                $safeSourceUrl = is_array($sourceUrlParts)
+                                    && in_array(strtolower((string) ($sourceUrlParts['scheme'] ?? '')), ['http', 'https'], true)
+                                    && filled($sourceUrlParts['host'] ?? null)
+                                    && ! isset($sourceUrlParts['user'])
+                                    && ! isset($sourceUrlParts['pass'])
+                                    ? $sourceUrl
+                                    : null;
+                            @endphp
+                            <li class="evidence-reference">
+                                <h3>{{ $evidenceReference->title }}</h3>
+                                <p class="evidence-reference__metadata">
+                                    <span><strong>Sumber:</strong> {{ $evidenceReference->source }}</span>
+                                    <span>
+                                        <strong>Tanggal publikasi:</strong>
+                                        {{ $evidenceReference->published_at?->format('d M Y') ?? 'Tanggal publikasi tidak tersedia' }}
+                                    </span>
+                                </p>
+                                <p class="evidence-reference__url">
+                                    <strong>Tautan sumber:</strong>
+                                    @if($safeSourceUrl)
+                                        <a href="{{ $safeSourceUrl }}" target="_blank" rel="noopener noreferrer">{{ $safeSourceUrl }}</a>
+                                    @else
+                                        <span>Tautan sumber tidak tersedia.</span>
+                                    @endif
+                                </p>
+                                <p class="evidence-reference__snippet"><strong>Kutipan:</strong> {{ $evidenceReference->snippet }}</p>
+                            </li>
+                        @endforeach
+                    </ol>
+                @endif
+            </section>
 
             <!-- Extracted Text (if applicable) -->
             @if(isset($submission->extracted_text) && $inputType !== 'text')
