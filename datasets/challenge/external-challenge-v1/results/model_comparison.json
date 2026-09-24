@@ -1,0 +1,54 @@
+{
+  "datasets": {
+    "internal_test_rows": 781,
+    "external_challenge_rows": 120,
+    "external_challenge_sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708"
+  },
+  "models": {
+    "indobert_v1.0.0": {
+      "display_name": "IndoBERT v1.0.0",
+      "internal": {
+        "accuracy": 1.0,
+        "macro_precision": 1.0,
+        "macro_recall": 1.0,
+        "macro_f1": 1.0
+      },
+      "external": {
+        "accuracy": 0.5083333333333333,
+        "macro_precision": 0.525020850708924,
+        "macro_recall": 0.5083333333333333,
+        "macro_f1": 0.40995082923576964
+      },
+      "generalization_gap": {
+        "accuracy": 0.4916666666666667,
+        "macro_f1": 0.5900491707642304,
+        "definition": "internal metric minus external metric"
+      }
+    },
+    "tfidf_logistic_regression": {
+      "display_name": "TF-IDF + Logistic Regression",
+      "internal": {
+        "accuracy": 0.9974391805377721,
+        "macro_precision": 0.9975,
+        "macro_recall": 0.9973890339425587,
+        "macro_f1": 0.9974379666443596
+      },
+      "external": {
+        "accuracy": 0.6666666666666666,
+        "macro_precision": 0.8,
+        "macro_recall": 0.6666666666666666,
+        "macro_f1": 0.625
+      },
+      "generalization_gap": {
+        "accuracy": 0.3307725138711055,
+        "macro_f1": 0.3724379666443596,
+        "definition": "internal metric minus external metric"
+      }
+    }
+  },
+  "methodology": {
+    "external_challenge_use": "evaluation only",
+    "parameter_search": false,
+    "ranking_claim": false
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "baseline": {
+    "name": "TF-IDF + Logistic Regression",
+    "label_mapping": {
+      "valid": 0,
+      "hoax": 1
+    },
+    "random_seed": 42,
+    "tfidf": {
+      "analyzer": "word",
+      "lowercase": true,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "sublinear_tf": true,
+      "token_pattern": "(?u)\\b\\w\\w+\\b",
+      "min_df": 1,
+      "max_df": 1.0,
+      "norm": "l2",
+      "use_idf": true
+    },
+    "logistic_regression": {
+      "C": 1.0,
+      "class_weight": null,
+      "max_iter": 2000,
+      "penalty": "l2",
+      "random_state": 42,
+      "solver": "liblinear",
+      "tol": 0.0001
+    },
+    "fit_split": "train.jsonl",
+    "fit_rows": 6253,
+    "fit_record_ids_sha256": "4cfeff386549143b4a28f618b0b6531b656ee5409a7176411d271a6ce8dc2e70",
+    "fit_dataset_sha256": "74bcb26ecfcf29b248ee39091d66b4db1360e6aad3e606d332baae8a28fff52f",
+    "training_label_distribution": {
+      "hoax": 3066,
+      "valid": 3187
+    },
+    "feature_count": 479237,
+    "training_seconds": 13.420599100005347,
+    "validation_used_for_selection": false,
+    "validation_audit": {
+      "rows": 782,
+      "sha256": "132de4af7fa2adc50cedc986658fa5c0ef44a4575433b9f6bf935f24f6b73552",
+      "vectorized": false,
+      "used_for_selection": false
+    },
+    "dependency_versions": {
+      "python": "3.14.6",
+      "numpy": "2.5.1",
+      "scikit-learn": "1.8.0",
+      "scipy": "1.18.1"
+    }
+  },
+  "dataset": {
+    "split": "internal_test",
+    "path": "datasets/processed/komdigi-antara-v1/test.jsonl",
+    "sha256": "e7616529a44f87bdfa3bcf080e51c2461235489edb1648b76bd49306b0291bfb",
+    "rows": 781,
+    "label_distribution": {
+      "hoax": 383,
+      "valid": 398
+    },
+    "fit_or_selection_use": false
+  },
+  "samples": 781,
+  "accuracy": 0.9974391805377721,
+  "macro_precision": 0.9975,
+  "macro_recall": 0.9973890339425587,
+  "macro_f1": 0.9974379666443596,
+  "per_class": {
+    "valid": {
+      "precision": 0.995,
+      "recall": 1.0,
+      "f1": 0.9974937343358395,
+      "support": 398
+    },
+    "hoax": {
+      "precision": 1.0,
+      "recall": 0.9947780678851175,
+      "f1": 0.9973821989528796,
+      "support": 383
+    }
+  },
+  "confusion_matrix": [
+    [
+      398,
+      0
+    ],
+    [
+      2,
+      381
+    ]
+  ],
+  "label_order": [
+    "valid",
+    "hoax"
+  ],
+  "confusion_axes": {
+    "rows": "actual",
+    "columns": "predicted"
+  },
+  "zero_division_policy": "undefined precision/recall/F1 is recorded as 0.0"
+}

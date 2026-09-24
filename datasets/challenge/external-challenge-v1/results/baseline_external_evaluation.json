@@ -1,0 +1,107 @@
+{
+  "baseline": {
+    "name": "TF-IDF + Logistic Regression",
+    "label_mapping": {
+      "valid": 0,
+      "hoax": 1
+    },
+    "random_seed": 42,
+    "tfidf": {
+      "analyzer": "word",
+      "lowercase": true,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "sublinear_tf": true,
+      "token_pattern": "(?u)\\b\\w\\w+\\b",
+      "min_df": 1,
+      "max_df": 1.0,
+      "norm": "l2",
+      "use_idf": true
+    },
+    "logistic_regression": {
+      "C": 1.0,
+      "class_weight": null,
+      "max_iter": 2000,
+      "penalty": "l2",
+      "random_state": 42,
+      "solver": "liblinear",
+      "tol": 0.0001
+    },
+    "fit_split": "train.jsonl",
+    "fit_rows": 6253,
+    "fit_record_ids_sha256": "4cfeff386549143b4a28f618b0b6531b656ee5409a7176411d271a6ce8dc2e70",
+    "fit_dataset_sha256": "74bcb26ecfcf29b248ee39091d66b4db1360e6aad3e606d332baae8a28fff52f",
+    "training_label_distribution": {
+      "hoax": 3066,
+      "valid": 3187
+    },
+    "feature_count": 479237,
+    "training_seconds": 13.420599100005347,
+    "validation_used_for_selection": false,
+    "validation_audit": {
+      "rows": 782,
+      "sha256": "132de4af7fa2adc50cedc986658fa5c0ef44a4575433b9f6bf935f24f6b73552",
+      "vectorized": false,
+      "used_for_selection": false
+    },
+    "dependency_versions": {
+      "python": "3.14.6",
+      "numpy": "2.5.1",
+      "scikit-learn": "1.8.0",
+      "scipy": "1.18.1"
+    }
+  },
+  "dataset": {
+    "split": "external_challenge",
+    "path": "datasets/challenge/external-challenge-v1/challenge.csv",
+    "sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708",
+    "rows": 120,
+    "label_distribution": {
+      "hoax": 60,
+      "valid": 60
+    },
+    "fit_or_selection_use": false,
+    "frozen_manifest_version": "1.0.0",
+    "evaluation_only": true
+  },
+  "samples": 120,
+  "accuracy": 0.6666666666666666,
+  "macro_precision": 0.8,
+  "macro_recall": 0.6666666666666666,
+  "macro_f1": 0.625,
+  "per_class": {
+    "valid": {
+      "precision": 0.6,
+      "recall": 1.0,
+      "f1": 0.75,
+      "support": 60
+    },
+    "hoax": {
+      "precision": 1.0,
+      "recall": 0.3333333333333333,
+      "f1": 0.5,
+      "support": 60
+    }
+  },
+  "confusion_matrix": [
+    [
+      60,
+      0
+    ],
+    [
+      40,
+      20
+    ]
+  ],
+  "label_order": [
+    "valid",
+    "hoax"
+  ],
+  "confusion_axes": {
+    "rows": "actual",
+    "columns": "predicted"
+  },
+  "zero_division_policy": "undefined precision/recall/F1 is recorded as 0.0"
+}

@@ -6,6 +6,7 @@ numpy>=2.0
 datasets==5.0.1
 accelerate==1.14.0
 matplotlib==3.11.1
+scikit-learn==1.8.0
 
 # Dev / dataset preparation extras:
 #   python -m pip install -e ".[dev]"

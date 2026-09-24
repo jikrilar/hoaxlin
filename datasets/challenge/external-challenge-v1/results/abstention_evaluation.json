@@ -1,0 +1,56 @@
+{
+  "dataset": {
+    "name": "external-challenge",
+    "version": "1.0.0",
+    "sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708",
+    "rows": 120,
+    "evaluation_only": true
+  },
+  "model": {
+    "version": "v1.0.0",
+    "relative_path": "models/indobert-hoax/v1.0.0",
+    "label_mapping": {
+      "0": "valid",
+      "1": "hoax"
+    },
+    "threshold": 0.99,
+    "release_metadata": {
+      "version": "1.0.0",
+      "exported_at": "2026-08-21T01:03:52.509812+00:00",
+      "threshold": 0.99,
+      "eval_accuracy": 1.0,
+      "eval_macro_f1": 1.0
+    }
+  },
+  "evaluated_at": "2026-09-21T11:25:21.913929+00:00",
+  "threshold": 0.99,
+  "total_samples": 120,
+  "covered_samples": 85,
+  "abstained_samples": 35,
+  "coverage": 0.7083333333333334,
+  "abstention_rate": 0.2916666666666667,
+  "covered_accuracy": 0.4235294117647059,
+  "covered_macro_precision": 0.7083333333333334,
+  "covered_macro_recall": 0.51,
+  "covered_macro_f1": 0.3137254901960784,
+  "covered_per_class": {
+    "valid": {
+      "precision": 1.0,
+      "recall": 0.02,
+      "f1": 0.0392156862745098,
+      "support": 50
+    },
+    "hoax": {
+      "precision": 0.4166666666666667,
+      "recall": 1.0,
+      "f1": 0.5882352941176471,
+      "support": 35
+    }
+  },
+  "label_order": [
+    "valid",
+    "hoax"
+  ],
+  "note": "meragukan is a serving abstention, not a third ground-truth or training class",
+  "zero_division_policy": "undefined precision/recall/F1 is recorded as 0.0"
+}
