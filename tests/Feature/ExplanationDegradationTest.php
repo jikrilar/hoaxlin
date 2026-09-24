@@ -48,7 +48,7 @@ class ExplanationDegradationTest extends TestCase
     {
         $classification = $this->classification();
         $excerpt = 'Kutipan berita yang sudah pernah dijelaskan.';
-        Cache::put($this->cacheKey($classification, $excerpt), [
+        Cache::put($this->cacheKey($classification, $excerpt, []), [
             'narrative' => 'Narasi aman dari cache.',
             'model' => 'gpt-test',
             'prompt_tokens' => 12,
@@ -60,7 +60,7 @@ class ExplanationDegradationTest extends TestCase
         $breaker->shouldNotReceive('check');
         Http::preventStrayRequests();
 
-        $result = (new OpenAiExplainer($breaker, $quota))->explain($classification, $excerpt);
+        $result = (new OpenAiExplainer($breaker, $quota))->explain($classification, $excerpt, []);
 
         $this->assertTrue($result->isReady());
         $this->assertTrue($result->cached);
@@ -73,7 +73,7 @@ class ExplanationDegradationTest extends TestCase
     {
         $classification = $this->classification();
         $excerpt = 'Kutipan berita saat kuota telah habis.';
-        Cache::put($this->cacheKey($classification, $excerpt), [
+        Cache::put($this->cacheKey($classification, $excerpt, []), [
             'narrative' => 'Penjelasan yang sebelumnya sudah tersimpan.',
             'model' => 'gpt-test',
             'prompt_tokens' => 10,
@@ -82,7 +82,7 @@ class ExplanationDegradationTest extends TestCase
         config()->set('services.openai.monthly_quota_usd', 0.0);
         Http::preventStrayRequests();
 
-        $result = $this->explainer()->explain($classification, $excerpt);
+        $result = $this->explainer()->explain($classification, $excerpt, []);
 
         $this->assertTrue($result->isReady());
         $this->assertTrue($result->cached);
@@ -305,14 +305,16 @@ class ExplanationDegradationTest extends TestCase
         return $submission->load('detectionResult');
     }
 
-    private function cacheKey(Classification $classification, string $excerpt): string
+    /** @param list<array<string, mixed>> $evidence */
+    private function cacheKey(Classification $classification, string $excerpt, array $evidence): string
     {
-        return 'explanation:'.sha1(implode('|', [
-            config('app.ai_prompt_version', '1.0'),
-            config('services.openai.chat_model'),
-            $classification->label->value,
-            $classification->confidenceBand(),
-            $excerpt,
-        ]));
+        return 'explanation:'.sha1(json_encode([
+            'prompt_version' => config('app.ai_prompt_version', '1.0'),
+            'model' => config('services.openai.chat_model'),
+            'label' => $classification->label->value,
+            'confidence_band' => $classification->confidenceBand(),
+            'excerpt' => $excerpt,
+            'evidence' => $evidence,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
     }
 }
