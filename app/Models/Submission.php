@@ -148,4 +148,9 @@ class Submission extends Model
     {
         return $this->hasMany(SubmissionProcessingEvent::class);
     }
+
+    public function evidenceReferences(): HasMany
+    {
+        return $this->hasMany(EvidenceReference::class);
+    }
 }
