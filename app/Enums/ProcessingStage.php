@@ -8,6 +8,7 @@ enum ProcessingStage: string
     case Extracting = 'extracting';
     case Translating = 'translating';
     case Classifying = 'classifying';
+    case Retrieving = 'retrieving';
     case Explaining = 'explaining';
     case Done = 'done';
 
@@ -18,6 +19,7 @@ enum ProcessingStage: string
             self::Extracting => 'Ekstraksi teks',
             self::Translating => 'Deteksi bahasa & terjemahan',
             self::Classifying => 'Klasifikasi BERT',
+            self::Retrieving => 'Pencarian bukti',
             self::Explaining => 'Penyusunan penjelasan',
             self::Done => 'Selesai',
         };
@@ -33,6 +35,7 @@ enum ProcessingStage: string
             self::Extracting => 25,
             self::Translating => 45,
             self::Classifying => 60,
+            self::Retrieving => 75,
             self::Explaining => 85,
             self::Done => 100,
         };
@@ -44,7 +47,8 @@ enum ProcessingStage: string
             self::Queued => self::Extracting,
             self::Extracting => self::Translating,
             self::Translating => self::Classifying,
-            self::Classifying => self::Explaining,
+            self::Classifying => self::Retrieving,
+            self::Retrieving => self::Explaining,
             self::Explaining => self::Done,
             self::Done => null,
         };

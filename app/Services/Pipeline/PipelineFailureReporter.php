@@ -170,14 +170,14 @@ class PipelineFailureReporter
     {
         $service = strtolower($service);
 
-        return in_array($service, ['article', 'bert', 'openai'], true) ? $service : 'provider';
+        return in_array($service, ['article', 'bert', 'openai', 'rag'], true) ? $service : 'provider';
     }
 
     private function safeMetadataService(string $service): string
     {
         $service = strtolower($service);
 
-        return in_array($service, ['article', 'bert', 'database', 'filesystem', 'openai', 'pipeline', 'provider', 'watchdog'], true)
+        return in_array($service, ['article', 'bert', 'database', 'filesystem', 'openai', 'pipeline', 'provider', 'rag', 'watchdog'], true)
             ? $service
             : 'pipeline';
     }

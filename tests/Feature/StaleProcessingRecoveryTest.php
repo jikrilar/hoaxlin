@@ -8,6 +8,7 @@ use App\Jobs\ClassifySubmission;
 use App\Jobs\ExtractSubmissionText;
 use App\Jobs\GenerateSubmissionExplanation;
 use App\Jobs\ProcessSubmission;
+use App\Jobs\RetrieveSubmissionEvidence;
 use App\Jobs\TranslateSubmissionText;
 use App\Models\Submission;
 use App\Services\Pipeline\StaleSubmissionRecovery;
@@ -109,7 +110,7 @@ class StaleProcessingRecoveryTest extends TestCase
         $this->assertSame('pending', $submission->fresh()->status);
     }
 
-    public function test_stuck_sixty_percent_with_result_continues_to_explanation_without_duplicate_result(): void
+    public function test_stale_submission_with_result_resumes_at_retrieval_without_duplicate_result(): void
     {
         Queue::fake();
         $submission = $this->processingSubmission(ProcessingStage::Classifying);
@@ -123,10 +124,11 @@ class StaleProcessingRecoveryTest extends TestCase
 
         $this->artisan('submissions:recover-stale')->assertSuccessful();
 
-        Queue::assertPushed(GenerateSubmissionExplanation::class, function (GenerateSubmissionExplanation $job): bool {
-            return $job->queue === 'explanation';
+        Queue::assertPushed(RetrieveSubmissionEvidence::class, function (RetrieveSubmissionEvidence $job): bool {
+            return $job->queue === 'retrieval';
         });
         Queue::assertNotPushed(ClassifySubmission::class);
+        Queue::assertNotPushed(GenerateSubmissionExplanation::class);
         $this->assertDatabaseCount('detection_results', 1);
         $this->assertSame('processing', $submission->fresh()->status);
     }
@@ -184,6 +186,7 @@ class StaleProcessingRecoveryTest extends TestCase
             new ExtractSubmissionText($submission->id),
             new TranslateSubmissionText($submission->id),
             new ClassifySubmission($submission->id),
+            new RetrieveSubmissionEvidence($submission->id),
             new GenerateSubmissionExplanation($submission->id),
         ];
 
@@ -207,6 +210,7 @@ class StaleProcessingRecoveryTest extends TestCase
             'extract-text',
             'extract-media',
             'inference',
+            'retrieval',
             'explanation',
         ], $queues);
     }

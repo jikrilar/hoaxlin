@@ -109,6 +109,11 @@ class SubmissionProgressTest extends TestCase
             ->assertSee('Klasifikasi BERT')
             ->assertSee('Sedang Menganalisis');
 
+        $submission->update(['processing_stage' => ProcessingStage::Retrieving->value]);
+        $component->call('refreshProgress')
+            ->assertSee('75%')
+            ->assertSee('Pencarian bukti');
+
         // Simulate stage change and refresh
         $submission->update(['processing_stage' => ProcessingStage::Explaining->value]);
         $component->call('refreshProgress')

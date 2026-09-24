@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Contracts\Classifier;
+use App\Contracts\EvidenceRetriever;
 use App\Contracts\Explainer;
 use App\Contracts\Translator;
 use App\DataObjects\Classification;
@@ -14,6 +15,7 @@ use App\Models\Submission;
 use App\Services\Extraction\TextExtractorResolver;
 use App\Services\Extraction\TextInputExtractor;
 use App\Services\Fakes\FakeClassifier;
+use App\Services\Fakes\FakeEvidenceRetriever;
 use App\Services\Fakes\FakeExplainer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
@@ -28,6 +30,7 @@ class OpenAiTranslatorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->app->instance(EvidenceRetriever::class, new FakeEvidenceRetriever);
         Cache::flush();
         config([
             'services.openai.key' => 'test-openai-key',

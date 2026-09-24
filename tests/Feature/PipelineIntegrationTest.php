@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Contracts\Classifier;
+use App\Contracts\EvidenceRetriever;
 use App\Contracts\Explainer;
 use App\DataObjects\Classification;
 use App\DataObjects\Explanation;
@@ -10,13 +11,13 @@ use App\Enums\DetectionLabel;
 use App\Exceptions\AiServiceException;
 use App\Jobs\ClassifySubmission;
 use App\Jobs\ExtractSubmissionText;
-use App\Jobs\GenerateSubmissionExplanation;
 use App\Models\Submission;
 use App\Services\Bert\BertClassifier;
 use App\Services\Bert\CircuitBreakingClassifier;
 use App\Services\Extraction\TextExtractorResolver;
 use App\Services\Extraction\TextInputExtractor;
 use App\Services\Fakes\FakeClassifier;
+use App\Services\Fakes\FakeEvidenceRetriever;
 use App\Services\Fakes\FakeExplainer;
 use App\Services\Resilience\CircuitBreaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,6 +32,7 @@ class PipelineIntegrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->app->instance(EvidenceRetriever::class, new FakeEvidenceRetriever);
         // Keep this cache test independent from a developer .env threshold;
         // its fixture confidence (0.92) is intentionally above the test
         // contract threshold used by the rest of the fake classifier suite.
@@ -160,7 +162,6 @@ class PipelineIntegrationTest extends TestCase
 
         ExtractSubmissionText::dispatchSync($submission->id);
         ClassifySubmission::dispatchSync($submission->id);
-        GenerateSubmissionExplanation::dispatchSync($submission->id);
 
         $submission->refresh()->load('detectionResult');
         $this->assertSame('completed', $submission->status);

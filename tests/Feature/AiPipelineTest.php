@@ -3,18 +3,19 @@
 namespace Tests\Feature;
 
 use App\Contracts\Classifier;
+use App\Contracts\EvidenceRetriever;
 use App\Contracts\Explainer;
 use App\DataObjects\Classification;
 use App\DataObjects\Explanation;
 use App\Enums\DetectionLabel;
 use App\Jobs\ClassifySubmission;
 use App\Jobs\ExtractSubmissionText;
-use App\Jobs\GenerateSubmissionExplanation;
 use App\Jobs\ProcessSubmission;
 use App\Models\Submission;
 use App\Services\Extraction\TextExtractorResolver;
 use App\Services\Extraction\TextInputExtractor;
 use App\Services\Fakes\FakeClassifier;
+use App\Services\Fakes\FakeEvidenceRetriever;
 use App\Services\Fakes\FakeExplainer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -22,6 +23,12 @@ use Tests\TestCase;
 class AiPipelineTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->app->instance(EvidenceRetriever::class, new FakeEvidenceRetriever);
+    }
 
     public function test_process_submission_drives_full_pipeline_to_completion(): void
     {
@@ -77,7 +84,6 @@ class AiPipelineTest extends TestCase
 
         ExtractSubmissionText::dispatchSync($submission->id);
         ClassifySubmission::dispatchSync($submission->id);
-        GenerateSubmissionExplanation::dispatchSync($submission->id);
 
         $submission->refresh()->load('detectionResult');
         $this->assertSame('completed', $submission->status);
@@ -103,7 +109,6 @@ class AiPipelineTest extends TestCase
 
         ExtractSubmissionText::dispatchSync($submission->id);
         ClassifySubmission::dispatchSync($submission->id);
-        GenerateSubmissionExplanation::dispatchSync($submission->id);
 
         $submission->refresh()->load('detectionResult');
         $this->assertSame('completed', $submission->status);
