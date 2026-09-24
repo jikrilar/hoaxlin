@@ -138,6 +138,44 @@ def test_top_k_deterministic_ranking_response_schema_and_provenance(tmp_path: Pa
         assert [item["document_id"] for item in one.json()["results"]] == ["doc-a"]
 
 
+def test_score_is_cosine_similarity_not_confidence_or_raw_dot_product(tmp_path: Path) -> None:
+    write_kb(
+        tmp_path,
+        [
+            document("doc-diagonal", "diagonal"),
+            document("doc-orthogonal", "orthogonal"),
+        ],
+    )
+
+    class NonUnitEmbedding:
+        dimension = 2
+
+        def encode(self, texts: list[str]) -> np.ndarray:
+            vectors = []
+            for text in texts:
+                lowered = text.lower()
+                if lowered == "query":
+                    vectors.append([4.0, 0.0])
+                elif "diagonal" in lowered:
+                    vectors.append([3.0, 3.0])
+                else:
+                    vectors.append([0.0, 7.0])
+            return np.asarray(vectors, dtype=np.float32)
+
+    app = create_app(
+        knowledge_base_directory=tmp_path, embedding_factory=NonUnitEmbedding
+    )
+    with TestClient(app) as client:
+        response = client.post("/retrieve", json={"text": "query", "top_k": 2})
+
+    assert response.status_code == 200
+    results = response.json()["results"]
+    assert results[0]["document_id"] == "doc-diagonal"
+    assert results[0]["score"] == pytest.approx(1 / np.sqrt(2))
+    assert -1.0 <= results[0]["score"] <= 1.0
+    assert "confidence" not in results[0]
+
+
 def test_ties_are_sorted_by_document_id(tmp_path: Path) -> None:
     write_kb(tmp_path, [document("doc-z", "beta"), document("doc-a", "alpha")])
     with TestClient(fixture_app(tmp_path)) as client:
