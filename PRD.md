@@ -1,258 +1,1046 @@
 ---
-title: "Product Requirements Document (PRD)"
-subtitle: "Rancang Bangun Sistem Pendeteksi Berita Hoax dengan Metode BERT untuk Analisis Teks Mendalam"
-author: "Muhamad Jikril Aryanda"
-date: "25 Juli 2026"
+title: "Product Requirements Document (PRD) — Hoaxlin"
+subtitle: "Sistem Deteksi Hoaks Berbasis IndoBERT dengan Retrieval-Augmented Generation untuk Bukti/Rujukan"
+version: "2.0"
+status: "Draft — Target Implementasi RAG"
+date: "24 September 2026"
 ---
 
-# Ringkasan Eksekutif
+# 1. Ringkasan Eksekutif
 
-Dokumen ini merupakan Product Requirements Document (PRD) untuk proyek Tugas Akhir Program Diploma III Teknik Komputer berjudul **"Rancang Bangun Sistem Pendeteksi Berita Hoax dengan Metode BERT untuk Analisis Teks Mendalam"**. Sistem yang dibangun adalah aplikasi web publik yang membantu pengguna umum memeriksa kebenaran suatu berita yang beredar di internet maupun media sosial. Pengguna dapat mengirimkan berita dalam empat bentuk masukan: teks langsung, foto/tangkapan layar, video, atau tautan (URL) berita. Sistem kemudian memproses masukan tersebut, mengekstraksi kontennya menjadi teks, dan melakukan klasifikasi menggunakan model **BERT (Bidirectional Encoder Representations from Transformers)** yang telah di-*fine-tune* untuk tugas deteksi hoax berbahasa Indonesia, lalu menampilkan hasil berupa label **Valid**, **Hoax**, atau **Meragukan** beserta tingkat keyakinan (*confidence score*) dan penjelasan singkat.
+**Hoaxlin** adalah aplikasi web untuk membantu pengguna memeriksa indikasi hoaks pada informasi yang diterima melalui teks, gambar, video, atau tautan. Sistem menggunakan **IndoBERT** sebagai classifier utama untuk menghasilkan prediksi `valid` atau `hoax`, dengan `meragukan` sebagai state abstention ketika confidence model tidak memenuhi threshold runtime.
 
-Aplikasi dibangun di atas **Laravel** dengan **Livewire** dan **Filament** untuk antarmuka pengguna dan panel admin, **MySQL** sebagai basis data, **Tailwind CSS** untuk styling, serta **OpenAI API** yang berperan sebagai layanan pendukung (OCR gambar, transkripsi audio/video, terjemahan Inggris ke Indonesia, dan penyusunan penjelasan hasil dalam bahasa alami) — bukan sebagai mesin klasifikasi utama, karena metode inti deteksi hoax tetap dijalankan oleh model BERT sesuai judul Tugas Akhir.
+Versi produk berikutnya menambahkan **Retrieval-Augmented Generation (RAG)** sebagai lapisan pencarian bukti/rujukan. RAG tidak menggantikan IndoBERT dan tidak boleh mengubah label classifier. Fungsinya adalah mencari dokumen relevan dari knowledge base terkurasi dan menampilkan sumber yang dapat diperiksa pengguna.
 
-# Latar Belakang
+Arah output utama mengikuti masukan dosen pembimbing:
 
-Penyebaran berita hoax dan disinformasi di Indonesia meningkat pesat seiring masifnya penggunaan media sosial. Masyarakat umum sering kesulitan membedakan berita yang valid dengan berita yang menyesatkan, terutama karena konten hoax kerap dikemas menyerupai berita resmi, disertai judul provokatif, dan menyebar cepat melalui grup percakapan maupun platform sosial. Proses verifikasi manual oleh lembaga pemeriksa fakta (*fact-checker*) membutuhkan waktu dan sumber daya, sehingga sering kalah cepat dibanding laju penyebaran hoax itu sendiri.
+> **Status Verifikasi + Skor Keyakinan + Daftar Bukti/Rujukan**
 
-Perkembangan Natural Language Processing (NLP), khususnya model berbasis Transformer seperti BERT, membuka peluang untuk melakukan analisis teks secara mendalam (*deep text analysis*) guna mengenali pola kebahasaan yang membedakan berita valid dan hoax — misalnya gaya penulisan, pemilihan kata yang provokatif, struktur kalimat, dan konteks semantik. Proyek ini memanfaatkan kemampuan tersebut untuk membangun sistem yang dapat diakses publik secara mudah melalui web, dengan dukungan input multimoda (teks, gambar, video, dan tautan) agar lebih relevan dengan cara masyarakat mengonsumsi berita sehari-hari.
+Untuk label internal `meragukan`, tampilan pengguna diubah menjadi:
 
-# Tujuan Proyek
+> **Informasi belum terverifikasi oleh sumber terpercaya**
 
-1. Merancang dan membangun sistem berbasis web yang mampu mendeteksi indikasi hoax pada suatu berita menggunakan metode BERT untuk analisis teks mendalam.
-2. Menyediakan mekanisme input yang fleksibel bagi pengguna umum: teks, foto/tangkapan layar, video, dan tautan berita.
-3. Menampilkan hasil deteksi yang mudah dipahami masyarakat awam, meliputi label klasifikasi, skor keyakinan, dan penjelasan singkat.
-4. Menyediakan panel administrasi untuk pengelolaan dataset, pemantauan performa model, dan moderasi konten menggunakan Filament.
-5. Mengukur dan mengevaluasi performa model BERT yang dibangun menggunakan metrik standar klasifikasi (akurasi, presisi, recall, F1-score).
+OpenAI tetap diposisikan sebagai layanan pendukung untuk OCR, transkripsi, terjemahan EN→ID, dan penyusunan explanation. OpenAI bukan classifier utama.
 
-# Rumusan Masalah
+---
 
-1. Bagaimana merancang arsitektur sistem yang dapat menerima input berita dalam berbagai format (teks, gambar, video, tautan) dan mengonversinya menjadi teks yang siap dianalisis?
-2. Bagaimana menerapkan metode BERT untuk melakukan klasifikasi teks berita ke dalam kategori valid atau hoax dengan akurasi yang memadai?
-3. Bagaimana mengintegrasikan model BERT (layanan Python) dengan aplikasi web berbasis Laravel secara efisien?
-4. Bagaimana merancang antarmuka yang mudah digunakan oleh masyarakat umum yang tidak memiliki latar belakang teknis?
+# 2. Latar Belakang Produk
 
-# Ruang Lingkup
+Deteksi hoaks berbasis classifier dapat memberikan prediksi dan skor keyakinan, tetapi pengguna tetap membutuhkan konteks untuk memahami dan memeriksa hasil tersebut. Hal ini terutama penting ketika model menghasilkan state `meragukan`, karena istilah tersebut tidak menjelaskan apa yang sebaiknya dilakukan pengguna selanjutnya.
 
-## Termasuk dalam Lingkup (In-Scope)
+Evaluasi model yang telah dilakukan juga menunjukkan bahwa performa pada data internal tidak otomatis merepresentasikan kemampuan generalisasi pada sumber dan domain baru. Karena itu, hasil Hoaxlin tidak boleh diposisikan sebagai kebenaran absolut.
 
-- Website dengan empat mekanisme input: teks, unggah foto, unggah/direct media URL, dan URL artikel. Guest hanya dapat mengirim teks; input URL dan media memerlukan login.
-- Ekstraksi teks dari gambar (OCR) dan dari video (transkripsi audio) sebagai tahap pra-pemrosesan sebelum masuk ke model BERT.
-- Model BERT (fine-tuned) untuk klasifikasi teks berita berbahasa Indonesia ke dalam kategori Valid / Hoax / Meragukan.
-- Terjemahan input Inggris ke Indonesia sebelum klasifikasi IndoBERT.
-- Penjelasan hasil deteksi berbasis bahasa alami menggunakan OpenAI API, dengan state `unavailable` bila dependency non-kritis tidak tersedia.
-- Riwayat pengecekan bagi pengguna terdaftar dan mekanisme umpan balik (feedback) atas hasil deteksi.
-- Panel admin (Filament) untuk pengelolaan dataset, pengguna, dan pemantauan statistik model.
-- Autentikasi pengguna dasar (registrasi, login) untuk fitur riwayat dan feedback.
+RAG ditambahkan untuk menjawab kebutuhan tersebut dengan menyediakan **referensi yang relevan dan dapat ditelusuri**, sehingga pengguna tidak hanya menerima prediksi model, tetapi juga memiliki sumber untuk melakukan verifikasi lanjutan.
 
-## Di Luar Lingkup (Out-of-Scope)
+---
 
-- Pemantauan otomatis (crawling real-time) media sosial tanpa input eksplisit dari pengguna.
-- Aplikasi mobile native (fokus awal pada web responsif).
-- Dukungan bahasa selain Indonesia dan Inggris. Input Inggris diterjemahkan ke Indonesia; model BERT tetap dilatih khusus korpus Indonesia.
-- Putusan hukum atau sertifikasi resmi atas status suatu berita — sistem hanya memberikan **indikasi probabilistik**, bukan vonis final, dan tetap menyarankan verifikasi ke sumber tepercaya.
-- Analisis konten visual video secara mendalam (deepfake detection) — dicatat sebagai potensi pengembangan lanjutan.
+# 3. Tujuan Produk
 
-# Target Pengguna
+Hoaxlin v2 bertujuan untuk:
 
-| Persona | Deskripsi | Kebutuhan Utama |
-|---|---|---|
-| Masyarakat umum | Pengguna media sosial yang menerima berita/forward pesan dan ingin memverifikasi cepat | Antarmuka sederhana, hasil cepat, mudah dipahami |
-| Mahasiswa/akademisi | Meneliti atau mempelajari topik literasi digital dan misinformasi | Detail skor keyakinan, riwayat, ekspor data |
-| Pengelola komunitas/redaksi kecil | Admin grup, komunitas, atau media lokal yang ingin menyaring info sebelum disebar | Riwayat pengecekan, kemampuan input massal (future work) |
-| Administrator sistem | Mengelola katalog kurasi, memantau metadata runtime/evaluasi model, moderasi | Panel admin (Filament), statistik dengan provenance |
+1. Memproses berita dari beberapa jenis input menjadi teks yang siap dianalisis.
+2. Menggunakan IndoBERT sebagai metode utama untuk klasifikasi hoaks.
+3. Menampilkan status hasil dalam bahasa yang mudah dipahami pengguna umum.
+4. Menampilkan confidence score sebagai tingkat keyakinan model, bukan probabilitas kebenaran absolut.
+5. Mencari bukti/rujukan relevan dari knowledge base sumber terpercaya menggunakan RAG.
+6. Memberikan explanation yang di-grounding pada hasil classifier dan evidence yang benar-benar tersedia.
+7. Menjaga provenance model, dataset, knowledge base, dan sumber evidence agar dapat diaudit.
+8. Mempertahankan pemisahan yang jelas antara classifier, retrieval, dan explanation.
+9. Mendukung evaluasi classifier dan retrieval sebagai dua komponen yang berbeda.
+10. Menyediakan pengalaman penggunaan yang aman, transparan, dan dapat direproduksi untuk kebutuhan Tugas Akhir.
 
-# Arsitektur Sistem (Gambaran Tingkat Tinggi)
+---
 
-Sistem terdiri atas beberapa lapisan utama:
+# 4. Prinsip Produk
 
-1. **Frontend/UI** — Dibangun dengan Blade + Livewire dan Tailwind CSS, menyediakan form input multimoda serta halaman hasil deteksi yang reaktif (live update status proses tanpa reload penuh).
-2. **Backend Aplikasi (Laravel)** — Menangani autentikasi, validasi input, penyimpanan data, orkestrasi job queue, serta komunikasi ke layanan eksternal (BERT service dan OpenAI API) melalui `Illuminate\Support\Facades\Http`.
-3. **Job Queue (Laravel Queue)** — Ekstraksi, deteksi bahasa/terjemahan, inferensi, dan explanation dijalankan asinkron pada named queue `default`, `extract-text`, `extract-media`, `inference`, dan `explanation`; status dipantau melalui polling halaman hasil.
-4. **Layanan Inferensi BERT (Python microservice)** — BERT dan library seperti Hugging Face Transformers berjalan di ekosistem Python, bukan PHP. Oleh karena itu, disarankan membangun microservice terpisah (misalnya dengan FastAPI atau Flask) yang meng-*host* model BERT hasil fine-tuning, diekspos sebagai REST API internal, dan dipanggil oleh Laravel melalui HTTP request. Ini menjaga aplikasi Laravel tetap ringan sekaligus memisahkan tanggung jawab (separation of concerns) antara logika aplikasi web dan komputasi machine learning.
-5. **OpenAI API (Layanan Pendukung)** — Digunakan untuk OCR gambar, transkripsi audio/video, terjemahan Inggris ke Indonesia, dan penyusunan penjelasan hasil deteksi dalam bahasa alami. Artikel URL diekstrak oleh parser aplikasi, bukan diklasifikasikan OpenAI.
-6. **Basis Data (MySQL)** — Menyimpan data pengguna, riwayat submission, hasil deteksi, katalog kurasi production, dan log aktivitas admin.
-7. **Panel Admin (Filament)** — Antarmuka pengelolaan katalog kurasi, pengguna, dan pemantauan performa model. Katalog ini tidak menjadi input training otomatis.
+## 4.1 IndoBERT tetap classifier utama
 
-**Catatan arsitektur penting:** karena Laravel/PHP tidak menjalankan model BERT secara native, komunikasi antara Laravel dan layanan BERT sebaiknya dirancang sejak awal sebagai API call antar-service (bukan proses inline), agar arsitektur tetap jelas saat dipresentasikan pada sidang Tugas Akhir dan mudah dikembangkan lebih lanjut.
+IndoBERT adalah satu-satunya komponen yang menghasilkan label klasifikasi.
 
-# Alur Kerja Sistem (User Flow)
+```text
+IndoBERT
+→ predicted class
+→ confidence score
+→ abstention bila confidence di bawah threshold
+```
 
-Alur umum berlaku untuk semua jenis input, dengan tahap pra-pemrosesan yang berbeda di awal:
+RAG dan OpenAI tidak boleh mengubah label tersebut secara otomatis.
 
-**1. Input Teks**
-Pengguna menempelkan teks berita → ekstraksi/normalisasi → deteksi bahasa → teks Indonesia diteruskan, sedangkan teks Inggris diterjemahkan ke Indonesia → tokenisasi dan inferensi BERT → hasil (label + skor keyakinan).
+## 4.2 RAG adalah evidence retrieval layer
 
-**2. Input Foto**
-User login mengunggah gambar/tangkapan layar berita → ekstraksi teks melalui OCR (OpenAI Vision API) → deteksi bahasa/terjemahan bila diperlukan → lanjut ke klasifikasi.
+RAG berfungsi untuk:
 
-**3. Input Video**
-User login mengunggah video atau memasukkan direct URL file audio/video → transkripsi dengan bahasa dideteksi provider → deteksi bahasa/terjemahan bila diperlukan → lanjut ke klasifikasi. URL halaman platform/player tidak didukung. Proses berjalan asinkron dengan indikator progres.
+```text
+claim / analysis text
+→ semantic retrieval
+→ top-k dokumen relevan
+→ bukti/rujukan untuk pengguna
+```
 
-**4. Input Tautan (URL)**
-Pengguna menempelkan tautan berita → sistem mengambil (fetch) halaman → ekstraksi konten artikel utama (menghilangkan elemen non-konten seperti iklan/navigasi) → lanjut ke alur analisis teks.
+Similarity tidak boleh dianggap sebagai bukti bahwa sebuah klaim benar atau salah.
 
-**Tahap Akhir (berlaku untuk semua jalur):**
-Pipeline aktual adalah `ProcessSubmission → ExtractSubmissionText → TranslateSubmissionText → ClassifySubmission → GenerateSubmissionExplanation → completed/failed`, dengan stage `queued → extracting → translating → classifying → explaining → done`. Hasil BERT (label + skor keyakinan) adalah hasil inti. OpenAI dapat menyusun penjelasan naratif; jika dependency explanation gagal secara non-kritis, explanation menjadi `unavailable` dan hasil BERT tetap final. Pengguna login dapat memberikan feedback, tetapi data production tidak otomatis menjadi corpus training.
+## 4.3 Explanation harus grounded
 
-# Kebutuhan Fungsional
+Explanation hanya boleh menggunakan:
 
-Prioritas menggunakan skala MoSCoW: **M**ust have, **S**hould have, **C**ould have.
+- hasil classifier;
+- analysis text;
+- evidence yang diberikan retriever.
 
-| ID | Fitur | Deskripsi | Prioritas |
-|---|---|---|---|
-| FR-01 | Input teks manual | Guest maupun user login memasukkan teks berita secara langsung | Must |
-| FR-02 | Input gambar + OCR | User login mengunggah foto/tangkapan layar, teks diekstraksi otomatis | Must |
-| FR-03 | Input video/direct media URL + transkripsi | User login mengunggah video atau direct URL file audio/video; halaman platform tidak didukung | Should |
-| FR-04 | Input tautan URL berita | User login memasukkan URL; sistem mengambil dan mengekstraksi konten artikel | Must |
-| FR-05 | Klasifikasi BERT | Proses inti deteksi hoax menghasilkan label & skor keyakinan | Must |
-| FR-06 | Penjelasan hasil berbasis AI | Narasi OpenAI dapat tersedia atau `unavailable`; hasil klasifikasi BERT tetap inti | Should |
-| FR-07 | Autentikasi pengguna | Registrasi, login, manajemen profil | Must |
-| FR-08 | Riwayat pengecekan | Pengguna terdaftar dapat melihat riwayat submission mereka | Should |
-| FR-09 | Feedback hasil deteksi | Pengguna melaporkan jika hasil dirasa kurang tepat | Should |
-| FR-10 | Panel admin (Filament) | Kelola dataset, pengguna, dan pantau statistik model | Must |
-| FR-11 | Katalog kurasi & label | Admin mencatat dan memverifikasi referensi kurasi production; tidak ada retraining otomatis | Should |
-| FR-12 | Statistik & visualisasi tren | Grafik tren jumlah hoax terdeteksi berdasarkan waktu/topik | Could |
-| FR-13 | Rate limiting & CAPTCHA | Mencegah penyalahgunaan/spam pada endpoint publik | Must |
-| FR-14 | Ekspor hasil (PDF/CSV) | Unduh hasil deteksi sebagai dokumen | Could |
-| FR-15 | Log aktivitas admin | Audit trail perubahan dataset/pengguna oleh admin | Should |
+Explanation tidak boleh mengarang sumber, URL, kutipan, atau fakta yang tidak tersedia pada context.
 
-# Kebutuhan Non-Fungsional
+## 4.4 Hasil bersifat probabilistik
 
-| Kategori | Kebutuhan |
+Hoaxlin bukan lembaga pemeriksa fakta resmi, keputusan hukum, atau sumber kebenaran absolut. Produk memberikan **indikasi model dan referensi untuk verifikasi**.
+
+---
+
+# 5. Kondisi Sistem Saat Ini
+
+Sebelum RAG diimplementasikan, pipeline produksi adalah:
+
+```text
+ProcessSubmission
+    ↓
+ExtractSubmissionText
+    ↓
+TranslateSubmissionText
+    ↓
+ClassifySubmission
+    ↓
+GenerateSubmissionExplanation
+    ↓
+Completed
+```
+
+Processing stage:
+
+```text
+queued
+extracting
+translating
+classifying
+explaining
+done
+```
+
+Stack utama:
+
+```text
+Laravel
+├── app
+├── queue
+├── scheduler
+├── MySQL
+├── Redis
+└── FastAPI IndoBERT
+```
+
+IndoBERT aktif:
+
+```text
+model: indobert-hoax
+version: v1.0.0
+training classes: valid / hoax
+meragukan: runtime abstention state
+```
+
+OpenAI saat ini mendukung:
+
+- OCR gambar;
+- transkripsi audio/video;
+- terjemahan Inggris ke Indonesia;
+- explanation.
+
+---
+
+# 6. Target Arsitektur Hoaxlin v2
+
+Target arsitektur:
+
+```text
+                           ┌────────────────────┐
+                           │   bert-service     │
+                           │ IndoBERT Classifier│
+                           └─────────┬──────────┘
+                                     │
+                                     │ label + confidence
+                                     ▼
+Input → Extract → Translate → Laravel Pipeline
+                                     │
+                                     ▼
+                           ┌────────────────────┐
+                           │    rag-service     │
+                           │ Evidence Retrieval │
+                           └─────────┬──────────┘
+                                     │
+                                     │ top-k evidence
+                                     ▼
+                           ┌────────────────────┐
+                           │ OpenAI Explanation │
+                           │ grounded narrative │
+                           └─────────┬──────────┘
+                                     │
+                                     ▼
+                              Result Page
+```
+
+Pembagian tanggung jawab:
+
+| Komponen | Tanggung Jawab |
 |---|---|
-| Performa | Tidak ada klaim latency produksi tanpa telemetry; `inference_ms` dilaporkan sebagai latency inferensi BERT, sedangkan input gambar/video diproses asinkron dengan progres |
-| Skalabilitas | Proses berat (OCR, transkripsi, inferensi) dijalankan melalui job queue agar tidak memblokir request utama |
-| Keamanan | Validasi & sanitasi seluruh input (termasuk file upload), proteksi CSRF/XSS/SQL Injection bawaan Laravel, penyimpanan API key secara terenkripsi di `.env` |
-| Privasi | Media asli dihapus maksimal 24 jam setelah `completed`/`failed`; delete account menghapus permanen data/history user |
-| Keandalan | Penanganan kegagalan (fallback/pesan error yang jelas) bila layanan BERT atau OpenAI API tidak tersedia |
-| Kegunaan (Usability) | Antarmuka sederhana, responsif di perangkat mobile, dapat digunakan tanpa latar belakang teknis |
-| Kontrol Biaya | Pembatasan kuota pemanggilan OpenAI API mengingat sistem bersifat publik dan terbuka |
-| Ketertelusuran | Setiap hasil deteksi mencatat versi model yang digunakan, untuk mendukung evaluasi dan reproducibility pada laporan Tugas Akhir |
+| Laravel | Auth, validasi, persistence, queue, orchestration, authorization, UI |
+| `bert-service` | Inference IndoBERT dan metadata runtime |
+| `rag-service` | Embedding, vector retrieval, dan top-k evidence |
+| MySQL | Data aplikasi, detection result, evidence reference, audit/usage data |
+| Redis | Queue, cache, lock, dan state operasional |
+| OpenAI | OCR, transkripsi, EN→ID translation, grounded explanation |
+| Knowledge Base RAG | Dokumen terpercaya dengan provenance dan URL sumber |
 
-# Metodologi BERT untuk Deteksi Hoax
+`bert-service` dan `rag-service` harus tetap terpisah agar tanggung jawab classifier dan retrieval tidak bercampur.
 
-Bagian ini menjadi inti metodologis Tugas Akhir sesuai judul yang diangkat.
+---
 
-**1. Dataset**
-Dibutuhkan korpus berita berbahasa Indonesia yang telah berlabel valid/hoax, dapat dihimpun dari kombinasi sumber berita resmi (sebagai kelas valid) dan basis data klarifikasi hoax dari lembaga pemeriksa fakta maupun dataset publik yang tersedia untuk riset klasifikasi hoax berbahasa Indonesia. Disarankan melakukan audit keseimbangan kelas (class balance) sejak awal.
+# 7. Target Pipeline
 
-Korpus training dikelola sebagai file offline/versioned dengan provenance dan split yang terpisah dari tabel `datasets` Laravel. Tabel Laravel hanya katalog/kurasi production dan tidak otomatis disinkronkan, diekspor, atau dipakai untuk melatih maupun mempromosikan model. Model training menggunakan kelas binary `valid`/`hoax`; `meragukan` merupakan state abstention berdasarkan confidence threshold.
+Pipeline target setelah RAG:
 
-**2. Pra-pemrosesan Teks**
-Pembersihan teks (penghapusan tag HTML, URL, karakter non-standar), normalisasi (penanganan singkatan/typo umum bila diperlukan), dan tokenisasi menggunakan WordPiece tokenizer bawaan model BERT yang dipilih.
+```text
+ProcessSubmission
+    ↓
+ExtractSubmissionText
+    ↓
+TranslateSubmissionText
+    ↓
+ClassifySubmission
+    ↓
+RetrieveSubmissionEvidence
+    ↓
+GenerateSubmissionExplanation
+    ↓
+Completed
+```
 
-**3. Pemilihan Model Dasar**
-Menggunakan model BERT yang telah dilatih untuk Bahasa Indonesia (IndoBERT) sebagai *pretrained base model*, kemudian dilakukan **fine-tuning** untuk klasifikasi binary `valid`/`hoax`. `Meragukan` bukan kelas training, melainkan abstention ketika confidence di bawah threshold runtime.
+Processing stage target:
 
-**4. Pipeline Pelatihan**
-Data dibagi menjadi train/validation/test set, fine-tuning dilakukan menggunakan library Hugging Face Transformers (berbasis PyTorch), dengan pemantauan loss dan metrik pada tiap epoch untuk mencegah overfitting.
+```text
+queued
+extracting
+translating
+classifying
+retrieving
+explaining
+done
+```
 
-**5. Evaluasi Model**
-Model dievaluasi menggunakan metrik standar klasifikasi: **akurasi, precision, recall, F1-score**, serta **confusion matrix** untuk melihat distribusi kesalahan klasifikasi antar kelas. Hasil evaluasi ini menjadi bagian penting dari bab pengujian pada laporan Tugas Akhir.
+Named queue target:
 
-**6. Deployment/Serving**
-Model hasil fine-tuning disimpan dan di-*serve* melalui microservice Python (FastAPI/Flask) yang mengekspos endpoint REST, dipanggil oleh backend Laravel untuk setiap permintaan klasifikasi.
+```text
+default
+extract-text
+extract-media
+inference
+retrieval
+explanation
+```
 
-# Peran OpenAI API sebagai Layanan Pendukung
+---
 
-Judul Tugas Akhir menegaskan **metode BERT** sebagai metode analisis teks utama. Agar konsisten secara metodologis, OpenAI API pada sistem ini diposisikan sebagai **layanan pendukung**, bukan mesin klasifikasi hoax utama, dengan peran sebagai berikut:
+# 8. Target Pengguna
 
-- **OCR gambar** — mengekstraksi teks dari foto/tangkapan layar berita sebelum diproses BERT.
-- **Transkripsi audio/video** — mengubah audio dari video menjadi teks sebelum diproses BERT.
-- **Terjemahan EN→ID** — menerjemahkan hasil ekstraksi/transkripsi Inggris ke Indonesia sebelum diproses IndoBERT.
-- **Penyusunan penjelasan hasil** — mengubah output teknis model BERT (label + skor) menjadi narasi yang mudah dipahami pengguna awam.
-
-Klasifikasi akhir **valid/hoax tetap ditentukan oleh model BERT**, sehingga alur kerja sistem selaras dengan judul dan rumusan masalah Tugas Akhir, sekaligus tetap memanfaatkan OpenAI API secara praktis untuk menangani input multimoda.
-
-# Rancangan Basis Data (Konsep)
-
-Struktur tabel utama yang disarankan (disederhanakan, dapat dikembangkan lebih detail pada tahap desain sistem):
-
-| Tabel | Kolom Kunci | Keterangan |
-|---|---|---|
-| `users` | id, name, email, password | Data akun pengguna terdaftar |
-| `submissions` | id, user_id (nullable), input_type (text/image/video/url), raw_input, extracted_text, media_path, source_url, status | Data pengajuan pengecekan berita |
-| `detection_results` | id, submission_id, label, confidence_score, model_version, explanation | Hasil klasifikasi BERT & penjelasan |
-| `feedback` | id, submission_id, user_id, is_correct, comment | Umpan balik pengguna atas hasil |
-| `datasets` | id, text, label, source, verified_by | Katalog/kurasi production; bukan corpus training otomatis |
-| `admin_logs` | id, admin_id, action, target_table, target_id, created_at | Audit trail aktivitas admin |
-
-# Rancangan Antarmuka & Peran Livewire/Filament
-
-**Livewire** digunakan pada sisi publik untuk membangun form input multimoda yang reaktif — misalnya validasi langsung saat unggah file, indikator progres saat proses OCR/transkripsi/inferensi berjalan di background (job queue), dan pembaruan status hasil tanpa perlu memuat ulang halaman.
-
-**Filament** digunakan untuk membangun panel admin, mencakup:
-
-- Dashboard ringkasan (jumlah submission, distribusi label, tren waktu).
-- Manajemen katalog kurasi production dan proses verifikasi label oleh admin.
-- Manajemen pengguna dan hak akses.
-- Log aktivitas dan audit trail.
-
-Halaman publik utama yang perlu dirancang: (1) Landing page dengan form empat jenis input, (2) Halaman hasil deteksi, (3) Halaman riwayat pengecekan pengguna, (4) Halaman autentikasi (login/registrasi).
-
-# Metrik Keberhasilan
-
-| Aspek | Target Indikatif |
+| Persona | Kebutuhan |
 |---|---|
-| Akurasi model BERT pada test set | Hanya ditampilkan dari artefak evaluasi held-out yang cocok dengan versi runtime, bersama provenance dan confusion matrix |
-| Precision & Recall per kelas | Seimbang antar kelas Valid/Hoax, dilaporkan pada bab pengujian |
-| Latency deteksi | Dilaporkan dari telemetry dengan definisi/populasi yang jelas; tidak ada angka target yang ditampilkan sebagai hasil aktual |
-| Keberhasilan integrasi end-to-end | Seluruh jalur input (teks, gambar, video, URL) berhasil menghasilkan output yang konsisten |
-| Usability | Umpan balik positif dari pengujian terbatas terhadap pengguna awam (opsional, misalnya kuesioner sederhana) |
+| Masyarakat umum | Memeriksa informasi secara mudah dan memperoleh sumber untuk verifikasi |
+| Pengguna media sosial | Memeriksa teks/forward, screenshot, video, atau artikel yang diragukan |
+| Mahasiswa/akademisi | Melihat hasil, confidence, provenance model, dan referensi terkait |
+| Pengelola komunitas | Menggunakan hasil sebagai bantuan sebelum menyebarkan informasi |
+| Administrator | Memantau sistem, data, metadata model, knowledge base, dan audit operasional |
 
-# Batasan dan Asumsi
+---
 
-- Kualitas hasil deteksi sangat bergantung pada kualitas dan keberagaman dataset pelatihan.
-- Model BERT dioptimalkan untuk berita berbahasa Indonesia. Input Inggris bergantung pada kualitas terjemahan EN→ID; bahasa lain tidak didukung.
-- Akurasi OCR dan transkripsi audio memengaruhi kualitas teks yang masuk ke model BERT, sehingga turut memengaruhi hasil akhir.
-- Penggunaan OpenAI API pada layanan publik memerlukan pemantauan biaya dan pembatasan kuota.
-- Sistem memberikan **indikasi probabilistik**, bukan keputusan hukum atau jaminan mutlak kebenaran suatu berita; pengguna tetap dianjurkan melakukan verifikasi lanjutan ke sumber tepercaya.
+# 9. Ruang Lingkup
 
-# Risiko dan Mitigasi
+## 9.1 In Scope
+
+- Input teks untuk guest dan user login.
+- Input gambar untuk user login.
+- Input video/file media langsung untuk user login.
+- Direct media URL sesuai media contract aplikasi.
+- Input URL artikel untuk user login.
+- OCR gambar.
+- Transkripsi audio/video.
+- Deteksi bahasa.
+- Terjemahan Inggris ke Indonesia.
+- Klasifikasi IndoBERT.
+- Runtime abstention `meragukan`.
+- Evidence retrieval berbasis knowledge base terkurasi.
+- Penyimpanan evidence beserta provenance.
+- Grounded explanation.
+- Halaman hasil dengan Status Verifikasi, Skor Keyakinan, dan Bukti/Rujukan.
+- Riwayat hasil pengguna.
+- Feedback hasil.
+- PDF/CSV sesuai kemampuan existing aplikasi.
+- Panel admin dan statistik existing.
+- Authentication dan email verification.
+- Rate limiting, CAPTCHA, guest capability, dan kontrol keamanan existing.
+- Docker sebagai environment lokal/deployment referensi.
+
+## 9.2 Out of Scope
+
+- Retraining IndoBERT sebagai bagian implementasi RAG.
+- Mengubah model binary menjadi model tiga kelas.
+- Menjadikan `meragukan` sebagai kelas training.
+- RAG mengganti atau mengoreksi label classifier secara otomatis.
+- LLM menentukan label final.
+- Live web search untuk setiap request.
+- Crawler media sosial real-time.
+- Fine-tuning embedding model pada MVP.
+- Deepfake/video visual manipulation detection.
+- Dukungan penuh bahasa selain Indonesia dan Inggris.
+- Klaim bahwa sistem memberikan keputusan faktual absolut.
+- Menggunakan frozen external challenge sebagai knowledge base production.
+
+---
+
+# 10. Input dan Access Rules
+
+## 10.1 Guest
+
+Guest hanya dapat menggunakan input teks.
+
+Guest result/status harus dilindungi menggunakan capability yang telah dibuat aplikasi dan tidak boleh dapat diakses oleh guest lain.
+
+## 10.2 User Login
+
+User terautentikasi dapat menggunakan:
+
+- teks;
+- gambar;
+- video;
+- direct media URL yang didukung;
+- URL artikel.
+
+Riwayat dan hasil hanya dapat diakses oleh pemilik submission sesuai authorization aplikasi.
+
+---
+
+# 11. Semantik Hasil
+
+## 11.1 Label internal
+
+Database tetap menggunakan:
+
+```text
+valid
+hoax
+meragukan
+```
+
+`meragukan` bukan kelas yang dilatih. Nilai ini berasal dari mekanisme abstention runtime.
+
+## 11.2 Presentation layer
+
+Tampilan utama:
+
+| Internal | Tampilan |
+|---|---|
+| `valid` | Valid |
+| `hoax` | Hoax |
+| `meragukan` | Informasi belum terverifikasi oleh sumber terpercaya |
+
+Heading utama halaman hasil:
+
+> **Status Verifikasi**
+
+Status harus disertai konteks bahwa hasil merupakan keluaran sistem/model dan bukan keputusan resmi.
+
+## 11.3 Skor keyakinan
+
+UI harus menggunakan istilah:
+
+> **Skor Keyakinan Model**
+
+Skor tidak boleh dijelaskan sebagai “persentase kebenaran berita”.
+
+## 11.4 Bukti/Rujukan
+
+Bagian hasil wajib mendukung:
+
+> **Bukti / Rujukan**
+
+Setiap item minimal berisi:
+
+- sumber;
+- judul;
+- URL asli;
+- tanggal publikasi jika tersedia;
+- snippet/ringkasan relevan.
+
+Similarity score disimpan untuk audit dan evaluasi, tetapi tidak wajib ditampilkan kepada pengguna umum.
+
+Jika tidak ada hasil retrieval yang memenuhi syarat:
+
+> **Belum ditemukan rujukan yang cukup relevan pada basis pengetahuan saat ini.**
+
+Sistem tidak boleh membuat referensi fiktif.
+
+---
+
+# 12. User Flow
+
+## 12.1 Teks
+
+```text
+User input teks
+→ normalisasi/extraction
+→ language detection
+→ EN→ID translation bila perlu
+→ IndoBERT classification
+→ evidence retrieval
+→ grounded explanation
+→ result
+```
+
+## 12.2 Gambar
+
+```text
+Upload gambar
+→ OCR
+→ language detection
+→ translation bila perlu
+→ IndoBERT
+→ evidence retrieval
+→ explanation
+→ result
+```
+
+## 12.3 Video
+
+```text
+Upload/direct media URL
+→ ekstraksi/transkripsi audio
+→ language detection
+→ translation bila perlu
+→ IndoBERT
+→ evidence retrieval
+→ explanation
+→ result
+```
+
+## 12.4 URL artikel
+
+```text
+URL artikel
+→ safe HTTP fetch
+→ ekstraksi isi artikel
+→ language detection
+→ translation bila perlu
+→ IndoBERT
+→ evidence retrieval
+→ explanation
+→ result
+```
+
+---
+
+# 13. Functional Requirements
+
+Prioritas: **Must / Should / Could**.
+
+| ID | Requirement | Priority |
+|---|---|---|
+| FR-01 | Guest dapat membuat submission teks | Must |
+| FR-02 | User login dapat membuat submission teks, gambar, video, dan URL | Must |
+| FR-03 | Sistem mengekstrak teks dari gambar melalui OCR | Must |
+| FR-04 | Sistem mentranskripsi media audio/video yang didukung | Must |
+| FR-05 | Sistem mengekstrak konten utama dari URL artikel secara aman | Must |
+| FR-06 | Sistem mendeteksi bahasa dan menerjemahkan EN→ID bila diperlukan | Must |
+| FR-07 | IndoBERT menghasilkan klasifikasi dan confidence score | Must |
+| FR-08 | Sistem mempertahankan `meragukan` sebagai abstention state | Must |
+| FR-09 | Sistem menjalankan evidence retrieval setelah classification | Must |
+| FR-10 | Retrieval berjalan untuk hasil valid, hoax, maupun meragukan | Must |
+| FR-11 | RAG mengembalikan top-k evidence dengan provenance | Must |
+| FR-12 | Evidence tidak boleh mengubah `DetectionResult.label` | Must |
+| FR-13 | Evidence disimpan per submission dan dapat diaudit | Must |
+| FR-14 | Halaman hasil menampilkan Status Verifikasi | Must |
+| FR-15 | Halaman hasil menampilkan Skor Keyakinan Model | Must |
+| FR-16 | Halaman hasil menampilkan Daftar Bukti/Rujukan | Must |
+| FR-17 | `meragukan` ditampilkan sebagai “Informasi belum terverifikasi oleh sumber terpercaya” | Must |
+| FR-18 | Explanation menggunakan classifier result + retrieved evidence | Must |
+| FR-19 | Explanation tidak boleh mengubah label model | Must |
+| FR-20 | Retrieval tanpa hasil memiliki empty state yang jujur | Must |
+| FR-21 | Failure RAG tidak menggagalkan classification yang sudah sukses | Must |
+| FR-22 | Failure explanation non-kritis tidak menggagalkan classification | Must |
+| FR-23 | User login dapat melihat riwayat submission miliknya | Should |
+| FR-24 | User dapat memberi feedback terhadap hasil | Should |
+| FR-25 | User dapat mengekspor hasil sesuai fitur existing | Should |
+| FR-26 | Admin dapat memantau metadata runtime/evaluation model | Should |
+| FR-27 | Sistem menyimpan processing events untuk audit pipeline | Must |
+| FR-28 | Sistem mendukung stale-processing recovery dan retry secara idempotent | Must |
+| FR-29 | Email verification tersedia untuk akun pengguna | Should |
+| FR-30 | Admin dapat melihat informasi versi knowledge base RAG | Should |
+
+---
+
+# 14. RAG Knowledge Base
+
+## 14.1 Boundary data
+
+Knowledge base RAG harus terpisah dari:
+
+```text
+datasets/processed/...
+datasets/challenge/external-challenge-v1/...
+```
+
+Training corpus, test set, external challenge, dan knowledge base memiliki tujuan berbeda dan tidak boleh dicampur.
+
+## 14.2 Struktur
+
+Target:
+
+```text
+datasets/rag/knowledge-base-v1/
+├── documents.jsonl
+├── manifest.json
+└── index/
+```
+
+Minimum document schema:
+
+```json
+{
+  "id": "string",
+  "title": "string",
+  "content": "string",
+  "source": "string",
+  "source_url": "string",
+  "published_at": "date|null",
+  "topic": "string|null"
+}
+```
+
+## 14.3 Sumber prioritas
+
+Knowledge base dapat memuat sumber terpercaya seperti:
+
+- TurnBackHoax / MAFINDO;
+- CekFakta;
+- AFP Fact Check Indonesia;
+- Komdigi;
+- BMKG;
+- Bank Indonesia;
+- Kementerian Kesehatan RI;
+- ANTARA;
+- sumber resmi lain dengan provenance yang dapat diverifikasi.
+
+## 14.4 Governance
+
+Setiap dokumen wajib:
+
+- memiliki ID stabil;
+- memiliki sumber;
+- memiliki URL sumber asli;
+- memiliki content non-empty;
+- tidak merupakan synthetic evidence dari LLM;
+- lolos validasi duplicate minimum;
+- tercatat dalam manifest knowledge-base version.
+
+---
+
+# 15. RAG Retrieval Service
+
+Service target:
+
+```text
+rag-service/
+```
+
+Service terpisah dari `bert-service`.
+
+## 15.1 Endpoint minimum
+
+```text
+GET  /health/live
+GET  /health/ready
+GET  /version
+POST /retrieve
+```
+
+Request:
+
+```json
+{
+  "text": "klaim pengguna",
+  "top_k": 3
+}
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {
+      "document_id": "doc-001",
+      "title": "Judul",
+      "source": "BMKG",
+      "source_url": "https://...",
+      "published_at": "2026-09-01",
+      "snippet": "Potongan informasi relevan...",
+      "score": 0.82,
+      "rank": 1
+    }
+  ]
+}
+```
+
+## 15.2 Model retrieval
+
+MVP menggunakan embedding model pretrained tanpa fine-tuning.
+
+Vector retrieval harus lokal dan reproducible. Implementasi dapat menggunakan FAISS atau komponen lokal setara yang sesuai kebutuhan proyek.
+
+Retrieval request tidak melakukan live web fetch.
+
+---
+
+# 16. Grounded Explanation
+
+Explainer target menerima:
+
+```text
+classification
++ analysis excerpt
++ evidence list
+```
+
+Prompt wajib menginstruksikan model untuk:
+
+- menjelaskan dalam Bahasa Indonesia;
+- bersikap netral;
+- tidak mengubah label classifier;
+- tidak mengarang sumber;
+- tidak membuat URL;
+- tidak membuat kutipan yang tidak tersedia;
+- tidak menyebut similarity sebagai bukti kebenaran;
+- menjelaskan jika evidence tidak tersedia.
+
+Cache explanation harus mempertimbangkan perubahan evidence atau knowledge-base version.
+
+---
+
+# 17. Data Model Target
+
+Existing core:
+
+```text
+users
+submissions
+detection_results
+feedback
+datasets
+admin_logs
+submission_processing_events
+openai usage/accounting tables
+```
+
+Tambahan target RAG:
+
+```text
+evidence_references
+```
+
+Minimum fields:
+
+```text
+id
+submission_id
+document_id
+title
+source
+source_url
+published_at
+snippet
+similarity_score
+rank
+knowledge_base_version
+created_at
+updated_at
+```
+
+Relasi:
+
+```text
+Submission
+├── hasOne DetectionResult
+└── hasMany EvidenceReference
+```
+
+Evidence harus terhapus mengikuti lifecycle submission.
+
+Retry tidak boleh membuat evidence duplicate.
+
+---
+
+# 18. Processing State dan Failure Policy
+
+## 18.1 Core failure
+
+Jika extraction, translation yang diperlukan, atau IndoBERT classification gagal secara final:
+
+```text
+submission → failed
+```
+
+## 18.2 RAG degradation
+
+Jika classification berhasil tetapi RAG gagal:
+
+```text
+classification → dipertahankan
+evidence → unavailable / empty
+pipeline → lanjut
+```
+
+RAG adalah dependency non-kritis terhadap classifier result.
+
+## 18.3 Explanation degradation
+
+Jika explanation provider gagal secara non-kritis:
+
+```text
+classification → dipertahankan
+evidence → tetap dapat ditampilkan
+explanation_status → unavailable
+submission → completed
+```
+
+## 18.4 Idempotency
+
+Setiap stage asynchronous harus aman terhadap:
+
+- retry;
+- redelivery;
+- duplicate dispatch;
+- worker restart.
+
+---
+
+# 19. Non-Functional Requirements
+
+| Area | Requirement |
+|---|---|
+| Reliability | Core classification tidak gagal hanya karena RAG atau explanation unavailable |
+| Reproducibility | Model version, knowledge-base version, dan pipeline metadata dapat ditelusuri |
+| Performance | Proses berat berjalan asynchronous melalui queue |
+| Security | Input divalidasi; SSRF protection untuk URL; secret hanya melalui environment |
+| Privacy | Media mengikuti retention policy existing dan tidak disimpan tanpa batas |
+| Authorization | Result, status, media, dan export hanya dapat diakses pemilik/capability yang sah |
+| Observability | Processing events, error code, stage, retry, dan duration dapat dicatat |
+| Cost Control | Penggunaan OpenAI mengikuti quota, rate limit, cache, dan usage accounting existing |
+| Accessibility | Status dan hasil tidak hanya bergantung pada warna |
+| Usability | Istilah teknis diminimalkan; confidence dijelaskan sebagai keyakinan model |
+| Maintainability | Classifier, retriever, dan explainer menggunakan abstraction/contract terpisah |
+| Portability | Docker menjadi reference environment lokal |
+| Data Integrity | Evidence provenance tidak boleh berubah menjadi source yang tidak dapat ditelusuri |
+
+---
+
+# 20. Security Requirements
+
+- API key/token tidak boleh di-hardcode atau di-commit.
+- `bert-service` dan `rag-service` menggunakan internal authentication jika diakses melalui service network.
+- Service internal tidak perlu diekspos ke host/public pada deployment normal.
+- URL artikel/direct media harus mengikuti SSRF protection existing.
+- HTML/source content dari knowledge base harus diperlakukan sebagai untrusted text.
+- UI wajib escape title dan snippet.
+- External evidence links menggunakan atribut link yang aman.
+- Public error tidak boleh membocorkan:
+  - API key;
+  - token;
+  - filesystem path;
+  - stack trace;
+  - internal provider response sensitif.
+- Guest access tetap menggunakan capability yang tidak dapat ditebak.
+- Account deletion dan retention behavior existing tetap dipertahankan.
+
+---
+
+# 21. Docker Target
+
+Target Compose:
+
+```text
+app
+queue
+scheduler
+mysql
+redis
+bert
+rag
+```
+
+Internal communication:
+
+```text
+Laravel → http://bert:8001
+Laravel → http://rag:8002
+```
+
+Environment RAG minimal:
+
+```text
+RAG_SERVICE_URL
+RAG_SERVICE_TOKEN
+RAG_SERVICE_CONNECT_TIMEOUT
+RAG_SERVICE_TIMEOUT
+RAG_SERVICE_TRIES
+RAG_TOP_K
+RAG_MIN_SCORE
+RAG_KNOWLEDGE_BASE_VERSION
+```
+
+Worker queue target:
+
+```text
+default,extract-text,extract-media,inference,retrieval,explanation
+```
+
+---
+
+# 22. Evaluasi
+
+## 22.1 Evaluasi classifier
+
+IndoBERT dievaluasi secara terpisah menggunakan:
+
+- accuracy;
+- precision;
+- recall;
+- macro F1;
+- confusion matrix.
+
+Frozen external challenge tetap merupakan evaluation-only artifact dan tidak boleh dijadikan knowledge base.
+
+## 22.2 Evaluasi retrieval
+
+RAG memiliki evaluation set tersendiri.
+
+Metrik dapat mencakup:
+
+- Hit Rate@3;
+- Hit Rate@5;
+- Precision@K;
+- Recall@K.
+
+Minimum interpretasi sederhana:
+
+> Apakah setidaknya satu referensi relevan muncul pada Top-3?
+
+Threshold retrieval harus memiliki dasar dari evaluasi, bukan dipilih hanya berdasarkan beberapa contoh manual.
+
+## 22.3 Usability
+
+Questionnaire/usability testing dapat digunakan untuk mengukur:
+
+- apakah Status Verifikasi mudah dipahami;
+- apakah kalimat untuk state `meragukan` lebih jelas;
+- apakah Bukti/Rujukan membantu pengguna melakukan verifikasi;
+- apakah sumber mudah ditemukan/dibuka;
+- apakah explanation mudah dipahami.
+
+Questionnaire tidak digunakan sebagai pengganti evaluasi accuracy classifier.
+
+---
+
+# 23. Konteks Kualitas Model Saat Ini
+
+Model IndoBERT `v1.0.0` memiliki hasil sangat tinggi pada held-out internal, tetapi frozen external challenge menunjukkan generalization gap yang besar, terutama kecenderungan memprediksi banyak contoh valid sebagai hoax.
+
+Implikasi produk:
+
+- UI tidak boleh menyampaikan hasil sebagai fakta absolut.
+- Confidence score harus diberi konteks sebagai keyakinan model.
+- Evidence retrieval dibutuhkan untuk mendukung verifikasi pengguna.
+- RAG tidak boleh diklaim memperbaiki accuracy classifier kecuali ada eksperimen yang secara eksplisit membuktikan hal tersebut.
+- External challenge tetap terpisah dari knowledge base untuk menjaga integritas evaluasi.
+
+---
+
+# 24. Success Criteria
+
+## 24.1 MVP RAG
+
+MVP dianggap selesai ketika:
+
+- IndoBERT `v1.0.0` tetap dipakai tanpa retraining.
+- Pipeline memiliki stage retrieval setelah classification.
+- `rag-service` dapat melakukan top-k retrieval.
+- Knowledge base memiliki provenance.
+- Evidence tersimpan per submission.
+- Result menampilkan Status Verifikasi.
+- Result menampilkan Skor Keyakinan Model.
+- Result menampilkan Daftar Bukti/Rujukan.
+- `meragukan` tampil sebagai “Informasi belum terverifikasi oleh sumber terpercaya”.
+- Explanation dapat menggunakan evidence.
+- RAG tidak mengubah label classifier.
+- Empty evidence tidak menghasilkan sumber palsu.
+- RAG outage tidak menggagalkan hasil IndoBERT.
+- Docker stack dapat menjalankan service RAG.
+- Automated regression utama lulus.
+
+## 24.2 Ready for TA Reporting
+
+Selain MVP:
+
+- retrieval evaluation set tersedia;
+- metrik retrieval terdokumentasi;
+- knowledge-base version dan provenance terdokumentasi;
+- arsitektur dan methodology sinkron dengan implementasi;
+- boundary classifier/RAG/OpenAI dijelaskan eksplisit;
+- hasil pengujian reproducible;
+- questionnaire/usability testing dapat dilakukan setelah fitur stabil.
+
+---
+
+# 25. Risks dan Mitigasi
 
 | Risiko | Dampak | Mitigasi |
 |---|---|---|
-| Dataset tidak seimbang/terbatas | Model bias terhadap satu kelas | Augmentasi data, oversampling/undersampling, evaluasi per kelas |
-| Biaya OpenAI API membengkak (sistem publik) | Beban operasional/keberlanjutan proyek | Rate limiting, caching hasil, batas ukuran file/durasi video |
-| Waktu pengerjaan terbatas (jadwal Tugas Akhir) | Fitur tidak selesai tepat waktu | Prioritas MoSCoW, membangun MVP (teks & URL dahulu) sebelum fitur gambar/video |
-| Layanan BERT/OpenAI API tidak tersedia | Stage inti dapat gagal; explanation non-kritis dapat unavailable | Retry policy, error publik tersanitasi, status transparan, dan graceful degradation explanation |
-| Penyalahgunaan sistem (spam/upload berlebihan) | Beban server & biaya API tinggi | CAPTCHA, rate limiting per IP/akun, validasi ukuran file |
+| Classifier salah pada domain baru | Hasil dapat menyesatkan | Tampilkan probabilistic framing, evidence, dan disclaimer |
+| RAG mengambil dokumen relevan tetapi tidak membuktikan klaim | Pengguna dapat salah menafsirkan | Jangan equate similarity dengan truth; gunakan wording “Bukti/Rujukan” dan sumber asli |
+| Knowledge base terlalu kecil | Banyak query tidak menemukan evidence | Empty state jujur; perluas KB bertahap |
+| Knowledge base bias pada sumber tertentu | Retrieval tidak representatif | Diversifikasi sumber dan audit provenance |
+| RAG service unavailable | Evidence tidak muncul | Graceful degradation; classifier result tetap final |
+| OpenAI unavailable | Explanation tidak tersedia | Evidence + classifier tetap ditampilkan |
+| Evidence hallucination | Kehilangan kepercayaan | Evidence hanya berasal dari retrieval result terverifikasi |
+| External challenge tercampur dengan KB | Evaluasi menjadi tidak valid | Boundary dataset eksplisit dan automated checks |
+| Dependency model embedding terlalu berat | Docker/laptop melambat | Pilih pretrained embedding model yang sesuai resource dan CPU-friendly |
+| Queue retrieval tidak dikonsumsi | Submission stuck | Tambahkan queue `retrieval`, health check, regression pipeline |
+| Referensi URL mati | UX buruk | Simpan provenance; lakukan maintenance KB terpisah |
+| Terminologi “Status Verifikasi” dianggap keputusan resmi | Overclaim | Tambahkan copy bahwa hasil adalah indikasi sistem dan verifikasi lanjutan tetap dianjurkan |
 
-# Rencana Pengujian
+---
 
-- **Pengujian unit & fitur (Laravel)** menggunakan Pest/PHPUnit untuk memastikan logika aplikasi, validasi, dan endpoint berjalan sesuai spesifikasi.
-- **Pengujian model** menggunakan metrik klasifikasi standar (akurasi, precision, recall, F1-score, confusion matrix) pada data uji yang terpisah dari data latih.
-- **Pengujian integrasi end-to-end** memastikan seluruh alur input (teks, gambar, video, URL) berjalan konsisten hingga hasil ditampilkan.
-- **User Acceptance Testing (UAT)** terhadap sejumlah responden umum untuk menilai kemudahan penggunaan dan kejelasan hasil.
+# 26. Assumptions
 
-# Roadmap Pengembangan (Indikatif)
+- Deployment utama proyek tetap dapat berjalan menggunakan Docker.
+- IndoBERT classifier aktif tetap `v1.0.0` selama implementasi RAG.
+- Embedding retriever MVP menggunakan pretrained model tanpa training.
+- Knowledge base dibuat khusus untuk retrieval dan tidak berasal dari evaluation-only artifacts.
+- OpenAI tetap tersedia sebagai optional supporting service, bukan source of classifier truth.
+- RAG MVP bersifat retrieval dari local/versioned knowledge base, bukan live internet retrieval.
 
-| Fase | Kegiatan Utama |
+---
+
+# 27. Non-Goals Metodologis
+
+Implementasi RAG tidak menjadi alasan untuk:
+
+- retrain IndoBERT;
+- tune threshold classifier menggunakan external challenge;
+- melakukan calibration ulang tanpa requirement penelitian baru;
+- menyatakan RAG meningkatkan accuracy classifier;
+- menggabungkan evidence retrieval dengan keputusan label final tanpa evaluasi sistem hybrid;
+- mengubah external challenge;
+- menghapus baseline TF-IDF + Logistic Regression;
+- menjadikan LLM sebagai pengganti metode BERT pada judul Tugas Akhir.
+
+---
+
+# 28. Milestone Implementasi
+
+| Milestone | Scope |
 |---|---|
-| 1. Perencanaan & Analisis | Penyusunan PRD, studi literatur BERT & deteksi hoax, penentuan dataset |
-| 2. Pengumpulan & Pra-pemrosesan Dataset | Pengumpulan data valid/hoax, pembersihan, pelabelan, pembagian train/val/test |
-| 3. Pengembangan Model BERT | Fine-tuning model, eksperimen, evaluasi metrik |
-| 4. Pengembangan Aplikasi Web | Pembangunan Laravel, Livewire, Filament, skema database, MVP fitur teks & URL |
-| 5. Integrasi | Menghubungkan Laravel ↔ layanan BERT ↔ OpenAI API, fitur gambar & video |
-| 6. Pengujian & Evaluasi | Pengujian model, pengujian sistem, UAT |
-| 7. Dokumentasi & Persiapan Sidang | Penyusunan laporan Tugas Akhir, penyiapan materi presentasi |
+| M1 | Boundary arsitektur RAG dan knowledge-base contract |
+| M2 | Knowledge Base v1 + validation |
+| M3 | `rag-service` + local embedding/index |
+| M4 | Laravel retriever contract + client |
+| M5 | Evidence persistence |
+| M6 | Pipeline `RetrieveSubmissionEvidence` |
+| M7 | Grounded explanation |
+| M8 | Result UI baru |
+| M9 | Docker integration |
+| M10 | Automated regression |
+| M11 | Retrieval evaluation |
+| M12 | Documentation + TA reporting sync |
 
-# Referensi Konseptual
+Detail pekerjaan teknis mengikuti dokumen `TASK-RAG-HOAXLIN.md`.
 
-- Devlin, J., et al. — *BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*, sebagai rujukan dasar metode BERT.
-- Dokumentasi resmi Hugging Face Transformers untuk proses fine-tuning model BERT/IndoBERT.
-- Dokumentasi resmi Laravel, Livewire, dan Filament untuk pengembangan aplikasi.
-- Dokumentasi resmi OpenAI API (Chat/Vision/Whisper) untuk fitur pendukung OCR, transkripsi, dan penyusunan penjelasan.
+---
 
-# Lampiran: Glosarium
+# 29. Product Acceptance Checklist
 
-| Istilah | Penjelasan |
+Sebelum versi RAG dianggap siap digunakan:
+
+- [ ] Classifier artifact tidak berubah.
+- [ ] Frozen external challenge tidak dimodifikasi.
+- [ ] Knowledge base terpisah dari training/evaluation dataset.
+- [ ] Semua evidence memiliki provenance dan URL sumber.
+- [ ] Retrieval berjalan untuk semua output classifier.
+- [ ] `meragukan` menggunakan copy baru pada UI.
+- [ ] Skor diberi label “Skor Keyakinan Model”.
+- [ ] Evidence section memiliki empty state.
+- [ ] RAG tidak dapat memodifikasi detection label.
+- [ ] RAG failure terdegradasi dengan aman.
+- [ ] Explanation hanya menggunakan evidence tersedia.
+- [ ] Result authorization tetap aman.
+- [ ] Retry pipeline idempotent.
+- [ ] Docker Compose valid.
+- [ ] Full regression lulus.
+- [ ] Retrieval evaluation selesai sebelum klaim performa dibuat.
+- [ ] Dokumentasi dan implementasi sinkron.
+
+---
+
+# 30. Glossary
+
+| Istilah | Definisi |
 |---|---|
-| BERT | Model bahasa berbasis Transformer yang memahami konteks kata secara dua arah (bidirectional) |
-| Fine-tuning | Proses melatih ulang sebagian/seluruh model pretrained pada dataset spesifik tugas |
-| Tokenisasi | Proses memecah teks menjadi unit-unit (token) yang dapat diproses model |
-| OCR | Optical Character Recognition, ekstraksi teks dari gambar |
-| Confidence score | Skor keyakinan model terhadap suatu prediksi klasifikasi |
-| MoSCoW | Metode prioritisasi kebutuhan: Must, Should, Could, Won't have |
-| MVP | Minimum Viable Product, versi minimum suatu produk yang sudah bernilai guna |
+| IndoBERT | Model bahasa Indonesia berbasis BERT yang menjadi classifier utama Hoaxlin |
+| Classifier | Komponen yang menghasilkan prediksi valid/hoax dan confidence |
+| `meragukan` | Abstention state ketika confidence tidak memenuhi threshold |
+| RAG | Retrieval-Augmented Generation; pada Hoaxlin difokuskan pada evidence retrieval + grounded explanation |
+| Evidence | Dokumen/rujukan relevan hasil retrieval dengan provenance |
+| Knowledge Base | Kumpulan dokumen terkurasi yang digunakan RAG |
+| Embedding | Representasi vector dari teks untuk semantic retrieval |
+| Similarity Score | Ukuran kedekatan semantik, bukan ukuran kebenaran |
+| Grounded Explanation | Penjelasan yang dibatasi pada classifier result dan evidence tersedia |
+| Confidence Score | Tingkat keyakinan classifier terhadap prediksi, bukan persentase kebenaran absolut |
+| Provenance | Informasi asal dokumen/model/dataset yang memungkinkan audit dan reproduksi |
+| External Challenge | Dataset evaluasi eksternal yang dibekukan dan tidak digunakan untuk training atau knowledge base |
+
+---
+
+# 31. Ringkasan Boundary Akhir
+
+```text
+TRAINING DATA
+→ melatih IndoBERT
+
+INDOBERT
+→ menentukan label + confidence
+
+EXTERNAL CHALLENGE
+→ mengevaluasi generalisasi classifier
+→ evaluation-only
+
+RAG KNOWLEDGE BASE
+→ menyediakan dokumen untuk retrieval
+
+RAG
+→ mengambil evidence terkait
+
+OPENAI
+→ menyusun explanation dari classifier + evidence
+
+USER
+→ menerima:
+   Status Verifikasi
+   + Skor Keyakinan Model
+   + Daftar Bukti/Rujukan
+   + Explanation
+```
+
+Boundary ini merupakan prinsip utama Hoaxlin v2 dan tidak boleh diubah tanpa keputusan metodologis baru.
