@@ -64,6 +64,12 @@ services:
       BERT_BREAKER_COOLDOWN: "${BERT_BREAKER_COOLDOWN:-30}"
       BERT_CACHE_TTL: "${BERT_CACHE_TTL:-604800}"
       BERT_CONFIDENCE_THRESHOLD: "${BERT_CONFIDENCE_THRESHOLD:-0.99}"
+      RAG_SERVICE_URL: "${RAG_SERVICE_URL:-http://rag:8002}"
+      RAG_SERVICE_TOKEN: "${RAG_SERVICE_TOKEN:-}"
+      RAG_SERVICE_CONNECT_TIMEOUT: "${RAG_SERVICE_CONNECT_TIMEOUT:-3}"
+      RAG_SERVICE_TIMEOUT: "${RAG_SERVICE_TIMEOUT:-15}"
+      RAG_TOP_K: "${RAG_TOP_K:-3}"
+      RAG_MIN_SCORE: "${RAG_MIN_SCORE:-}"
       OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
       OPENAI_ORGANIZATION: "${OPENAI_ORGANIZATION:-}"
       OPENAI_CHAT_MODEL: "${OPENAI_CHAT_MODEL:-gpt-4o-mini}"
@@ -212,6 +218,24 @@ services:
       BERT_REQUIRE_RELEASE_MANIFEST: "true"
       HF_HUB_OFFLINE: "1"
       TRANSFORMERS_OFFLINE: "1"
+    networks:
+      - hoaxlin
+
+  rag:
+    image: hoaxlin-rag:local
+    build:
+      context: .
+      dockerfile: rag-service/Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8002"
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8002"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health/live', timeout=3).read()"]
+      interval: 15s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
     networks:
       - hoaxlin
 

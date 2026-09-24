@@ -1,0 +1,21 @@
+# This service shares the repository-root build context, but only needs its
+# own source, the R2 validator it imports, and the versioned RAG corpus.
+**
+
+!rag-service/
+!rag-service/Dockerfile
+!rag-service/requirements.txt
+!rag-service/app/
+!rag-service/app/**
+
+!scripts/
+!scripts/validate_rag_knowledge_base.py
+
+!datasets/
+!datasets/rag/
+!datasets/rag/knowledge-base-v1/
+!datasets/rag/knowledge-base-v1/documents.jsonl
+!datasets/rag/knowledge-base-v1/manifest.json
+
+**/__pycache__/
+**/*.py[cod]

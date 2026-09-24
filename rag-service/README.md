@@ -39,6 +39,26 @@ The model preparation step requires internet access once. Runtime startup and
 `/retrieve` use cached files only. `requirements-dev.txt` adds only the test
 client and test runner; all dependencies remain local to this service.
 
+## Docker image
+
+From the repository root, `docker compose build rag` builds the internal-only
+service image. The build installs `requirements.txt` and explicitly runs
+`python -m app.prepare_model`, downloading the model at the pinned revision
+into `/opt/huggingface`. This build step requires network access; the image
+contains the prepared cache, and its runtime sets `HF_HUB_OFFLINE=1` and
+`TRANSFORMERS_OFFLINE=1`. The embedding backend also uses
+`local_files_only=True`, so service startup and requests do not download model
+files.
+
+The image runs as a non-root user and listens on port 8002 inside the
+`hoaxlin` network without publishing a host port. Its build context allowlist
+contains only the RAG service source and requirements, the knowledge-base
+`documents.jsonl` and `manifest.json`, and the validator imported by the
+service. The image places the corpus at `/app/datasets/rag/knowledge-base-v1/`,
+which is the path resolved by `app.config.KNOWLEDGE_BASE_DIRECTORY`. The
+container healthcheck uses `/health/live`; an empty corpus can therefore keep
+the process healthy while `/health/ready` reports `knowledge_base_empty`.
+
 The production knowledge base currently has **0 documents**. The service
 starts, `/health/live` returns 200, `/health/ready` returns 503 with
 `knowledge_base_empty`, `/version` reports 0 documents and a null embedding
