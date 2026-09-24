@@ -279,15 +279,16 @@ def test_runner_and_artifact_are_deterministic_with_a_fixture_corpus(tmp_path: P
     ] == [0.0, 0.8]
 
 
-def test_empty_production_knowledge_base_is_blocked_without_metric_or_model_load(
+def test_empty_knowledge_base_fixture_is_blocked_without_metric_or_model_load(
     tmp_path: Path,
 ) -> None:
-    production_root = REPOSITORY_ROOT / "datasets/rag"
-    corpus_directory = production_root / "knowledge-base-v1"
-    evaluation_directory = production_root / "evaluation-v1"
+    corpus_directory = tmp_path / "empty-corpus"
+    evaluation_directory = tmp_path / "empty-evaluation"
+    write_corpus(corpus_directory, [])
+    write_evaluation(evaluation_directory, corpus_directory, [])
 
     def must_not_load_embedding() -> FixtureEmbedding:
-        raise AssertionError("empty production corpus must not instantiate an embedder")
+        raise AssertionError("empty fixture corpus must not instantiate an embedder")
 
     result = run_evaluation(
         evaluation_directory,

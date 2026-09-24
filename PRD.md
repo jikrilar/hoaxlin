@@ -2,7 +2,7 @@
 title: "Product Requirements Document (PRD) — Hoaxlin"
 subtitle: "Sistem Deteksi Hoaks Berbasis IndoBERT dengan Retrieval-Augmented Generation untuk Bukti/Rujukan"
 version: "2.1"
-status: "As-built - R1-R12 complete; production retrieval evaluation blocked"
+status: "As-built - R1-R12 complete; R11 retrieval evaluation complete for approved v1.0.0 snapshots"
 date: "24 September 2026"
 ---
 
@@ -10,7 +10,7 @@ date: "24 September 2026"
 
 **Hoaxlin** adalah aplikasi web untuk membantu pengguna memeriksa indikasi hoaks pada informasi yang diterima melalui teks, gambar, video, atau tautan. Sistem menggunakan **IndoBERT** sebagai classifier utama untuk menghasilkan prediksi `valid` atau `hoax`, dengan `meragukan` sebagai state abstention ketika confidence model tidak memenuhi threshold runtime.
 
-Implementasi RAG menambahkan lapisan pencarian bukti/rujukan dari knowledge base lokal. RAG tidak menggantikan IndoBERT dan tidak mengubah label classifier. Knowledge base production v1 saat ini masih kosong; service, persistence, pipeline, UI, dan framework evaluasi retrieval tersedia, tetapi kualitas retrieval production belum dapat dinilai.
+Implementasi RAG menambahkan lapisan pencarian bukti/rujukan dari knowledge base lokal. RAG tidak menggantikan IndoBERT dan tidak mengubah label classifier. Snapshot knowledge base v1.0.0 berisi 24 dokumen bersumber; evaluation v1.0.0 berisi 20 query dengan relevance judgment yang disetujui owner. Evaluasi R11 final menghasilkan Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5 0.25, Recall@3 0.975, Recall@5 1.0, dan MRR 0.95. Kandidat threshold hanya eksploratif dan `RAG_MIN_SCORE` production tidak ditetapkan.
 
 Arah output utama mengikuti masukan dosen pembimbing:
 
@@ -97,7 +97,7 @@ Hoaxlin bukan lembaga pemeriksa fakta resmi, keputusan hukum, atau sumber kebena
 
 # 5. Kondisi Sistem Saat Ini
 
-R1–R11 telah diimplementasikan dan digabungkan ke `main`. R12 menyelaraskan dokumentasi dengan source dan konfigurasi yang telah diaudit. Status implementasi pipeline tidak berarti retrieval production telah dievaluasi: knowledge base production masih memiliki 0 dokumen.
+R1-R11 telah diimplementasikan dan digabungkan ke `main`; setelah R12, snapshot corpus 24 dokumen dan 20 relevance judgment disiapkan, disetujui owner, lalu dievaluasi dengan framework R11. Report final terikat pada kedua checksum snapshot tersebut. Evaluasi classifier tetap terpisah.
 
 Pipeline aplikasi saat ini:
 
@@ -147,7 +147,7 @@ Input → Extraction → Translation → IndoBERT Classification
 | OpenAI | Grounded explanation; juga OCR, transkripsi, dan EN→ID translation pada jalur input |
 | MySQL | Submission, detection result, evidence reference, processing events, dan data aplikasi |
 | Redis | Queue, cache, session, lock, dan limiter |
-| Knowledge base RAG | Dokumen lokal berversi dan metadata provenance; saat ini kosong |
+| Knowledge base RAG | 24 dokumen lokal berversi dan metadata provenance pada snapshot data-preparation saat ini |
 
 Boundary metodologisnya tetap: **IndoBERT = classifier**, **RAG = evidence retrieval**, **OpenAI = explanation**. RAG tidak mengubah label atau confidence classifier. Similarity score mengukur relevansi retrieval, bukan kebenaran dokumen dan bukan confidence classifier.
 
@@ -450,7 +450,7 @@ Minimum document schema:
 
 `published_at` dan `topic` menerima nilai `null` sesuai schema. Manifest v1 menyimpan versi/schema, jumlah dokumen, checksum SHA-256 file JSONL, dan provenance. Validator tersedia di `scripts/validate_rag_knowledge_base.py`; ia memvalidasi schema, ID/duplikasi, checksum/count, dan boundary input lokal. Validator tidak memverifikasi kebenaran isi atau melakukan fetch URL.
 
-Snapshot production saat ini adalah knowledge-base v1.0.0 dengan **0 dokumen**. Dokumen harus dikurasi dan ditinjau manual dari publikasi asli sebelum ditambahkan. `datasets/processed/`, test set classifier, dan `datasets/challenge/` termasuk external challenge tidak boleh menjadi sumber knowledge base. Tidak ada dokumen sintetis di corpus production.
+Snapshot production saat ini adalah knowledge-base v1.0.0 dengan **24 dokumen bersumber**. Ringkasan isi dan provenance ditautkan ke publikasi asli. Evaluation v1.0.0 memuat 20 query dengan relevance judgment yang disetujui owner untuk corpus ini. `datasets/processed/`, test set classifier, dan `datasets/challenge/` termasuk external challenge tidak boleh menjadi sumber knowledge base. Tidak ada dokumen sintetis di corpus production.
 
 ## 14.3 Sumber prioritas
 
@@ -764,9 +764,9 @@ Frozen external challenge tetap merupakan evaluation-only artifact dan tidak bol
 
 RAG memiliki evaluation dataset terpisah dan berversi di `datasets/rag/evaluation-v1/`. Evaluator memakai corpus version/checksum yang tercatat dalam manifest dan menjalankan `CosineIndex` serta embedding revision yang sama dengan `rag-service`. Metric calculator mendukung Hit Rate@3, Hit Rate@5, Precision@3, Precision@5, Recall@3, Recall@5, dan MRR pada tingkat document ID. Hasil reproducible untuk dataset, corpus, model revision, dan code yang sama.
 
-Dataset evaluasi saat ini berisi 0 query karena KB production v1.0.0 berisi 0 dokumen. Artifact `reports/rag-retrieval-evaluation-v1.json` menyatakan `status: blocked`, `reason: production_knowledge_base_empty`, dan `metrics: null`. Karena itu tidak tersedia metric retrieval production, tidak ada threshold candidate dari corpus production, dan `RAG_MIN_SCORE` production tetap kosong. Fixture sintetis hanya menguji evaluator dan tidak mewakili hasil retrieval production.
+Snapshot evaluation berisi 20 query yang dipetakan ke corpus v1.0.0 berisi 24 dokumen; seluruh relevance judgment telah disetujui owner. Report final `reports/rag-retrieval-evaluation-v1.json` memakai checksum kedua snapshot tersebut. Metric-nya: Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5 0.25, Recall@3 0.975, Recall@5 1.0, dan MRR 0.95. Kandidat threshold 0.4–0.6 menunjukkan trade-off coverage dan precision, tetapi belum cukup untuk menetapkan threshold production. `RAG_MIN_SCORE` tetap kosong. Fixture sintetis hanya menguji evaluator dan tidak mewakili hasil retrieval production.
 
-Threshold retrieval tidak otomatis dipilih dari evaluasi kosong atau fixture. Ketika corpus dan relevance judgment production sudah tersedia, threshold candidate masih harus dinilai berdasarkan evaluasi yang representatif; threshold similarity juga berbeda dari confidence threshold classifier.
+Threshold retrieval tidak otomatis dipilih dari hasil ini. Pada kandidat 0.4, coverage 100% dan hit/recall sama dengan baseline tanpa filter; pada 0.5 precision naik sementara hit rate turun menjadi 0.95; pada 0.6 precision lebih tinggi lagi dengan coverage 95%. Hanya ada 20 query dalam satu snapshot, sehingga bukti ini belum cukup representatif untuk menetapkan threshold production. Threshold similarity berbeda dari confidence threshold classifier.
 
 ## 22.3 Usability
 
@@ -802,11 +802,11 @@ Implikasi produk:
 
 Boundary arsitektur, knowledge-base schema/validator, local retrieval service, Laravel client, evidence persistence, pipeline retrieval, grounded explanation, result UI, Docker integration, dan regression tests telah diimplementasikan. IndoBERT `indobert-hoax v1.0.0` tetap classifier frozen dengan kelas training `valid` dan `hoax`; `meragukan` adalah abstention serving. RAG hanya menambah evidence, dan OpenAI menyusun explanation dari classification, excerpt, serta evidence yang tersimpan. Perubahan RAG tidak mengubah label atau confidence classifier.
 
-Production KB memiliki schema, manifest, checksum, dan validator terpisah, tetapi saat ini berisi 0 dokumen. Service tetap dapat hidup, retrieval kosong tidak menghasilkan evidence palsu, dan kegagalan RAG tidak menghapus hasil classifier.
+Production KB memiliki schema, manifest, checksum, dan validator terpisah; snapshot saat ini berisi 24 dokumen bersumber. Service tetap mendukung kondisi KB kosong, retrieval kosong tidak menghasilkan evidence palsu, dan kegagalan RAG tidak menghapus hasil classifier.
 
-## 24.2 R11 - framework selesai, kualitas production belum dievaluasi
+## 24.2 R11 - evaluasi snapshot selesai, threshold production belum ditetapkan
 
-Evaluation dataset v1, evaluator, metric calculator, automated tests, dan artifact report sudah tersedia. Evaluasi production berstatus blocked karena corpus dan query relevance set belum berisi data. Maka metric retrieval production dan threshold production belum tersedia; nilai fixture sintetis bukan hasil production.
+Evaluation dataset v1, evaluator, metric calculator, automated tests, dan artifact final sudah tersedia. Snapshot 24 dokumen/20 query telah dievaluasi dengan embedding revision yang dipatok. Hasil dan kandidat threshold eksploratif tercatat pada report; threshold production belum ditetapkan karena ukuran serta cakupan dataset belum cukup untuk keputusan robust.
 
 ## 24.3 Pekerjaan lanjutan untuk pelaporan TA
 
@@ -864,7 +864,7 @@ Implementasi RAG tidak menjadi alasan untuk:
 | Milestone | Status dan hasil |
 |---|---|
 | M1 | Selesai - boundary arsitektur dan knowledge-base contract |
-| M2 | Selesai - KB v1 schema, provenance contract, dan validator; corpus production 0 dokumen |
+| M2 | Selesai - KB v1 schema, provenance contract, dan validator; snapshot data-preparation berisi 24 dokumen bersumber |
 | M3 | Selesai - `rag-service`, embedding CPU, dan cosine index lokal |
 | M4 | Selesai - retriever contract dan HTTP adapter Laravel |
 | M5 | Selesai - persistence `EvidenceReference` |
@@ -873,7 +873,7 @@ Implementasi RAG tidak menjadi alasan untuk:
 | M8 | Selesai - presentation status, confidence, dan evidence |
 | M9 | Selesai - Docker service RAG internal-only |
 | M10 | Selesai - automated tests dan regression |
-| M11 | Framework selesai; production evaluation blocked karena KB kosong |
+| M11 | Selesai - evaluasi final pada corpus 24 dokumen dan 20 query yang disetujui; threshold production belum ditetapkan |
 | M12 | Selesai - sinkronisasi dokumentasi dan catatan keterbatasan |
 
 Detail scope historis dan acceptance per milestone tercatat pada `TASK-RAG-HOAXLIN.md`.
@@ -890,7 +890,7 @@ Detail scope historis dan acceptance per milestone tercatat pada `TASK-RAG-HOAXL
 - [x] Docker Compose menyediakan service RAG internal-only dan healthcheck liveness.
 - [x] Regression R1-R10 dan framework evaluation R11 tersedia.
 - [x] Dokumentasi R12 diselaraskan dengan implementasi dan artifact yang ada.
-- [ ] Evaluasi kualitas retrieval production: blocked sampai KB dan relevance judgment terkurasi.
+- [x] Evaluasi retrieval pada snapshot 24 dokumen dan 20 relevance judgment yang disetujui owner.
 - [ ] Threshold retrieval production: belum ditentukan.
 - [ ] Questionnaire/usability testing: pekerjaan lanjutan untuk laporan TA.
 

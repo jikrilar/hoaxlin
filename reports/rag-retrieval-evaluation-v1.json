@@ -1,29 +1,40 @@
 {
   "corpus": {
-    "document_count": 0,
-    "documents_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "document_count": 24,
+    "documents_sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2",
     "reference": "../knowledge-base-v1",
     "version": "1.0.0"
   },
   "embedding": {
-    "dimension": null,
+    "dimension": 384,
     "model_id": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
     "revision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42"
   },
   "evaluation_dataset": {
     "name": "hoaxlin-rag-retrieval-evaluation",
-    "queries_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "query_count": 0,
+    "queries_sha256": "0010336a9a3c1060cf0d12e5ddf6772448d74a46960eb049098378cffa3bc0de",
+    "query_count": 20,
     "schema_version": "1.0.0",
     "script_version": "1.0.0",
     "version": "1.0.0"
   },
-  "metrics": null,
-  "query_summary": {
-    "query_count": 0,
-    "valid_query_count": 0
+  "metrics": {
+    "hit_rate@3": 1.0,
+    "hit_rate@5": 1.0,
+    "mrr": 0.95,
+    "precision@3": 0.4,
+    "precision@5": 0.25,
+    "recall@3": 0.975,
+    "recall@5": 1.0
   },
-  "reason": "production_knowledge_base_empty",
+  "query_summary": {
+    "query_count": 20,
+    "query_hits": {
+      "@3": 20,
+      "@5": 20
+    },
+    "valid_query_count": 20
+  },
   "retrieval": {
     "algorithm": "cosine_similarity",
     "document_unit": "document_id",
@@ -34,11 +45,152 @@
     ]
   },
   "schema_version": "1.0.0",
-  "status": "blocked",
+  "status": "complete",
   "threshold_evaluation": {
-    "candidate_results": [],
+    "candidate_results": [
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.4,
+          "precision@5": 0.25,
+          "recall@3": 0.975,
+          "recall@5": 1.0
+        },
+        "min_score": 0.0
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.4,
+          "precision@5": 0.25,
+          "recall@3": 0.975,
+          "recall@5": 1.0
+        },
+        "min_score": 0.1
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.4,
+          "precision@5": 0.2525,
+          "recall@3": 0.975,
+          "recall@5": 1.0
+        },
+        "min_score": 0.2
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.4,
+          "precision@5": 0.266667,
+          "recall@3": 0.975,
+          "recall@5": 1.0
+        },
+        "min_score": 0.3
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.425,
+          "precision@5": 0.334167,
+          "recall@3": 0.975,
+          "recall@5": 1.0
+        },
+        "min_score": 0.4
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 0.95,
+          "hit_rate@5": 0.95,
+          "mrr": 0.925,
+          "precision@3": 0.658333,
+          "precision@5": 0.635833,
+          "recall@3": 0.925,
+          "recall@5": 0.95
+        },
+        "min_score": 0.5
+      },
+      {
+        "coverage": 0.95,
+        "coverage_count": 19,
+        "metrics": {
+          "hit_rate@3": 0.95,
+          "hit_rate@5": 0.95,
+          "mrr": 0.925,
+          "precision@3": 0.816667,
+          "precision@5": 0.8,
+          "recall@3": 0.925,
+          "recall@5": 0.925
+        },
+        "min_score": 0.6
+      },
+      {
+        "coverage": 0.55,
+        "coverage_count": 11,
+        "metrics": {
+          "hit_rate@3": 0.55,
+          "hit_rate@5": 0.55,
+          "mrr": 0.55,
+          "precision@3": 0.55,
+          "precision@5": 0.55,
+          "recall@3": 0.55,
+          "recall@5": 0.55
+        },
+        "min_score": 0.7
+      },
+      {
+        "coverage": 0.3,
+        "coverage_count": 6,
+        "metrics": {
+          "hit_rate@3": 0.3,
+          "hit_rate@5": 0.3,
+          "mrr": 0.3,
+          "precision@3": 0.3,
+          "precision@5": 0.3,
+          "recall@3": 0.266667,
+          "recall@5": 0.266667
+        },
+        "min_score": 0.8
+      },
+      {
+        "coverage": 0.0,
+        "coverage_count": 0,
+        "metrics": {
+          "hit_rate@3": 0.0,
+          "hit_rate@5": 0.0,
+          "mrr": 0.0,
+          "precision@3": 0.0,
+          "precision@5": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0
+        },
+        "min_score": 0.9
+      }
+    ],
     "production_min_score": null,
     "reason": "threshold production belum ditetapkan karena evaluation corpus belum cukup representatif.",
-    "status": "not_evaluated"
+    "status": "exploratory_candidates_not_selected"
   }
 }

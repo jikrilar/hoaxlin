@@ -87,7 +87,7 @@ docker compose exec rag python -c "import urllib.request; print(urllib.request.u
 docker compose exec rag python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8002/version', timeout=3).read().decode())"
 ```
 
-Production knowledge base berada di `datasets/rag/knowledge-base-v1/` dan saat ini memiliki 0 dokumen. Karena itu `/health/ready` mengembalikan 503 `knowledge_base_empty`; ini bukan kegagalan liveness. Request retrieval yang valid mengembalikan daftar kosong dan tidak membuat sumber. `RAG_MIN_SCORE` production tetap kosong karena evaluasi kualitas belum dapat dilakukan.
+Snapshot corpus di `datasets/rag/knowledge-base-v1/` berisi 24 dokumen bersumber. Evaluation v1.0.0 berisi 20 query dengan relevance judgment yang disetujui owner dan sudah memiliki report R11 final. `/health/ready` menunjukkan kesiapan resource model/index; untuk konfigurasi KB kosong, 503 `knowledge_base_empty` tetap merupakan kondisi yang ditangani, bukan kegagalan liveness. `RAG_MIN_SCORE` production tetap kosong karena threshold belum ditetapkan secara robust.
 
 Validasi knowledge base dan jalankan regression evaluasi dari root repository:
 
@@ -99,7 +99,7 @@ Set-Location rag-service
 Set-Location ..
 ```
 
-Framework retrieval evaluation dijalankan dari root dengan `.\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py`. Report deterministik berada di `reports/rag-retrieval-evaluation-v1.json`. Saat KB masih kosong, report berstatus `blocked`, tidak berisi metric production, dan tidak menetapkan threshold. Rincian schema dan metric ada di [datasets/rag/README.md](datasets/rag/README.md).
+Framework retrieval evaluation dijalankan dari root dengan `.\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py`. Report deterministik untuk snapshot yang disetujui berada di `reports/rag-retrieval-evaluation-v1.json`, terikat pada corpus 24 dokumen dan 20 query melalui checksum manifest. Kandidat threshold pada report bersifat eksploratif; threshold production tetap belum ditetapkan. Rincian schema dan metric ada di [datasets/rag/README.md](datasets/rag/README.md).
 
 ## Docker lifecycle
 

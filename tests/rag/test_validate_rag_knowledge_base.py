@@ -71,8 +71,13 @@ class KnowledgeBaseValidatorTest(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, pattern):
             validate_knowledge_base(self.directory)
 
-    def test_real_corpus_is_valid_and_empty(self) -> None:
-        self.assertEqual(validate_knowledge_base(DEFAULT_DIRECTORY), 0)
+    def test_real_corpus_is_valid_and_matches_manifest_count(self) -> None:
+        manifest = json.loads(
+            (DEFAULT_DIRECTORY / "manifest.json").read_text(encoding="utf-8")
+        )
+        document_count = validate_knowledge_base(DEFAULT_DIRECTORY)
+        self.assertGreater(document_count, 0)
+        self.assertEqual(document_count, manifest["document_count"])
 
     def test_complete_schema_accepts_nullable_fields_and_real_date(self) -> None:
         self.write_fixture(

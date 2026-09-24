@@ -1,9 +1,11 @@
 # Hoaxlin RAG knowledge base
 
-`knowledge-base-v1/documents.jsonl` is the versioned retrieval corpus. It is
-currently empty: the repository has no separately curated, verified source
-documents suitable for this corpus. Training data in `datasets/processed/` and
-evaluation data in `datasets/challenge/` must never be used as input.
+`knowledge-base-v1/documents.jsonl` is the versioned retrieval corpus. The
+current data-preparation snapshot contains 24 source-linked document summaries
+from BMKG, Komdigi, Bank Indonesia, Kementerian Kesehatan RI, and
+MAFINDO/TurnBackHoax.ID. The content is paraphrased from the linked
+publications; it is not full-page HTML. Training data in `datasets/processed/`
+and evaluation data in `datasets/challenge/` must never be used as input.
 
 ## Document contract (schema 1.0.0)
 
@@ -46,8 +48,9 @@ python -m unittest discover -s tests/rag -p 'test_*.py'
 The validator checks UTF-8 JSONL, the document contract, unique IDs, normalized
 exact duplicates (Unicode NFKC, whitespace collapse, casefold), manifest count
 and checksum, and the no-local-input boundary. It does not fetch URLs or
-certify claims. Document collection and editorial approval remain separate
-work before retrieval can use this corpus.
+certify claims. The current v1.0.0 snapshot contains 24 manually reviewed
+documents. Any future additions or edits need source review and a new manifest
+checksum before they are used for evaluation or retrieval.
 
 ## Retrieval evaluation (schema 1.0.0)
 
@@ -57,25 +60,29 @@ in `queries.jsonl` has a unique `id`, a nonempty `query`, and nonempty
 in `manifest.json`. It has no classifier labels. The manifest pins the corpus
 version and `documents.jsonl` checksum as well as the query file checksum.
 
-The production knowledge base currently contains zero documents, so the
-versioned evaluation file currently contains zero queries. This is an explicit
-uncollected state, not an evaluation score. The production evaluation artifact
-therefore reports `blocked` with reason
-`production_knowledge_base_empty`; it does not report zero-valued retrieval
-metrics or select `RAG_MIN_SCORE`. Synthetic documents and queries exist only
-inside temporary automated test fixtures and are never used as production
-evaluation data.
+The approved evaluation snapshot contains 20 query records against the
+24-document corpus snapshot. Owner approval and its exact version/checksum
+scope are recorded in
+[`evaluation-v1/relevance-review.md`](evaluation-v1/relevance-review.md).
+The final R11 report at `reports/rag-retrieval-evaluation-v1.json` is bound to
+these snapshots. It reports Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5
+0.25, Recall@3 0.975, Recall@5 1.0, and MRR 0.95. Threshold candidates are
+exploratory only; `RAG_MIN_SCORE` remains unset because 20 queries are not a
+robust basis for selecting a production threshold. Synthetic documents and
+queries exist only inside temporary automated test fixtures and are never
+used as production corpus or evaluation records.
 
 The evaluator supports document-level Hit Rate@3, Hit Rate@5, Precision@3,
 Precision@5, Recall@3, Recall@5, and MRR. It uses the same local cosine index
 and pinned embedding revision as the service. Results are deterministic for
-the same query set, corpus snapshot, model revision, and code. The current
-production artifact has `metrics: null`, no threshold candidates, and no
-selected production threshold. Metric values from synthetic test fixtures are
-only calculator/runner tests, not production results.
+the same query set, corpus snapshot, model revision, and code. The final
+production artifact records the metrics for the approved snapshot. Its
+exploratory threshold candidates show increasing precision with reduced hit
+rate or coverage at higher scores; no production threshold is selected from
+this 20-query set. Metric values from synthetic test fixtures are only
+calculator/runner tests, not production results.
 
-After manually curating verified knowledge-base documents and independent
-query-to-document relevance judgments, run from the repository root:
+To reproduce the approved v1.0.0 evaluation from the repository root, run:
 
 ```powershell
 .\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py

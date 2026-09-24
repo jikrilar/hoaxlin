@@ -59,13 +59,16 @@ which is the path resolved by `app.config.KNOWLEDGE_BASE_DIRECTORY`. The
 container healthcheck uses `/health/live`; an empty corpus can therefore keep
 the process healthy while `/health/ready` reports `knowledge_base_empty`.
 
-The production knowledge base currently has **0 documents**. The service
-starts, `/health/live` returns 200, `/health/ready` returns 503 with
-`knowledge_base_empty`, `/version` reports 0 documents and a null embedding
-dimension, and valid `/retrieve` requests return `{"results": []}`. It does
-not load the model until real documents exist. If a populated knowledge base
-or index is invalid, readiness is 503 and retrieval is 503 with a generic
-public error. Internal exception details stay in server logs.
+The current data-preparation corpus snapshot has **24 documents**. The local
+service needs the pinned model cache prepared before it can build vectors; it
+does not download model files on request. A genuinely empty corpus remains a
+supported state: liveness stays healthy, readiness reports
+`knowledge_base_empty`, version metadata reports zero documents and no vector
+dimension, and valid retrieval requests return `{"results": []}`. Empty-corpus
+behavior is tested using a temporary fixture, not by replacing production
+documents. If a populated knowledge base or index is invalid, readiness is 503
+and retrieval is 503 with a generic public error. Internal exception details
+stay in server logs.
 
 ## API
 
@@ -111,8 +114,14 @@ the repository root with:
 .\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py
 ```
 
-The artifact is `reports/rag-retrieval-evaluation-v1.json`. At present the
-production KB is empty, so the evaluator writes `status: blocked`, leaves
-production metrics null, and does not choose `RAG_MIN_SCORE`. Synthetic
-corpora are used only in automated tests; they are not presented as production
-retrieval evaluation.
+The artifact is `reports/rag-retrieval-evaluation-v1.json`. Its final run is
+bound to the approved v1.0.0 evaluation snapshot (20 queries) and the
+knowledge-base v1.0.0 corpus (24 documents) by manifest checksums. It reports
+Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5 0.25, Recall@3 0.975,
+Recall@5 1.0, and MRR 0.95. Threshold candidates are exploratory: 0.4 retains
+baseline hit rate and recall with Precision@5 0.334167; 0.5 raises
+Precision@5 to 0.635833 while Hit Rate@3/@5 falls to 0.95; 0.6 raises
+Precision@5 to 0.8 with coverage and Recall@5 at 0.95. This 20-query set is
+not sufficient to set a robust production threshold, so `RAG_MIN_SCORE`
+remains unset. Synthetic corpora are used only in automated tests; they are
+not presented as production retrieval evaluation.

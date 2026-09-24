@@ -111,7 +111,7 @@ py -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8002
 ```
 
-Knowledge base saat ini berisi 0 dokumen. Dalam kondisi ini service tetap hidup, `/health/live` sukses, `/health/ready` mengembalikan 503 dengan alasan `knowledge_base_empty`, dan `/retrieve` mengembalikan hasil kosong. Model embedding tidak dimuat. Jika KB telah diisi dokumen terkurasi, siapkan model secara eksplisit sebelum menjalankan service dengan `python -m app.prepare_model`; langkah ini mengunduh revision model yang dipatok dan memerlukan jaringan.
+Snapshot knowledge base v1.0.0 memuat 24 dokumen dan evaluation v1.0.0 memuat 20 query dengan relevance judgment yang telah disetujui owner. Evaluasi R11 final untuk snapshot ini melaporkan Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5 0.25, Recall@3 0.975, Recall@5 1.0, dan MRR 0.95. Kandidat threshold 0.4–0.6 bersifat eksploratif; `RAG_MIN_SCORE` production tetap kosong karena 20 query belum cukup untuk memilih threshold secara robust. Untuk menjalankan service lokal, siapkan revision model embedding yang dipatok terlebih dahulu dengan `python -m app.prepare_model`; langkah ini memerlukan jaringan satu kali. Perilaku saat knowledge base kosong tetap diuji menggunakan fixture sementara, bukan corpus production.
 
 ## Kontrak media dan dependency opsional
 
@@ -175,7 +175,7 @@ docker compose config --quiet
 ```
 
 Test real-BERT membutuhkan service dan artifact yang tersedia; test tersebut skip secara eksplisit jika dependency tidak tersedia.
-Evaluator RAG menulis artifact deterministik ke `reports/rag-retrieval-evaluation-v1.json`. Saat KB production kosong, hasilnya berstatus `blocked` tanpa metric production atau threshold.
+Artifact evaluasi R11 untuk snapshot yang disetujui tersedia di `reports/rag-retrieval-evaluation-v1.json`. Ia terikat pada checksum corpus dan query yang tercatat pada manifest. Jalankan ulang hanya ketika snapshot yang dievaluasi berubah dan telah melalui review.
 
 ## Docker
 
