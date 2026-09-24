@@ -58,7 +58,13 @@ class RiwayatController extends Controller
 
     public function show(string $id): View
     {
-        $submission = Submission::with(['detectionResult', 'feedbacks'])
+        $submission = Submission::with([
+            'detectionResult',
+            'feedbacks',
+            'evidenceReferences' => fn ($query) => $query
+                ->orderBy('rank')
+                ->orderBy('document_id'),
+        ])
             ->forUser(request()->user())
             ->findOrFail($id);
 

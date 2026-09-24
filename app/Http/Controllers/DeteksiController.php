@@ -28,6 +28,11 @@ class DeteksiController extends Controller
         $this->access->authorize($request, $submission);
 
         $result = $submission->isCompleted() ? $submission->detectionResult : null;
+        if ($result !== null) {
+            $submission->load(['evidenceReferences' => fn ($query) => $query
+                ->orderBy('rank')
+                ->orderBy('document_id')]);
+        }
         $feedback = auth()->check()
             ? $submission->feedbacks->firstWhere('user_id', auth()->id())
             : null;
