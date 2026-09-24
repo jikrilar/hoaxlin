@@ -59,6 +59,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Internal RAG Retrieval Service
+    |--------------------------------------------------------------------------
+    |
+    | Local evidence retrieval is independently deployable from the classifier.
+    | A null minimum score leaves filtering to the service default (no filter).
+    |
+    */
+
+    'rag' => [
+        'url' => env('RAG_SERVICE_URL', 'http://127.0.0.1:8002'),
+        'internal_token' => env('RAG_SERVICE_TOKEN'),
+        'connect_timeout' => (int) env('RAG_SERVICE_CONNECT_TIMEOUT', 3),
+        'timeout' => (int) env('RAG_SERVICE_TIMEOUT', 15),
+        'top_k' => (int) env('RAG_TOP_K', 3),
+        'min_score' => env('RAG_MIN_SCORE'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | OpenAI Support Services
     |--------------------------------------------------------------------------
     |

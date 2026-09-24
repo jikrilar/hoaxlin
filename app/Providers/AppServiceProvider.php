@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\Classifier;
+use App\Contracts\EvidenceRetriever;
 use App\Contracts\Explainer;
 use App\Contracts\HostResolver;
 use App\Contracts\Translator;
@@ -26,6 +27,7 @@ use App\Services\OpenAI\OpenAiQuota;
 use App\Services\Pipeline\PipelineFailureReporter;
 use App\Services\Pipeline\ProcessingEventRecorder;
 use App\Services\Pipeline\SubmissionStateMachine;
+use App\Services\Rag\RagRetriever;
 use App\Services\Resilience\CircuitBreaker;
 use App\Support\OpenAiTranslator;
 use App\Support\TextLanguageDetector;
@@ -48,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
 
             return new CachedBertClassifier($protected);
         });
+        $this->app->singleton(EvidenceRetriever::class, RagRetriever::class);
 
         $this->app->singleton(Explainer::class, function ($app): Explainer {
             $quota = $app->make(OpenAiQuota::class);
