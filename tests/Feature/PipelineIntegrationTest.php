@@ -5,8 +5,9 @@ namespace Tests\Feature;
 use App\Contracts\Classifier;
 use App\Contracts\EvidenceRetriever;
 use App\Contracts\Explainer;
+use App\Contracts\Translator;
 use App\DataObjects\Classification;
-use App\DataObjects\Explanation;
+use App\DataObjects\Translation;
 use App\Enums\DetectionLabel;
 use App\Exceptions\AiServiceException;
 use App\Jobs\ClassifySubmission;
@@ -14,6 +15,7 @@ use App\Jobs\ExtractSubmissionText;
 use App\Models\Submission;
 use App\Services\Bert\BertClassifier;
 use App\Services\Bert\CircuitBreakingClassifier;
+use App\Services\Extraction\OpenAiImageExtractor;
 use App\Services\Extraction\TextExtractorResolver;
 use App\Services\Extraction\TextInputExtractor;
 use App\Services\Fakes\FakeClassifier;
@@ -21,8 +23,10 @@ use App\Services\Fakes\FakeEvidenceRetriever;
 use App\Services\Fakes\FakeExplainer;
 use App\Services\Resilience\CircuitBreaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PipelineIntegrationTest extends TestCase
@@ -74,40 +78,78 @@ class PipelineIntegrationTest extends TestCase
         Http::assertSentCount(1);
     }
 
-    public function test_openai_ocr_cache_hit_avoids_second_api_call(): void
+    public function test_openai_image_ocr_extracts_stored_image_and_caches_response(): void
     {
+        Storage::fake('local');
+        config([
+            'filesystems.media_disk' => 'local',
+            'services.openai.key' => 'test-openai-key',
+            'services.openai.vision_model' => 'gpt-4o-mini',
+            'services.openai.rate_limit_per_minute' => 1000,
+            'services.openai.monthly_quota_usd' => 1000,
+        ]);
+        $classifier = new FakeClassifier;
+        $explainer = new FakeExplainer;
+        $translator = new class implements Translator
+        {
+            /** @var list<string> */
+            public array $queries = [];
+
+            public function translate(string $text): Translation
+            {
+                $this->queries[] = $text;
+
+                return Translation::notRequired($text, 'id');
+            }
+        };
+        $this->app->instance(Classifier::class, $classifier);
+        $this->app->instance(Explainer::class, $explainer);
+        $this->app->instance(Translator::class, $translator);
         $this->app->instance(
-            Classifier::class,
-            (new FakeClassifier)->willReturn(new Classification(DetectionLabel::Hoax, 0.9, 'v1.0.0', ['valid' => 0.1, 'hoax' => 0.9], 10))
+            TextExtractorResolver::class,
+            new TextExtractorResolver([app(OpenAiImageExtractor::class)])
         );
-        $this->app->instance(
-            Explainer::class,
-            (new FakeExplainer)->willReturn(Explanation::ready('cached explanation', 'openai-test'))
-        );
-        $this->app->instance(TextExtractorResolver::class, new TextExtractorResolver([new TextInputExtractor]));
+
+        $imageBytes = "\x89PNG\r\n\x1a\n".str_repeat("\0", 12);
+        Storage::disk('local')->put('uploads/claim.png', $imageBytes);
+        $extractedText = 'Teks klaim hasil OCR dari gambar sintetis untuk regression test.';
+        $normalizedText = mb_strtolower($extractedText);
+        Http::fake([
+            'https://api.openai.com/v1/chat/completions' => Http::response([
+                'choices' => [['message' => ['content' => $extractedText]]],
+                'usage' => ['prompt_tokens' => 24, 'completion_tokens' => 13],
+            ]),
+        ]);
 
         $submission = Submission::create([
-            'input_type' => 'text',
-            'raw_input' => str_repeat('Teks untuk cache test. ', 10),
+            'input_type' => 'image',
+            'media_path' => 'uploads/claim.png',
             'status' => 'pending',
         ]);
 
-        // First run — miss
         ExtractSubmissionText::dispatchSync($submission->id);
-        ClassifySubmission::dispatchSync($submission->id);
-        $firstResult = $submission->fresh()->detectionResult;
-        $this->assertNotNull($firstResult);
+        $submission->refresh()->load('detectionResult');
+        $this->assertSame('completed', $submission->status);
+        $this->assertSame($normalizedText, $submission->extracted_text);
+        $this->assertSame([$normalizedText], $translator->queries);
+        $this->assertSame([$normalizedText], $classifier->classifiedTexts());
+        $this->assertSame($normalizedText, $explainer->calls()[0]['excerpt']);
 
-        // Second submission with identical content_hash should hit cache on classify?
-        // Instead test explainer directly — FakeExplainer returns same narrative
-        $explainer = app(Explainer::class);
-        $classification = new Classification(DetectionLabel::Hoax, 0.9, 'v1.0.0', ['valid' => 0.1, 'hoax' => 0.9], 10);
-        $firstExplain = $explainer->explain($classification, 'excerpt cache test', []);
-        $secondExplain = $explainer->explain($classification, 'excerpt cache test', []);
+        $cached = app(OpenAiImageExtractor::class)->extract($submission->fresh());
+        $this->assertSame($extractedText, $cached->text);
+        $this->assertTrue($cached->cached);
+        Http::assertSentCount(1);
+        Http::assertSent(function (Request $request) use ($imageBytes): bool {
+            $payload = $request->data();
+            $imageUrl = data_get($payload, 'messages.0.content.1.image_url.url');
 
-        $this->assertSame($firstExplain->narrative, $secondExplain->narrative);
-        // FakeExplainer is deterministic — both calls return same
-        $this->assertSame('cached explanation', $secondExplain->narrative);
+            return $request->url() === 'https://api.openai.com/v1/chat/completions'
+                && $request->hasHeader('Authorization', 'Bearer test-openai-key')
+                && data_get($payload, 'messages.0.content.1.type') === 'image_url'
+                && is_string($imageUrl)
+                && str_starts_with($imageUrl, 'data:')
+                && str_ends_with($imageUrl, base64_encode($imageBytes));
+        });
     }
 
     public function test_bert_retryable_failures_are_retried(): void
