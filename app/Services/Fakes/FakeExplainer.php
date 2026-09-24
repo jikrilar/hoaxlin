@@ -11,14 +11,43 @@ use App\DataObjects\Explanation;
  */
 class FakeExplainer implements Explainer
 {
-    /** @var list<array{classification: Classification, excerpt: string}> */
+    /**
+     * @var list<array{
+     *     classification: Classification,
+     *     excerpt: string,
+     *     evidence: list<array{
+     *         document_id: string,
+     *         title: string,
+     *         source: string,
+     *         source_url: string,
+     *         published_at: string|null,
+     *         snippet: string,
+     *         similarity_score: float,
+     *         rank: int,
+     *         knowledge_base_version: string|null
+     *     }>
+     * }>
+     */
     private array $calls = [];
 
     public function __construct(private ?Explanation $result = null) {}
 
-    public function explain(Classification $classification, string $excerpt): Explanation
+    /**
+     * @param list<array{
+     *     document_id: string,
+     *     title: string,
+     *     source: string,
+     *     source_url: string,
+     *     published_at: string|null,
+     *     snippet: string,
+     *     similarity_score: float,
+     *     rank: int,
+     *     knowledge_base_version: string|null
+     * }> $evidence
+     */
+    public function explain(Classification $classification, string $excerpt, array $evidence): Explanation
     {
-        $this->calls[] = ['classification' => $classification, 'excerpt' => $excerpt];
+        $this->calls[] = ['classification' => $classification, 'excerpt' => $excerpt, 'evidence' => $evidence];
 
         return $this->result ?? Explanation::ready(
             narrative: sprintf(
@@ -45,7 +74,21 @@ class FakeExplainer implements Explainer
     }
 
     /**
-     * @return list<array{classification: Classification, excerpt: string}>
+     * @return list<array{
+     *     classification: Classification,
+     *     excerpt: string,
+     *     evidence: list<array{
+     *         document_id: string,
+     *         title: string,
+     *         source: string,
+     *         source_url: string,
+     *         published_at: string|null,
+     *         snippet: string,
+     *         similarity_score: float,
+     *         rank: int,
+     *         knowledge_base_version: string|null
+     *     }>
+     * }>
      */
     public function calls(): array
     {

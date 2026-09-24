@@ -102,8 +102,8 @@ class PipelineIntegrationTest extends TestCase
         // Instead test explainer directly — FakeExplainer returns same narrative
         $explainer = app(Explainer::class);
         $classification = new Classification(DetectionLabel::Hoax, 0.9, 'v1.0.0', ['valid' => 0.1, 'hoax' => 0.9], 10);
-        $firstExplain = $explainer->explain($classification, 'excerpt cache test');
-        $secondExplain = $explainer->explain($classification, 'excerpt cache test');
+        $firstExplain = $explainer->explain($classification, 'excerpt cache test', []);
+        $secondExplain = $explainer->explain($classification, 'excerpt cache test', []);
 
         $this->assertSame($firstExplain->narrative, $secondExplain->narrative);
         // FakeExplainer is deterministic — both calls return same
@@ -208,8 +208,8 @@ class PipelineIntegrationTest extends TestCase
         $classification = new Classification(DetectionLabel::Valid, 0.9, 'v1.0.0', ['valid' => 0.9, 'hoax' => 0.1], 10);
         $excerpt = 'Teks yang sama untuk cache test.';
 
-        $first = $explainer->explain($classification, $excerpt);
-        $second = $explainer->explain($classification, $excerpt);
+        $first = $explainer->explain($classification, $excerpt, []);
+        $second = $explainer->explain($classification, $excerpt, []);
 
         $this->assertSame($first->narrative, $second->narrative);
     }

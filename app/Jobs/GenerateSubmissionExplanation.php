@@ -9,6 +9,7 @@ use App\Enums\ExplanationStatus;
 use App\Enums\ProcessingStage;
 use App\Jobs\Concerns\HandlesPipelineFailures;
 use App\Jobs\Concerns\UniqueSubmissionStage;
+use App\Models\EvidenceReference;
 use App\Models\Submission;
 use App\Services\Pipeline\ProcessingEventRecorder;
 use App\Services\Pipeline\SubmissionStateMachine;
@@ -39,7 +40,7 @@ class GenerateSubmissionExplanation implements ShouldBeUnique, ShouldQueue
     public function handle(Explainer $explainer, ProcessingEventRecorder $events, SubmissionStateMachine $state): void
     {
         Cache::lock("submission:{$this->submissionId}:explain", 75)->block(5, function () use ($explainer, $state): void {
-            $submission = Submission::with('detectionResult')->findOrFail($this->submissionId);
+            $submission = Submission::with(['detectionResult', 'evidenceReferences'])->findOrFail($this->submissionId);
 
             if ($submission->isTerminal()) {
                 return;
@@ -70,7 +71,33 @@ class GenerateSubmissionExplanation implements ShouldBeUnique, ShouldQueue
                     $result->inference_ms,
                     $result->classifier_cached,
                 );
-                $explanation = $explainer->explain($classification, mb_substr((string) $submission->analysis_text, 0, 1500));
+                $evidence = $submission->evidenceReferences
+                    ->sort(fn (EvidenceReference $left, EvidenceReference $right): int => [
+                        $left->rank,
+                        $left->document_id,
+                    ] <=> [
+                        $right->rank,
+                        $right->document_id,
+                    ])
+                    ->map(fn (EvidenceReference $reference): array => [
+                        'document_id' => $reference->document_id,
+                        'title' => $reference->title,
+                        'source' => $reference->source,
+                        'source_url' => $reference->source_url,
+                        'published_at' => $reference->published_at?->format('Y-m-d'),
+                        'snippet' => $reference->snippet,
+                        'similarity_score' => (float) $reference->similarity_score,
+                        'rank' => (int) $reference->rank,
+                        'knowledge_base_version' => $reference->knowledge_base_version,
+                    ])
+                    ->values()
+                    ->all();
+
+                $explanation = $explainer->explain(
+                    $classification,
+                    mb_substr((string) $submission->analysis_text, 0, 1500),
+                    $evidence,
+                );
                 $state->markExplained($submission, $explanation, $this->attempts());
                 $state->markCompleted($submission, $this->attempts());
             } catch (Throwable $exception) {
