@@ -75,15 +75,14 @@ def fixture_app(directory: Path):
     )
 
 
-def test_live_health_and_empty_production_knowledge_base() -> None:
-    repository_root = Path(__file__).resolve().parents[2]
-    production_kb = repository_root / "datasets/rag/knowledge-base-v1"
+def test_live_health_and_empty_knowledge_base_fixture(tmp_path: Path) -> None:
+    write_kb(tmp_path, [])
 
     def must_not_load_model():
-        raise AssertionError("empty corpus must not load an embedding model")
+        raise AssertionError("empty fixture must not load an embedding model")
 
     app = create_app(
-        knowledge_base_directory=production_kb,
+        knowledge_base_directory=tmp_path,
         embedding_factory=must_not_load_model,
     )
     with TestClient(app) as client:

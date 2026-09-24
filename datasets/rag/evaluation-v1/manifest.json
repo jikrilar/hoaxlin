@@ -1,16 +1,16 @@
 {
-    "dataset_name":  "hoaxlin-rag-retrieval-evaluation",
-    "version":  "1.0.0",
-    "schema_version":  "1.0.0",
-    "query_count":  0,
-    "queries":  {
-                    "path":  "queries.jsonl",
-                    "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                },
-    "corpus":  {
-                   "path":  "../knowledge-base-v1",
-                   "version":  "1.0.0",
-                   "documents_sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-               },
-    "evaluation_script_version":  "1.0.0"
+  "dataset_name": "hoaxlin-rag-retrieval-evaluation",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "query_count": 20,
+  "queries": {
+    "path": "queries.jsonl",
+    "sha256": "0010336a9a3c1060cf0d12e5ddf6772448d74a46960eb049098378cffa3bc0de"
+  },
+  "corpus": {
+    "path": "../knowledge-base-v1",
+    "version": "1.0.0",
+    "documents_sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2"
+  },
+  "evaluation_script_version": "1.0.0"
 }

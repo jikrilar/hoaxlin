@@ -2,10 +2,10 @@
   "dataset_name": "hoaxlin-rag-knowledge-base",
   "version": "1.0.0",
   "schema_version": "1.0.0",
-  "document_count": 0,
+  "document_count": 24,
   "documents": {
     "path": "documents.jsonl",
-    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2"
   },
   "provenance": {
     "source_type": "original_publication_url",
