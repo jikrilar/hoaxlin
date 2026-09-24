@@ -1,8 +1,8 @@
 ---
 title: "Product Requirements Document (PRD) — Hoaxlin"
 subtitle: "Sistem Deteksi Hoaks Berbasis IndoBERT dengan Retrieval-Augmented Generation untuk Bukti/Rujukan"
-version: "2.0"
-status: "Draft — Target Implementasi RAG"
+version: "2.1"
+status: "As-built - R1-R12 complete; production retrieval evaluation blocked"
 date: "24 September 2026"
 ---
 
@@ -10,7 +10,7 @@ date: "24 September 2026"
 
 **Hoaxlin** adalah aplikasi web untuk membantu pengguna memeriksa indikasi hoaks pada informasi yang diterima melalui teks, gambar, video, atau tautan. Sistem menggunakan **IndoBERT** sebagai classifier utama untuk menghasilkan prediksi `valid` atau `hoax`, dengan `meragukan` sebagai state abstention ketika confidence model tidak memenuhi threshold runtime.
 
-Versi produk berikutnya menambahkan **Retrieval-Augmented Generation (RAG)** sebagai lapisan pencarian bukti/rujukan. RAG tidak menggantikan IndoBERT dan tidak boleh mengubah label classifier. Fungsinya adalah mencari dokumen relevan dari knowledge base terkurasi dan menampilkan sumber yang dapat diperiksa pengguna.
+Implementasi RAG menambahkan lapisan pencarian bukti/rujukan dari knowledge base lokal. RAG tidak menggantikan IndoBERT dan tidak mengubah label classifier. Knowledge base production v1 saat ini masih kosong; service, persistence, pipeline, UI, dan framework evaluasi retrieval tersedia, tetapi kualitas retrieval production belum dapat dinilai.
 
 Arah output utama mengikuti masukan dosen pembimbing:
 
@@ -97,113 +97,63 @@ Hoaxlin bukan lembaga pemeriksa fakta resmi, keputusan hukum, atau sumber kebena
 
 # 5. Kondisi Sistem Saat Ini
 
-Sebelum RAG diimplementasikan, pipeline produksi adalah:
+R1–R11 telah diimplementasikan dan digabungkan ke `main`. R12 menyelaraskan dokumentasi dengan source dan konfigurasi yang telah diaudit. Status implementasi pipeline tidak berarti retrieval production telah dievaluasi: knowledge base production masih memiliki 0 dokumen.
+
+Pipeline aplikasi saat ini:
 
 ```text
-ProcessSubmission
-    ↓
-ExtractSubmissionText
-    ↓
-TranslateSubmissionText
-    ↓
-ClassifySubmission
-    ↓
-GenerateSubmissionExplanation
-    ↓
-Completed
+Input
+  ↓
+Extraction
+  ↓
+Translation
+  ↓
+IndoBERT Classification
+  ↓
+Evidence Retrieval
+  ↓
+Grounded Explanation
+  ↓
+Result
 ```
 
-Processing stage:
+Tiga job pipeline setelah translation adalah `ClassifySubmission` → `RetrieveSubmissionEvidence` → `GenerateSubmissionExplanation`. Retrieval baru dijalankan setelah classification berhasil. Stage yang tersedia adalah `queued`, `extracting`, `translating`, `classifying`, `retrieving`, `explaining`, dan `done`; named queue meliputi `default`, `extract-text`, `extract-media`, `inference`, `retrieval`, dan `explanation`.
 
-```text
-queued
-extracting
-translating
-classifying
-explaining
-done
-```
+Stack Docker aktual terdiri dari `app`, `queue`, `scheduler`, `mysql`, `redis`, `bert`, dan `rag`. Service RAG hanya berada di network internal; healthcheck container menguji `/health/live`. Saat KB kosong, `/health/ready` memang mengembalikan 503 `knowledge_base_empty`, tanpa menghentikan container atau worker.
 
-Stack utama:
+Model classifier aktif adalah frozen `indobert-hoax v1.0.0` dengan training classes `valid` dan `hoax`. `meragukan` bukan kelas training; serving layer menggunakannya sebagai abstention saat confidence di bawah threshold. Threshold classifier tidak berubah karena RAG.
 
-```text
-Laravel
-├── app
-├── queue
-├── scheduler
-├── MySQL
-├── Redis
-└── FastAPI IndoBERT
-```
-
-IndoBERT aktif:
-
-```text
-model: indobert-hoax
-version: v1.0.0
-training classes: valid / hoax
-meragukan: runtime abstention state
-```
-
-OpenAI saat ini mendukung:
-
-- OCR gambar;
-- transkripsi audio/video;
-- terjemahan Inggris ke Indonesia;
-- explanation.
+OpenAI menghasilkan grounded explanation dari hasil classification, excerpt, dan retrieved evidence, serta tetap dipakai untuk OCR, transkripsi, dan terjemahan EN→ID pada tahap input. OpenAI bukan classifier atau retriever.
 
 ---
 
-# 6. Target Arsitektur Hoaxlin v2
-
-Target arsitektur:
+# 6. Arsitektur Hoaxlin yang Diimplementasikan
 
 ```text
-                           ┌────────────────────┐
-                           │   bert-service     │
-                           │ IndoBERT Classifier│
-                           └─────────┬──────────┘
-                                     │
-                                     │ label + confidence
-                                     ▼
-Input → Extract → Translate → Laravel Pipeline
-                                     │
-                                     ▼
-                           ┌────────────────────┐
-                           │    rag-service     │
-                           │ Evidence Retrieval │
-                           └─────────┬──────────┘
-                                     │
-                                     │ top-k evidence
-                                     ▼
-                           ┌────────────────────┐
-                           │ OpenAI Explanation │
-                           │ grounded narrative │
-                           └─────────┬──────────┘
-                                     │
-                                     ▼
-                              Result Page
+Input → Extraction → Translation → IndoBERT Classification
+                                      ↓
+                          Evidence Retrieval (RAG)
+                                      ↓
+                    Grounded Explanation (OpenAI)
+                                      ↓
+                                    Result
 ```
 
-Pembagian tanggung jawab:
-
-| Komponen | Tanggung Jawab |
+| Komponen | Tanggung jawab aktual |
 |---|---|
-| Laravel | Auth, validasi, persistence, queue, orchestration, authorization, UI |
-| `bert-service` | Inference IndoBERT dan metadata runtime |
-| `rag-service` | Embedding, vector retrieval, dan top-k evidence |
-| MySQL | Data aplikasi, detection result, evidence reference, audit/usage data |
-| Redis | Queue, cache, lock, dan state operasional |
-| OpenAI | OCR, transkripsi, EN→ID translation, grounded explanation |
-| Knowledge Base RAG | Dokumen terpercaya dengan provenance dan URL sumber |
+| Laravel | Authentication/authorization, validasi, persistence, pipeline, queue, dan UI |
+| `bert-service` | Inference classifier IndoBERT frozen dan metadata runtime |
+| `rag-service` | Embedding CPU, cosine retrieval lokal, serta top-k evidence dari KB v1 |
+| OpenAI | Grounded explanation; juga OCR, transkripsi, dan EN→ID translation pada jalur input |
+| MySQL | Submission, detection result, evidence reference, processing events, dan data aplikasi |
+| Redis | Queue, cache, session, lock, dan limiter |
+| Knowledge base RAG | Dokumen lokal berversi dan metadata provenance; saat ini kosong |
 
-`bert-service` dan `rag-service` harus tetap terpisah agar tanggung jawab classifier dan retrieval tidak bercampur.
+Boundary metodologisnya tetap: **IndoBERT = classifier**, **RAG = evidence retrieval**, **OpenAI = explanation**. RAG tidak mengubah label atau confidence classifier. Similarity score mengukur relevansi retrieval, bukan kebenaran dokumen dan bukan confidence classifier.
 
 ---
 
-# 7. Target Pipeline
-
-Pipeline target setelah RAG:
+# 7. Pipeline yang Diimplementasikan
 
 ```text
 ProcessSubmission
@@ -218,31 +168,12 @@ RetrieveSubmissionEvidence
     ↓
 GenerateSubmissionExplanation
     ↓
-Completed
+completed | failed
 ```
 
-Processing stage target:
+Stage progres: `queued` → `extracting` → `translating` → `classifying` → `retrieving` → `explaining` → `done`. Named queue yang dikonsumsi worker adalah `default`, `extract-text`, `extract-media`, `inference`, `retrieval`, dan `explanation`.
 
-```text
-queued
-extracting
-translating
-classifying
-retrieving
-explaining
-done
-```
-
-Named queue target:
-
-```text
-default
-extract-text
-extract-media
-inference
-retrieval
-explanation
-```
+`RetrieveSubmissionEvidence` mengambil teks analisis dan memakai contract Laravel `EvidenceRetriever`; hasilnya dipersist sebagai `EvidenceReference` secara idempotent. `GenerateSubmissionExplanation` membaca evidence yang tersimpan tanpa retrieval ulang. Evidence kosong tetap dikirim sebagai daftar kosong; kegagalan RAG ditangani sebagai degradation dan tidak menghapus `DetectionResult`. Explanation yang unavailable juga tidak membatalkan hasil classifier.
 
 ---
 
@@ -495,15 +426,12 @@ datasets/challenge/external-challenge-v1/...
 
 Training corpus, test set, external challenge, dan knowledge base memiliki tujuan berbeda dan tidak boleh dicampur.
 
-## 14.2 Struktur
-
-Target:
+## 14.2 Struktur aktual
 
 ```text
 datasets/rag/knowledge-base-v1/
 ├── documents.jsonl
-├── manifest.json
-└── index/
+└── manifest.json
 ```
 
 Minimum document schema:
@@ -519,6 +447,10 @@ Minimum document schema:
   "topic": "string|null"
 }
 ```
+
+`published_at` dan `topic` menerima nilai `null` sesuai schema. Manifest v1 menyimpan versi/schema, jumlah dokumen, checksum SHA-256 file JSONL, dan provenance. Validator tersedia di `scripts/validate_rag_knowledge_base.py`; ia memvalidasi schema, ID/duplikasi, checksum/count, dan boundary input lokal. Validator tidak memverifikasi kebenaran isi atau melakukan fetch URL.
+
+Snapshot production saat ini adalah knowledge-base v1.0.0 dengan **0 dokumen**. Dokumen harus dikurasi dan ditinjau manual dari publikasi asli sebelum ditambahkan. `datasets/processed/`, test set classifier, dan `datasets/challenge/` termasuk external challenge tidak boleh menjadi sumber knowledge base. Tidak ada dokumen sintetis di corpus production.
 
 ## 14.3 Sumber prioritas
 
@@ -548,9 +480,9 @@ Setiap dokumen wajib:
 
 ---
 
-# 15. RAG Retrieval Service
+# 15. RAG Retrieval Service yang Diimplementasikan
 
-Service target:
+Lokasi service:
 
 ```text
 rag-service/
@@ -595,13 +527,11 @@ Response:
 }
 ```
 
-## 15.2 Model retrieval
+## 15.2 Model dan perilaku retrieval aktual
 
-MVP menggunakan embedding model pretrained tanpa fine-tuning.
+Service memakai pretrained CPU embedding `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` pada revision `e8f8c211226b894fcb81acc59f3b34ba3efd5f42` (384 dimensi); tidak ada training atau fine-tuning. `CosineIndex` membangun index in-memory dari chunk 90 kata dengan overlap 15, menggabungkan title ke teks embedding, dan memilih paling banyak satu hasil per `document_id`. Ranking memakai cosine similarity dengan tie-break deterministik. Tidak ada FAISS, persisted vector index, atau live web fetch.
 
-Vector retrieval harus lokal dan reproducible. Implementasi dapat menggunakan FAISS atau komponen lokal setara yang sesuai kebutuhan proyek.
-
-Retrieval request tidak melakukan live web fetch.
+Request menerima teks 1–4000 karakter, `top_k` 1–10 (default 3), dan `min_score` opsional dalam rentang cosine -1 sampai 1. Tidak ada minimum score default. Image Docker menyiapkan model pada build; runtime offline dan tidak mengunduh model saat request. Dengan KB kosong, service tidak memuat embedder; `/health/live` tetap sehat, `/health/ready` 503 `knowledge_base_empty`, dan `/retrieve` mengembalikan `results: []`.
 
 ---
 
@@ -625,12 +555,17 @@ Prompt wajib menginstruksikan model untuk:
 - tidak membuat kutipan yang tidak tersedia;
 - tidak menyebut similarity sebagai bukti kebenaran;
 - menjelaskan jika evidence tidak tersedia.
+- hanya memakai classification, excerpt, dan evidence terstruktur yang diberikan aplikasi;
+- tidak membuat judul sumber atau tanggal publikasi baru;
+- tidak melakukan re-classification meskipun evidence tampak bertentangan dengan label classifier.
 
 Cache explanation harus mempertimbangkan perubahan evidence atau knowledge-base version.
 
+`GenerateSubmissionExplanation` membaca `EvidenceReference` yang sudah dipersist, tanpa memanggil ulang retriever. Field `similarity_score` adalah skor relevansi retrieval; nilainya bukan confidence classifier atau ukuran benar/salah. Evidence kosong dikirim sebagai daftar kosong dan tidak diganti placeholder.
+
 ---
 
-# 17. Data Model Target
+# 17. Data Model RAG yang Diimplementasikan
 
 Existing core:
 
@@ -645,7 +580,7 @@ submission_processing_events
 openai usage/accounting tables
 ```
 
-Tambahan target RAG:
+Tabel evidence RAG aktual:
 
 ```text
 evidence_references
@@ -668,6 +603,8 @@ knowledge_base_version
 created_at
 updated_at
 ```
+
+`knowledge_base_version` nullable; implementasi Laravel saat ini belum mengisi versi KB pada record evidence hasil pipeline, sehingga nilainya dapat `null`.
 
 Relasi:
 
@@ -750,7 +687,7 @@ Setiap stage asynchronous harus aman terhadap:
 # 20. Security Requirements
 
 - API key/token tidak boleh di-hardcode atau di-commit.
-- `bert-service` dan `rag-service` menggunakan internal authentication jika diakses melalui service network.
+- `bert-service` memvalidasi token internal. `rag-service` saat ini hanya dibatasi melalui network internal Docker dan belum memvalidasi bearer token; `RAG_SERVICE_TOKEN` pada Laravel dapat menambahkan header, tetapi bukan pengganti autentikasi yang ditegakkan oleh service.
 - Service internal tidak perlu diekspos ke host/public pada deployment normal.
 - URL artikel/direct media harus mengikuti SSRF protection existing.
 - HTML/source content dari knowledge base harus diperlakukan sebagai untrusted text.
@@ -767,9 +704,9 @@ Setiap stage asynchronous harus aman terhadap:
 
 ---
 
-# 21. Docker Target
+# 21. Integrasi Docker yang Diimplementasikan
 
-Target Compose:
+Compose aktual:
 
 ```text
 app
@@ -788,20 +725,20 @@ Laravel → http://bert:8001
 Laravel → http://rag:8002
 ```
 
-Environment RAG minimal:
+Environment RAG yang didukung aplikasi:
 
 ```text
 RAG_SERVICE_URL
 RAG_SERVICE_TOKEN
 RAG_SERVICE_CONNECT_TIMEOUT
 RAG_SERVICE_TIMEOUT
-RAG_SERVICE_TRIES
 RAG_TOP_K
 RAG_MIN_SCORE
-RAG_KNOWLEDGE_BASE_VERSION
 ```
 
-Worker queue target:
+Nilai Docker menggunakan `RAG_SERVICE_URL=http://rag:8002`, connect timeout 3 detik, timeout 15 detik, `RAG_TOP_K=3`, token kosong, dan `RAG_MIN_SCORE` kosong. `RAG_SERVICE_TRIES` serta `RAG_KNOWLEDGE_BASE_VERSION` bukan konfigurasi yang tersedia di `config/services.php`. Queue worker mengonsumsi queue `retrieval`, tetapi tidak bergantung pada health/readiness RAG untuk startup. Service `rag` menggunakan healthcheck `/health/live`, `expose: 8002`, dan tidak memiliki host `ports:`.
+
+Queue worker aktual:
 
 ```text
 default,extract-text,extract-media,inference,retrieval,explanation
@@ -825,20 +762,11 @@ Frozen external challenge tetap merupakan evaluation-only artifact dan tidak bol
 
 ## 22.2 Evaluasi retrieval
 
-RAG memiliki evaluation set tersendiri.
+RAG memiliki evaluation dataset terpisah dan berversi di `datasets/rag/evaluation-v1/`. Evaluator memakai corpus version/checksum yang tercatat dalam manifest dan menjalankan `CosineIndex` serta embedding revision yang sama dengan `rag-service`. Metric calculator mendukung Hit Rate@3, Hit Rate@5, Precision@3, Precision@5, Recall@3, Recall@5, dan MRR pada tingkat document ID. Hasil reproducible untuk dataset, corpus, model revision, dan code yang sama.
 
-Metrik dapat mencakup:
+Dataset evaluasi saat ini berisi 0 query karena KB production v1.0.0 berisi 0 dokumen. Artifact `reports/rag-retrieval-evaluation-v1.json` menyatakan `status: blocked`, `reason: production_knowledge_base_empty`, dan `metrics: null`. Karena itu tidak tersedia metric retrieval production, tidak ada threshold candidate dari corpus production, dan `RAG_MIN_SCORE` production tetap kosong. Fixture sintetis hanya menguji evaluator dan tidak mewakili hasil retrieval production.
 
-- Hit Rate@3;
-- Hit Rate@5;
-- Precision@K;
-- Recall@K.
-
-Minimum interpretasi sederhana:
-
-> Apakah setidaknya satu referensi relevan muncul pada Top-3?
-
-Threshold retrieval harus memiliki dasar dari evaluasi, bukan dipilih hanya berdasarkan beberapa contoh manual.
+Threshold retrieval tidak otomatis dipilih dari evaluasi kosong atau fixture. Ketika corpus dan relevance judgment production sudah tersedia, threshold candidate masih harus dinilai berdasarkan evaluasi yang representatif; threshold similarity juga berbeda dari confidence threshold classifier.
 
 ## 22.3 Usability
 
@@ -868,39 +796,21 @@ Implikasi produk:
 
 ---
 
-# 24. Success Criteria
+# 24. Status Implementasi dan Kesiapan Pelaporan
 
-## 24.1 MVP RAG
+## 24.1 R1-R10 - implementasi tersedia
 
-MVP dianggap selesai ketika:
+Boundary arsitektur, knowledge-base schema/validator, local retrieval service, Laravel client, evidence persistence, pipeline retrieval, grounded explanation, result UI, Docker integration, dan regression tests telah diimplementasikan. IndoBERT `indobert-hoax v1.0.0` tetap classifier frozen dengan kelas training `valid` dan `hoax`; `meragukan` adalah abstention serving. RAG hanya menambah evidence, dan OpenAI menyusun explanation dari classification, excerpt, serta evidence yang tersimpan. Perubahan RAG tidak mengubah label atau confidence classifier.
 
-- IndoBERT `v1.0.0` tetap dipakai tanpa retraining.
-- Pipeline memiliki stage retrieval setelah classification.
-- `rag-service` dapat melakukan top-k retrieval.
-- Knowledge base memiliki provenance.
-- Evidence tersimpan per submission.
-- Result menampilkan Status Verifikasi.
-- Result menampilkan Skor Keyakinan Model.
-- Result menampilkan Daftar Bukti/Rujukan.
-- `meragukan` tampil sebagai “Informasi belum terverifikasi oleh sumber terpercaya”.
-- Explanation dapat menggunakan evidence.
-- RAG tidak mengubah label classifier.
-- Empty evidence tidak menghasilkan sumber palsu.
-- RAG outage tidak menggagalkan hasil IndoBERT.
-- Docker stack dapat menjalankan service RAG.
-- Automated regression utama lulus.
+Production KB memiliki schema, manifest, checksum, dan validator terpisah, tetapi saat ini berisi 0 dokumen. Service tetap dapat hidup, retrieval kosong tidak menghasilkan evidence palsu, dan kegagalan RAG tidak menghapus hasil classifier.
 
-## 24.2 Ready for TA Reporting
+## 24.2 R11 - framework selesai, kualitas production belum dievaluasi
 
-Selain MVP:
+Evaluation dataset v1, evaluator, metric calculator, automated tests, dan artifact report sudah tersedia. Evaluasi production berstatus blocked karena corpus dan query relevance set belum berisi data. Maka metric retrieval production dan threshold production belum tersedia; nilai fixture sintetis bukan hasil production.
 
-- retrieval evaluation set tersedia;
-- metrik retrieval terdokumentasi;
-- knowledge-base version dan provenance terdokumentasi;
-- arsitektur dan methodology sinkron dengan implementasi;
-- boundary classifier/RAG/OpenAI dijelaskan eksplisit;
-- hasil pengujian reproducible;
-- questionnaire/usability testing dapat dilakukan setelah fitur stabil.
+## 24.3 Pekerjaan lanjutan untuk pelaporan TA
+
+Sebelum melaporkan kualitas retrieval production, kurasi dokumen KB dari publikasi asli dan kumpulkan query serta relevance judgment independen yang merujuk pada dokumen di snapshot corpus tersebut. Jalankan ulang evaluator dan simpan artifact hasilnya. Jangan menetapkan `RAG_MIN_SCORE` sebelum evaluasi representatif. Questionnaire/usability testing untuk menilai kegunaan referensi masih merupakan pekerjaan lanjutan.
 
 ---
 
@@ -917,7 +827,7 @@ Selain MVP:
 | Evidence hallucination | Kehilangan kepercayaan | Evidence hanya berasal dari retrieval result terverifikasi |
 | External challenge tercampur dengan KB | Evaluasi menjadi tidak valid | Boundary dataset eksplisit dan automated checks |
 | Dependency model embedding terlalu berat | Docker/laptop melambat | Pilih pretrained embedding model yang sesuai resource dan CPU-friendly |
-| Queue retrieval tidak dikonsumsi | Submission stuck | Tambahkan queue `retrieval`, health check, regression pipeline |
+| Queue retrieval tidak dikonsumsi | Submission tertunda | Worker Docker dan Horizon telah mencakup queue `retrieval`; pantau backlog serta gunakan stale recovery |
 | Referensi URL mati | UX buruk | Simpan provenance; lakukan maintenance KB terpisah |
 | Terminologi “Status Verifikasi” dianggap keputusan resmi | Overclaim | Tambahkan copy bahwa hasil adalah indikasi sistem dan verifikasi lanjutan tetap dianjurkan |
 
@@ -951,46 +861,40 @@ Implementasi RAG tidak menjadi alasan untuk:
 
 # 28. Milestone Implementasi
 
-| Milestone | Scope |
+| Milestone | Status dan hasil |
 |---|---|
-| M1 | Boundary arsitektur RAG dan knowledge-base contract |
-| M2 | Knowledge Base v1 + validation |
-| M3 | `rag-service` + local embedding/index |
-| M4 | Laravel retriever contract + client |
-| M5 | Evidence persistence |
-| M6 | Pipeline `RetrieveSubmissionEvidence` |
-| M7 | Grounded explanation |
-| M8 | Result UI baru |
-| M9 | Docker integration |
-| M10 | Automated regression |
-| M11 | Retrieval evaluation |
-| M12 | Documentation + TA reporting sync |
+| M1 | Selesai - boundary arsitektur dan knowledge-base contract |
+| M2 | Selesai - KB v1 schema, provenance contract, dan validator; corpus production 0 dokumen |
+| M3 | Selesai - `rag-service`, embedding CPU, dan cosine index lokal |
+| M4 | Selesai - retriever contract dan HTTP adapter Laravel |
+| M5 | Selesai - persistence `EvidenceReference` |
+| M6 | Selesai - job dan pipeline retrieval |
+| M7 | Selesai - grounded explanation |
+| M8 | Selesai - presentation status, confidence, dan evidence |
+| M9 | Selesai - Docker service RAG internal-only |
+| M10 | Selesai - automated tests dan regression |
+| M11 | Framework selesai; production evaluation blocked karena KB kosong |
+| M12 | Selesai - sinkronisasi dokumentasi dan catatan keterbatasan |
 
-Detail pekerjaan teknis mengikuti dokumen `TASK-RAG-HOAXLIN.md`.
+Detail scope historis dan acceptance per milestone tercatat pada `TASK-RAG-HOAXLIN.md`.
 
 ---
 
-# 29. Product Acceptance Checklist
+# 29. Product Acceptance dan Batas Kesiapan
 
-Sebelum versi RAG dianggap siap digunakan:
+- [x] IndoBERT artifact `indobert-hoax v1.0.0` dan frozen external challenge tidak diubah oleh RAG.
+- [x] Knowledge base memiliki struktur, schema, versioning, provenance contract, dan validator terpisah dari training/test/external challenge classifier.
+- [x] Pipeline menjalankan classification, retrieval, lalu explanation pada stage dan queue berbeda.
+- [x] UI mempertahankan label internal, copy abstention `meragukan`, confidence classifier, dan empty state evidence.
+- [x] Persistence evidence menyimpan provenance dan idempotent; RAG failure tetap graceful.
+- [x] Docker Compose menyediakan service RAG internal-only dan healthcheck liveness.
+- [x] Regression R1-R10 dan framework evaluation R11 tersedia.
+- [x] Dokumentasi R12 diselaraskan dengan implementasi dan artifact yang ada.
+- [ ] Evaluasi kualitas retrieval production: blocked sampai KB dan relevance judgment terkurasi.
+- [ ] Threshold retrieval production: belum ditentukan.
+- [ ] Questionnaire/usability testing: pekerjaan lanjutan untuk laporan TA.
 
-- [ ] Classifier artifact tidak berubah.
-- [ ] Frozen external challenge tidak dimodifikasi.
-- [ ] Knowledge base terpisah dari training/evaluation dataset.
-- [ ] Semua evidence memiliki provenance dan URL sumber.
-- [ ] Retrieval berjalan untuk semua output classifier.
-- [ ] `meragukan` menggunakan copy baru pada UI.
-- [ ] Skor diberi label “Skor Keyakinan Model”.
-- [ ] Evidence section memiliki empty state.
-- [ ] RAG tidak dapat memodifikasi detection label.
-- [ ] RAG failure terdegradasi dengan aman.
-- [ ] Explanation hanya menggunakan evidence tersedia.
-- [ ] Result authorization tetap aman.
-- [ ] Retry pipeline idempotent.
-- [ ] Docker Compose valid.
-- [ ] Full regression lulus.
-- [ ] Retrieval evaluation selesai sebelum klaim performa dibuat.
-- [ ] Dokumentasi dan implementasi sinkron.
+Jangan membaca checklist framework yang selesai sebagai klaim bahwa retrieval production sudah dievaluasi.
 
 ---
 

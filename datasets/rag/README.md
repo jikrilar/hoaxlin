@@ -66,6 +66,14 @@ metrics or select `RAG_MIN_SCORE`. Synthetic documents and queries exist only
 inside temporary automated test fixtures and are never used as production
 evaluation data.
 
+The evaluator supports document-level Hit Rate@3, Hit Rate@5, Precision@3,
+Precision@5, Recall@3, Recall@5, and MRR. It uses the same local cosine index
+and pinned embedding revision as the service. Results are deterministic for
+the same query set, corpus snapshot, model revision, and code. The current
+production artifact has `metrics: null`, no threshold candidates, and no
+selected production threshold. Metric values from synthetic test fixtures are
+only calculator/runner tests, not production results.
+
 After manually curating verified knowledge-base documents and independent
 query-to-document relevance judgments, run from the repository root:
 
