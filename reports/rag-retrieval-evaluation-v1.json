@@ -1,0 +1,44 @@
+{
+  "corpus": {
+    "document_count": 0,
+    "documents_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reference": "../knowledge-base-v1",
+    "version": "1.0.0"
+  },
+  "embedding": {
+    "dimension": null,
+    "model_id": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "revision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42"
+  },
+  "evaluation_dataset": {
+    "name": "hoaxlin-rag-retrieval-evaluation",
+    "queries_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "query_count": 0,
+    "schema_version": "1.0.0",
+    "script_version": "1.0.0",
+    "version": "1.0.0"
+  },
+  "metrics": null,
+  "query_summary": {
+    "query_count": 0,
+    "valid_query_count": 0
+  },
+  "reason": "production_knowledge_base_empty",
+  "retrieval": {
+    "algorithm": "cosine_similarity",
+    "document_unit": "document_id",
+    "min_score": null,
+    "top_k": [
+      3,
+      5
+    ]
+  },
+  "schema_version": "1.0.0",
+  "status": "blocked",
+  "threshold_evaluation": {
+    "candidate_results": [],
+    "production_min_score": null,
+    "reason": "threshold production belum ditetapkan karena evaluation corpus belum cukup representatif.",
+    "status": "not_evaluated"
+  }
+}
