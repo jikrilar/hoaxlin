@@ -48,3 +48,34 @@ exact duplicates (Unicode NFKC, whitespace collapse, casefold), manifest count
 and checksum, and the no-local-input boundary. It does not fetch URLs or
 certify claims. Document collection and editorial approval remain separate
 work before retrieval can use this corpus.
+
+## Retrieval evaluation (schema 1.0.0)
+
+`evaluation-v1/` is a separate, versioned retrieval relevance set. Each line
+in `queries.jsonl` has a unique `id`, a nonempty `query`, and nonempty
+`relevant_document_ids` that must exist in the exact corpus snapshot recorded
+in `manifest.json`. It has no classifier labels. The manifest pins the corpus
+version and `documents.jsonl` checksum as well as the query file checksum.
+
+The production knowledge base currently contains zero documents, so the
+versioned evaluation file currently contains zero queries. This is an explicit
+uncollected state, not an evaluation score. The production evaluation artifact
+therefore reports `blocked` with reason
+`production_knowledge_base_empty`; it does not report zero-valued retrieval
+metrics or select `RAG_MIN_SCORE`. Synthetic documents and queries exist only
+inside temporary automated test fixtures and are never used as production
+evaluation data.
+
+After manually curating verified knowledge-base documents and independent
+query-to-document relevance judgments, run from the repository root:
+
+```powershell
+.\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py
+```
+
+The deterministic report is written to
+`reports/rag-retrieval-evaluation-v1.json`. The evaluator uses the same local
+cosine index and pinned embedding model as `rag-service`; it never calls a
+production HTTP endpoint or uses an LLM judge. Threshold sweep values are
+exploratory candidates only. `production_min_score` remains unset and must
+not be inferred automatically from a small or unrepresentative evaluation set.

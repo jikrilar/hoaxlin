@@ -1,0 +1,16 @@
+{
+    "dataset_name":  "hoaxlin-rag-retrieval-evaluation",
+    "version":  "1.0.0",
+    "schema_version":  "1.0.0",
+    "query_count":  0,
+    "queries":  {
+                    "path":  "queries.jsonl",
+                    "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                },
+    "corpus":  {
+                   "path":  "../knowledge-base-v1",
+                   "version":  "1.0.0",
+                   "documents_sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+               },
+    "evaluation_script_version":  "1.0.0"
+}
