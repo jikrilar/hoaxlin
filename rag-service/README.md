@@ -1,6 +1,6 @@
 # Hoaxlin local RAG retrieval service
 
-This service reads only `../datasets/rag/knowledge-base-v1/`. It validates the
+This service reads only `../datasets/rag/knowledge-base-v1.1.1/` by default. It validates the
 R2 manifest and document schema before building an in-memory index. It does
 not classify claims, change IndoBERT results, fetch evidence from the web, or
 generate text. Evidence metadata and snippets come directly from the validated
@@ -54,12 +54,18 @@ The image runs as a non-root user and listens on port 8002 inside the
 `hoaxlin` network without publishing a host port. Its build context allowlist
 contains only the RAG service source and requirements, the knowledge-base
 `documents.jsonl` and `manifest.json`, and the validator imported by the
-service. The image places the corpus at `/app/datasets/rag/knowledge-base-v1/`,
+service. The image places the corpus at `/app/datasets/rag/knowledge-base-v1.1.1/`,
 which is the path resolved by `app.config.KNOWLEDGE_BASE_DIRECTORY`. The
 container healthcheck uses `/health/live`; an empty corpus can therefore keep
 the process healthy while `/health/ready` reports `knowledge_base_empty`.
 
-The current data-preparation corpus snapshot has **24 documents**. The local
+The active v1.1.1 corpus snapshot has **61 documents**: 24 records preserved
+from the previously reviewed v1.0.0 snapshot and 37 additions that passed
+automated source/content checks. These checks are not human review or owner
+approval; the final snapshot report lists 21 excluded and 16 unresolved
+candidates. Candidate v1.1.0 (98 documents) remains available for audit. The
+retained v1.0.0 snapshot contains 24 documents and remains the corpus used by
+the approved R11 evaluation. The local
 service needs the pinned model cache prepared before it can build vectors; it
 does not download model files on request. A genuinely empty corpus remains a
 supported state: liveness stays healthy, readiness reports
@@ -114,7 +120,7 @@ the repository root with:
 .\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py
 ```
 
-The artifact is `reports/rag-retrieval-evaluation-v1.json`. Its final run is
+The artifact is `reports/rag-retrieval-evaluation-v1.json`. Its approved run is
 bound to the approved v1.0.0 evaluation snapshot (20 queries) and the
 knowledge-base v1.0.0 corpus (24 documents) by manifest checksums. It reports
 Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5 0.25, Recall@3 0.975,
@@ -124,4 +130,6 @@ Precision@5 to 0.635833 while Hit Rate@3/@5 falls to 0.95; 0.6 raises
 Precision@5 to 0.8 with coverage and Recall@5 at 0.95. This 20-query set is
 not sufficient to set a robust production threshold, so `RAG_MIN_SCORE`
 remains unset. Synthetic corpora are used only in automated tests; they are
-not presented as production retrieval evaluation.
+not presented as production retrieval evaluation. These metrics remain tied to
+v1.0.0 and do not measure the expanded v1.1.1 runtime corpus. The expansion task
+does not set `RAG_MIN_SCORE` or claim a retrieval-quality improvement.

@@ -10,7 +10,7 @@ date: "24 September 2026"
 
 **Hoaxlin** adalah aplikasi web untuk membantu pengguna memeriksa indikasi hoaks pada informasi yang diterima melalui teks, gambar, video, atau tautan. Sistem menggunakan **IndoBERT** sebagai classifier utama untuk menghasilkan prediksi `valid` atau `hoax`, dengan `meragukan` sebagai state abstention ketika confidence model tidak memenuhi threshold runtime.
 
-Implementasi RAG menambahkan lapisan pencarian bukti/rujukan dari knowledge base lokal. RAG tidak menggantikan IndoBERT dan tidak mengubah label classifier. Snapshot knowledge base v1.0.0 berisi 24 dokumen bersumber; evaluation v1.0.0 berisi 20 query dengan relevance judgment yang disetujui owner. Evaluasi R11 final menghasilkan Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5 0.25, Recall@3 0.975, Recall@5 1.0, dan MRR 0.95. Kandidat threshold hanya eksploratif dan `RAG_MIN_SCORE` production tidak ditetapkan.
+Implementasi RAG menambahkan lapisan pencarian bukti/rujukan dari knowledge base lokal. RAG tidak menggantikan IndoBERT dan tidak mengubah label classifier. Runtime saat ini menggunakan knowledge-base v1.1.1 dengan 61 dokumen; 37 tambahan lolos automated checks, yang bukan human review. Evaluation R11 v1.0.0 tetap terikat pada corpus 24 dokumen dan 20 query dengan relevance judgment yang disetujui owner. Evaluasi R11 final menghasilkan Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5 0.25, Recall@3 0.975, Recall@5 1.0, dan MRR 0.95; metric tersebut tidak mengukur v1.1.1. Kandidat threshold hanya eksploratif dan `RAG_MIN_SCORE` production tidak ditetapkan.
 
 Arah output utama mengikuti masukan dosen pembimbing:
 
@@ -429,10 +429,28 @@ Training corpus, test set, external challenge, dan knowledge base memiliki tujua
 ## 14.2 Struktur aktual
 
 ```text
-datasets/rag/knowledge-base-v1/
-├── documents.jsonl
-└── manifest.json
+datasets/rag/
+├── knowledge-base-v1/
+│   ├── documents.jsonl
+│   └── manifest.json
+├── knowledge-base-v1.1.0/  (candidate, 98 dokumen)
+│   ├── documents.jsonl
+│   ├── manifest.json
+│   └── review-report.md
+└── knowledge-base-v1.1.1/  (runtime, 61 dokumen)
+    ├── documents.jsonl
+    ├── manifest.json
+    └── review-report.md
 ```
+
+Runtime RAG memilih snapshot v1.1.1 (61 dokumen) melalui konfigurasi service.
+Snapshot ini mempertahankan 24 dokumen v1.0.0 dan menambahkan 37 dokumen yang
+lolos automated source/content checks; hasil otomatis ini bukan human review
+atau persetujuan owner. Candidate v1.1.0 (98 dokumen) tetap tersedia. Snapshot
+v1.0.0 tetap menjadi corpus evaluation R11 yang disetujui, sehingga metric R11
+tidak mengukur snapshot runtime v1.1.1. Struktur aktual juga memiliki
+`knowledge-base-v1.1.1/` berisi `documents.jsonl`, `manifest.json`, dan
+`review-report.md`.
 
 Minimum document schema:
 
@@ -450,7 +468,7 @@ Minimum document schema:
 
 `published_at` dan `topic` menerima nilai `null` sesuai schema. Manifest v1 menyimpan versi/schema, jumlah dokumen, checksum SHA-256 file JSONL, dan provenance. Validator tersedia di `scripts/validate_rag_knowledge_base.py`; ia memvalidasi schema, ID/duplikasi, checksum/count, dan boundary input lokal. Validator tidak memverifikasi kebenaran isi atau melakukan fetch URL.
 
-Snapshot production saat ini adalah knowledge-base v1.0.0 dengan **24 dokumen bersumber**. Ringkasan isi dan provenance ditautkan ke publikasi asli. Evaluation v1.0.0 memuat 20 query dengan relevance judgment yang disetujui owner untuk corpus ini. `datasets/processed/`, test set classifier, dan `datasets/challenge/` termasuk external challenge tidak boleh menjadi sumber knowledge base. Tidak ada dokumen sintetis di corpus production.
+Snapshot runtime production saat ini adalah knowledge-base v1.1.1 dengan **61 dokumen**; review report membedakan 24 dokumen legacy yang sebelumnya ditinjau dari 37 tambahan yang hanya lolos pemeriksaan otomatis. Evaluation v1.0.0 memuat 20 query dengan relevance judgment yang disetujui owner untuk corpus v1.0.0 berisi 24 dokumen, bukan v1.1.1. `datasets/processed/`, test set classifier, dan `datasets/challenge/` termasuk external challenge tidak boleh menjadi sumber knowledge base. Tidak ada dokumen sintetis di corpus production.
 
 ## 14.3 Sumber prioritas
 
@@ -802,15 +820,15 @@ Implikasi produk:
 
 Boundary arsitektur, knowledge-base schema/validator, local retrieval service, Laravel client, evidence persistence, pipeline retrieval, grounded explanation, result UI, Docker integration, dan regression tests telah diimplementasikan. IndoBERT `indobert-hoax v1.0.0` tetap classifier frozen dengan kelas training `valid` dan `hoax`; `meragukan` adalah abstention serving. RAG hanya menambah evidence, dan OpenAI menyusun explanation dari classification, excerpt, serta evidence yang tersimpan. Perubahan RAG tidak mengubah label atau confidence classifier.
 
-Production KB memiliki schema, manifest, checksum, dan validator terpisah; snapshot saat ini berisi 24 dokumen bersumber. Service tetap mendukung kondisi KB kosong, retrieval kosong tidak menghasilkan evidence palsu, dan kegagalan RAG tidak menghapus hasil classifier.
+Production KB memiliki schema, manifest, checksum, dan validator terpisah. Snapshot runtime v1.1.1 memuat 61 dokumen: 24 record legacy yang sebelumnya ditinjau dan 37 tambahan yang lolos automated source/content checks. Sebanyak 21 kandidat dikecualikan dan 16 masih memerlukan review; tidak ada klaim bahwa 37 hasil otomatis telah human-reviewed. Evaluasi R11 tetap menggunakan snapshot v1.0.0 berisi 24 dokumen. Service mendukung kondisi KB kosong, retrieval kosong tidak menghasilkan evidence palsu, dan kegagalan RAG tidak menghapus hasil classifier.
 
 ## 24.2 R11 - evaluasi snapshot selesai, threshold production belum ditetapkan
 
 Evaluation dataset v1, evaluator, metric calculator, automated tests, dan artifact final sudah tersedia. Snapshot 24 dokumen/20 query telah dievaluasi dengan embedding revision yang dipatok. Hasil dan kandidat threshold eksploratif tercatat pada report; threshold production belum ditetapkan karena ukuran serta cakupan dataset belum cukup untuk keputusan robust.
 
-## 24.3 Pekerjaan lanjutan untuk pelaporan TA
+## 24.3 R13 dan pekerjaan lanjutan
 
-Sebelum melaporkan kualitas retrieval production, kurasi dokumen KB dari publikasi asli dan kumpulkan query serta relevance judgment independen yang merujuk pada dokumen di snapshot corpus tersebut. Jalankan ulang evaluator dan simpan artifact hasilnya. Jangan menetapkan `RAG_MIN_SCORE` sebelum evaluasi representatif. Questionnaire/usability testing untuk menilai kegunaan referensi masih merupakan pekerjaan lanjutan.
+R13 memperluas corpus melalui pemeriksaan otomatis atas provenance dan isi. Sebanyak 37 kandidat baru masuk snapshot runtime setelah melewati seluruh gate otomatis; 21 dikecualikan dan 16 tetap review-required. Pemeriksaan ini bukan human review dan tidak merupakan evaluasi retrieval formal. Sebelum menggeneralisasi kualitas ke snapshot v1.1.1, susun atau perbarui evaluation queries dan relevance judgments yang secara independen mengacu pada corpus baru, lalu jalankan tahap evaluasi berikutnya. Jangan menetapkan `RAG_MIN_SCORE` sebelum evaluasi representatif. Questionnaire/usability testing untuk menilai kegunaan referensi masih merupakan pekerjaan lanjutan.
 
 ---
 
@@ -875,6 +893,7 @@ Implementasi RAG tidak menjadi alasan untuk:
 | M10 | Selesai - automated tests dan regression |
 | M11 | Selesai - evaluasi final pada corpus 24 dokumen dan 20 query yang disetujui; threshold production belum ditetapkan |
 | M12 | Selesai - sinkronisasi dokumentasi dan catatan keterbatasan |
+| M13 | Selesai - pemeriksaan otomatis kandidat KB; snapshot v1.1.1 berisi 61 dokumen, tanpa klaim human approval |
 
 Detail scope historis dan acceptance per milestone tercatat pada `TASK-RAG-HOAXLIN.md`.
 

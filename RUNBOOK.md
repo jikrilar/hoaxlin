@@ -87,7 +87,7 @@ docker compose exec rag python -c "import urllib.request; print(urllib.request.u
 docker compose exec rag python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8002/version', timeout=3).read().decode())"
 ```
 
-Snapshot corpus di `datasets/rag/knowledge-base-v1/` berisi 24 dokumen bersumber. Evaluation v1.0.0 berisi 20 query dengan relevance judgment yang disetujui owner dan sudah memiliki report R11 final. `/health/ready` menunjukkan kesiapan resource model/index; untuk konfigurasi KB kosong, 503 `knowledge_base_empty` tetap merupakan kondisi yang ditangani, bukan kegagalan liveness. `RAG_MIN_SCORE` production tetap kosong karena threshold belum ditetapkan secara robust.
+Runtime RAG memakai `datasets/rag/knowledge-base-v1.1.1/` (61 dokumen): 24 dokumen legacy yang sebelumnya ditinjau dan 37 tambahan yang lolos automated checks. Pemeriksaan otomatis bukan human review atau owner approval; snapshot v1.1.0 (98 dokumen) tetap tersedia sebagai candidate. Report R11 tetap terikat melalui checksum ke corpus v1.0.0 (24 dokumen), sehingga metric-nya tidak mengukur runtime v1.1.1. `/health/ready` menunjukkan kesiapan resource model/index; 503 `knowledge_base_empty` tetap merupakan kondisi yang ditangani, bukan kegagalan liveness. `RAG_MIN_SCORE` production tetap kosong karena threshold belum ditetapkan secara robust.
 
 Validasi knowledge base dan jalankan regression evaluasi dari root repository:
 

@@ -13,9 +13,12 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from scripts.validate_rag_knowledge_base import (  # noqa: E402
     DEFAULT_DIRECTORY,
+    LEGACY_DIRECTORY,
     ValidationError,
     validate_knowledge_base,
 )
+
+CANDIDATE_DIRECTORY = LEGACY_DIRECTORY.parent / "knowledge-base-v1.1.0"
 
 
 def fixture_document(**changes: object) -> dict:
@@ -78,6 +81,30 @@ class KnowledgeBaseValidatorTest(unittest.TestCase):
         document_count = validate_knowledge_base(DEFAULT_DIRECTORY)
         self.assertGreater(document_count, 0)
         self.assertEqual(document_count, manifest["document_count"])
+        self.assertEqual(manifest["version"], "1.1.1")
+        self.assertEqual(document_count, 61)
+
+    def test_unreviewed_candidate_snapshot_remains_valid_and_unchanged(self) -> None:
+        manifest = json.loads(
+            (CANDIDATE_DIRECTORY / "manifest.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(validate_knowledge_base(CANDIDATE_DIRECTORY), 98)
+        self.assertEqual(manifest["version"], "1.1.0")
+        self.assertEqual(
+            manifest["documents"]["sha256"],
+            "2d6945ea68b2be604e8d2737cfbed5f33e6c2d61fa468b5cc2a5aafc3daf4bdc",
+        )
+
+    def test_legacy_snapshot_remains_valid_and_unchanged(self) -> None:
+        manifest = json.loads(
+            (LEGACY_DIRECTORY / "manifest.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(validate_knowledge_base(LEGACY_DIRECTORY), 24)
+        self.assertEqual(manifest["version"], "1.0.0")
+        self.assertEqual(
+            manifest["documents"]["sha256"],
+            "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2",
+        )
 
     def test_complete_schema_accepts_nullable_fields_and_real_date(self) -> None:
         self.write_fixture(
@@ -179,6 +206,11 @@ class KnowledgeBaseValidatorTest(unittest.TestCase):
         self.assert_invalid("documents.path")
 
         manifest["documents"]["path"] = "documents.jsonl"
+        manifest["version"] = "9.0.0"
+        self.write_manifest(manifest)
+        self.assert_invalid("unsupported version")
+
+        manifest["version"] = "1.0.0"
         manifest["schema_version"] = "2.0.0"
         self.write_manifest(manifest)
         self.assert_invalid("version")
