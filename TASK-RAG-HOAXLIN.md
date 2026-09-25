@@ -1,8 +1,8 @@
 # TASK — Implementasi RAG Evidence Retrieval pada Hoaxlin
 
-## Status Implementasi R1-R12 (snapshot 24 September 2026)
+## Status Implementasi R1-R13 (snapshot 25 September 2026)
 
-R1-R11 sudah diimplementasikan dan merged ke `main`; R12 adalah sinkronisasi dokumentasi final. Ringkasan berikut membedakan implementasi kode dari ketersediaan data evaluasi:
+R1-R12 sudah diimplementasikan dan merged ke `main`; R13 melakukan perluasan knowledge base melalui automated verification. Ringkasan ini membedakan implementasi kode dari status review dan evaluasi data:
 
 | Tahap | Status aktual |
 |---|---|
@@ -18,6 +18,7 @@ R1-R11 sudah diimplementasikan dan merged ke `main`; R12 adalah sinkronisasi dok
 | R10 | Selesai - automated tests dan regression |
 | R11 | Selesai - snapshot 24 dokumen/20 query disetujui dan dievaluasi; threshold production belum ditetapkan |
 | R12 | Selesai - sinkronisasi dokumentasi final |
+| R13 | Selesai - source/content checks otomatis; snapshot v1.1.1 berisi 24 dokumen legacy dan 37 tambahan yang lolos checks; hasil otomatis bukan human review; 21 dikecualikan dan 16 masih perlu review |
 
 Boundary tetap: **IndoBERT = classifier**, **RAG = evidence retrieval**, dan **OpenAI = grounded explanation**. OpenAI juga dipakai pada tahap input untuk OCR, transkripsi, serta translation. `meragukan` adalah abstention serving, bukan kelas training IndoBERT. Similarity score bukan confidence classifier dan bukan bukti kebenaran.
 

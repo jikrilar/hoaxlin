@@ -13,7 +13,10 @@ import unicodedata
 from urllib.parse import urlsplit
 
 
-DEFAULT_DIRECTORY = Path(__file__).resolve().parents[1] / "datasets/rag/knowledge-base-v1"
+DATASET_ROOT = Path(__file__).resolve().parents[1] / "datasets/rag"
+LEGACY_DIRECTORY = DATASET_ROOT / "knowledge-base-v1"
+DEFAULT_DIRECTORY = DATASET_ROOT / "knowledge-base-v1.1.1"
+SUPPORTED_VERSIONS = frozenset({"1.0.0", "1.1.0", "1.1.1"})
 DOCUMENT_FIELDS = frozenset(
     {"id", "title", "content", "source", "source_url", "published_at", "topic"}
 )
@@ -128,7 +131,11 @@ def _validate_manifest(value: object) -> dict:
     manifest = _exact_keys(value, MANIFEST_FIELDS, "manifest.json")
     if manifest["dataset_name"] != "hoaxlin-rag-knowledge-base":
         raise ValidationError("manifest.json: unexpected dataset_name")
-    if manifest["version"] != "1.0.0" or manifest["schema_version"] != "1.0.0":
+    if (
+        not isinstance(manifest["version"], str)
+        or manifest["version"] not in SUPPORTED_VERSIONS
+        or manifest["schema_version"] != "1.0.0"
+    ):
         raise ValidationError("manifest.json: unsupported version or schema_version")
     if type(manifest["document_count"]) is not int or manifest["document_count"] < 0:
         raise ValidationError("manifest.json: document_count must be a nonnegative integer")

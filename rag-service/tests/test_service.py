@@ -105,6 +105,20 @@ def test_live_health_and_empty_knowledge_base_fixture(tmp_path: Path) -> None:
         assert response.json() == {"results": []}
 
 
+def test_runtime_selects_expanded_versioned_snapshot_without_real_model() -> None:
+    with TestClient(
+        create_app(embedding_factory=TestEmbedding)
+    ) as client:
+        version = client.get("/version")
+        assert version.status_code == 200
+        assert version.json()["knowledge_base_version"] == "1.1.1"
+        assert version.json()["document_count"] == 61
+        assert client.get("/health/ready").json() == {
+            "status": "ready",
+            "reason": None,
+        }
+
+
 def test_top_k_deterministic_ranking_response_schema_and_provenance(tmp_path: Path) -> None:
     documents = [document("doc-b", "beta"), document("doc-a", "alpha")]
     write_kb(tmp_path, documents)

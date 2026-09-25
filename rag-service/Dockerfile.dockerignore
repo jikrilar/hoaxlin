@@ -13,9 +13,9 @@
 
 !datasets/
 !datasets/rag/
-!datasets/rag/knowledge-base-v1/
-!datasets/rag/knowledge-base-v1/documents.jsonl
-!datasets/rag/knowledge-base-v1/manifest.json
+!datasets/rag/knowledge-base-v1.1.1/
+!datasets/rag/knowledge-base-v1.1.1/documents.jsonl
+!datasets/rag/knowledge-base-v1.1.1/manifest.json
 
 **/__pycache__/
 **/*.py[cod]

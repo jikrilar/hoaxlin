@@ -21,7 +21,7 @@ WORKDIR /app/rag-service
 RUN groupadd --system --gid 10001 rag \
     && useradd --system --uid 10001 --gid rag --home-dir /nonexistent \
         --shell /usr/sbin/nologin rag \
-    && mkdir -p /opt/huggingface /app/scripts /app/datasets/rag/knowledge-base-v1
+    && mkdir -p /opt/huggingface /app/scripts /app/datasets/rag/knowledge-base-v1.1.1
 
 COPY rag-service/requirements.txt /tmp/requirements.txt
 
@@ -35,7 +35,7 @@ RUN python -m pip install \
 
 COPY --chown=10001:10001 rag-service/app/ ./app/
 COPY --chown=10001:10001 scripts/validate_rag_knowledge_base.py /app/scripts/validate_rag_knowledge_base.py
-COPY --chown=10001:10001 datasets/rag/knowledge-base-v1/ /app/datasets/rag/knowledge-base-v1/
+COPY --chown=10001:10001 datasets/rag/knowledge-base-v1.1.1/ /app/datasets/rag/knowledge-base-v1.1.1/
 
 # This explicit build-time step downloads the model at the revision pinned in
 # app/config.py. The runtime uses this same HF_HOME with offline mode enabled.
