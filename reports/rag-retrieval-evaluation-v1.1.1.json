@@ -1,0 +1,555 @@
+{
+  "baseline_comparison": {
+    "baseline_corpus_version": "1.0.0",
+    "baseline_document_count": 24,
+    "baseline_documents_sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2",
+    "baseline_report": "reports/rag-retrieval-evaluation-v1.json",
+    "interpretation": "Perbedaan bersifat deskriptif karena corpus berubah; bukan klaim peningkatan atau penurunan kualitas absolut.",
+    "metrics": {
+      "hit_rate@3": {
+        "difference_v1.1.1_minus_v1.0.0": 0.0,
+        "v1.0.0": 1.0,
+        "v1.1.1": 1.0
+      },
+      "hit_rate@5": {
+        "difference_v1.1.1_minus_v1.0.0": 0.0,
+        "v1.0.0": 1.0,
+        "v1.1.1": 1.0
+      },
+      "mrr": {
+        "difference_v1.1.1_minus_v1.0.0": 0.0,
+        "v1.0.0": 0.95,
+        "v1.1.1": 0.95
+      },
+      "precision@3": {
+        "difference_v1.1.1_minus_v1.0.0": -0.016667,
+        "v1.0.0": 0.4,
+        "v1.1.1": 0.383333
+      },
+      "precision@5": {
+        "difference_v1.1.1_minus_v1.0.0": 0.0,
+        "v1.0.0": 0.25,
+        "v1.1.1": 0.25
+      },
+      "recall@3": {
+        "difference_v1.1.1_minus_v1.0.0": -0.016667,
+        "v1.0.0": 0.975,
+        "v1.1.1": 0.958333
+      },
+      "recall@5": {
+        "difference_v1.1.1_minus_v1.0.0": 0.0,
+        "v1.0.0": 1.0,
+        "v1.1.1": 1.0
+      }
+    }
+  },
+  "corpus": {
+    "document_count": 61,
+    "documents_sha256": "c937f0ac221b3d6fd5ce829a969c0712832e1c873959ed531ff8bc363366877d",
+    "reference": "../knowledge-base-v1.1.1",
+    "version": "1.1.1"
+  },
+  "embedding": {
+    "dimension": 384,
+    "model_id": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "revision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42"
+  },
+  "evaluation_dataset": {
+    "name": "hoaxlin-rag-retrieval-evaluation",
+    "queries_sha256": "0010336a9a3c1060cf0d12e5ddf6772448d74a46960eb049098378cffa3bc0de",
+    "query_count": 20,
+    "schema_version": "1.0.0",
+    "script_version": "1.0.0",
+    "version": "1.0.0"
+  },
+  "evaluation_scope": {
+    "classification": "limited_evaluation_set",
+    "judgment_approval_scope": {
+      "approved_corpus_sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2",
+      "approved_corpus_version": "1.0.0",
+      "evaluation_version": "1.0.0",
+      "queries_sha256": "0010336a9a3c1060cf0d12e5ddf6772448d74a46960eb049098378cffa3bc0de",
+      "status": "owner_approved_for_v1.0.0_corpus_only"
+    },
+    "limitations": [
+      "Evaluasi menggunakan 20 query yang ada; hasil tidak universal dan tidak mencakup query baru.",
+      "Relevance judgment disetujui owner untuk evaluation v1.0.0 pada corpus v1.0.0 (24 dokumen), bukan untuk corpus v1.1.1.",
+      "Dokumen tambahan pada corpus v1.1.1 tidak memiliki relevance judgment independen pada query ini; metric menghitung dokumen yang tidak tercantum sebagai non-relevant, sehingga precision dapat terpengaruh label yang belum lengkap.",
+      "Retrieval relevance dan cosine similarity bukan bukti kebenaran berita atau confidence classifier."
+    ]
+  },
+  "failure_analysis": {
+    "cases": [
+      {
+        "precision_at_5": 0.4,
+        "query": "Bagaimana BI bekerja bersama regulator dan industri untuk meningkatkan kewaspadaan masyarakat terhadap penipuan keuangan digital?",
+        "query_id": "eval-020",
+        "reason": "tidak semua dokumen relevan yang dinilai muncul di Top-3; dokumen relevan pertama berada pada rank 2, bukan rank 1",
+        "relevant_document_ids": [
+          "kb-bi-013",
+          "kb-bi-015"
+        ],
+        "relevant_ranks": {
+          "kb-bi-013": 2,
+          "kb-bi-015": 4
+        },
+        "top5": [
+          {
+            "document_id": "kb-bi-012",
+            "rank": 1,
+            "score": 0.691031
+          },
+          {
+            "document_id": "kb-bi-013",
+            "rank": 2,
+            "score": 0.6595
+          },
+          {
+            "document_id": "kb-bi-014",
+            "rank": 3,
+            "score": 0.65346
+          },
+          {
+            "document_id": "kb-bi-015",
+            "rank": 4,
+            "score": 0.591264
+          },
+          {
+            "document_id": "tb-31700",
+            "rank": 5,
+            "score": 0.481613
+          }
+        ]
+      },
+      {
+        "precision_at_5": 0.6,
+        "query": "Pesan berantai menyebut gempa susulan berkekuatan besar akan terjadi pada jam tertentu. Apakah BMKG pernah menerbitkan informasi seperti itu dan bisakah waktu gempa dipastikan?",
+        "query_id": "eval-002",
+        "reason": "tidak semua dokumen relevan yang dinilai muncul di Top-3",
+        "relevant_document_ids": [
+          "kb-bmkg-003",
+          "kb-bmkg-004",
+          "kb-komdigi-006"
+        ],
+        "relevant_ranks": {
+          "kb-bmkg-003": 1,
+          "kb-bmkg-004": 4,
+          "kb-komdigi-006": 2
+        },
+        "top5": [
+          {
+            "document_id": "kb-bmkg-003",
+            "rank": 1,
+            "score": 0.809393
+          },
+          {
+            "document_id": "kb-komdigi-006",
+            "rank": 2,
+            "score": 0.783564
+          },
+          {
+            "document_id": "tb-30467",
+            "rank": 3,
+            "score": 0.773844
+          },
+          {
+            "document_id": "kb-bmkg-004",
+            "rank": 4,
+            "score": 0.708406
+          },
+          {
+            "document_id": "kb-komdigi-007",
+            "rank": 5,
+            "score": 0.61718
+          }
+        ]
+      },
+      {
+        "precision_at_5": 0.2,
+        "query": "Sebuah akun memakai citra Gubernur BI dan nomor WhatsApp untuk mendaftarkan bantuan. Apa yang ditemukan pemeriksa fakta mengenai pengumuman itu?",
+        "query_id": "eval-017",
+        "reason": "dokumen relevan pertama berada pada rank 2, bukan rank 1",
+        "relevant_document_ids": [
+          "kb-mafindo-023"
+        ],
+        "relevant_ranks": {
+          "kb-mafindo-023": 2
+        },
+        "top5": [
+          {
+            "document_id": "kb-mafindo-020",
+            "rank": 1,
+            "score": 0.53322
+          },
+          {
+            "document_id": "kb-mafindo-023",
+            "rank": 2,
+            "score": 0.484948
+          },
+          {
+            "document_id": "kb-mafindo-022",
+            "rank": 3,
+            "score": 0.479422
+          },
+          {
+            "document_id": "tb-26369",
+            "rank": 4,
+            "score": 0.455731
+          },
+          {
+            "document_id": "tb-36282",
+            "rank": 5,
+            "score": 0.439898
+          }
+        ]
+      }
+    ],
+    "document_unit": "document_id",
+    "query_count_with_judged_relevance_not_all_in_top3": 2,
+    "query_count_with_judged_relevance_not_all_in_top5": 0,
+    "query_count_with_no_judged_relevant_in_top5": 0,
+    "ranking_method": "same production CosineIndex; top_k=5; min_score=None"
+  },
+  "metrics": {
+    "hit_rate@3": 1.0,
+    "hit_rate@5": 1.0,
+    "mrr": 0.95,
+    "precision@3": 0.383333,
+    "precision@5": 0.25,
+    "recall@3": 0.958333,
+    "recall@5": 1.0
+  },
+  "query_summary": {
+    "query_count": 20,
+    "query_hits": {
+      "@3": 20,
+      "@5": 20
+    },
+    "valid_query_count": 20
+  },
+  "retrieval": {
+    "algorithm": "cosine_similarity",
+    "document_unit": "document_id",
+    "min_score": null,
+    "top_k": [
+      3,
+      5
+    ]
+  },
+  "schema_version": "1.0.0",
+  "smoke_tests": {
+    "cases": [
+      {
+        "deterministic": true,
+        "id": "existing-eval-001",
+        "query": "Ada kanal Telegram yang memakai nama sistem peringatan dini gempa BMKG dan meminta biaya. Apakah kanal itu resmi dan bagaimana status sistemnya?",
+        "top5": [
+          {
+            "document_id": "kb-bmkg-001",
+            "rank": 1,
+            "score": 0.680213
+          },
+          {
+            "document_id": "kb-komdigi-006",
+            "rank": 2,
+            "score": 0.65732
+          },
+          {
+            "document_id": "kb-bmkg-005",
+            "rank": 3,
+            "score": 0.545653
+          },
+          {
+            "document_id": "kb-bmkg-003",
+            "rank": 4,
+            "score": 0.536471
+          },
+          {
+            "document_id": "tb-30467",
+            "rank": 5,
+            "score": 0.465805
+          }
+        ]
+      },
+      {
+        "deterministic": true,
+        "id": "existing-eval-018",
+        "query": "Jika aplikasi investasi emas mengaku diawasi Bank Indonesia, apakah BI memberi izin atau sertifikasi untuk aplikasi investasi emas?",
+        "top5": [
+          {
+            "document_id": "kb-mafindo-024",
+            "rank": 1,
+            "score": 0.85187
+          },
+          {
+            "document_id": "kb-mafindo-023",
+            "rank": 2,
+            "score": 0.455429
+          },
+          {
+            "document_id": "kb-bi-014",
+            "rank": 3,
+            "score": 0.428041
+          },
+          {
+            "document_id": "kb-bi-012",
+            "rank": 4,
+            "score": 0.411954
+          },
+          {
+            "document_id": "kb-bi-015",
+            "rank": 5,
+            "score": 0.40162
+          }
+        ]
+      },
+      {
+        "deterministic": true,
+        "id": "ad-hoc-education",
+        "query": "Apakah tautan pendaftaran Beasiswa Garuda yang beredar merupakan saluran resmi?",
+        "top5": [
+          {
+            "document_id": "tb-31097",
+            "rank": 1,
+            "score": 0.664406
+          },
+          {
+            "document_id": "tb-33311",
+            "rank": 2,
+            "score": 0.457211
+          },
+          {
+            "document_id": "kb-mafindo-021",
+            "rank": 3,
+            "score": 0.454811
+          },
+          {
+            "document_id": "tb-31204",
+            "rank": 4,
+            "score": 0.407287
+          },
+          {
+            "document_id": "kb-mafindo-022",
+            "rank": 5,
+            "score": 0.402369
+          }
+        ]
+      },
+      {
+        "deterministic": true,
+        "id": "ad-hoc-sports",
+        "query": "Benarkah FIFA menunjuk Indonesia sebagai tuan rumah Piala Dunia 2026?",
+        "top5": [
+          {
+            "document_id": "tb-32807",
+            "rank": 1,
+            "score": 0.830034
+          },
+          {
+            "document_id": "kb-bmkg-002",
+            "rank": 2,
+            "score": 0.496011
+          },
+          {
+            "document_id": "tb-30452",
+            "rank": 3,
+            "score": 0.462072
+          },
+          {
+            "document_id": "kb-bi-015",
+            "rank": 4,
+            "score": 0.444618
+          },
+          {
+            "document_id": "kb-bi-013",
+            "rank": 5,
+            "score": 0.42501
+          }
+        ]
+      },
+      {
+        "deterministic": true,
+        "id": "ad-hoc-energy",
+        "query": "Benarkah harga BBM akan turun menjadi Rp7.000 setelah kesepakatan pemerintah?",
+        "top5": [
+          {
+            "document_id": "tb-31649",
+            "rank": 1,
+            "score": 0.740545
+          },
+          {
+            "document_id": "tb-30261",
+            "rank": 2,
+            "score": 0.456748
+          },
+          {
+            "document_id": "tb-36521",
+            "rank": 3,
+            "score": 0.379337
+          },
+          {
+            "document_id": "esdm-2025-capaian",
+            "rank": 4,
+            "score": 0.351307
+          },
+          {
+            "document_id": "kb-komdigi-011",
+            "rank": 5,
+            "score": 0.346926
+          }
+        ]
+      }
+    ],
+    "corpus_documents_sha256": "c937f0ac221b3d6fd5ce829a969c0712832e1c873959ed531ff8bc363366877d",
+    "corpus_version": "1.1.1",
+    "runtime_corpus_directory": "datasets/rag/knowledge-base-v1.1.1"
+  },
+  "status": "complete",
+  "threshold_evaluation": {
+    "candidate_results": [
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.383333,
+          "precision@5": 0.25,
+          "recall@3": 0.958333,
+          "recall@5": 1.0
+        },
+        "min_score": 0.0
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.383333,
+          "precision@5": 0.25,
+          "recall@3": 0.958333,
+          "recall@5": 1.0
+        },
+        "min_score": 0.1
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.383333,
+          "precision@5": 0.25,
+          "recall@3": 0.958333,
+          "recall@5": 1.0
+        },
+        "min_score": 0.2
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.383333,
+          "precision@5": 0.25,
+          "recall@3": 0.958333,
+          "recall@5": 1.0
+        },
+        "min_score": 0.3
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 1.0,
+          "hit_rate@5": 1.0,
+          "mrr": 0.95,
+          "precision@3": 0.391667,
+          "precision@5": 0.279167,
+          "recall@3": 0.958333,
+          "recall@5": 1.0
+        },
+        "min_score": 0.4
+      },
+      {
+        "coverage": 1.0,
+        "coverage_count": 20,
+        "metrics": {
+          "hit_rate@3": 0.95,
+          "hit_rate@5": 0.95,
+          "mrr": 0.925,
+          "precision@3": 0.533333,
+          "precision@5": 0.490833,
+          "recall@3": 0.908333,
+          "recall@5": 0.95
+        },
+        "min_score": 0.5
+      },
+      {
+        "coverage": 0.95,
+        "coverage_count": 19,
+        "metrics": {
+          "hit_rate@3": 0.95,
+          "hit_rate@5": 0.95,
+          "mrr": 0.925,
+          "precision@3": 0.741667,
+          "precision@5": 0.731667,
+          "recall@3": 0.908333,
+          "recall@5": 0.925
+        },
+        "min_score": 0.6
+      },
+      {
+        "coverage": 0.55,
+        "coverage_count": 11,
+        "metrics": {
+          "hit_rate@3": 0.55,
+          "hit_rate@5": 0.55,
+          "mrr": 0.55,
+          "precision@3": 0.508333,
+          "precision@5": 0.5125,
+          "recall@3": 0.533333,
+          "recall@5": 0.55
+        },
+        "min_score": 0.7
+      },
+      {
+        "coverage": 0.3,
+        "coverage_count": 6,
+        "metrics": {
+          "hit_rate@3": 0.3,
+          "hit_rate@5": 0.3,
+          "mrr": 0.3,
+          "precision@3": 0.3,
+          "precision@5": 0.3,
+          "recall@3": 0.266667,
+          "recall@5": 0.266667
+        },
+        "min_score": 0.8
+      },
+      {
+        "coverage": 0.0,
+        "coverage_count": 0,
+        "metrics": {
+          "hit_rate@3": 0.0,
+          "hit_rate@5": 0.0,
+          "mrr": 0.0,
+          "precision@3": 0.0,
+          "precision@5": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0
+        },
+        "min_score": 0.9
+      }
+    ],
+    "production_min_score": null,
+    "reason": "Kandidat hanya eksploratif dan tidak dipilih sebagai threshold production. Evaluation set terbatas pada 20 query dan relevance judgment disetujui untuk corpus v1.0.0; threshold production belum dapat ditetapkan secara robust.",
+    "status": "exploratory_candidates_not_selected"
+  }
+}

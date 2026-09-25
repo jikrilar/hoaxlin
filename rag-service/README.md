@@ -130,6 +130,15 @@ Precision@5 to 0.635833 while Hit Rate@3/@5 falls to 0.95; 0.6 raises
 Precision@5 to 0.8 with coverage and Recall@5 at 0.95. This 20-query set is
 not sufficient to set a robust production threshold, so `RAG_MIN_SCORE`
 remains unset. Synthetic corpora are used only in automated tests; they are
-not presented as production retrieval evaluation. These metrics remain tied to
-v1.0.0 and do not measure the expanded v1.1.1 runtime corpus. The expansion task
-does not set `RAG_MIN_SCORE` or claim a retrieval-quality improvement.
+not presented as production retrieval evaluation.
+
+The separate R14 artifact `reports/rag-retrieval-evaluation-v1.1.1.json`
+re-runs the same 20 query records on the 61-document v1.1.1 corpus using this
+service's `CosineIndex` and pinned embedding revision. It reports Hit Rate@3/@5
+1.0, Precision@3 0.383333, Precision@5 0.25, Recall@3 0.958333, Recall@5 1.0,
+and MRR 0.95. The query judgments were owner-approved only against v1.0.0;
+new corpus documents have no independent relevance judgments, so this result
+is limited and precision may be affected by unjudged relevant documents. The
+20-query set is not universal, and cross-corpus metric differences do not
+establish an absolute quality increase or decrease. `RAG_MIN_SCORE` remains
+unset; no production threshold is selected.

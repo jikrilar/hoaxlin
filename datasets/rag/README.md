@@ -70,45 +70,31 @@ in `queries.jsonl` has a unique `id`, a nonempty `query`, and nonempty
 in `manifest.json`. It has no classifier labels. The manifest pins the corpus
 version and `documents.jsonl` checksum as well as the query file checksum.
 
-The approved evaluation snapshot contains 20 query records against the
-24-document v1.0.0 corpus snapshot. Owner approval and its exact version/checksum
-scope are recorded in
+The approved evaluation snapshot contains 20 query records and is bound by
+manifest checksum to the 24-document v1.0.0 corpus. Owner approval and its exact
+version/checksum scope are recorded in
 [`evaluation-v1/relevance-review.md`](evaluation-v1/relevance-review.md).
-The R11 report at `reports/rag-retrieval-evaluation-v1.json` remains bound to
-these v1.0.0 snapshots; it does not evaluate v1.1.0 or v1.1.1. It reports Hit Rate@3/@5
-1.0, Precision@3 0.4, Precision@5
-0.25, Recall@3 0.975, Recall@5 1.0, and MRR 0.95. Threshold candidates are
-exploratory only; `RAG_MIN_SCORE` remains unset because 20 queries are not a
-robust basis for selecting a production threshold. Synthetic documents and
-queries exist only inside temporary automated test fixtures and are never
-used as production corpus or evaluation records.
+The original R11 report, `reports/rag-retrieval-evaluation-v1.json`, remains
+unchanged and reports Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5 0.25,
+Recall@3 0.975, Recall@5 1.0, and MRR 0.95 for those v1.0.0 snapshots.
 
-The evaluator supports document-level Hit Rate@3, Hit Rate@5, Precision@3,
-Precision@5, Recall@3, Recall@5, and MRR. It uses the same local cosine index
-and pinned embedding revision as the service. Results are deterministic for
-the same query set, corpus snapshot, model revision, and code. The final
-production artifact records the metrics for the approved snapshot. Its
-exploratory threshold candidates show increasing precision with reduced hit
-rate or coverage at higher scores; no production threshold is selected from
-this 20-query set. Metric values from synthetic test fixtures are only
-calculator/runner tests, not production results.
+R14 adds `reports/rag-retrieval-evaluation-v1.1.1.json`: the same 20 query
+bytes and relevance judgments were evaluated with the v1.1.1 corpus (61
+records), using the same local cosine index and pinned embedding revision as
+`rag-service`. It reports Hit Rate@3/@5 1.0, Precision@3 0.383333,
+Precision@5 0.25, Recall@3 0.958333, Recall@5 1.0, and MRR 0.95. The owner
+approval remains scoped to v1.0.0; relevance of newly added documents was not
+independently judged. Unlisted documents are treated as non-relevant by the
+metric calculator, so precision on the expanded corpus is subject to incomplete
+judgments. This is a limited evaluation set, not a universal estimate. Metric
+differences are descriptive across different corpus snapshots, not proof of
+absolute quality improvement or decline.
 
-To reproduce the approved v1.0.0 evaluation from the repository root, run:
-
-```powershell
-.\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py
-```
-
-The deterministic report is written to
-`reports/rag-retrieval-evaluation-v1.json`. The evaluator uses the same local
-cosine index and pinned embedding model as `rag-service`; it never calls a
-production HTTP endpoint or uses an LLM judge. Threshold sweep values are
-exploratory candidates only. `production_min_score` remains unset and must
-not be inferred automatically from a small or unrepresentative evaluation set.
-
-The default R11 evaluator deliberately continues to use
-`knowledge-base-v1/` (v1.0.0), because `evaluation-v1/` relevance judgments
-and the report are checksum-bound to that 24-document snapshot. Do not interpret
-those metrics as results for the expanded runtime snapshot. A new evaluation
-snapshot and reviewed relevance judgments are required before evaluating
-v1.1.1. No retrieval threshold is set by the expansion task.
+The v1.1.1 report includes an exploratory score sweep: at min_score 0.4,
+coverage is 100% and Precision@5 is 0.279167; at 0.5, coverage remains 100%,
+Precision@5 is 0.490833 and Hit Rate@5/Recall@5 are 0.95; at 0.6, coverage is
+95%, Precision@5 is 0.731667 and Recall@5 is 0.925. These candidates do not
+establish a production threshold. `RAG_MIN_SCORE` remains unset. The original
+evaluation manifest and relevance judgments were not changed; the v1.1.1 run
+used a temporary corpus binding while preserving query bytes. Synthetic
+fixtures remain limited to automated tests.
