@@ -1,0 +1,962 @@
+# Hoaxlin — Tasks untuk Codex
+
+| Metadata | Nilai |
+| --- | --- |
+| Versi | 1.0 |
+| Tanggal | 11 Oktober 2026 |
+| Status | Audit IP-001 selesai; 1 dari 39 task selesai, IP-002–IP-039 pending |
+| Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
+| Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
+| Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
+| Task pertama | IP-001 |
+| Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
+
+Dokumen ini disiapkan untuk eksekusi Codex ketika implementasi diminta. Penyusunan file ini belum menjalankan task, mengubah source aplikasi, atau memverifikasi runtime.
+
+## Panduan eksekusi
+
+Baca [AGENTS.md](../../AGENTS.md), [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md), dan [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md).
+
+`IMPLEMENTATION-PLAN.md` menjelaskan milestone, dependency dan strategi QA. `TASKS.md` adalah checklist tindakan dan sumber status eksekusi rinci. ID dipertahankan agar task, page acceptance, dan hasil review dapat ditelusuri.
+
+1. Periksa working copy, instruksi lokal dan perubahan pengguna sebelum mengedit.
+2. Pilih task paling awal dalam scope pengguna yang dependensinya selesai. IP-001 siap dimulai pada status awal ini.
+3. Tandai status `in_progress` pada tabel, lalu baca source/contract yang terkait.
+4. Kerjakan checklist dan acceptance; keputusan implementation routine dapat diselesaikan mandiri dalam scope.
+5. Jalankan validasi sesuai perubahan. Perbaiki regresi sebelum menutup task.
+6. Catat evidence pada jurnal di akhir file; ubah status menjadi `review` atau `done` sesuai hasil.
+7. Lanjutkan task siap berikutnya jika pengguna meminta satu fase atau seluruh backlog. Jika scope hanya satu task, laporkan hasil task tersebut.
+
+Jangan berhenti untuk meminta konfirmasi setelah setiap perubahan rutin yang reversible. Jika data/akses atau keputusan produk yang menentukan scope belum tersedia, jelaskan kebutuhan konkretnya; pekerjaan independen tetap dapat dilanjutkan. Jangan menggunakan TASKS sebagai izin untuk memperluas produk atau melakukan tindakan eksternal di luar instruksi pengguna.
+
+### Status dan pencatatan
+
+| Status | Penggunaan |
+| --- | --- |
+| pending | Belum mulai; dependency/acceptance dapat dibaca pada kartu |
+| in_progress | Sedang dikerjakan |
+| blocked | Acceptance wajib tidak dapat diselesaikan; alasan dan dampak dicatat |
+| review | Perubahan siap ditinjau dengan evidence |
+| done | Checklist yang berlaku dan acceptance dibuktikan; validasi wajib tidak tertinggal |
+
+Tabel status di bawah menjadi acuan utama; kartu tidak menduplikasi status. Checkbox tindakan hanya dicentang jika benar-benar dilakukan. Jika suatu langkah tidak berlaku, catat alasan yang dapat diperiksa, jangan mencentang test yang tidak dijalankan.
+
+Task audit IP-002 dapat selesai setelah inventaris kesiapan/baseline dicatat meskipun sebagian service unavailable. Hal itu tidak menutup QA runtime task turunan. Jika acceptance wajib suatu task belum diuji, task tersebut belum done.
+
+Ketika eksekusi dimulai, selaraskan ringkasan status umum implementation plan agar tidak tetap menyatakan semua task pending. Detail progres harian cukup di TASKS; perbarui juga jumlah task selesai pada metadata file ini. Tidak perlu menduplikasi jurnal pada semua dokumen.
+
+### Batas perubahan
+
+- Pertahankan Laravel 12/Blade/Tailwind 4/Vite/Livewire/Filament dan native server forms.
+- Pertahankan route/middleware/request/service, CSRF/CAPTCHA/quota, media/URL guards, ownership/capability, dan escaping.
+- Domain input tetap `text/image/video/video_url/url`; label tetap `valid/hoax/meragukan`.
+- Result parsial bukan final; confidence classifier bukan peluang kebenaran atau similarity retrieval.
+- Jangan mengubah frozen model, threshold, prompt/provider/retrieval/queue, schema, retention, atau storage policy demi tampilan.
+- Admin tetap native Filament. Resources baca/detail tidak diaktifkan menjadi CRUD baru.
+- Filter `video_url`, filtered CSV, evidence PDF baru, notification preferences dan retry submission adalah perubahan contract tersendiri.
+- Pertahankan data dan perubahan pengguna; tidak ada reset repo, wipe database/volume, atau seeding demo pada environment pengguna.
+- Buat module/komponen baru jika ada pemakai nyata. File opsional pada kartu tidak wajib dibuat.
+- Source/target pada kartu adalah path relatif root repo dan acuan area kerja; tidak semua file harus diedit. Baca controller/request/service/policy/test terkait untuk menjaga contract. Path baru mengikuti frontend architecture, bukan klaim file sudah tersedia.
+
+Semantik hasil: valid neutral, hoax danger, meragukan warning. Presentasi abstention memakai “Informasi belum terverifikasi oleh sumber terpercaya” dan “Ini bukan bukti bahwa informasi benar atau palsu.” Arah visual, limit, typography, dan layout mengikuti design system serta page specifications.
+
+## Definition of done per task
+
+- [ ] Scope dan dependency task diperiksa; perubahan pengguna terjaga.
+- [ ] Checklist yang berlaku dikerjakan dan acceptance halaman terkait terpenuhi.
+- [ ] Kontrak backend/security serta FA decisions tetap benar.
+- [ ] Build/Blade/test/browser/output yang relevan diperiksa sesuai jenis perubahan.
+- [ ] Tidak ada secret, input pribadi, password atau capability yang bocor ke log/deliverable.
+- [ ] Evidence, skip, fixture versus real service, dan blocker dicatat secara jujur.
+- [ ] Tabel status diperbarui; jika keputusan akhir berubah, dokumen terkait diselaraskan.
+
+Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh backlog. Perubahan style kecil tidak memerlukan test yang hanya menyalin implementasi; gunakan visual QA. Perilaku baru atau risiko yang belum dilindungi memerlukan test yang bermakna.
+
+## Tabel status
+
+| ID | Fase | Tugas | Status |
+| --- | --- | --- | --- |
+| [IP-001](#ip-001) | F0 | Audit checkout dan instruksi | done |
+| [IP-002](#ip-002) | F0 | Siapkan baseline verifikasi development/test | pending |
+| [IP-003](#ip-003) | F0 | Susun inventaris state dan data QA | pending |
+| [IP-004](#ip-004) | F1 | Implementasikan tokens, bridge Tailwind, dan font | pending |
+| [IP-005](#ip-005) | F1 | Rapikan base CSS dan transisi legacy | pending |
+| [IP-006](#ip-006) | F1 | Buat komponen dasar reusable | pending |
+| [IP-007](#ip-007) | F1 | Bangun lifecycle dan helper JS | pending |
+| [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | pending |
+| [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | pending |
+| [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | pending |
+| [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | pending |
+| [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | pending |
+| [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | pending |
+| [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | pending |
+| [IP-015](#ip-015) | F3 | Migrasikan hasil final, evidence, dan provenance | pending |
+| [IP-016](#ip-016) | F3 | Migrasikan actions dan feedback hasil | pending |
+| [IP-017](#ip-017) | F4 | Migrasikan login dan registrasi | pending |
+| [IP-018](#ip-018) | F4 | Migrasikan lupa/reset password | pending |
+| [IP-019](#ip-019) | F4 | Migrasikan verifikasi email | pending |
+| [IP-020](#ip-020) | F4 | Migrasikan profil dan konfirmasi hapus akun | pending |
+| [IP-021](#ip-021) | F4 | Migrasikan riwayat, filter, dan pagination | pending |
+| [IP-022](#ip-022) | F4 | Verifikasi detail riwayat memakai hasil bersama | pending |
+| [IP-023](#ip-023) | F4 | Migrasikan Cara kerja dan Tentang | pending |
+| [IP-024](#ip-024) | F4 | Rapikan halaman privasi berdasarkan praktik aktual | pending |
+| [IP-025](#ip-025) | F4 | Migrasikan statistik dan alternatif tabel | pending |
+| [IP-026](#ip-026) | F4 | Buat error/fallback HTML sesuai scope | pending |
+| [IP-027](#ip-027) | F5 | Buat theme Filament dan login admin light-only | pending |
+| [IP-028](#ip-028) | F5 | Rapikan dashboard dan widgets existing | pending |
+| [IP-029](#ip-029) | F5 | Migrasikan resource Users | pending |
+| [IP-030](#ip-030) | F5 | Migrasikan resource Datasets | pending |
+| [IP-031](#ip-031) | F5 | Migrasikan resources baca/detail | pending |
+| [IP-032](#ip-032) | F5 | Migrasikan monitoring events dan admin logs | pending |
+| [IP-033](#ip-033) | F5 | Migrasikan dan render PDF hasil | pending |
+| [IP-034](#ip-034) | F5 | Verifikasi tindakan dan kontrak ekspor CSV | pending |
+| [IP-035](#ip-035) | F6 | Cleanup setelah seluruh pemakai dimigrasi | pending |
+| [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | pending |
+| [IP-037](#ip-037) | F6 | Lengkapi QA browser lintas halaman/state | pending |
+| [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
+| [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
+
+Status diperbarui berdasarkan eksekusi pada jurnal; task selain IP-001 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+
+## F0 — Audit dan baseline
+
+### IP-001
+
+**Audit checkout dan instruksi**
+
+- **Dependensi:** Tidak ada.
+- **Acceptance:** Baseline seluruh halaman.
+- **Arsitektur:** FA-01, FA-08.
+- **Source/target:** `AGENTS.md`, `routes/web.php`, `composer.json`, `composer.lock`, `package.json`, `package-lock.json`, `vite.config.js`.
+
+- [x] Periksa branch, SHA, git status/diff, serta instruksi AGENTS root dan yang lebih dekat dengan area perubahan; pertahankan perubahan pengguna.
+- [x] Baca dokumen refactor; cocokkan route, input, middleware, resource pages/actions dan manifest dengan working copy aktual.
+- [x] Catat halaman/state/pemakai CSS/JS, temuan source, perbedaan baseline dan area berisiko.
+- [x] Tinjau penempatan dokumen refactor dan selaraskan rujukan; integrasikan instruksi dengan memahami aturan existing. Jangan mengganti AGENTS atau mereset checkout secara membabi buta.
+
+**Validasi:** git status/diff; review source dan dokumen.
+
+**Selesai ketika:** Branch/SHA, perubahan pengguna, instruksi lokal, route dan scope halaman tercatat; penempatan dokumen refactor ditinjau dan rujukan diselaraskan.
+
+### IP-002
+
+**Siapkan baseline verifikasi development/test**
+
+- **Dependensi:** [IP-001](#ip-001).
+- **Acceptance:** Baseline verifikasi; G07, G08.
+- **Arsitektur:** FA-08.
+- **Source/target:** `Dockerfile`, `docker-compose.yml`, `phpunit.xml`, `scripts/docker-setup.sh`, `README.md`, `RUNBOOK.md`.
+
+- [ ] Pilih host development/test atau Docker target test yang memiliki dependency sesuai lockfile; gunakan konfigurasi existing tanpa mencetak secret.
+- [ ] Jalankan baseline build/Blade/test yang environment-nya tersedia; catat hasil dan failure sebelum refactor.
+- [ ] Periksa kemampuan browser QA, service BERT/RAG, artifact model, database/queue dan jalur mail test; bedakan unavailable dari failure kode.
+- [ ] Catat cara rebuild bundled source dan blocker. Task ini menutup inventaris kesiapan; runtime unavailable tetap membatasi QA task turunan, bukan dinyatakan pass.
+
+**Validasi:** Build, Blade, baseline test, smoke browser.
+
+**Selesai ketika:** Build/Blade/test baseline dijalankan bila environment tersedia; error lama, skip, service/artifact yang hilang dicatat tanpa mengubah data pengguna.
+
+### IP-003
+
+**Susun inventaris state dan data QA**
+
+- **Dependensi:** [IP-001](#ip-001), [IP-002](#ip-002).
+- **Acceptance:** Matriks QA seluruh halaman.
+- **Arsitektur:** FA-08, FA-09.
+- **Source/target:** `tests/Feature/`, `tests/Unit/`, `tests/TestCase.php`.
+
+- [ ] Petakan test/fake/fixture existing untuk guest, unverified, verified, admin, ownership, dan capability guest.
+- [ ] Siapkan rencana state pending/processing/completed/failed/final-unavailable, seluruh label, explanation/evidence, long text, error dan ekspor.
+- [ ] Tentukan cara mengakses state di development/test secara terisolasi; jangan seed demo pada data pengguna.
+- [ ] Tambahkan fixture/test hanya jika risiko atau perilaku belum dilindungi; catat fixture pass terpisah dari real-service E2E.
+
+**Validasi:** Review fixture dan matriks QA.
+
+**Selesai ketika:** Fixture/fake existing dipetakan untuk role, input, progress, label, evidence, explanation dan error; hanya gap perilaku nyata yang memerlukan fixture/test baru.
+
+## F1 — Fondasi
+
+### IP-004
+
+**Implementasikan tokens, bridge Tailwind, dan font**
+
+- **Dependensi:** [IP-001](#ip-001), [IP-002](#ip-002).
+- **Acceptance:** Fondasi DESIGN-SYSTEM.md.
+- **Arsitektur:** FA-03, FA-10.
+- **Source/target:** `resources/css/design-tokens.css`, `resources/css/app.css`, `resources/views/layouts/app.blade.php`, `resources/fonts/` (opsional).
+
+- [ ] Implementasikan primitive dan semantic tokens sesuai design system, termasuk typography, focus, spacing, radius, motion dan semantic states.
+- [ ] Map utility publik melalui @theme inline; semantic tokens menjadi sumber nilai, bukan hex per halaman.
+- [ ] Muat Inter 400/500/600 dan Newsreader 400/500 dengan swap dan fallback; pilih strategi font yang nyata dan berlisensi.
+- [ ] Verifikasi light-only, computed fonts, mapping utility dan kontras; pertahankan lockfile kecuali dependency change memiliki kebutuhan jelas.
+
+**Validasi:** Build, computed font, contrast review.
+
+**Selesai ketika:** Primitive/semantic tokens sesuai design system; Inter/Newsreader benar-benar dimuat; mapping @theme inline dan fallback tersedia.
+
+### IP-005
+
+**Rapikan base CSS dan transisi legacy**
+
+- **Dependensi:** [IP-004](#ip-004).
+- **Acceptance:** Fondasi publik; G08.
+- **Arsitektur:** FA-03, FA-08.
+- **Source/target:** `resources/css/app.css`, `resources/css/base.css`, `resources/css/theme.css` (bila diperlukan).
+
+- [ ] Pisahkan entry/base/bridge dan aturan komponen dengan urutan import/layer yang sah; pertahankan @source yang diperlukan.
+- [ ] Terapkan canvas light, focus-visible dan typography fungsional; Newsreader hanya untuk konteks editorial.
+- [ ] Inventaris selector/token legacy dan gunakan alias sementara hanya jika pemakainya jelas; jangan menumpuk overrides tanpa batas.
+- [ ] Cek seluruh halaman publik termasuk yang belum dimigrasi; perbaiki sumber overflow, bukan menyembunyikan overflow global.
+
+**Validasi:** Build; smoke semua view publik.
+
+**Selesai ketika:** Light-only, focus, typography dan responsive base bekerja; alias sementara memiliki daftar pemakai; halaman yang belum dimigrasi tetap diperiksa.
+
+### IP-006
+
+**Buat komponen dasar reusable**
+
+- **Dependensi:** [IP-004](#ip-004), [IP-005](#ip-005).
+- **Acceptance:** Komponen UI/form reusable.
+- **Arsitektur:** FA-02, FA-03.
+- **Source/target:** `resources/views/components/ui/`, `resources/views/components/forms/`, `resources/css/components.css`.
+
+- [ ] Buat pola yang dipakai: button/link, field, alert, empty state, disclosure, serta field form yang memang reusable; jangan membangun pustaka tanpa pemakai.
+- [ ] Tentukan props/slots/variants kecil dan tertutup; button type eksplisit, id unik, dan atribut internal tidak bocor ke HTML.
+- [ ] Hubungkan label/hint/error melalui for/id/aria-describedby/aria-invalid; pertahankan escaping dan cegah nested form.
+- [ ] Gunakan native details/radio bila cocok; tidak ada query Eloquent, service AI, atau keputusan akses di komponen.
+
+**Validasi:** Blade compile; form/keyboard/state review.
+
+**Selesai ketika:** Button/link, field, alert, empty state dan disclosure punya props kecil, id unik, escaping dan markup semantik; tanpa query di komponen.
+
+### IP-007
+
+**Bangun lifecycle dan helper JS**
+
+- **Dependensi:** [IP-002](#ip-002), [IP-006](#ip-006).
+- **Acceptance:** Lifecycle publik.
+- **Arsitektur:** FA-04, FA-05, FA-09, FA-10.
+- **Source/target:** `resources/js/app.js`, `resources/js/bootstrap.js`, `resources/js/core/lifecycle.js`, `resources/js/components/`.
+
+- [ ] Sediakan mount(root) dan cleanup per module; registrasi global sekali dan guard init per root/instance.
+- [ ] Tangani load biasa, livewire:navigating/navigated, async import setelah root berubah, dan browser back/forward restore.
+- [ ] Cleanup listener/timer/request/object URL/chart/dialog/scroll lock yang dibuat; data sensitif tidak disimpan di browser storage.
+- [ ] Audit pemakai window.Hoaxlin/window.axios; ekstrak handler berulang tanpa menambah global baru, dan hapus global lama hanya setelah tidak dipakai.
+
+**Validasi:** Load normal, navigate, back/forward, console.
+
+**Selesai ketika:** Mount/cleanup idempotent; listener, async import dan restore state aman; tidak menambah framework/global handler baru.
+
+## F2 — Shell publik dan auth
+
+### IP-008
+
+**Ekstrak fondasi head/runtime dan shell publik**
+
+- **Dependensi:** [IP-005](#ip-005), [IP-006](#ip-006), [IP-007](#ip-007).
+- **Acceptance:** AC-P00 — shell.
+- **Arsitektur:** FA-01, FA-02, FA-03.
+- **Source/target:** `resources/views/layouts/app.blade.php`, `resources/views/partials/head.blade.php`, `resources/views/partials/runtime.blade.php`.
+
+- [ ] Ekstrak head/runtime bersama tanpa mengubah view lookup, sections, yields dan stacks existing.
+- [ ] Pastikan @vite dan Livewire styles/scripts dimuat sekali; metadata memakai default aman tanpa isi submission.
+- [ ] Susun skip link/header/flash/satu main/footer; hapus landmark main tambahan pada child view yang dimigrasi.
+- [ ] Periksa load normal dan navigation lintas view; admin dan PDF tetap memakai renderer masing-masing.
+
+**Validasi:** Blade/build; source DOM; lintas view.
+
+**Selesai ketika:** Satu main; skip link; Vite/Livewire dimuat sekali; title/description dan stacks existing tetap bekerja.
+
+### IP-009
+
+**Migrasikan navigasi, footer, dan flash**
+
+- **Dependensi:** [IP-008](#ip-008).
+- **Acceptance:** AC-P00 — navigation/flash.
+- **Arsitektur:** FA-02, FA-04.
+- **Source/target:** `resources/views/partials/navigation.blade.php`, `resources/views/partials/footer.blade.php`, `resources/js/components/navigation.js`.
+
+- [ ] Migrasikan wordmark/nav/account/footer memakai route nyata, active state dan aria-current; tampilkan akses sesuai status server.
+- [ ] Pertahankan logout form POST + CSRF; context verified/admin tidak membuka route yang tidak sah.
+- [ ] Implementasikan disclosure mobile/akun dengan keyboard, aria-expanded, Escape/focus return sesuai pola; focus trap hanya jika benar-benar modal.
+- [ ] Ganti flash dekoratif/auto-dismiss penting dengan alert/status yang jelas dan kontrol tutup aksesibel; hapus social/action placeholder tanpa tujuan.
+
+**Validasi:** Guest/user/admin navigation; keyboard/mobile.
+
+**Selesai ketika:** Route dan auth state benar; logout POST; disclosure/menu mobile memakai keyboard; error penting tidak auto-dismiss; tidak ada link palsu.
+
+### IP-010
+
+**Buat shell auth dan pola form enhancement**
+
+- **Dependensi:** [IP-006](#ip-006), [IP-007](#ip-007), [IP-008](#ip-008).
+- **Acceptance:** Fondasi AC-P05–AC-P09; helper AC-P10.
+- **Arsitektur:** FA-01, FA-02, FA-04.
+- **Source/target:** `resources/views/layouts/auth.blade.php`, `resources/js/components/password-toggle.js`, `resources/js/components/form-submit.js`.
+
+- [ ] Buat shell auth ringkas yang berbagi head/runtime, wordmark, reading/form width dan feedback error.
+- [ ] Ekstrak password toggle aksesibel dengan id/name/autocomplete yang benar; tidak memulihkan password dari old input.
+- [ ] Loading/double-submit guard bekerja pada form native; reset disabled/loading pada restore navigation yang relevan.
+- [ ] Periksa no-JS, Enter, autofill, keyboard dan mobile; jangan menambah marketing sidebar atau login provider.
+
+**Validasi:** Blade; native submit, autocomplete, no-JS.
+
+**Selesai ketika:** Auth ringkas berbagi head/runtime; loading/toggle aksesibel; password tidak dipulihkan; form native tidak bergantung JS.
+
+## F3 — Pemeriksaan, progress, hasil
+
+### IP-011
+
+**Migrasikan hierarchy beranda dan form teks**
+
+- **Dependensi:** [IP-003](#ip-003), [IP-006](#ip-006), [IP-009](#ip-009).
+- **Acceptance:** AC-P01 — teks.
+- **Arsitektur:** FA-01, FA-02, FA-04.
+- **Source/target:** `resources/views/welcome.blade.php`, `resources/views/partials/submission/`, `resources/js/pages/submission-form.js`.
+
+- [ ] Tempatkan pengantar singkat dan form sebagai fokus awal; statistik/cara kerja menjadi konteks sekunder.
+- [ ] Migrasikan POST deteksi untuk guest teks: raw_input, input_type=text, CSRF, captcha_answer dan honeypot website tetap.
+- [ ] Jaga batas 50–50.000 karakter, error summary/inline, old input aman, dan focus recovery.
+- [ ] Tampilkan loading mengirim dan cegah double submit; hapus timer yang berpura-pura menandai tahap analisis sebelum respons backend.
+
+**Validasi:** SubmissionTest, AtomicCaptchaQuotaTest; browser.
+
+**Selesai ketika:** Form menjadi fokus awal; guest teks 50–50.000 karakter; CSRF/CAPTCHA/honeypot, old input dan error recovery terjaga.
+
+### IP-012
+
+**Migrasikan URL, gambar, video, dan URL media**
+
+- **Dependensi:** [IP-011](#ip-011), [IP-007](#ip-007).
+- **Acceptance:** AC-P01 — semua input; G01.
+- **Arsitektur:** FA-01, FA-02, FA-04, FA-09.
+- **Source/target:** `resources/views/welcome.blade.php`, `resources/views/partials/submission/`, `resources/js/pages/submission-form.js`, `app/Http/Controllers/HomeController.php` (view data bila diperlukan).
+
+- [ ] Sediakan empat kategori presentasi dan dua pilihan Video dengan lima nilai domain tetap: text/image/video/video_url/url.
+- [ ] Ambil limit/format/durasi/blocked hosts dari request/service/config; tambah structured view data bila perlu, tanpa mengubah policy/validator.
+- [ ] Jaga media_file/source_url/multipart/required state dan input inactive; no-JS path dapat ditemukan dan guest tetap hanya teks.
+- [ ] Preview filename/URL memakai textContent/escaping; revoke object URL; invalid file/URL/host memiliki recovery dan file harus dipilih ulang.
+
+**Validasi:** VideoMediaContractTest, ExternalUrlSecurityTest, SubmissionTest.
+
+**Selesai ketika:** Seluruh input login mengikuti request/service; empat kategori presentasi mempertahankan lima domain; multipart/limit/required state dan no-JS path benar.
+
+### IP-013
+
+**Migrasikan view progress Livewire**
+
+- **Dependensi:** [IP-003](#ip-003), [IP-006](#ip-006), [IP-008](#ip-008).
+- **Acceptance:** AC-P02/AC-P04 — progress.
+- **Arsitektur:** FA-02, FA-05.
+- **Source/target:** `resources/views/livewire/submission-progress.blade.php`, `app/Livewire/SubmissionProgress.php` (bila perlu presentasi).
+
+- [ ] Migrasikan typography/status/progress tanpa mengubah enum stage atau persen backend.
+- [ ] Pertahankan SubmissionAccess pada setiap refresh; result parsial tidak ditampilkan sebagai final.
+- [ ] Jaga wire:poll.2s.visible hanya untuk nonterminal; failed tidak disajikan sebagai sukses 100%.
+- [ ] Sediakan live-region perubahan bermakna dan refresh manual; hilangkan dekorasi/countdown dan baca status unknown/unavailable secara jujur.
+
+**Validasi:** SubmissionProgressTest, FinalResultStateTest, PublicPipelineErrorTest.
+
+**Selesai ketika:** Status/stage/persen backend, terminal stop, final guard, failure semantics dan authorization refresh tetap benar; tanpa countdown.
+
+### IP-014
+
+**Perbaiki kepemilikan fallback dan terminal transition**
+
+- **Dependensi:** [IP-007](#ip-007), [IP-013](#ip-013).
+- **Acceptance:** AC-P02/AC-P04 — lifecycle polling.
+- **Arsitektur:** FA-04, FA-05.
+- **Source/target:** `resources/js/progress/fallback.js`, `resources/js/pages/result.js`, `resources/views/hasil.blade.php`.
+
+- [ ] Deteksi init Livewire sesuai runtime terpasang; marker wire:id saja bukan bukti hydration. Fallback aktif hanya bila belum ada pemilik Livewire.
+- [ ] Gunakan timeout berurutan, satu in-flight request, session same-origin, URL hasil.status dari server dan cleanup AbortController/timer.
+- [ ] Pause/resume saat hidden/visible/unmount; tangani network error, non-JSON, access/session error dan 429 tanpa mengubah status domain.
+- [ ] Hentikan loop sebelum handoff/terminal; reload bila diperlukan sekali per root/submission. Uji navigasi antarhasil, back/forward, request lambat dan bootstrap failure.
+
+**Validasi:** Network/lifecycle QA; progress/access tests.
+
+**Selesai ketika:** Satu pemilik; satu in-flight request; init runtime bukan hanya wire:id; pause/resume, cleanup, access error dan reload per submission benar.
+
+### IP-015
+
+**Migrasikan hasil final, evidence, dan provenance**
+
+- **Dependensi:** [IP-006](#ip-006), [IP-013](#ip-013), [IP-014](#ip-014).
+- **Acceptance:** AC-P02/AC-P04 — final result.
+- **Arsitektur:** FA-02, FA-04, FA-09.
+- **Source/target:** `resources/views/hasil.blade.php`, `resources/views/components/results/`, `resources/views/partials/result/`, `app/View/Presenters/DetectionPresentation.php` (opsional).
+
+- [ ] Komposisikan progress/failed/completed tanpa result/final berdasarkan data server; hasil final hanya saat completed dan result sah.
+- [ ] Terapkan label/tone/disclaimer yang sama: valid neutral, hoax danger, meragukan warning dengan copy abstention; unknown/null tidak menjadi hasil buatan.
+- [ ] Tampilkan confidence classifier sebagai metadata, explanation states, evidence nyata berurutan rank/document_id, dan link/kutipan aman.
+- [ ] Tambahkan disclosure input/provenance dari data tersedia; presenter opsional hanya mapping tanpa query, threshold, inference atau authorization baru.
+
+**Validasi:** ResultEvidencePresentationTest, FinalResultStateTest, GroundedExplanationTest, ExplanationDegradationTest.
+
+**Selesai ketika:** Label/copy/tone, confidence classifier, explanation states, evidence rank/link/escaping dan input disclosure sesuai spesifikasi; hasil parsial tidak final.
+
+### IP-016
+
+**Migrasikan actions dan feedback hasil**
+
+- **Dependensi:** [IP-015](#ip-015), [IP-010](#ip-010).
+- **Acceptance:** AC-P02/AC-P04 — actions/feedback; actions P15/P16.
+- **Arsitektur:** FA-01, FA-02, FA-09.
+- **Source/target:** `resources/views/hasil.blade.php`, `resources/views/partials/result/`, `resources/js/components/form-submit.js`.
+
+- [ ] Sediakan next-check/history/PDF/CSV actions sesuai akses dan state final; CSV diberi label seluruh riwayat.
+- [ ] Render feedback hanya untuk verified account owner; guest capability atau admin access hasil tidak otomatis memberi ownership feedback.
+- [ ] Pertahankan POST feedback, submission_id, boolean is_correct dan comment max 1000; gunakan radio/native selection bila cocok.
+- [ ] Tampilkan sent/duplicate/error state, bukan edit/resubmit baru; feedback berarti penilaian pengguna, bukan voting fakta.
+
+**Validasi:** FeedbackTest, GuestSubmissionAccessTest, ResultEndpointAuthorizationTest.
+
+**Selesai ketika:** PDF/riwayat/CSV hanya sesuai akses; feedback verified milik akun dan satu submission; guest tidak diberi form yang pasti ditolak.
+
+## F4 — Akun, riwayat, dan publik
+
+### IP-017
+
+**Migrasikan login dan registrasi**
+
+- **Dependensi:** [IP-010](#ip-010), [IP-003](#ip-003).
+- **Acceptance:** AC-P05/AC-P06.
+- **Arsitektur:** FA-01, FA-02, FA-09.
+- **Source/target:** `resources/views/auth/login.blade.php`, `resources/views/auth/register.blade.php`.
+
+- [ ] Migrasikan login/register ke shell auth dengan label/hint/error, autocomplete dan loading native.
+- [ ] Jaga remember boolean, credential/throttle feedback, session/intended redirect dan email recovery; password tidak masuk old input.
+- [ ] Pertahankan name/email/password confirmation/terms/unique validation serta Registered event/redirect verification contract.
+- [ ] Gunakan link privasi/register/login/forgot nyata; jangan mengarang password policy atau URL syarat penggunaan yang belum tersedia.
+
+**Validasi:** AuthenticationTest; keyboard/mobile/error submit.
+
+**Selesai ketika:** Credential error/throttle/intended redirect; terms/password confirmation/unique email dan redirect verifikasi dipertahankan.
+
+### IP-018
+
+**Migrasikan lupa/reset password**
+
+- **Dependensi:** [IP-010](#ip-010), [IP-017](#ip-017).
+- **Acceptance:** AC-P07/AC-P08.
+- **Arsitektur:** FA-01, FA-02, FA-09.
+- **Source/target:** `resources/views/auth/forgot-password.blade.php`, `resources/views/auth/reset-password.blade.php`.
+
+- [ ] Migrasikan request reset dengan field email, CSRF/throttle dan status broker; inbox/spam hint tidak menjanjikan delivery.
+- [ ] Jaga token hidden, email dan confirmed password pada POST password.store; GET form tidak dianggap bukti token valid.
+- [ ] Tampilkan invalid/expired broker recovery dan redirect login setelah success; tidak membuat auto-login baru.
+- [ ] Verifikasi old email aman, password/confirmation tidak dipulihkan, native submit dan mobile/keyboard.
+
+**Validasi:** AuthenticationTest, MailConfigurationTest; broker scenarios.
+
+**Selesai ketika:** Status broker, token hidden, policy/confirmation dan expired recovery benar; success redirect login; tidak menjanjikan email tiba.
+
+### IP-019
+
+**Migrasikan verifikasi email**
+
+- **Dependensi:** [IP-010](#ip-010), [IP-017](#ip-017).
+- **Acceptance:** AC-P09.
+- **Arsitektur:** FA-01, FA-02, FA-09.
+- **Source/target:** `resources/views/auth/verify-email.blade.php`.
+
+- [ ] Jelaskan kebutuhan verifikasi dan email akun yang di-escape; sediakan resend, profil/ubah email dan logout.
+- [ ] Pertahankan resend POST + CSRF/throttle, verification-link-sent dan verified redirect.
+- [ ] Link verifikasi tetap signed + auth + throttle; expired/invalid link mengikuti respons server.
+- [ ] Jangan menambah timer inbox, auto resend atau jaminan SMTP; uji verified/unverified dan keyboard/mobile.
+
+**Validasi:** AuthenticationTest, MailConfigurationTest; verified/unverified.
+
+**Selesai ketika:** Resend POST/throttle, signed verify link, verified redirect, profil/ubah email dan logout tetap benar.
+
+### IP-020
+
+**Migrasikan profil dan konfirmasi hapus akun**
+
+- **Dependensi:** [IP-010](#ip-010), [IP-019](#ip-019), [IP-007](#ip-007).
+- **Acceptance:** AC-P10.
+- **Arsitektur:** FA-01, FA-02, FA-04, FA-09.
+- **Source/target:** `resources/views/profile.blade.php`, `resources/js/components/dialog.js`, `resources/js/components/password-toggle.js`, `resources/js/components/form-submit.js`.
+
+- [ ] Pisahkan section identitas/password/penghapusan dengan form PATCH, PUT, DELETE dan method spoofing/CSRF yang benar.
+- [ ] Jaga fields name/email, current_password/password confirmation, dan password konfirmasi delete; error dekat tindakan yang tepat.
+- [ ] Tampilkan status verified/unverified dan state email change/reverification; tidak menambah notification preference.
+- [ ] Dialog delete memiliki akibat sesuai service, focus/Escape/return focus, password validation dan fallback native; uji pada data test.
+
+**Validasi:** ProfileTest; keyboard, validation, deletion di test data.
+
+**Selesai ketika:** Tiga form PATCH/PUT/DELETE terpisah; error konteks benar; perubahan email meminta verifikasi; hapus memakai password/focus recovery.
+
+### IP-021
+
+**Migrasikan riwayat, filter, dan pagination**
+
+- **Dependensi:** [IP-009](#ip-009), [IP-015](#ip-015), [IP-006](#ip-006).
+- **Acceptance:** AC-P03; action AC-P16; G02/G03.
+- **Arsitektur:** FA-01, FA-02, FA-04.
+- **Source/target:** `resources/views/riwayat.blade.php`, `resources/views/components/ui/`.
+
+- [ ] Migrasikan heading/toolbar, summary, tabel/list, empty state dan pagination tanpa filter client-side.
+- [ ] Pertahankan GET search/label/input_type/status/sort existing, query string dan pagination 15; filter change kembali ke page awal.
+- [ ] Jelaskan summary seluruh riwayat dan CSV seluruh riwayat; jangan menambah opsi video_url atau menganggap Video mencakup domain itu.
+- [ ] Label/confidence nonfinal memakai unavailable, bukan valid/0%; mobile tabel scroll lokal atau list semantik.
+
+**Validasi:** SubmissionHistoryTest; filter/pagination/mobile.
+
+**Selesai ketika:** Scope pengguna, 15-row pagination, GET filter/sort existing, empty state, reset page dan summary seluruh riwayat jelas; tidak menambah filter video_url.
+
+### IP-022
+
+**Verifikasi detail riwayat memakai hasil bersama**
+
+- **Dependensi:** [IP-021](#ip-021), [IP-016](#ip-016).
+- **Acceptance:** AC-P04.
+- **Arsitektur:** FA-01, FA-02, FA-05.
+- **Source/target:** `resources/views/hasil.blade.php`, `resources/views/partials/result/`.
+
+- [ ] Verifikasi riwayat.show tetap memakai view hasil bersama dan back link Kembali ke riwayat.
+- [ ] Jaga forUser sebagai boundary query detail; tidak mengubahnya menjadi akses admin lintas pemilik.
+- [ ] Periksa missing/other-owned record dan direct refresh tanpa bocoran input/status.
+- [ ] Pastikan PDF/status/media dan feedback menggunakan akses masing-masing; tidak membuat mapping/evidence template kedua.
+
+**Validasi:** SubmissionHistoryTest, ResultEndpointAuthorizationTest.
+
+**Selesai ketika:** Back context benar; view hasil tidak diduplikasi; forUser tetap boundary; PDF/status/media mempertahankan akses masing-masing.
+
+### IP-023
+
+**Migrasikan Cara kerja dan Tentang**
+
+- **Dependensi:** [IP-009](#ip-009), [IP-015](#ip-015).
+- **Acceptance:** AC-P11/AC-P12.
+- **Arsitektur:** FA-01, FA-02.
+- **Source/target:** `resources/views/cara-kerja.blade.php`, `resources/views/tentang.blade.php`.
+
+- [ ] Migrasikan reading layout/heading/sections dan link pemeriksaan yang nyata.
+- [ ] Jelaskan input, ekstraksi/terjemahan, IndoBERT, retrieval lokal, explanation, confidence dan abstention sesuai pipeline.
+- [ ] Gunakan identitas/kontak/data aktual; hilangkan klaim crawler seluruh web, universal accuracy, fitur rencana, partner/testimoni buatan.
+- [ ] Periksa Bahasa Indonesia, long text, mobile, keyboard dan konsistensi copy dengan halaman hasil.
+
+**Validasi:** DocumentationWorkflowContractTest, ModelStatisticsClaimsTest; copy review.
+
+**Selesai ketika:** Reading hierarchy editorial; penjelasan input/pipeline/label/score realistis; tidak ada klaim crawler seluruh web atau fitur rencana seolah aktif.
+
+### IP-024
+
+**Rapikan halaman privasi berdasarkan praktik aktual**
+
+- **Dependensi:** [IP-009](#ip-009), [IP-001](#ip-001).
+- **Acceptance:** AC-P13.
+- **Arsitektur:** FA-01, FA-02, FA-09.
+- **Source/target:** `resources/views/kebijakan-privasi.blade.php`.
+
+- [ ] Susun data akun/input, pemrosesan/integrasi, storage/access, retention, deletion dan kontak sesuai praktik source aktual.
+- [ ] Periksa config/service terkait sebagai evidence; retensi media tidak disamakan dengan retensi semua submission/akun.
+- [ ] Jangan menambah jaminan backup/provider deletion, compliance atau local-only processing tanpa dasar.
+- [ ] Jaga tanggal kebijakan sesuai revisi nyata; verifikasi readability/link/mobile/long text dan catat perbedaan copy yang ditemukan.
+
+**Validasi:** Source-to-copy review; mobile/long text.
+
+**Selesai ketika:** Struktur terbaca; integrasi/retensi/akses/penghapusan sesuai implementasi; tanggal kebijakan tidak diubah otomatis; tidak mengarang jaminan.
+
+### IP-025
+
+**Migrasikan statistik dan alternatif tabel**
+
+- **Dependensi:** [IP-007](#ip-007), [IP-009](#ip-009), [IP-006](#ip-006).
+- **Acceptance:** AC-P14; G04.
+- **Arsitektur:** FA-01, FA-04, FA-10.
+- **Source/target:** `resources/views/statistik.blade.php`, `resources/js/pages/statistics.js` (bila chart dipertahankan), `package.json`, `package-lock.json` (hanya jika strategi chart memerlukan).
+
+- [ ] Tampilkan tren/periode dan distribusi label dengan penjelasan populasi/timezone/query existing.
+- [ ] Sebut byTopic sebagai distribusi label; total/aggregate tidak diklaim completed-only, accuracy atau prevalensi masyarakat.
+- [ ] Render alternatif tabel sebelum chart; chart tidak menjadi syarat akses data dan dibersihkan saat unmount.
+- [ ] Jika chart dipertahankan, pilih versi/loading yang jelas dan terbatas halaman statistik; jangan import paket yang belum dipasang atau upgrade dependency lain.
+
+**Validasi:** MonthlyStatisticsBoundaryTest, ModelStatisticsClaimsTest; chart failure QA.
+
+**Selesai ketika:** Periode/timezone/populasi jelas; byTopic disebut distribusi label; query tidak diubah diam-diam; chart gagal tetap memiliki data tabel.
+
+### IP-026
+
+**Buat error/fallback HTML sesuai scope**
+
+- **Dependensi:** [IP-008](#ip-008), [IP-006](#ip-006), [IP-014](#ip-014).
+- **Acceptance:** AC-E01.
+- **Arsitektur:** FA-01, FA-02, FA-04, FA-09.
+- **Source/target:** `resources/views/errors/`, `resources/views/partials/head.blade.php`, `resources/views/components/ui/`.
+
+- [ ] Buat themed error HTML minimal untuk kode relevan tanpa user/submission/AI dependency yang rapuh.
+- [ ] Sediakan pesan aman dan recovery nyata untuk 403/404/419/429/500/503; invalid guest capability tetap 404.
+- [ ] Validation redirect/422 tetap menuntun ke field; Accept JSON/status endpoint tetap contract JSON dan HTTP code existing.
+- [ ] Periksa no secret/stack trace, navigation/keyboard, serta network polling error yang tidak berarti domain failed.
+
+**Validasi:** ResultEndpointAuthorizationTest, PublicPipelineErrorTest; HTML/JSON.
+
+**Selesai ketika:** 403/404/419/429/500/503 aman dan punya recovery nyata; validation tetap pada form; JSON/status code tidak diubah.
+
+## F5 — Admin dan ekspor
+
+### IP-027
+
+**Buat theme Filament dan login admin light-only**
+
+- **Dependensi:** [IP-004](#ip-004), [IP-005](#ip-005), [IP-006](#ip-006).
+- **Acceptance:** AC-A00; fondasi A01–A08.
+- **Arsitektur:** FA-03, FA-06, FA-10.
+- **Source/target:** `app/Providers/Filament/AdminPanelProvider.php`, `resources/css/filament/admin/theme.css`, `vite.config.js`, `package.json`, `package-lock.json` (diff generator bila ada).
+
+- [ ] Buat theme admin lewat generator versi terpasang; review semua perubahan provider/Vite/package/lockfile yang dihasilkan.
+- [ ] Import token bersama dengan path benar, scanner relevan dan fondasi Filament; jangan import reset/shell app.css publik.
+- [ ] Daftarkan viteTheme, darkMode(false), Inter dan primary evergreen; audit shade/contrast/font aktual.
+- [ ] Pertahankan middleware/auth/discovery/canAccessPanel; uji native login admin/non-admin dan mobile/keyboard; vendor/published assets tidak diedit.
+
+**Validasi:** Build; A00 keyboard/mobile; admin/non-admin access.
+
+**Selesai ketika:** Theme terdaftar/dibuild; font/primary/light-only benar; CSS publik tidak bocor; middleware/discovery/canAccessPanel terjaga.
+
+### IP-028
+
+**Rapikan dashboard dan widgets existing**
+
+- **Dependensi:** [IP-027](#ip-027), [IP-003](#ip-003).
+- **Acceptance:** AC-A01.
+- **Arsitektur:** FA-03, FA-06.
+- **Source/target:** `app/Filament/Widgets/`, `app/Providers/Filament/AdminPanelProvider.php`.
+
+- [ ] Review AccountWidget, FilamentInfoWidget, StatsOverview, SubmissionTrendChart dan ModelVersionWidget; atur hierarchy sesuai tugas administrasi.
+- [ ] Nilai/periode/scope/model berasal dari widget/service; unavailable jujur tanpa angka contoh/SLA buatan.
+- [ ] Widget vendor tidak perlu mendominasi; perubahan daftar/order dilakukan eksplisit pada provider.
+- [ ] Verifikasi chart/text/long labels/light theme/density dan akses admin tanpa public data leakage.
+
+**Validasi:** Widget/source review; A01 data/error/chart states.
+
+**Selesai ketika:** Operational summary/model metadata bersumber nyata; scope/periode dan unavailable jelas; tidak ada KPI/counter buatan.
+
+### IP-029
+
+**Migrasikan resource Users**
+
+- **Dependensi:** [IP-027](#ip-027), [IP-003](#ip-003).
+- **Acceptance:** AC-A02.
+- **Arsitektur:** FA-03, FA-06, FA-09.
+- **Source/target:** `app/Filament/Resources/Users/`.
+
+- [ ] Migrasikan list/create/view/edit melalui schema/table/page native; search/filter/verified/admin mengikuti source existing.
+- [ ] Jaga password handling dan role/verification fields; stored password tidak ditampilkan atau diubah otomatis.
+- [ ] Pertahankan constraints termasuk demotion verifier dataset; tampilkan validation error tanpa melemahkan rule.
+- [ ] Review View/Edit/DeleteBulkAction existing, selected count/confirmation, keyboard/modal, mobile dan access di data test.
+
+**Validasi:** Schema/action/authorization review; form/list/modal QA.
+
+**Selesai ketika:** List/create/view/edit native dan existing actions; role/verified/password/model constraints terjaga; bulk delete jelas.
+
+### IP-030
+
+**Migrasikan resource Datasets**
+
+- **Dependensi:** [IP-027](#ip-027), [IP-003](#ip-003).
+- **Acceptance:** AC-A03.
+- **Arsitektur:** FA-03, FA-06.
+- **Source/target:** `app/Filament/Resources/Datasets/`.
+
+- [ ] Migrasikan native table/form/detail dengan text panjang full-width dan section/divider yang jelas.
+- [ ] Pertahankan text min 10, label options katalog, source max 255, nullable verified_by dan AdminUser rule.
+- [ ] Jelaskan kurasi production tidak retrain/mengganti BERT frozen; meragukan katalog bukan kelas training aktif.
+- [ ] Verifikasi filter/verifier/policy/actions/audit existing dan destructive confirmation di test data.
+
+**Validasi:** DatasetCurationBoundaryTest; form/list/detail QA.
+
+**Selesai ketika:** Text/label/source/verifier validation; hanya admin verifier; copy kurasi production bukan retraining; actions/policy existing.
+
+### IP-031
+
+**Migrasikan resources baca/detail**
+
+- **Dependensi:** [IP-027](#ip-027), [IP-015](#ip-015), [IP-016](#ip-016).
+- **Acceptance:** AC-A04/AC-A05/AC-A06; G02/G06.
+- **Arsitektur:** FA-03, FA-06, FA-09.
+- **Source/target:** `app/Filament/Resources/Submissions/`, `app/Filament/Resources/DetectionResults/`, `app/Filament/Resources/Feedback/`.
+
+- [ ] Migrasikan list/view dengan field, filters, relation dan long content yang diberikan schema existing.
+- [ ] Bedakan submission nonfinal dari result classifier parsial; confidence adalah skor classifier dan is_correct adalah feedback pengguna.
+- [ ] Pertahankan getPages serta canCreate/Edit/Delete/read-only rules; file legacy Create/Edit tidak diaktifkan.
+- [ ] Jangan menambah video_url filter tanpa contract, reprocess/retry, edit classifier result atau voting truth; uji table/detail/access/escaping.
+
+**Validasi:** Resource getPages/actions review; list/detail/access QA.
+
+**Selesai ketika:** List/view tetap read-only; status parsial dibedakan; confidence/feedback bukan truth; tidak mengaktifkan Create/Edit legacy.
+
+### IP-032
+
+**Migrasikan monitoring events dan admin logs**
+
+- **Dependensi:** [IP-027](#ip-027), [IP-003](#ip-003).
+- **Acceptance:** AC-A07/AC-A08.
+- **Arsitektur:** FA-03, FA-06, FA-09.
+- **Source/target:** `app/Filament/Resources/SubmissionProcessingEvents/`, `app/Filament/Resources/AdminLogs/`.
+
+- [ ] Migrasikan monitoring list/detail dengan stage/outcome/action/target/time, filter dan default order existing.
+- [ ] Tampilkan unit durasi dan metadata panjang dengan jelas; label operasional tidak memakai semantik fakta berita.
+- [ ] Tidak menambah cancel/retry/edit/clear log atau klaim immutable yang tidak dijamin backend.
+- [ ] Periksa admin access dan secret/capability/raw provider response tidak bocor melalui detail atau preview.
+
+**Validasi:** Native table/detail/filter review; admin access.
+
+**Selesai ketika:** Filter/unit/datetime/long metadata terbaca; tidak menambah edit/clear/retry atau memunculkan secret.
+
+### IP-033
+
+**Migrasikan dan render PDF hasil**
+
+- **Dependensi:** [IP-015](#ip-015), [IP-016](#ip-016), [IP-004](#ip-004).
+- **Acceptance:** AC-P15; G05.
+- **Arsitektur:** FA-02, FA-07.
+- **Source/target:** `resources/views/hasil-pdf.blade.php`, `app/View/Presenters/DetectionPresentation.php` (opsional).
+
+- [ ] Migrasikan PDF mandiri A4 portrait dengan CSS/font DomPDF yang didukung; tanpa layout web/Vite/JS/WOFF2 browser.
+- [ ] Selaraskan label/disclaimer/confidence/model/time/provenance dengan web; jangan tampilkan path storage internal atau versi double-v.
+- [ ] Jika input/extraction dicuplik, beri penanda; evidence yang belum disuplai tidak dibuat sebagai referensi palsu.
+- [ ] Render PDF aktual untuk seluruh label, explanation unavailable, teks/URL panjang dan karakter Indonesia; verifikasi page break serta access/final guards.
+
+**Validasi:** Render PDF aktual + ResultEndpointAuthorizationTest/FinalResultStateTest.
+
+**Selesai ketika:** A4, font/line/page break/URL panjang diuji; label/confidence/disclaimer sesuai web; excerpt jelas; tanpa path internal atau evidence palsu.
+
+### IP-034
+
+**Verifikasi tindakan dan kontrak ekspor CSV**
+
+- **Dependensi:** [IP-021](#ip-021), [IP-016](#ip-016).
+- **Acceptance:** AC-P16; G03.
+- **Arsitektur:** FA-01, FA-07, FA-09.
+- **Source/target:** `resources/views/riwayat.blade.php`, `resources/views/hasil.blade.php`.
+
+- [ ] Gunakan copy Unduh seluruh riwayat CSV pada actions; tidak menjanjikan scope filter atau satu hasil.
+- [ ] Baca/uji exporter existing untuk ownership/verified/final field placeholders/header/confidence scale/excerpt.
+- [ ] Pertahankan BOM/CRLF/delimiter dan CsvCellSanitizer; UI styling tidak menjadi alasan mengubah format data.
+- [ ] Verifikasi empty/header-only, nonfinal, translation provenance dan formula-injection input melalui test data; hindari perubahan exporter jika tidak diperlukan.
+
+**Validasi:** CsvExportTest, TranslationProvenanceExportTest, CsvCellSanitizerTest.
+
+**Selesai ketika:** Copy seluruh riwayat; scope/header/skala/BOM/CRLF/placeholder/excerpt/sanitization tidak berubah; tanpa filtered-export baru.
+
+## F6 — Cleanup, QA, dan handoff
+
+### IP-035
+
+**Cleanup setelah seluruh pemakai dimigrasi**
+
+- **Dependensi:** Seluruh task migrasi IP-011–IP-034.
+- **Acceptance:** Seluruh halaman; G08.
+- **Arsitektur:** FA-03, FA-04, FA-08, FA-10.
+- **Source/target:** `resources/css/`, `resources/js/`, `resources/views/`, `package.json`, `package-lock.json` (audit pemakai dependency/font).
+
+- [ ] Pastikan seluruh task migrasi IP-011–IP-034 selesai atau review tanpa perubahan yang dibuktikan; jangan hapus pemakai legacy yang masih diperlukan.
+- [ ] Gunakan rg untuk memetakan glass/gradient/orb/reveal/counter/inline handlers/aliases/globals dan hapus setelah tidak dipakai.
+- [ ] Periksa scanner, font imports, global utilities dan page modules agar tidak ada orphan code, event, interval atau dependency.
+- [ ] Jalankan build dan review area yang berubah; jangan menghapus vendor/published assets atau kode di luar scope.
+
+**Validasi:** rg pemakai; build; smoke area terdampak.
+
+**Selesai ketika:** Tidak ada alias/orphan handler/interval/gradient/reveal/counter tersisa tanpa alasan; source scanner dan dependency cleanup berdasarkan pemakai nyata.
+
+### IP-036
+
+**Validasi build, Blade, PHP dan regression final**
+
+- **Dependensi:** [IP-035](#ip-035).
+- **Acceptance:** Regression seluruh scope.
+- **Arsitektur:** FA-01–FA-10.
+- **Source/target:** berkas yang berubah, `tests/Feature/`, `tests/Unit/`, lockfiles dan manifest hasil build.
+
+- [ ] Jalankan npm run build serta Blade cache/clear pada development/test; periksa manifest/import/class variants yang diperlukan.
+- [ ] Jalankan test terkait dan suite penuh untuk final perubahan lintas layout/alur; Pint --test pada PHP yang diubah.
+- [ ] Jika exact-copy/markup assertion berubah, update intention sambil menjaga escaping/ownership/final/provenance/evidence/score.
+- [ ] Perbaiki failure yang disebabkan refactor; catat failure lama, skip dan blocker dengan alasan, tanpa menganggap real-BERT skip sebagai E2E pass.
+
+**Validasi:** npm build; view cache/clear; test; Pint bila PHP berubah.
+
+**Selesai ketika:** Build/Blade dan suite relevan/penuh sesuai perubahan selesai; failure lama dibedakan; skip/blocker dicatat; test keamanan tidak dilemahkan.
+
+### IP-037
+
+**Lengkapi QA browser lintas halaman/state**
+
+- **Dependensi:** [IP-036](#ip-036).
+- **Acceptance:** AC-P00–AC-P16, AC-A00–AC-A08, AC-E01.
+- **Arsitektur:** FA-01–FA-10.
+- **Source/target:** halaman implementasi, matriks QA pada `IMPLEMENTATION-PLAN.md`, dan jurnal `TASKS.md`.
+
+- [ ] Jalankan matriks role/input/progress/final/label/explanation/evidence/history/auth/profile/admin/statistics/error/exports yang terdampak.
+- [ ] Periksa reflow 320, viewport 360/768/1280, zoom 200%, keyboard/Escape/focus return/reduced motion dan konten panjang.
+- [ ] Periksa no-JS/bootstrap failure/navigate/back-forward/hidden-visible/slow request serta console/network; fixture dan real-service evidence dibedakan.
+- [ ] Perbaiki regresi dan ulangi cek terdampak; jangan menutup task jika acceptance penting belum diperiksa.
+
+**Validasi:** Matriks QA browser; console/network.
+
+**Selesai ketika:** Coverage role/state/mobile/keyboard/no-JS/lifecycle/long text dan admin tercatat; tidak hanya screenshot ideal; regresi dipulihkan dan cek terdampak diulang.
+
+### IP-038
+
+**Tutup gap, sinkronkan keputusan dan bukti**
+
+- **Dependensi:** [IP-036](#ip-036), [IP-037](#ip-037), [IP-033](#ip-033), [IP-034](#ip-034).
+- **Acceptance:** Traceability/keputusan; G01–G08.
+- **Arsitektur:** FA-01–FA-10.
+- **Source/target:** `TASKS.md`, `IMPLEMENTATION-PLAN.md`, `FRONTEND-ARCHITECTURE.md`, `DESIGN-SYSTEM.md`, `PAGE-SPECIFICATIONS.md` (bila keputusan berubah).
+
+- [ ] Cocokkan task, page/AC, FA decisions dan evidence; pastikan setiap gap G01–G08 memiliki keputusan/status yang jelas.
+- [ ] Gabungkan evidence PDF/CSV/admin yang sudah valid; ulangi hanya jika perubahan/failure/risiko baru memerlukannya.
+- [ ] Selaraskan nama module/helper serta keputusan final pada dokumen terkait; status progres rinci tetap berpusat di TASKS.md.
+- [ ] Catat batas E2E/runtime/retained contract; perubahan fitur yang di luar scope tetap backlog terpisah.
+
+**Validasi:** Traceability, known gaps, decision/evidence review.
+
+**Selesai ketika:** G01–G08 punya keputusan/status; perubahan final diselaraskan; bukti export/admin yang sudah valid digabung, bukan test diulang tanpa alasan.
+
+### IP-039
+
+**Siapkan handoff yang dapat ditinjau**
+
+- **Dependensi:** [IP-038](#ip-038).
+- **Acceptance:** Handoff dan definition of done keseluruhan.
+- **Arsitektur:** FA-08.
+- **Source/target:** `TASKS.md`, final diff/review notes dan dokumen yang berubah.
+
+- [ ] Review final diff, files changed dan task status; pastikan perubahan pengguna yang tidak terkait tetap terjaga.
+- [ ] Siapkan ringkasan perilaku akhir, cara menjalankan/meninjau, validasi dan risk/known limitations berbasis evidence.
+- [ ] Periksa seluruh page acceptance dan definition of done; jika ada blocker penting, nyatakan status pekerjaan belum selesai.
+- [ ] Sediakan next action yang konkret bila masih blocked; commit/PR/publish/deploy mengikuti lingkup instruksi pengguna, bukan dipicu hanya oleh checklist ini.
+
+**Validasi:** Final review dan definition of done.
+
+**Selesai ketika:** Scope/hasil/risk/validasi/reproduksi lengkap; semua AC dibuktikan atau blocker dinyatakan; deployment bukan bagian penyusunan dokumen ini.
+
+
+## Perintah dan pemilihan validasi
+
+Semua perintah dijalankan dari root repo pada development/test yang benar, bukan pada folder dokumen ini. Periksa AGENTS dan environment aktual dahulu.
+
+### Checkout
+
+```bash
+git status --short
+git branch --show-current
+git rev-parse HEAD
+git diff --stat
+```
+
+### Aset dan Blade
+
+Siapkan dependency dengan `npm ci` jika diperlukan. Sesudah perubahan CSS/JS/Vite:
+
+```bash
+npm run build
+php artisan view:cache
+php artisan view:clear
+```
+
+Cache/clear hanya pada environment development/test terkait. Build/Blade compilation tidak menggantikan test authorization atau browser interaction.
+
+### Test sesuai scope
+
+Contoh kelompok input/progress/access:
+
+```bash
+php artisan test --filter='SubmissionTest|AtomicCaptchaQuotaTest|VideoMediaContractTest|ExternalUrlSecurityTest'
+php artisan test --filter='SubmissionProgressTest|FinalResultStateTest|GuestSubmissionAccessTest|ResultEndpointAuthorizationTest'
+```
+
+Kelompok lain mengikuti kartu dan implementation plan. Jalankan suite PHP penuh setelah perubahan lintas layout/alur atau sebelum final handoff:
+
+```bash
+php artisan test
+```
+
+Jika PHP berubah, gunakan `vendor/bin/pint --test` dengan file PHP terkait. Jangan mengarang `npm run lint`, `npm test`, Playwright atau Cypress sebagai tooling baseline. Python/evaluation tests dipilih hanya bila area Python/evaluation benar-benar berubah.
+
+Sesuaikan test exact-copy/markup jika presentasi berubah, sambil menjaga assertion escaping, ownership, final state, score source, rank dan provenance. Jangan menghapus perlindungan agar refactor lolos.
+
+### Compose existing
+
+Source bundled memerlukan rebuild/recreate untuk perubahan source:
+
+```bash
+docker compose build app
+docker compose up -d --force-recreate app queue scheduler
+docker compose ps
+```
+
+Image normal memakai Composer no-dev; test tools tidak diasumsikan ada pada container app. Gunakan host dengan dev dependencies atau target Docker test sesuai AGENTS.
+
+Baseline `composer run dev` memiliki path Windows dan belum memulai RAG. Bootstrap Linux melakukan migration dan memerlukan artifact/service; tidak dijalankan untuk sekadar cek CSS. Catat dependency runtime yang belum tersedia, bukan mengganti model/data dengan hasil palsu.
+
+### Browser dan output
+
+Periksa state yang berubah, bukan hanya screenshot data ideal: guest/user/unverified/verified/admin, validasi, nonterminal/terminal, explanation/evidence, access denial, empty, long text, responsive, keyboard, no-JS, lifecycle dan console/network.
+
+Reflow 320px, viewport 360/768/1280px, zoom 200%, reduced motion dan focus sesuai design system. PDF diuji pada file render aktual; CSV diuji sebagai data. Gunakan fixture/test data aman dan laporkan batas real-service E2E.
+
+Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang masih berlaku dapat dipakai pada final review; tidak perlu test berulang tanpa alasan.
+
+## Jurnal eksekusi dan handoff antarsesi
+
+### IP-001 — Catatan eksekusi
+
+- **Status:** done; 11 Oktober 2026, Asia/Jakarta; pelaksana Codex.
+- **Branch/commit aktual yang diaudit:** `refactor/frontend` / `af173ecb25aca930720db52b3d76201b4b27aaff`, sama dengan SHA baseline. Commit task dibuat setelah review; jurnal ini memakai SHA source yang diperiksa agar tidak membutuhkan self-reference hash.
+- **Files changed:** `docs/refactor/AUDIT-IP-001.md` baru; tujuh dokumen refactor memperbaiki tautan/penempatan, daftar dokumen aktual dan ringkasan status. Karena paket pengguna belum tracked, paket dokumentasi dicatat Git bersama audit. `AGENTS.md`, `bootstrap/app.php` dan artifact BERT tidak disertakan commit ini.
+- **Page/AC dan FA decisions:** inventaris P00–P16, A00–A08, E01 sebagai baseline source; FA-01/FA-08. Tidak ada acceptance UI/runtime yang dinyatakan pass.
+- **Perilaku akhir:** scope, route/input/access, resource pages/actions, lockfile, pemakai CSS/JS, state dan risiko terdokumentasi pada [AUDIT-IP-001.md](AUDIT-IP-001.md). Dokumen tetap satu paket di `docs/refactor/`; instruksi root pengguna dipertahankan tanpa edit.
+- **Validasi:** review `git status/branch/rev-parse/diff`, instruksi root/ancestor/subtree, manifest JSON, routes/controller/request/service/enum dan resource/view/CSS/JS. Pemeriksaan Python standard library exit 0: 219 tautan lokal dan 126 anchor Markdown valid, code fences seimbang, 39 ID task unik (done=1/pending=38), checklist IP-001 4/4, serta 94 ID kasus QA unik. SHA-256 AGENTS/bootstrap cocok dengan awal; ukuran/mtime artifact dan scope diff tracked tetap. Review perubahan dokumentasi terhadap salinan awal serta scope staged commit; `git diff --check` dan `git diff --cached --check` exit 0. Staged hanya delapan dokumen refactor.
+- **Evidence:** QA-ENV-01 pass, mode `source_review`; tujuh dokumen dibaca lengkap; branch/SHA dan perubahan pengguna tercatat; fingerprints berkas pengguna menjadi pembanding sebelum/sesudah. Status QA saat ini pass=1, not_run=93.
+- **Skip/blocker:** tidak ada blocker acceptance audit. Build/Blade/PHPUnit/Pint/browser/PDF/CSV/pipeline nyata tidak dijalankan karena scope dokumentasi/source review IP-001. Artifact lokal belum diperiksa readiness-nya; tidak disebut service unavailable. Gate F0 tetap belum lengkap.
+- **Berikutnya:** berhenti sesuai instruksi pengguna. IP-002–IP-039 tetap pending; tidak menjalankan task lain.
+
+### Format catatan berikutnya
+
+Saat task dikerjakan, tambahkan catatan di bawah ini dengan format berikut. Jangan memasukkan secret atau data pengguna.
+
+```markdown
+### IP-xxx — Catatan eksekusi
+- Status:
+- Branch/commit aktual:
+- Files changed:
+- Page/AC dan FA decisions:
+- Perilaku akhir:
+- Validasi: perintah atau skenario, hasil/exit code, output yang diperiksa.
+- Evidence: ringkasan; artefak test/QA bila diperlukan.
+- Skip/blocker: alasan, dampak, fixture vs real service.
+- Berikutnya: task siap atau langkah konkret untuk menutup blocker.
+```
+
+Jika sesi berhenti/berganti, catat task aktif, perubahan belum selesai, validasi yang sudah dilakukan, dan langkah berikutnya. Sesi berikutnya membaca status/jurnal serta diff aktual; jangan mengulang task done atau menimpa perubahan karena konteks percakapan tidak tersedia.
+
+Simpan dokumen di `docs/refactor/TASKS.md`; path source dan perintah tetap relatif root repo. Jika task dipecah, gunakan sub-ID seperti `IP-014.1` dengan mapping ke parent; parent selesai hanya setelah acceptance keseluruhan terpenuhi. Dependency dan keputusan kontrak baru diselaraskan dengan implementation plan.
+
+## Instruksi awal untuk Codex
+
+Contoh untuk memulai audit:
+
+```text
+Baca AGENTS.md dan dokumen refactor Hoaxlin.
+Kerjakan IP-001 dari TASKS.md pada working copy repo saat ini.
+Periksa branch, instruksi lokal, perubahan pengguna, route dan kontrak frontend.
+Catat temuan serta dependency; perbarui status dan jurnal berdasarkan evidence.
+```
+
+Contoh untuk mengeksekusi backlog sesuai dependency:
+
+```text
+Baca AGENTS.md dan seluruh dokumen refactor Hoaxlin.
+Eksekusi TASKS.md sesuai dependency, mulai dari task pending paling awal
+yang siap dikerjakan. Pertahankan kontrak backend dan perubahan pengguna.
+Selesaikan tiap task dengan validasi yang relevan, perbarui tabel status
+serta jurnal, lalu lanjutkan task siap berikutnya dalam scope refactor.
+Jika acceptance wajib terblokir, catat blocker konkret dan lanjutkan
+pekerjaan independen; jangan menandainya done tanpa evidence.
+```
+
+Contoh di atas digunakan ketika pengguna memang meminta implementasi. File ini menyediakan daftar kerja untuk eksekusi berikutnya.
