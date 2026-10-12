@@ -3,8 +3,8 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 11 Oktober 2026 |
-| Status | QA-ENV-01 pass melalui audit source; 93 kasus lainnya not_run |
+| Tanggal | 13 Oktober 2026 |
+| Status | QA-ENV-01–03 pass sebagai audit/inventaris; 91 kasus lainnya not_run |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Arah desain | Warm Editorial Intelligence; light-only |
@@ -13,7 +13,7 @@
 | Task implementasi | IP-001–IP-039 |
 | Skenario QA | 94 kasus dalam 15 kelompok |
 
-Penyusunan dokumen ini memeriksa source dan dokumen rencana. **Build aplikasi, PHPUnit, browser QA, screen reader, PDF renderer dan pipeline nyata belum dijalankan untuk menyatakan kelulusan implementasi.** Seluruh kasus pada katalog dimulai `not_run`; QA-ENV-01 kini memiliki bukti audit checkout pada [AUDIT-IP-001.md](AUDIT-IP-001.md). Pemeriksaan konsistensi dokumen tidak dihitung sebagai aplikasi lulus QA.
+Seluruh kasus pada katalog dimulai `not_run`. QA-ENV-01 memiliki bukti [audit checkout](AUDIT-IP-001.md); QA-ENV-02 memiliki bukti [inventaris baseline](BASELINE-IP-002.md). Build frontend host lulus pada IP-002, tetapi **Blade/PHPUnit, smoke browser aplikasi, screen reader, PDF renderer dan pipeline nyata belum dijalankan** karena runtime belum siap. Probe Firefox about:blank bukan QA halaman Hoaxlin. QA-ENV-03 memiliki bukti [inventaris/rencana fixture](FIXTURES-IP-003.md) melalui review source, tanpa run PHP/browser baru. Kelulusan audit/inventaris dan konsistensi dokumen tidak dihitung sebagai kelulusan implementasi UI.
 
 File ini berada di `docs/refactor/` bersama [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md). [AGENTS.md](../../AGENTS.md) tetap di root repository.
 
@@ -92,7 +92,7 @@ Tidak membuat seed demo pada environment pengguna hanya untuk screenshot. Pengha
 | Statistik | 12 bulan, bulan nol, no data, boundary timezone, total dan label population berbeda; chart gagal |
 | Output/error | PDF satu/multi-halaman; CSV Unicode/quote/newline/formula prefix; error HTML/JSON dan jaringan lambat/offline |
 
-Gunakan fixture/fake existing terlebih dahulu. Jangan membuat test baru yang hanya mengecek class CSS atau menyalin implementasi. Tambah fixture/test jika ada perilaku atau regresi penting yang belum dapat dibuktikan.
+Peta factory/fake, rujukan method test, state dan seluruh halaman tersedia pada [FIXTURES-IP-003.md](FIXTURES-IP-003.md); rencana akses PHP test dan browser fixture dipisahkan. Gunakan fixture/fake existing terlebih dahulu. Jangan membuat test baru yang hanya mengecek class CSS atau menyalin implementasi. Tambah fixture/test jika ada perilaku atau regresi penting yang belum dapat dibuktikan.
 
 ### 2.3 Mode verifikasi
 
@@ -645,6 +645,10 @@ Jika commit berubah tetapi area terkait tidak berubah, catat alasan evidence mas
 
 Angka ini adalah status katalog awal, bukan penilaian kualitas repo. Belum ada execution result atau defect yang diklaim dari pembuatan dokumen ini.
 
-Status setelah IP-001 (11 Oktober 2026): QA-ENV-01 **pass**, mode `source_review`, berdasarkan [audit checkout](AUDIT-IP-001.md#validasi-dan-batas-bukti) dan [jurnal eksekusi](TASKS.md#ip-001--catatan-eksekusi). Total terkini: pass=1, not_run=93, fail=0, blocked=0, not_applicable=0. IP-002/IP-003 dan seluruh QA aplikasi belum dijalankan; gate F0 belum lengkap.
+Status setelah IP-001 (11 Oktober 2026): QA-ENV-01 **pass**, mode `source_review`, berdasarkan [audit checkout](AUDIT-IP-001.md#validasi-dan-batas-bukti) dan [jurnal eksekusi](TASKS.md#ip-001--catatan-eksekusi). Total pada penutupan IP-001: pass=1, not_run=93.
+
+Status setelah IP-002 (11 Oktober 2026): QA-ENV-02 **pass sebagai inventaris baseline**, mode build frontend host/probe environment/source review, berdasarkan [laporan baseline](BASELINE-IP-002.md) dan [jurnal IP-002](TASKS.md#ip-002--catatan-eksekusi). Checks yang tersedia serta failure/unavailable telah dicatat sesuai expected QA-ENV-02. Subhasil: build frontend pass, Blade/PHPUnit/smoke aplikasi blocked oleh environment; tidak dihitung sebagai aplikasi pass. Total pada penutupan IP-002: pass=2, not_run=92. Catatan ini dipulihkan identik secara evidence dari commit 2b8284d; tidak merupakan probe readiness baru pada sesi IP-003.
+
+Status setelah IP-003 (13 Oktober 2026): QA-ENV-03 **pass sebagai review inventaris/rencana fixture**, berdasarkan [inventaris state](FIXTURES-IP-003.md) dan [jurnal IP-003](TASKS.md#ip-003--catatan-eksekusi). Total terkini: pass=3, not_run=91, fail=0, blocked=0, not_applicable=0. Rencana run fixture/browser/export/real service belum dijalankan; semua QA halaman/pipeline masih not_run. Catatan F0 lengkap untuk scope audit/inventaris, tetapi blocker backend/runtime dan harness browser fixture tetap terbuka.
 
 Ketika implementasi diminta, lanjutkan task pending sesuai dependency pada TASKS.md, pilih kasus yang relevan, jalankan pemeriksaan yang tersedia, lalu catat hasil aktual. Tuntaskan failure acceptance dan ulangi scope yang terdampak. Lanjutkan pekerjaan independen saat ada blocker, tetapi pertahankan batas klaim QA dan E2E sampai bukti tersedia.

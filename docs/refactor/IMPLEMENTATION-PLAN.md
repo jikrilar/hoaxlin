@@ -3,8 +3,8 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 11 Oktober 2026 |
-| Status | Audit IP-001 selesai; 1 dari 39 task done, IP-002–IP-039 pending |
+| Tanggal | 13 Oktober 2026 |
+| Status | IP-001–IP-003 selesai; 3 dari 39 task done, IP-004–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Arah desain | Warm Editorial Intelligence; light-only |
@@ -17,7 +17,7 @@ Dokumen terkait: [AGENTS.md](../../AGENTS.md), [OVERVIEW.md](OVERVIEW.md), [DESI
 
 Rencana ini mengubah spesifikasi desain, halaman, dan arsitektur menjadi tugas yang dapat dikerjakan, ditinjau, dan diverifikasi. Ia bukan daftar fitur baru maupun bukti bahwa refactor sudah diterapkan.
 
-Pembacaan source untuk penyusunan dokumentasi sudah dilakukan. Audit working copy IP-001 kini selesai dan tercatat pada [AUDIT-IP-001.md](AUDIT-IP-001.md) serta [jurnal TASKS.md](TASKS.md#ip-001--catatan-eksekusi). Baseline browser, perubahan kode aplikasi, build, test, dan QA runtime belum dijalankan; IP-002–IP-039 tetap pending.
+IP-001–IP-003 memiliki bukti pada [audit checkout](AUDIT-IP-001.md), [baseline historis IP-002](BASELINE-IP-002.md), [inventaris fixture IP-003](FIXTURES-IP-003.md) dan [jurnal eksekusi](TASKS.md#ip-003--catatan-eksekusi). Catatan IP-002 dipulihkan dari commit 2b8284d yang belum masuk branch ini; tidak menjalankan ulang baseline tersebut. Build frontend host pada sesi IP-002 lulus, tetapi Blade/PHPUnit dan smoke aplikasi belum tersedia; probe Firefox hanya menilai engine. IP-003 memetakan setup/oracle dan gap, tanpa eksekusi fixture runtime atau perubahan aplikasi. IP-004–IP-039 tetap pending.
 
 Kerjakan dependency sebelum task turunannya. Tuntaskan satu alur dengan error, empty, akses, mobile, dan keyboard sebelum memperluas perubahan. Untuk layout/CSS bersama, cek pula halaman yang masih memakai presentasi lama.
 
@@ -145,7 +145,7 @@ Prioritas ini tidak mengubah dependency individual. Seluruh area scope tetap waj
 
 **Gate F0:** checkout/instruksi/perubahan pengguna tercatat; test/build/browser baseline dan gap environment diketahui; fixture/states QA memiliki rencana yang jelas. Blocker runtime tertentu tidak menghentikan pekerjaan source/CSS yang independen, tetapi membatasi klaim validasinya.
 
-Jika AGENTS existing berbeda dari dokumen refactor yang telah disiapkan, review dan integrasikan instruksi yang relevan; jangan menimpa aturan lokal atau perubahan pengguna tanpa memahami dampaknya. Dokumen refactor dipertahankan di `docs/refactor/`; AGENTS root working copy sudah memuat arah dan kontrak refactor sehingga tidak perlu ditimpa. IP-001 selesai belum menutup gate F0, yang juga memerlukan IP-002 dan IP-003.
+Jika AGENTS existing berbeda dari dokumen refactor yang telah disiapkan, review dan integrasikan instruksi yang relevan; jangan menimpa aturan lokal atau perubahan pengguna tanpa memahami dampaknya. Dokumen refactor dipertahankan di `docs/refactor/`; AGENTS root pendek dan instruksi terbaru pengguna dipertahankan. Arah desain/kontrak target tetap dirujuk dari paket refactor; panduan AGENTS lama tidak diberlakukan kembali. IP-001–IP-003 memenuhi gate F0 untuk catatan audit/inventaris/rencana fixture. Ini bukan kelulusan build Laravel, test atau QA aplikasi: blocker runtime dan baseline parsial IP-002 tetap terbuka, harness browser fixture belum tersedia. Scope sesi berakhir pada IP-003; fase implementasi berikutnya belum dimulai.
 
 ## 7. F1 — Fondasi token, komponen, dan lifecycle
 
