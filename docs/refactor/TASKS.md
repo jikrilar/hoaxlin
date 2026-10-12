@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-004 selesai; 4 dari 39 task selesai, IP-005–IP-039 pending |
+| Status | IP-001–IP-005 selesai; 5 dari 39 task selesai, IP-006–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-004 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-005 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -80,7 +80,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-002](#ip-002) | F0 | Siapkan baseline verifikasi development/test | done |
 | [IP-003](#ip-003) | F0 | Susun inventaris state dan data QA | done |
 | [IP-004](#ip-004) | F1 | Implementasikan tokens, bridge Tailwind, dan font | done |
-| [IP-005](#ip-005) | F1 | Rapikan base CSS dan transisi legacy | pending |
+| [IP-005](#ip-005) | F1 | Rapikan base CSS dan transisi legacy | done |
 | [IP-006](#ip-006) | F1 | Buat komponen dasar reusable | pending |
 | [IP-007](#ip-007) | F1 | Bangun lifecycle dan helper JS | pending |
 | [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | pending |
@@ -203,10 +203,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-03, FA-08.
 - **Source/target:** `resources/css/app.css`, `resources/css/base.css`, `resources/css/theme.css` (bila diperlukan).
 
-- [ ] Pisahkan entry/base/bridge dan aturan komponen dengan urutan import/layer yang sah; pertahankan @source yang diperlukan.
-- [ ] Terapkan canvas light, focus-visible dan typography fungsional; Newsreader hanya untuk konteks editorial.
-- [ ] Inventaris selector/token legacy dan gunakan alias sementara hanya jika pemakainya jelas; jangan menumpuk overrides tanpa batas.
-- [ ] Cek seluruh halaman publik termasuk yang belum dimigrasi; perbaiki sumber overflow, bukan menyembunyikan overflow global.
+- [x] Pisahkan entry/base/bridge dan aturan komponen dengan urutan import/layer yang sah; pertahankan @source yang diperlukan.
+- [x] Terapkan canvas light, focus-visible dan typography fungsional; Newsreader hanya untuk konteks editorial.
+- [x] Inventaris selector/token legacy dan gunakan alias sementara hanya jika pemakainya jelas; jangan menumpuk overrides tanpa batas.
+- [x] Cek seluruh halaman publik termasuk yang belum dimigrasi; perbaiki sumber overflow, bukan menyembunyikan overflow global.
 
 **Validasi:** Build; smoke semua view publik.
 
@@ -955,6 +955,18 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Skip/blocker:** vendor/autoload.php/PHPUnit tidak tersedia; daemon Docker tidak dapat diakses (exit 1). Blade/PHPUnit/Pint/Laravel browser/admin/PDF/pipeline tidak dijalankan. Text resize bukan native browser zoom 200%; Chromium/screen reader belum tersedia. Perhitungan palette tidak menutup contrast legacy gradients/opacity atau keseluruhan aksesibilitas.
 - **Perlindungan:** source backend/test/routes/models/auth/CSRF/quotas/provenance/env/lockfiles/vendor assets tidak diedit; fingerprints dibandingkan dengan awal. Tidak menambah dependency, training, fixture route atau demo seed; tidak menjalankan migration/bootstrap/deploy/worker, mengirim mail atau memakai provider API.
 - **Berikutnya:** berhenti pada IP-004 dan commit sesuai permintaan. IP-005–IP-039 tetap pending; tahap base/components/shell/admin/PDF belum dikerjakan.
+
+### IP-005 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex. Scope base publik/compatibility, G08 dan FA-03/FA-08.
+- **Checkout:** frontend-refactor/foundation, HEAD awal 66f7cccf616996f19e6480fd4d6eab9d466fc192; tree/index bersih, AGENTS dibaca, tanpa instruksi subtree.
+- **Files changed:** app.css menjadi entry/scanner; base.css dan legacy-components.css baru; fonts.css memakai layer components; legacy-tokens.css kini sembilan alias semantic dengan inventory. View publik/progress memakai palette light, role fungsional <=600 dan layout responsive. Entry JS/beranda menghapus reveal. BASE-IP-005.md baru; status TASKS/IMPLEMENTATION-PLAN/DESIGN-SYSTEM/QA dan konteks historis IP-004 diperbarui.
+- **Perilaku akhir:** canvas ivory, Inter UI/Newsreader editorial, focus-visible 3px/2px, konten langsung terlihat, reduced motion; komponen legacy mengganti style asal dalam components layer. Overflow diperbaiki melalui track/flex/padding/history/header/footer, tanpa clipping global. Route/form/data/security tidak berubah.
+- **Validasi:** npm build, node syntax, 19 render Blade asli tanpa warning, compiled PHP syntax, tiga run Firefox 157.0.1 (normal/dark+reduced/JS-disabled), 152 sampel viewport, text resize 200%, native Tab focus dan console nol. Empat state password strength/match, native file input Tab dan utility/component cascade lulus; 877 text nodes visible memenuhi contrast, minimum sekitar 4.58:1 (opaque backgrounds, bukan seluruh WCAG). Review akhir: 330 tautan lokal/134 anchor valid; done=5/pending=34; 94 QA IDs tetap lengkap. Kontrak form/hook Blade dan protected fingerprints cocok awal; 24 tracked files serta 3 file baru sesuai scope; secret scan lulus. git diff --check dan git diff --cached --check lulus.
+- **Evidence:** [BASE-IP-005.md](BASE-IP-005.md), source base/legacy dan sembilan alias beserta pemakai. JSON/screenshots/harness berada di /tmp/hoaxlin-ip005-7601ib6s. Seluruh 13 view publik dan fragment progress tercakup sebagai render fixture, bukan alur aplikasi E2E.
+- **Batas:** dependency sementara memakai lockfile dengan platform requirements diabaikan karena PHP host 8.5 dan ekstensi tidak lengkap; bukan environment aplikasi yang didukung. Tidak ada runtime controller/middleware/DB/POST, Livewire mount/poll authorization, PHPUnit, admin, PDF atau AI/provider run. QA aggregate tetap pass=3/not_run=91. Text resize bukan native zoom audit.
+- **Perlindungan:** backend/tests/routes/config/env/lockfile/AGENTS/font assets/vendor/Filament/PDF dibandingkan snapshot; tidak mengubah kontrak, migration, dependency proyek, seed/data atau deployment. Komponen Blade reusable dan lifecycle baru belum dikerjakan.
+- **Berikutnya:** berhenti pada IP-005; commit semantic sesuai instruksi. IP-006–IP-039 pending.
 
 ### Format catatan berikutnya
 

@@ -1,22 +1,17 @@
-/* Compatibility for unmigrated public CSS/views. Inventory: docs/refactor/FOUNDATION-IP-004.md.
- * Remove as consumers migrate in IP-005/IP-035; modern utilities resolve --ds-* directly. */
+/* Temporary aliases for public views only. Inventory: docs/refactor/BASE-IP-005.md.
+ * Remove with their last consumer; new styles use --ds-* directly. */
 [data-legacy-tokens] {
-    --font-sans: var(--ds-font-ui);
     --font-display: var(--ds-font-ui);
 
     /* Brand colors */
-    --color-primary: #6366f1;
-    --color-primary-light: #818cf8;
-    --color-success: #10b981;
+    --color-primary: var(--ds-action-primary);
+    --color-primary-light: var(--ds-link);
+    --color-success: var(--ds-success-fg);
 
-    /* Surface colors */
-    --color-surface-0: #080b14;
-    --color-surface-1: #0d1117;
+    --color-text-primary: var(--ds-text-primary);
+    --color-text-secondary: var(--ds-text-body);
+    --color-text-muted: var(--ds-text-muted);
 
-    --color-text-primary: #f0f4ff;
-    --color-text-secondary: #94a3b8;
-    --color-text-muted: #64748b;
-
-    --color-border: rgba(99, 102, 241, 0.15);
-    --color-border-light: rgba(148, 163, 184, 0.1);
+    --color-border: var(--ds-border-subtle);
+    --color-border-light: var(--ds-border-subtle);
 }

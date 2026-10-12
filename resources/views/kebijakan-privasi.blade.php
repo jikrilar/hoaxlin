@@ -12,21 +12,21 @@
             Kembali
         </a>
 
-        <div class="glass-card" style="padding:3rem;" role="main">
+        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-12));" role="main">
             <h1 class="hl-heading-editorial" style="margin-bottom:0.5rem;">Kebijakan Privasi</h1>
             <p style="color:var(--color-text-muted); font-size:0.9375rem; margin-bottom:2.5rem;">Terakhir diperbarui: 18 September 2026</p>
 
             <div style="display:flex; flex-direction:column; gap:2rem; color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.8;">
 
                 <section aria-labelledby="intro-heading">
-                    <h2 id="intro-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:700; margin-bottom:0.75rem;">1. Pendahuluan</h2>
+                    <h2 id="intro-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">1. Pendahuluan</h2>
                     <p>hoaxlin.id ("kami", "layanan") berkomitmen untuk melindungi privasi pengguna. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi Anda saat menggunakan sistem deteksi hoax berbasis BERT ini.</p>
                 </section>
 
                 <div class="divider"></div>
 
                 <section aria-labelledby="data-heading">
-                    <h2 id="data-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:700; margin-bottom:0.75rem;">2. Data yang Dikumpulkan</h2>
+                    <h2 id="data-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">2. Data yang Dikumpulkan</h2>
                     <ul style="list-style:none; display:flex; flex-direction:column; gap:0.625rem;">
                         @foreach([
                             'Teks berita yang Anda kirimkan untuk dianalisis',
@@ -46,7 +46,7 @@
                 <div class="divider"></div>
 
                 <section aria-labelledby="use-heading">
-                    <h2 id="use-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:700; margin-bottom:0.75rem;">3. Penggunaan Data</h2>
+                    <h2 id="use-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">3. Penggunaan Data</h2>
                     <p style="margin-bottom:0.75rem;">Data yang dikumpulkan digunakan untuk:</p>
                     <ul style="list-style:none; display:flex; flex-direction:column; gap:0.625rem;">
                         @foreach([
@@ -66,21 +66,21 @@
                 <div class="divider"></div>
 
                 <section aria-labelledby="third-party-heading">
-                    <h2 id="third-party-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:700; margin-bottom:0.75rem;">4. Layanan Pihak Ketiga</h2>
+                    <h2 id="third-party-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">4. Layanan Pihak Ketiga</h2>
                     <p>Sistem kami menggunakan layanan OpenAI API untuk menerjemahkan berita berbahasa Inggris ke Bahasa Indonesia, OCR gambar, transkripsi video, dan penyusunan narasi penjelasan. Konten yang memerlukan fungsi tersebut mungkin diproses oleh layanan ini sesuai dengan <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary-light); text-decoration:none;">Kebijakan Privasi OpenAI</a>.</p>
                 </section>
 
                 <div class="divider"></div>
 
                 <section aria-labelledby="retention-heading">
-                    <h2 id="retention-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:700; margin-bottom:0.75rem;">5. Retensi Data</h2>
+                    <h2 id="retention-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">5. Retensi Data</h2>
                     <p>File media asli (gambar/video) dihapus otomatis maksimal 24 jam setelah pemrosesan mencapai status selesai atau gagal. Data teks dan hasil analisis tetap tersedia dalam riwayat selama akun aktif.</p>
                 </section>
 
                 <div class="divider"></div>
 
                 <section aria-labelledby="rights-heading">
-                    <h2 id="rights-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:700; margin-bottom:0.75rem;">6. Hak Pengguna</h2>
+                    <h2 id="rights-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">6. Hak Pengguna</h2>
                     <p>Pengguna terdaftar dapat menghapus akun melalui pengaturan akun. Penghapusan ini bersifat permanen dan menghapus akun, seluruh riwayat submission, hasil deteksi, feedback, serta file media terkait. Untuk pertanyaan lebih lanjut mengenai privasi, hubungi kami melalui form di halaman Tentang.</p>
                 </section>
 

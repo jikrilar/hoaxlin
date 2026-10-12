@@ -34,32 +34,9 @@ function animateCounter(el, target, duration = 1500) {
 }
 
 /**
- * Intersection Observer for reveal animations
- */
-const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0) scale(1)';
-            revealObserver.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-/**
- * Initialize all animations on DOM load
+ * Initialize shared page behavior on DOM load
  */
 document.addEventListener('DOMContentLoaded', () => {
-    // Reveal elements
-    document.querySelectorAll('.feature-card, .stat-card, .glass-card').forEach(el => {
-        if (!el.style.opacity) {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px) scale(0.98)';
-            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            revealObserver.observe(el);
-        }
-    });
-
     // Navbar scroll
     const navbar = document.getElementById('main-navbar');
     if (navbar) {

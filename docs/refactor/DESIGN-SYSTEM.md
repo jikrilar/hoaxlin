@@ -3,13 +3,15 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 11 Oktober 2026 |
-| Status | Fondasi token/font/bridge IP-004 diterapkan; base/komponen/admin/PDF belum dimigrasi |
+| Tanggal | 13 Oktober 2026 |
+| Status | Fondasi IP-004 dan base publik IP-005 diterapkan; komponen reusable/halaman/admin/PDF masih pending |
 | Arah visual | Warm Editorial Intelligence |
 | Theme | Light-only, publik dan admin |
 | Stack target | Laravel 12, Blade, Tailwind CSS 4, Vite, Livewire 4, Filament 5 |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Dokumen terkait | [AGENTS.md](../../AGENTS.md), [OVERVIEW.md](OVERVIEW.md) |
+
+Base publik/light/focus dan compatibility kini diterapkan pada [laporan IP-005](BASE-IP-005.md). Smoke fixture seluruh view publik tidak menutup seluruh acceptance state/interaksi aplikasi.
 
 ## 1. Tujuan dan otoritas desain
 

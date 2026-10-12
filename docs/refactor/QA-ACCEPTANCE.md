@@ -17,6 +17,8 @@ Seluruh kasus pada katalog dimulai `not_run`. QA-ENV-01 memiliki bukti [audit ch
 
 IP-004 menambah subhasil fondasi pada [FOUNDATION-IP-004.md](FOUNDATION-IP-004.md): build font/token, browser specimen Firefox, mapping utility, dark/reduced preference, fallback dan contrast diperiksa. QA-ASSET-01/02 serta QA-A11Y-04 tetap **not_run secara agregat**, karena seluruh UI/renderer/varian runtime belum diverifikasi. Tidak menambah kasus atau mengubah 3 pass audit/inventaris menjadi klaim aplikasi pass.
 
+IP-005 menambah [subhasil base publik](BASE-IP-005.md): 19 render Blade dan smoke seluruh view publik pada tiga profile browser. QA-ASSET/QA-A11Y dan kasus halaman tetap not_run secara agregat; controller/authorization/pipeline, semua varian interaksi dan renderer admin/PDF belum diverifikasi.
+
 File ini berada di `docs/refactor/` bersama [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md). [AGENTS.md](../../AGENTS.md) tetap di root repository.
 
 ## 1. Tujuan dan otoritas dokumen

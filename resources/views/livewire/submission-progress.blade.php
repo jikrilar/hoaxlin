@@ -9,7 +9,7 @@
         @endif
     >
     {{-- Progress Bar --}}
-    <div style="width:4rem; height:4rem; margin:0 auto 1.25rem; border-radius:1rem; background:rgba(99,102,241,0.12); display:flex; align-items:center; justify-content:center; font-size:1.75rem;" aria-hidden="true">
+    <div style="width:4rem; height:4rem; margin:0 auto 1.25rem; border-radius:1rem; background:var(--ds-bg-selected); display:flex; align-items:center; justify-content:center; font-size:1.75rem;" aria-hidden="true">
         @if($isFailed)
             ❌
         @elseif($isCompleted)
@@ -23,7 +23,7 @@
         Status: <span data-stage-label>{{ $isFailed ? 'Gagal' : ($isCompleted ? 'Selesai' : $stageLabel) }}</span>
     </p>
 
-    <h1 style="font-size:1.5rem; font-weight:700; margin-bottom:0.75rem;">
+    <h1 style="font-size:1.5rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">
         {{ $isFailed ? 'Pemrosesan Gagal' : ($isCompleted ? 'Analisis Selesai' : 'Sedang Menganalisis') }}
     </h1>
 
@@ -41,7 +41,7 @@
     <div style="max-width:480px; margin:0 auto 1rem;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
             <span style="color:var(--color-text-muted); font-size:0.75rem; font-weight:500;">Progress</span>
-            <span style="color:var(--color-primary-light); font-size:0.8125rem; font-weight:700;" aria-live="polite">{{ $progress }}%</span>
+            <span style="color:var(--color-primary-light); font-size:0.8125rem; font-weight:var(--ds-font-weight-semibold);" aria-live="polite">{{ $progress }}%</span>
         </div>
         <div
             role="progressbar"
@@ -49,10 +49,10 @@
             aria-valuemin="0"
             aria-valuemax="100"
             aria-label="Progress pemrosesan {{ $progress }} persen, tahap {{ $stageLabel }}"
-            style="width:100%; height:0.75rem; background:rgba(99,102,241,0.15); border-radius:9999px; overflow:hidden; border:1px solid rgba(99,102,241,0.15);"
+           style="width:100%; height:0.75rem; background:var(--ds-bg-selected); border-radius:9999px; overflow:hidden; border:1px solid var(--ds-border-control);"
         >
             <div
-                style="height:100%; width:{{ $progress }}%; background:linear-gradient(90deg, {{ $isFailed ? '#f87171, #ef4444' : ($isCompleted ? '#34d399, #10b981' : '#818cf8, #06b6d4') }}); border-radius:9999px; transition:width 0.6s ease; will-change:width;"
+               style="height:100%; width:{{ $progress }}%; background:{{ $isFailed ? 'var(--ds-danger-fg)' : ($isCompleted ? 'var(--ds-success-fg)' : 'var(--ds-action-primary)') }}; border-radius:9999px; transition:width var(--ds-duration-progress) var(--ds-ease); will-change:width;"
             ></div>
         </div>
         <div style="display:flex; justify-content:space-between; margin-top:0.5rem; gap:0.25rem;">

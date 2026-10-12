@@ -7,13 +7,12 @@
 <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem;">
 
     <!-- Background decoration -->
-    <div class="glow-orb glow-orb-1" style="opacity:0.5;" aria-hidden="true"></div>
-    <div class="glow-orb glow-orb-2" style="opacity:0.4;" aria-hidden="true"></div>
 
-    <div style="width:100%; max-width:440px; position:relative;" class="animate-scale-in">
+
+    <div style="width:100%; max-width:440px; position:relative;">
 
         <!-- Card -->
-        <div class="glass-card-solid" style="padding:2.75rem;" role="main">
+        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem);" role="main">
 
             <!-- Back to Login -->
             <a href="{{ route('login') }}" class="btn-ghost" style="display:inline-flex; margin-bottom:1.75rem; padding:0; color:var(--color-text-muted); font-size:0.875rem;" aria-label="Kembali ke halaman masuk">
@@ -23,8 +22,8 @@
 
             <!-- Icon & Title -->
             <div style="text-align:center; margin-bottom:2rem;">
-                <div style="width:4rem; height:4rem; background:linear-gradient(135deg, rgba(99,102,241,0.15), rgba(6,182,212,0.1)); border:1px solid rgba(99,102,241,0.25); border-radius:1.25rem; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; font-size:1.75rem;" aria-hidden="true">🔑</div>
-                <h1 style="font-size:1.5rem; font-weight:700; margin-bottom:0.375rem;">Lupa Kata Sandi?</h1>
+                <div style="width:4rem; height:4rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:1.25rem; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; font-size:1.75rem;" aria-hidden="true">🔑</div>
+                <h1 style="font-size:1.5rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.375rem;">Lupa Kata Sandi?</h1>
                 <p style="color:var(--color-text-muted); font-size:0.9375rem; line-height:1.6;">
                     Masukkan email yang terdaftar. Kami akan mengirimkan tautan untuk mereset kata sandimu.
                 </p>
@@ -32,17 +31,17 @@
 
             <!-- Status Message -->
             @if (session('status'))
-            <div style="padding:1rem 1.25rem; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); border-radius:0.875rem; margin-bottom:1.5rem; display:flex; gap:0.625rem; align-items:center;" role="status">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <p style="color:#34d399; font-size:0.875rem;">{{ session('status') }}</p>
+            <div style="padding:1rem 1.25rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:0.875rem; margin-bottom:1.5rem; display:flex; gap:0.625rem; align-items:center;" role="status">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-success-fg)" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <p style="color:var(--ds-success-fg); font-size:0.875rem;">{{ session('status') }}</p>
             </div>
             @endif
 
             <!-- Error -->
             @if($errors->any())
-            <div style="padding:0.875rem 1rem; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:0.75rem; margin-bottom:1.5rem;" role="alert">
+            <div style="padding:0.875rem 1rem; background:var(--ds-danger-bg); border:1px solid var(--ds-danger-fg); border-radius:0.75rem; margin-bottom:1.5rem;" role="alert">
                 @foreach($errors->all() as $error)
-                <p style="color:#f87171; font-size:0.875rem;">{{ $error }}</p>
+                <p style="color:var(--ds-danger-fg); font-size:0.875rem;">{{ $error }}</p>
                 @endforeach
             </div>
             @endif

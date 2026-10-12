@@ -8,6 +8,8 @@
 | Status | Token/font/bridge diterapkan; build dan browser fixture lulus |
 | Batas | Base/komponen legacy, admin, PDF dan seluruh alur aplikasi belum dimigrasi atau dinyatakan lulus |
 
+Catatan ini adalah evidence historis IP-004. Palette/consumer legacy dan base kemudian diperbarui pada [IP-005](BASE-IP-005.md); gunakan inventory terbaru tersebut untuk source saat ini.
+
 ## Implementasi
 
 - [design-tokens.css](../../resources/css/design-tokens.css) menjadi sumber primitive dan semantic colors, typography, spacing, containers, radius, focus, shadow/layering dan motion. Root menetapkan `color-scheme: light`; tidak ada theme toggle atau palette mengikuti dark OS. Reduced motion mengubah tiga duration token menjadi nol.
