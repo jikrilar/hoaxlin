@@ -15,6 +15,8 @@
 
 Seluruh kasus pada katalog dimulai `not_run`. QA-ENV-01 memiliki bukti [audit checkout](AUDIT-IP-001.md); QA-ENV-02 memiliki bukti [inventaris baseline](BASELINE-IP-002.md). Build frontend host lulus pada IP-002, tetapi **Blade/PHPUnit, smoke browser aplikasi, screen reader, PDF renderer dan pipeline nyata belum dijalankan** karena runtime belum siap. Probe Firefox about:blank bukan QA halaman Hoaxlin. QA-ENV-03 memiliki bukti [inventaris/rencana fixture](FIXTURES-IP-003.md) melalui review source, tanpa run PHP/browser baru. Kelulusan audit/inventaris dan konsistensi dokumen tidak dihitung sebagai kelulusan implementasi UI.
 
+IP-004 menambah subhasil fondasi pada [FOUNDATION-IP-004.md](FOUNDATION-IP-004.md): build font/token, browser specimen Firefox, mapping utility, dark/reduced preference, fallback dan contrast diperiksa. QA-ASSET-01/02 serta QA-A11Y-04 tetap **not_run secara agregat**, karena seluruh UI/renderer/varian runtime belum diverifikasi. Tidak menambah kasus atau mengubah 3 pass audit/inventaris menjadi klaim aplikasi pass.
+
 File ini berada di `docs/refactor/` bersama [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md). [AGENTS.md](../../AGENTS.md) tetap di root repository.
 
 ## 1. Tujuan dan otoritas dokumen

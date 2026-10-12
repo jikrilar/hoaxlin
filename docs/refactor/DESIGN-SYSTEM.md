@@ -4,7 +4,7 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 11 Oktober 2026 |
-| Status | Spesifikasi target refactoring; belum diterapkan ke aplikasi |
+| Status | Fondasi token/font/bridge IP-004 diterapkan; base/komponen/admin/PDF belum dimigrasi |
 | Arah visual | Warm Editorial Intelligence |
 | Theme | Light-only, publik dan admin |
 | Stack target | Laravel 12, Blade, Tailwind CSS 4, Vite, Livewire 4, Filament 5 |
@@ -16,6 +16,8 @@
 Dokumen ini menetapkan token, hierarchy, komponen, state, responsive rules, dan pola presentasi Hoaxlin. Codex menggunakan nilai di sini untuk implementasi yang konsisten. `AGENTS.md` tetap mengatur workflow dan kontrak teknis; `OVERVIEW.md` menjelaskan scope dan tujuan proyek.
 
 Arah desain mengambil kehangatan editorial, serif–sans hierarchy, whitespace, dan kesederhanaan antarmuka Claude. Identitas Hoaxlin memakai evergreen, Newsreader, dan alur pemeriksaan informasi yang terstruktur. `DESIGN.md` referensi Claude bukan sumber token final.
+
+Fondasi IP-004 tersedia pada [design-tokens.css](../../resources/css/design-tokens.css), [bridge publik](../../resources/css/theme.css) dan [font berlisensi](../../resources/fonts/README.md), dengan [evidence dan batas transisi](FOUNDATION-IP-004.md). Status ini tidak menandai seluruh checklist design system atau halaman sebagai lulus.
 
 Spesifikasi ini mengatur presentasi. Jangan mengubah authorization, schema, classifier, threshold, retrieval, prompt, quota, atau state machine agar sesuai rancangan. Nilai domain serta data server tetap menjadi sumber kebenaran.
 

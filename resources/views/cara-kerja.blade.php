@@ -14,7 +14,7 @@
             <span class="hero-badge-dot" aria-hidden="true"></span>
             Teknologi & Metodologi
         </div>
-        <h1 style="font-size:clamp(2rem, 5vw, 3.5rem); font-weight:900; margin-bottom:1rem;">
+        <h1 class="hl-heading-editorial" style="margin-bottom:1rem;">
             Cara Kerja <span class="gradient-text">hoaxlin.id</span>
         </h1>
         <p style="color:var(--color-text-secondary); max-width:560px; margin:0 auto; font-size:1.0625rem; line-height:1.7;">

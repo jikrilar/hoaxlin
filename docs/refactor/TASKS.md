@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-003 selesai; 3 dari 39 task selesai, IP-004–IP-039 pending |
+| Status | IP-001–IP-004 selesai; 4 dari 39 task selesai, IP-005–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-003 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-004 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -79,7 +79,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-001](#ip-001) | F0 | Audit checkout dan instruksi | done |
 | [IP-002](#ip-002) | F0 | Siapkan baseline verifikasi development/test | done |
 | [IP-003](#ip-003) | F0 | Susun inventaris state dan data QA | done |
-| [IP-004](#ip-004) | F1 | Implementasikan tokens, bridge Tailwind, dan font | pending |
+| [IP-004](#ip-004) | F1 | Implementasikan tokens, bridge Tailwind, dan font | done |
 | [IP-005](#ip-005) | F1 | Rapikan base CSS dan transisi legacy | pending |
 | [IP-006](#ip-006) | F1 | Buat komponen dasar reusable | pending |
 | [IP-007](#ip-007) | F1 | Bangun lifecycle dan helper JS | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-003 selesai, IP-004–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-005–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -185,10 +185,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-003 selesai, IP-
 - **Arsitektur:** FA-03, FA-10.
 - **Source/target:** `resources/css/design-tokens.css`, `resources/css/app.css`, `resources/views/layouts/app.blade.php`, `resources/fonts/` (opsional).
 
-- [ ] Implementasikan primitive dan semantic tokens sesuai design system, termasuk typography, focus, spacing, radius, motion dan semantic states.
-- [ ] Map utility publik melalui @theme inline; semantic tokens menjadi sumber nilai, bukan hex per halaman.
-- [ ] Muat Inter 400/500/600 dan Newsreader 400/500 dengan swap dan fallback; pilih strategi font yang nyata dan berlisensi.
-- [ ] Verifikasi light-only, computed fonts, mapping utility dan kontras; pertahankan lockfile kecuali dependency change memiliki kebutuhan jelas.
+- [x] Implementasikan primitive dan semantic tokens sesuai design system, termasuk typography, focus, spacing, radius, motion dan semantic states.
+- [x] Map utility publik melalui @theme inline; semantic tokens menjadi sumber nilai, bukan hex per halaman.
+- [x] Muat Inter 400/500/600 dan Newsreader 400/500 dengan swap dan fallback; pilih strategi font yang nyata dan berlisensi.
+- [x] Verifikasi light-only, computed fonts, mapping utility dan kontras; pertahankan lockfile kecuali dependency change memiliki kebutuhan jelas.
 
 **Validasi:** Build, computed font, contrast review.
 
@@ -941,6 +941,20 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Skip/blocker:** autoloader/PHPUnit belum tersedia pada checkout ini; tidak menjalankan build/Blade/test/browser/PDF/CSV/real-service, tidak ada angka pass/fail/skip suite. Harness browser fixture belum ada dan SQLite in-memory/session array tidak dibagi dengan proses browser. Gap coverage ditautkan ke task implementasi berikutnya, tanpa mengklaim bug runtime telah direproduksi.
 - **Perlindungan:** snapshot hash tracked files dan .env dibuat pada awal sesi; dibandingkan pada akhir agar source/instruksi/config/dependency/data tidak tertimpa. Tidak menampilkan secret/capability, menulis browser storage, menjalankan migration/seeding/worker, mengirim email atau memanggil API provider.
 - **Berikutnya:** berhenti setelah IP-003 dan commit dokumentasi sesuai permintaan. IP-004–IP-039 tetap pending; belum memulai task berikutnya.
+
+### IP-004 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex. Scope fondasi token/utility/font, bukan migrasi seluruh CSS/halaman.
+- **Branch/commit source:** `refactor/frontend` / `05f23f4eacdfa08cec129c84bf814ee0691fc5a5`; tree/index awal bersih. Root AGENTS dibaca, tidak ada instruksi subtree tambahan; instruksi langsung pengguna menentukan scope.
+- **Files changed:** resources/css/design-tokens.css, theme.css, fonts.css, legacy-tokens.css baru; app.css mengimpor fondasi dan menempatkan reset/default typography pada base layer. Dua font WOFF2, dua OFL dan README font baru. Layout publik menghapus Google Fonts dan memberi scope alias; welcome/cara-kerja/tentang/privasi memberi role heading editorial. FOUNDATION-IP-004.md baru; TASKS/IMPLEMENTATION-PLAN/QA-ACCEPTANCE/DESIGN-SYSTEM menyelaraskan status/evidence.
+- **Page/AC dan FA:** FA-03/FA-10; font shell seluruh 13 view publik, h1 editorial P01/P11–P13. QA-ASSET-01/02 dan QA-A11Y-04 hanya subhasil fondasi, bukan agregat UI/admin/PDF pass.
+- **Perilaku akhir:** 30 primitive dan 109 semantic tokens untuk colors/type/spacing/focus/radius/containers/motion; bridge @theme inline. Inter 400/500/600 untuk UI, Newsreader 400/500 tersedia dan h1 editorial memakai 400, swap/fallback/self-hosted/license. Skema token light saat dark OS dan duration nol saat reduced motion. Valid prediction neutral berbeda dari success operation. Dua belas alias legacy terdokumentasi; delapan tanpa consumer dihapus. Canvas/komponen/animasi legacy belum dimigrasi.
+- **Validasi:** npm run build exit 0, 55 modules; asset/manifest tersedia. Build specimen Vite/Tailwind import entry aktual exit 0. Dua browser run Firefox 157.0.1/BiDi exit 0: profile normal dan dark+reduced, 320/360/768/1280px; lima font weight loads berstatus loaded; computed font/type/color/spacing/radius/container, pressed state, Tab/focus-visible 3px/2px, text resize 200% dan failed-font fallback diperiksa. 34 solid semantic contrast pairs memenuhi nilai asli 4.5/3:1; muted/disabled terendah text 4.5033:1. Hover media false pada headless: utility tidak menerapkan hover; shade hover source/contrast diperiksa. Dua expected font-download errors pada negative control, tanpa unexpected console error. Pemeriksaan akhir exit 0: 319 tautan lokal/133 anchor valid, 39 status task konsisten (done=4/pending=35), 94 ID QA tetap lengkap (pass=3/not_run=91), semua referensi token/scanner/alias/font/manifest benar. Sepuluh file tracked berubah dan sepuluh file baru sesuai scope; hash file lain serta .env cocok snapshot awal, JS build tidak berubah dan scan secret deliverable lulus. git diff --check dan git diff --cached --check exit 0.
+- **Evidence:** [FOUNDATION-IP-004.md](FOUNDATION-IP-004.md), source token/font/bridge, README/OFL dan SHA font. Browser HTML/CSS khusus, JSON, screenshots dan runner sementara di /tmp/hoaxlin-ip004-vx3naac3; bukan render Blade atau jalur aplikasi. Screenshot mobile diperiksa; ukuran welcome 32px mobile/48px desktop, heading informasi 28/36px.
+- **Temuan/perbaikan:** reset unlayered mengalahkan padding utility (p-4=0); base layer memperbaikinya tanpa full base cleanup. Opsi build/path/session/unit/timing/hover pada harness disesuaikan, tidak disebut defect Laravel. Font failure hanya di stylesheet negative specimen, bukan source production.
+- **Skip/blocker:** vendor/autoload.php/PHPUnit tidak tersedia; daemon Docker tidak dapat diakses (exit 1). Blade/PHPUnit/Pint/Laravel browser/admin/PDF/pipeline tidak dijalankan. Text resize bukan native browser zoom 200%; Chromium/screen reader belum tersedia. Perhitungan palette tidak menutup contrast legacy gradients/opacity atau keseluruhan aksesibilitas.
+- **Perlindungan:** source backend/test/routes/models/auth/CSRF/quotas/provenance/env/lockfiles/vendor assets tidak diedit; fingerprints dibandingkan dengan awal. Tidak menambah dependency, training, fixture route atau demo seed; tidak menjalankan migration/bootstrap/deploy/worker, mengirim mail atau memakai provider API.
+- **Berikutnya:** berhenti pada IP-004 dan commit sesuai permintaan. IP-005–IP-039 tetap pending; tahap base/components/shell/admin/PDF belum dikerjakan.
 
 ### Format catatan berikutnya
 

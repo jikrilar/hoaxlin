@@ -13,7 +13,7 @@
         </a>
 
         <div class="glass-card" style="padding:3rem;" role="main">
-            <h1 style="font-size:2rem; font-weight:800; margin-bottom:0.5rem;">Kebijakan Privasi</h1>
+            <h1 class="hl-heading-editorial" style="margin-bottom:0.5rem;">Kebijakan Privasi</h1>
             <p style="color:var(--color-text-muted); font-size:0.9375rem; margin-bottom:2.5rem;">Terakhir diperbarui: 18 September 2026</p>
 
             <div style="display:flex; flex-direction:column; gap:2rem; color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.8;">

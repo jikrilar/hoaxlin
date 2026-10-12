@@ -27,7 +27,7 @@
         </div>
 
         <!-- Headline -->
-        <h1 class="animate-fade-in-up delay-100" style="font-size:clamp(2.5rem, 6vw, 4.5rem); font-weight:900; margin-bottom:1.5rem; letter-spacing:-0.02em; line-height:1.1;">
+        <h1 class="hl-heading-display animate-fade-in-up delay-100" style="margin-bottom:1.5rem;">
             Perangi Hoax dengan<br>
             <span class="gradient-text">Kecerdasan Buatan</span>
         </h1>
