@@ -3,15 +3,15 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 11 Oktober 2026 |
-| Status | Audit IP-001 selesai; 1 dari 39 task selesai, IP-002–IP-039 pending |
+| Tanggal | 13 Oktober 2026 |
+| Status | IP-001–IP-003 selesai; 3 dari 39 task selesai, IP-004–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini disiapkan untuk eksekusi Codex ketika implementasi diminta. Penyusunan file ini belum menjalankan task, mengubah source aplikasi, atau memverifikasi runtime.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-003 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -77,8 +77,8 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | ID | Fase | Tugas | Status |
 | --- | --- | --- | --- |
 | [IP-001](#ip-001) | F0 | Audit checkout dan instruksi | done |
-| [IP-002](#ip-002) | F0 | Siapkan baseline verifikasi development/test | pending |
-| [IP-003](#ip-003) | F0 | Susun inventaris state dan data QA | pending |
+| [IP-002](#ip-002) | F0 | Siapkan baseline verifikasi development/test | done |
+| [IP-003](#ip-003) | F0 | Susun inventaris state dan data QA | done |
 | [IP-004](#ip-004) | F1 | Implementasikan tokens, bridge Tailwind, dan font | pending |
 | [IP-005](#ip-005) | F1 | Rapikan base CSS dan transisi legacy | pending |
 | [IP-006](#ip-006) | F1 | Buat komponen dasar reusable | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; task selain IP-001 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-003 selesai, IP-004–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -147,10 +147,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; task selain IP-001 tetap pen
 - **Arsitektur:** FA-08.
 - **Source/target:** `Dockerfile`, `docker-compose.yml`, `phpunit.xml`, `scripts/docker-setup.sh`, `README.md`, `RUNBOOK.md`.
 
-- [ ] Pilih host development/test atau Docker target test yang memiliki dependency sesuai lockfile; gunakan konfigurasi existing tanpa mencetak secret.
-- [ ] Jalankan baseline build/Blade/test yang environment-nya tersedia; catat hasil dan failure sebelum refactor.
-- [ ] Periksa kemampuan browser QA, service BERT/RAG, artifact model, database/queue dan jalur mail test; bedakan unavailable dari failure kode.
-- [ ] Catat cara rebuild bundled source dan blocker. Task ini menutup inventaris kesiapan; runtime unavailable tetap membatasi QA task turunan, bukan dinyatakan pass.
+- [x] Pilih host development/test atau Docker target test yang memiliki dependency sesuai lockfile; gunakan konfigurasi existing tanpa mencetak secret.
+- [x] Jalankan baseline build/Blade/test yang environment-nya tersedia; catat hasil dan failure sebelum refactor.
+- [x] Periksa kemampuan browser QA, service BERT/RAG, artifact model, database/queue dan jalur mail test; bedakan unavailable dari failure kode.
+- [x] Catat cara rebuild bundled source dan blocker. Task ini menutup inventaris kesiapan; runtime unavailable tetap membatasi QA task turunan, bukan dinyatakan pass.
 
 **Validasi:** Build, Blade, baseline test, smoke browser.
 
@@ -165,10 +165,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; task selain IP-001 tetap pen
 - **Arsitektur:** FA-08, FA-09.
 - **Source/target:** `tests/Feature/`, `tests/Unit/`, `tests/TestCase.php`.
 
-- [ ] Petakan test/fake/fixture existing untuk guest, unverified, verified, admin, ownership, dan capability guest.
-- [ ] Siapkan rencana state pending/processing/completed/failed/final-unavailable, seluruh label, explanation/evidence, long text, error dan ekspor.
-- [ ] Tentukan cara mengakses state di development/test secara terisolasi; jangan seed demo pada data pengguna.
-- [ ] Tambahkan fixture/test hanya jika risiko atau perilaku belum dilindungi; catat fixture pass terpisah dari real-service E2E.
+- [x] Petakan test/fake/fixture existing untuk guest, unverified, verified, admin, ownership, dan capability guest.
+- [x] Siapkan rencana state pending/processing/completed/failed/final-unavailable, seluruh label, explanation/evidence, long text, error dan ekspor.
+- [x] Tentukan cara mengakses state di development/test secara terisolasi; jangan seed demo pada data pengguna.
+- [x] Tambahkan fixture/test hanya jika risiko atau perilaku belum dilindungi; catat fixture pass terpisah dari real-service E2E.
 
 **Validasi:** Review fixture dan matriks QA.
 
@@ -914,6 +914,33 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence:** QA-ENV-01 pass, mode `source_review`; tujuh dokumen dibaca lengkap; branch/SHA dan perubahan pengguna tercatat; fingerprints berkas pengguna menjadi pembanding sebelum/sesudah. Status QA saat ini pass=1, not_run=93.
 - **Skip/blocker:** tidak ada blocker acceptance audit. Build/Blade/PHPUnit/Pint/browser/PDF/CSV/pipeline nyata tidak dijalankan karena scope dokumentasi/source review IP-001. Artifact lokal belum diperiksa readiness-nya; tidak disebut service unavailable. Gate F0 tetap belum lengkap.
 - **Berikutnya:** berhenti sesuai instruksi pengguna. IP-002–IP-039 tetap pending; tidak menjalankan task lain.
+
+### IP-002 — Catatan eksekusi
+
+- **Status:** done; 11 Oktober 2026, Asia/Jakarta; pelaksana Codex. Checklist menandai inventaris/check yang tersedia, bukan kelulusan Blade/PHPUnit/smoke aplikasi.
+- **Branch/commit aktual yang diperiksa:** `refactor/audit-and-baseline` / `1278b139403085fd4ff94321ed0017f70e87bec7`. Working tree/index awal bersih; instruksi root berlaku, tidak ada AGENTS subtree tambahan.
+- **Files changed:** `docs/refactor/BASELINE-IP-002.md` baru; `TASKS.md`, `IMPLEMENTATION-PLAN.md` dan `QA-ACCEPTANCE.md` menyelaraskan progres dan evidence. Tidak mengubah kode aplikasi, dependency, lockfile atau konfigurasi operasional.
+- **Page/AC dan FA decisions:** baseline readiness QA-ENV-02, G07/G08, FA-08. Tidak ada acceptance halaman/UI yang dinyatakan pass; gate F0 masih memerlukan IP-003.
+- **Perilaku akhir:** baseline tool/build, service/artifact/mail/media/browser, failure platform serta cara rebuild/recheck tercatat pada [BASELINE-IP-002.md](BASELINE-IP-002.md). Host dipakai untuk frontend; backend host dan Docker belum siap.
+- **Validasi:** `npm ci --no-audit --no-fund` dan `npm run build` exit 0; 86 versi paket cocok lockfile, dua entry manifest/aset ada. `docker compose config --quiet` exit 0. Firefox headless about:blank exit 0, PNG 1280×720; hanya probe engine. PHP extensions/PDO, DNS/TCP service, package Python, model/cache, mail configuration presence dan media binary diinventaris tanpa mencetak secret. Pemeriksaan Python standard library exit 0: 234 tautan lokal, 128 anchor, fences/EOF, 39 ID task unik (done=2/pending=37) dan 94 ID QA unik valid. `git diff --check`/`git diff --cached --check` exit 0; review staged hanya empat dokumen; nilai secret konfigurasi tidak ditemukan pada deliverable.
+- **Evidence:** build Vite 6.4.3, 55 module; CSS 32.925 byte, JS 47.561 byte, hash pada laporan. QA-ENV-02 pass sebagai inventaris baseline; total QA pass=2, not_run=92. Build host tanpa vendor bukan pengganti build Docker atau smoke UI.
+- **Failure/skip/blocker:** Docker daemon tidak terjangkau (exit 1); Composer platform check/install exit 2: PHP 8.5 tidak didukung OpenSpout, ext-intl/iconv hilang. PDO SQLite/GD/Redis juga belum tersedia. Blade/PHPUnit/Pint/doctor/PDF/CSV dan smoke aplikasi tidak dijalankan; tidak ada angka test/skip yang diklaim. BERT/RAG/DB/Redis internal tidak terjangkau dari host, artifact/virtualenv/cache model tidak tersedia; kredensial SMTP/provider belum diuji. Dua risiko build context Docker dicatat dari source, belum direproduksi.
+- **Perlindungan:** hash seluruh tracked file dan `.env` dibandingkan dengan awal; perubahan hanya dokumen task. NPM dependency/build dan profile probe tetap lokal/diabaikan Git. Tidak menjalankan bootstrap/migration, seeding, queue job, pengiriman mail atau API provider.
+- **Berikutnya:** berhenti pada IP-002 dan buat commit semantik sesuai permintaan. IP-003–IP-039 tetap pending; penutupan blocker runtime diperlukan sebelum QA aplikasi dapat diklaim lulus.
+
+### IP-003 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; mode source_review. Step penambahan fixture/test dinilai tidak perlu: existing factories/model/DTO/facade fake cukup untuk rencana varian, tidak ada behavior baru.
+- **Branch/commit aktual yang diaudit:** `refactor/frontend` / `cd12f5b113601c7fd3ae9590e22b69378ffd7083`; working tree/index awal bersih. Instruksi pengguna terbaru dan AGENTS root pendek berlaku; tidak ditemukan AGENTS subtree tambahan.
+- **Dependency dan pemulihan catatan:** commit IP-002 `2b8284d` ada tetapi bukan ancestor branch ini; empat dokumen hasil task itu disertakan kembali dari object commit. Diff source terhadap commit IP-002 hanya AGENTS/bootstrap; tests/factories/contracts/routes/models/lockfiles sama. Tidak cherry-pick atau menimpa instruksi/proxy, tidak menjalankan ulang task IP-002. Laporan 11 Oktober tetap bukti historis, bukan probe runtime baru.
+- **Files changed:** `docs/refactor/FIXTURES-IP-003.md` baru; `BASELINE-IP-002.md` dipulihkan identik dari commit IP-002; TASKS/IMPLEMENTATION-PLAN/QA-ACCEPTANCE membawa catatan IP-002 serta status/jurnal IP-003. Tidak mengubah PHP/JS/CSS/schema/lockfile/config/env.
+- **Page/AC dan FA decisions:** matriks P00–P16, A00–A08, E01; semua 15 kelompok/94 ID QA memiliki rencana; QA-ENV-03, FA-08/FA-09. Role/ownership/capability tetap server-side; persisted video URL dinormalisasi menjadi video sesuai source; nilai null yang dilarang schema hanya in-memory robustness fixture.
+- **Perilaku akhir:** [FIXTURES-IP-003.md](FIXTURES-IP-003.md) memetakan 38 file Feature + 3 Unit (282 method test_* declarations), 6 factories, 3 fake services, setup deterministik dan oracle spesifik. State final/nonfinal, explanation/evidence, provenance/media/feedback, auth/history/admin/statistik/error/export serta gap assertion/browser dicatat. Akses PHP test versus browser server terisolasi dipisahkan; tidak memakai demo seeder pada data pengguna.
+- **Validasi:** review factory/fake/DTO/schema/request/controller/routes/Livewire dan setup/assertion test terkait. Pemeriksaan Python standard library exit 0: 300 tautan lokal/132 anchor, 38 rujukan class-qualified/40 nama method test valid, 27 ID halaman/15 kelompok/94 ID QA lengkap, status done=3/pending=36 dan checklist IP-003 4/4. Dua recipe PHP lolos php -l (syntax saja). `git diff --check` dan `git diff --cached --check` exit 0; staged hanya lima dokumen; nilai secret konfigurasi tidak ditemukan. Hash source/AGENTS/config/.env/lockfile cocok awal, baseline IP-002 byte-identical dengan commit asal.
+- **Evidence:** QA-ENV-03 pass sebagai review inventaris/rencana fixture, tanpa automated_test/browser_fixture pass. Total QA pass=3 (audit/inventaris), not_run=91. F0 memiliki catatan inventaris lengkap; blocker runtime IP-002 tetap terbuka.
+- **Skip/blocker:** autoloader/PHPUnit belum tersedia pada checkout ini; tidak menjalankan build/Blade/test/browser/PDF/CSV/real-service, tidak ada angka pass/fail/skip suite. Harness browser fixture belum ada dan SQLite in-memory/session array tidak dibagi dengan proses browser. Gap coverage ditautkan ke task implementasi berikutnya, tanpa mengklaim bug runtime telah direproduksi.
+- **Perlindungan:** snapshot hash tracked files dan .env dibuat pada awal sesi; dibandingkan pada akhir agar source/instruksi/config/dependency/data tidak tertimpa. Tidak menampilkan secret/capability, menulis browser storage, menjalankan migration/seeding/worker, mengirim email atau memanggil API provider.
+- **Berikutnya:** berhenti setelah IP-003 dan commit dokumentasi sesuai permintaan. IP-004–IP-039 tetap pending; belum memulai task berikutnya.
 
 ### Format catatan berikutnya
 
