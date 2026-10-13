@@ -14,6 +14,10 @@ const modules = [
         matches: root => Boolean(root.querySelector('[data-page="statistics"]')),
         load: () => import('./pages/statistics'),
     },
+    {
+        matches: root => Boolean(root.querySelector('[data-page="result"]')),
+        load: () => import('./pages/result'),
+    },
 ];
 
 export function boot() {

@@ -131,6 +131,9 @@ class SubmissionProgressPresentationTest extends TestCase
         if ($status !== 'failed') {
             $this->assertSame((string) $percentage, $dom->evaluate('string(//*[@role="progressbar"]/@aria-valuenow)'));
         }
+        if ($status === 'completed') {
+            $this->assertSame(0, $dom->query('//script')->length, 'Terminal transitions belong to the result lifecycle.');
+        }
         $this->assertSame(1, $dom->query('//*[@role="status" and @aria-live="polite" and @aria-atomic="true"]')->length);
         $this->assertSame(0, $dom->query('//*[@data-progress-percent and @aria-live]')->length);
         $this->assertSame('http://localhost/hasil/101', $dom->evaluate('string(//a[@data-progress-refresh]/@href)'));

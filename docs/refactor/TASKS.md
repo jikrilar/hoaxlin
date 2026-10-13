@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-013 selesai; 13 dari 39 task selesai, IP-014–IP-039 pending |
+| Status | IP-001–IP-014 selesai; 14 dari 39 task selesai, IP-015–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-013 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-014 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -89,7 +89,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | done |
 | [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | done |
 | [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | done |
-| [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | pending |
+| [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | done |
 | [IP-015](#ip-015) | F3 | Migrasikan hasil final, evidence, dan provenance | pending |
 | [IP-016](#ip-016) | F3 | Migrasikan actions dan feedback hasil | pending |
 | [IP-017](#ip-017) | F4 | Migrasikan login dan registrasi | pending |
@@ -369,10 +369,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-04, FA-05.
 - **Source/target:** `resources/js/progress/fallback.js`, `resources/js/pages/result.js`, `resources/views/hasil.blade.php`.
 
-- [ ] Deteksi init Livewire sesuai runtime terpasang; marker wire:id saja bukan bukti hydration. Fallback aktif hanya bila belum ada pemilik Livewire.
-- [ ] Gunakan timeout berurutan, satu in-flight request, session same-origin, URL hasil.status dari server dan cleanup AbortController/timer.
-- [ ] Pause/resume saat hidden/visible/unmount; tangani network error, non-JSON, access/session error dan 429 tanpa mengubah status domain.
-- [ ] Hentikan loop sebelum handoff/terminal; reload bila diperlukan sekali per root/submission. Uji navigasi antarhasil, back/forward, request lambat dan bootstrap failure.
+- [x] Deteksi init Livewire sesuai runtime terpasang; marker wire:id saja bukan bukti hydration. Fallback aktif hanya bila belum ada pemilik Livewire.
+- [x] Gunakan timeout berurutan, satu in-flight request, session same-origin, URL hasil.status dari server dan cleanup AbortController/timer.
+- [x] Pause/resume saat hidden/visible/unmount; tangani network error, non-JSON, access/session error dan 429 tanpa mengubah status domain.
+- [x] Hentikan loop sebelum handoff/terminal; reload bila diperlukan sekali per root/submission. Uji navigasi antarhasil, back/forward, request lambat dan bootstrap failure.
 
 **Validasi:** Network/lifecycle QA; progress/access tests.
 
@@ -1064,6 +1064,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence:** [PROGRESS-IP-013.md](PROGRESS-IP-013.md), unit/feature regressions dan /tmp/hoaxlin-ip013-9ogzjcgb. 257 protected fingerprints cocok; app/routes/config/database/locks/admin/PDF tetap.
 - **Batas:** artisan tiga feature suites exit 255 karena autoload repo hilang; feature regressions belum dieksekusi. Unit menggunakan vendor lock sementara dan refresh double tanpa SQL; browser tanpa component snapshot/hydration. HTTP aplikasi/DB/network polling/session middleware/AI/admin/PDF/screen reader/native zoom belum diverifikasi. QA tetap 3 audit pass/91 not_run.
 - **Berikutnya:** berhenti dan buat commit semantic untuk IP-013; kepemilikan fallback dan terminal reload existing tetap IP-014. IP-014–IP-039 pending.
+
+### IP-014 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P02/AC-P04 lifecycle; FA-04/FA-05.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal cc29c16; tree/index awal bersih.
+- **Perubahan:** result coordinator, fallback scheduler dan Livewire adapter; data-page/root/status URL/stages dari server. Inline interval/reload global dihapus. Native ownership lewat registered find/$el/hooks; fallback abort sebelum handoff. Satu GET in-flight, timeout body, pause/resume, same-origin session, response ID/schema guard, bounded retry/Retry-After dan notice transport aman.
+- **Contract:** stage/persen/access/status backend dan final guard tetap. Terminal cleanup mendahului reload per root/ID; A/B independen, SSR terminal tidak reload dan failed tidak diisi 100%. Native in-flight tetap dimiliki SDK; module menghapus hook dan memblokir action berikutnya bila hidden/error. Per-message disposer SDK 4.3.3 yang rusak dihindari tanpa patch/upgrade vendor.
+- **Validasi:** build, 61 Node tests (27 progress), 80 standalone PHP tests/657 assertions, Pint/syntax/diff pass. 57 renders/456 layout samples; 12 native runtime dan 13 fallback network checks pass. Native A/B/Back/terminal, bootstrap inert/asset failure, handoff abort, slow max-one-flight, hidden/visible/removal/access/non-JSON/429 recovery terbukti lewat SDK asli dan receiver loopback.
+- **Evidence:** [POLLING-IP-014.md](POLLING-IP-014.md), progress.test.mjs, SubmissionProgressPresentationTest dan /tmp/hoaxlin-ip014-87avom0p; 257 protected fingerprints cocok.
+- **Batas:** artisan tiga feature suites exit 255 karena autoload repo hilang. Browser memakai checksum/transport fixture; bukan controller/DB/session/checksum HTTP aplikasi atau AI/admin/PDF. Invalid JSON native yang sengaja diinjeksi menghasilkan parser log SDK yang diharapkan, tanpa modal unsafe; run akhir tanpa error cleanup/import tak diharapkan. QA aggregate tetap 3 audit pass/91 not_run; F3 belum ditutup.
+- **Berikutnya:** commit semantic dan berhenti pada IP-014; IP-015–IP-039 pending.
 
 ### Format catatan berikutnya
 

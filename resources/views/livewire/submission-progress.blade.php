@@ -58,10 +58,10 @@
             </div>
             <p class="hl-submission-progress__hint" id="progress-hint-{{ $submission->id }}">
                 Persentase mengikuti tahap atau status yang tercatat, bukan perkiraan waktu tersisa.
-                @if(! $stage && ! $isCompleted) Rincian tahap belum tersedia. @endif
-                @if(! $isCompleted && $stage === \App\Enums\ProcessingStage::Done)
+                <span data-progress-stage-unavailable @if($stage || $isCompleted) hidden @endif>Rincian tahap belum tersedia.</span>
+                <span data-progress-not-final-done @if($isCompleted || $stage !== \App\Enums\ProcessingStage::Done) hidden @endif>
                     Tahap tercatat selesai, tetapi status pemrosesan belum selesai; hasil belum final.
-                @endif
+                </span>
             </p>
         </div>
     @endif
@@ -75,13 +75,4 @@
         @endif
     </div>
 
-    @if($isCompleted)
-        {{-- Existing terminal transition; ownership/cleanup migrates in IP-014. --}}
-        <script>
-            if (! window.__submissionCompletedReloaded) {
-                window.__submissionCompletedReloaded = true;
-                setTimeout(() => window.location.reload(), 800);
-            }
-        </script>
-    @endif
 </section>

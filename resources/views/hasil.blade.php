@@ -4,7 +4,7 @@
 @section('description', 'Lihat hasil analisis deteksi hoax dari sistem AI BERT.')
 
 @section('content')
-<div style="padding:9rem 0 5rem; min-height:100vh;">
+<div data-page="result" style="padding:9rem 0 5rem; min-height:100vh;">
     <div class="container-app" style="max-width:800px;">
 
         <!-- Back Button -->
@@ -17,53 +17,16 @@
         <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10)); margin-bottom:1.5rem;" role="region" aria-label="Hasil deteksi berita">
             @if(! $submission->isCompleted())
                 {{-- Livewire polling progress bar (wire:poll.2s.visible) with JS fallback via /hasil/{id}/status --}}
-                <div id="submission-progress-wrapper" data-submission-id="{{ $submission->id }}">
+                <div id="submission-progress-wrapper" data-progress-root data-submission-id="{{ $submission->id }}"
+                    data-initial-status="{{ $submission->status }}" data-status-url="{{ route('hasil.status', $submission->id) }}"
+                    data-progress-stages="{{ json_encode(\App\Enums\ProcessingStage::values()) }}">
                     <livewire:submission-progress :submission="$submission" />
+                    <p class="hl-submission-progress__hint" data-progress-transport role="status" aria-live="polite" aria-atomic="true" hidden></p>
                     {{-- Without JavaScript, the native refresh action remains available. --}}
                     <noscript>
                         <p class="hl-submission-progress__hint">JavaScript dinonaktifkan. Gunakan “Muat ulang status” untuk melihat pembaruan.</p>
                     </noscript>
                 </div>
-                {{-- Vanilla JS polling fallback (if Livewire not loaded, polls /hasil/{id}/status) --}}
-                @if(! $submission->isTerminal())
-                <script>
-                    (() => {
-                        const wrapper = document.getElementById('submission-progress-wrapper');
-                        // Correctly detect Livewire: check for wire:id (Livewire 3/4) or Livewire global
-                        const hasLivewire = wrapper && (wrapper.querySelector('[wire\\:id]') || wrapper.querySelector('[wire\\:poll], [wire\\:poll\\.2s], [wire\\:poll\\.2s\\.visible]') || typeof window.Livewire !== 'undefined');
-                        if (! wrapper || hasLivewire) return;
-                        const url = `{{ route('hasil.status', $submission->id) }}`;
-                        let interval = setInterval(async () => {
-                            try {
-                                const res = await fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
-                                if (! res.ok) return;
-                                const data = await res.json();
-                                const bar = wrapper.querySelector('[role="progressbar"]');
-                                const pctEl = wrapper.querySelector('[data-progress-percent]');
-                                const stageEl = wrapper.querySelector('[data-stage-label]');
-                                if (bar && typeof data.progress === 'number') {
-                                    bar.setAttribute('aria-valuenow', data.progress);
-                                    bar.setAttribute('aria-valuetext', `${data.progress} persen; ${data.stage_label || 'tahap belum tersedia'}; status ${data.status || 'belum tersedia'}`);
-                                    const fill = bar.firstElementChild;
-                                    if (fill) {
-                                        fill.style.width = data.progress + '%';
-                                        fill.style.willChange = 'width';
-                                    }
-                                }
-                                if (pctEl && typeof data.progress === 'number') pctEl.textContent = data.progress + '%';
-                                if (stageEl && data.stage_label) stageEl.textContent = data.stage_label;
-                                if (data.is_completed || data.is_failed) {
-                                    clearInterval(interval);
-                                    setTimeout(() => window.location.reload(), 800);
-                                }
-                            } catch (_) {}
-                        }, 2000);
-                        document.addEventListener('visibilitychange', () => {
-                            if (document.hidden) clearInterval(interval);
-                        });
-                    })();
-                </script>
-                @endif
                 <div class="divider" style="margin:1.5rem 0;"></div>
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 150px), 1fr)); gap:1rem; margin-bottom:1.5rem;">
                     <div>

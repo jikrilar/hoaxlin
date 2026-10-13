@@ -258,6 +258,8 @@ Bukti default: ID kasus, commit/build, fixture/role, langkah aktual, mode, expec
 
 IP-013 menambah [subhasil view progress](PROGRESS-IP-013.md): 27 unit tests/276 assertions menjalankan component/access nyata tanpa SQL, 57 render Blade/456 browser samples dan refresh GET native di normal/no-JS/reduced. QA-PROGRESS-01/09, QA-ACCESS-03 dan QA-A11Y-03 mendapat evidence terbatas pada component/render/DOM; hydration/network polling, controller/DB/session middleware dan screen reader belum dijalankan. Feature suites terblokir oleh autoload repo. QA-PROGRESS/ACCESS tetap not_run secara agregat; jumlah 3 audit pass/91 not_run tidak berubah. Pemilik fallback/terminal transition tetap IP-014.
 
+IP-014 menambah [subhasil polling](POLLING-IP-014.md): 27 Node progress tests, 12 browser native runtime dan 13 fallback/network checks, termasuk registered hydration, A/B/Back/terminal, bootstrap inert/failure, slow single-flight, abort handoff, visibility/removal dan access/non-JSON/429. QA-PROGRESS-02–08 memiliki evidence client memakai SDK asli dengan transport/checksum fixture; middleware/DB/checksum HTTP aplikasi belum diverifikasi. Native malformed JSON fault mencatat parser log vendor yang diharapkan, recovery aman; screen reader belum diuji. QA agregat tetap 3 audit pass/91 not_run dan F3 belum ditutup.
+
 ### 6.5 Progress, lifecycle dan fallback
 
 **Prasyarat:** P02/P04 nonterminal, state fixture dapat diubah terkontrol, runtime Livewire dan endpoint status tersedia.
