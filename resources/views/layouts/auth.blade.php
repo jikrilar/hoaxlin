@@ -12,13 +12,7 @@
         @include('partials.flash')
         <main id="main-content" class="hl-auth-main" tabindex="-1">
             @if($errors->any())
-                <x-ui.alert tone="danger" title="Periksa kembali formulir" role="alert" class="hl-auth-errors">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </x-ui.alert>
+                @include('partials.auth.errors', ['targets' => $authErrorTargets ?? []])
             @endif
             @yield('content')
         </main>

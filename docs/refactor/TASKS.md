@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-016 selesai; 16 dari 39 task selesai, IP-017–IP-039 pending |
+| Status | IP-001–IP-017 selesai; 17 dari 39 task selesai, IP-018–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-016 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-017 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -92,7 +92,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | done |
 | [IP-015](#ip-015) | F3 | Migrasikan hasil final, evidence, dan provenance | done |
 | [IP-016](#ip-016) | F3 | Migrasikan actions dan feedback hasil | done |
-| [IP-017](#ip-017) | F4 | Migrasikan login dan registrasi | pending |
+| [IP-017](#ip-017) | F4 | Migrasikan login dan registrasi | done |
 | [IP-018](#ip-018) | F4 | Migrasikan lupa/reset password | pending |
 | [IP-019](#ip-019) | F4 | Migrasikan verifikasi email | pending |
 | [IP-020](#ip-020) | F4 | Migrasikan profil dan konfirmasi hapus akun | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-016 selesai, IP-017–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-017 selesai, IP-018–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -425,10 +425,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-016 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-09.
 - **Source/target:** `resources/views/auth/login.blade.php`, `resources/views/auth/register.blade.php`.
 
-- [ ] Migrasikan login/register ke shell auth dengan label/hint/error, autocomplete dan loading native.
-- [ ] Jaga remember boolean, credential/throttle feedback, session/intended redirect dan email recovery; password tidak masuk old input.
-- [ ] Pertahankan name/email/password confirmation/terms/unique validation serta Registered event/redirect verification contract.
-- [ ] Gunakan link privasi/register/login/forgot nyata; jangan mengarang password policy atau URL syarat penggunaan yang belum tersedia.
+- [x] Migrasikan login/register ke shell auth dengan label/hint/error, autocomplete dan loading native.
+- [x] Jaga remember boolean, credential/throttle feedback, session/intended redirect dan email recovery; password tidak masuk old input.
+- [x] Pertahankan name/email/password confirmation/terms/unique validation serta Registered event/redirect verification contract.
+- [x] Gunakan link privasi/register/login/forgot nyata; jangan mengarang password policy atau URL syarat penggunaan yang belum tersedia.
 
 **Validasi:** AuthenticationTest; keyboard/mobile/error submit.
 
@@ -1096,6 +1096,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence:** [ACTIONS-IP-016.md](ACTIONS-IP-016.md), DetectionPresentationTest dan /tmp/hoaxlin-ip016-3yxbjtxs. 226 protected fingerprints dan seluruh source JS unchanged.
 - **Batas:** tiga feature suites exit 255 karena autoload repo hilang; assertions baru belum dieksekusi. PHP 8.5/vendor sementara dan receiver/checksum fixture bukan HTTP controller/CSRF/middleware/DB/access/export/provider aplikasi. Validator field tidak mencakup exists/ownership. Native JSON fault mencatat parser error SDK yang diharapkan; layout/feedback tanpa console error. Back no-store fresh reload memulihkan kontrol, bukan draft; old-input recovery terpisah. Screen reader/native zoom belum diuji; QA tetap 3 audit pass/91 not_run, F3 belum ditutup.
 - **Berikutnya:** buat commit semantic dan berhenti pada IP-016; IP-017–IP-039 pending.
+
+### IP-017 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P05/AC-P06; FA-01/FA-02/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 0339875; tree/index awal bersih.
+- **Perubahan:** login/register semantic memakai shell/fields/toggles/buttons/links IP-010; copy Masuk/Buat akun dan kebutuhan verifikasi nyata. Remember value=1 sesuai boolean backend, tanpa klaim 30 hari; terms accepted/value=1, name/email max 255 dan native validation. Old name/email string escaped, checkbox recovery aman dan password kosong. Error partial menerima field targets untuk fokus/link, pesan credential/throttle/unique/terms/confirmation tetap server. Inline style/decorative divider, strength meter heuristik dan data-password-hints registrasi dihapus.
+- **Contract:** POST/CSRF/autocomplete/confirmation/terms/Password::defaults/unique/Registered/verification dan session/intended/limiter tetap; seluruh backend/JS unchanged. Forgot/reset/verify/profile tidak dimigrasi; summary generic shared shell tetap tersedia.
+- **Validasi:** build 16 modules; 193 unit terisolasi/1049 assertions (AuthShell 28/183), sepuluh actual field-rule cases tanpa unique SQL/auth; 61 Node tests; Pint dua PHP files, 52 compiled syntax/diff pass. 95 renders/760 browser samples dan 129 account checks; account normal/no-JS/reduced native keyboard/POST/303/remember on-off/terms/toggle/loading/Back/error-focus-recovery/double-submit diperiksa. Screenshot mobile ditinjau; console tanpa error.
+- **Evidence:** [LOGIN-REGISTER-IP-017.md](LOGIN-REGISTER-IP-017.md), AuthShellTest, AuthenticationTest dan /tmp/hoaxlin-ip017-6t815gco. 226 protected fingerprints cocok; seluruh JS unchanged.
+- **Batas:** AuthenticationTest exit 255 karena autoload repo tidak tersedia; empat regression tests baru belum dieksekusi. PHP 8.5/vendor sementara dan receiver loopback bukan autentikasi/session/intended/limiter/unique/Registered/mail/guards HTTP aplikasi. Back no-store load baru; password-manager nyata/screen reader/native zoom belum diuji. QA tetap 3 audit pass/91 not_run, F4 belum ditutup; tidak ada perubahan environment/data/deployment.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-017; IP-018–IP-039 pending.
 
 ### Format catatan berikutnya
 

@@ -39,11 +39,22 @@
     .hl-auth-main { padding: var(--ds-space-6); border: var(--ds-border-width) solid var(--ds-border-subtle); border-radius: var(--ds-radius-lg); background: var(--ds-bg-surface); }
     .hl-auth-errors { margin-block-end: var(--ds-space-6); }
     .hl-auth-errors ul { list-style: disc; padding-inline-start: var(--ds-space-5); }
+    .hl-auth-errors a { color: inherit; }
     .hl-auth-title { margin-block-end: var(--ds-space-6); }
     .hl-auth-title h1 { font-size: var(--ds-type-page-title-size); font-weight: var(--ds-font-weight-semibold); }
     .hl-auth-title p { margin-block-start: var(--ds-space-2); color: var(--ds-text-muted); }
     .hl-auth-choice { display: flex; align-items: center; gap: var(--ds-space-3); margin-block-end: var(--ds-space-6); }
     .hl-auth-choice label { min-block-size: 2.75rem; align-content: center; }
+    .hl-auth-form .hl-auth-choice { align-items: flex-start; }
+    .hl-auth-form .hl-auth-choice input { inline-size: 1.125rem; block-size: 1.125rem; flex-shrink: 0; margin-block-start: var(--ds-space-3); cursor: pointer; }
+    .hl-auth-form .hl-auth-choice label { font-size: var(--ds-type-body-sm-size); cursor: pointer; }
+    .hl-auth-options { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--ds-space-3); margin-block-end: var(--ds-space-6); }
+    .hl-auth-options .hl-auth-choice { margin-block-end: 0; }
+    .hl-auth-options > a { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
+    .hl-auth-form > .hl-button[type="submit"] { inline-size: 100%; }
+    .hl-auth-switch { margin-block-start: var(--ds-space-6); }
+    .hl-auth-switch > a { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
+    .hl-auth-guest { margin-block-start: var(--ds-space-2); }
     .hl-auth-recovery a { display: inline-flex; align-items: center; min-block-size: 2.75rem; }
     .hl-auth-recovery { display: flex; justify-content: flex-end; margin-block-end: var(--ds-space-4); }
     .hl-auth-footer { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--ds-space-2) var(--ds-space-6); padding: var(--ds-space-6) var(--ds-space-4); font-size: var(--ds-type-meta-size); }

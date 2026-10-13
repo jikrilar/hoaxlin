@@ -78,6 +78,66 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_native_remember_value_preserves_intended_redirect_and_regenerates_session(): void
+    {
+        $user = User::factory()->create(['password' => 'password']);
+        $this->get(route('login'))->assertOk()
+            ->assertSee('name="remember" value="1"', false)
+            ->assertDontSee('30 hari');
+        $this->withSession(['url.intended' => route('riwayat')]);
+        $previousSessionId = session()->getId();
+
+        $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password', 'remember' => '1'])
+            ->assertRedirect(route('riwayat'));
+        $this->assertAuthenticatedAs($user);
+        $this->assertNotSame($previousSessionId, session()->getId());
+    }
+
+    public function test_invalid_credentials_restore_email_and_remember_without_restoring_password(): void
+    {
+        $this->from(route('login'))->post(route('login.store'), [
+            'email' => 'invalid-credentials@example.test', 'password' => 'secret-marker', 'remember' => '1',
+        ])->assertSessionHasErrors('email')->assertSessionMissing('_old_input.password');
+
+        $this->get(route('login'))->assertOk()
+            ->assertSee('Email atau kata sandi yang kamu masukkan salah.')
+            ->assertSee('invalid-credentials@example.test')
+            ->assertSee('id="auth-errors"', false)
+            ->assertDontSee('secret-marker');
+        $this->assertGuest();
+    }
+
+    public function test_login_rate_limit_feedback_remains_a_server_message(): void
+    {
+        $credentials = ['email' => 'rate-limited@example.test', 'password' => 'wrong-password'];
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->post(route('login.store'), $credentials)->assertSessionHasErrors('email');
+        }
+        $this->post(route('login.store'), $credentials)->assertSessionHasErrors('email');
+        $this->get(route('login'))->assertOk()
+            ->assertSee('Terlalu banyak percobaan masuk. Coba lagi dalam')
+            ->assertSee('href="#email"', false);
+        $this->assertGuest();
+    }
+
+    public function test_registration_preserves_terms_confirmation_and_error_recovery(): void
+    {
+        $this->from(route('register'))->post(route('register.store'), [
+            'name' => 'Nama <script id="attack">literal</script>',
+            'email' => 'registration-recovery@example.test',
+            'password' => 'secret-marker', 'password_confirmation' => 'different',
+        ])->assertSessionHasErrors(['password', 'terms'])
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.password_confirmation');
+        $this->get(route('register'))->assertOk()
+            ->assertSee('registration-recovery@example.test')
+            ->assertSee('href="#terms"', false)
+            ->assertSee('Nama &lt;script id=&quot;attack&quot;&gt;literal&lt;/script&gt;', false)
+            ->assertDontSee('<script id="attack">', false)
+            ->assertDontSee('secret-marker');
+        $this->assertDatabaseEmpty('users');
+    }
+
     public function test_user_can_verify_email_using_signed_url(): void
     {
         Event::fake([Verified::class]);

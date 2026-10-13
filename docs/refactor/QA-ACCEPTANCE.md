@@ -311,6 +311,8 @@ IP-016 menambah [subhasil actions/feedback](ACTIONS-IP-016.md): 29 unit/validato
 | **QA-AUTH-07 — Verifikasi email** | Unverified buka notice, resend sekali, coba throttle, signed URL sah/expired/tampered/id-hash salah dan user sudah verified. | verification-link-sent terbaca; resend POST ber-CSRF tidak otomatis berulang. Auth/signed/throttle bertahan; email di-escape; verified redirect sesuai controller. | AC-P09; IP-019 |
 | **QA-AUTH-08 — Guest/auth route guards** | Sebagai guest buka profil/verify/history; sebagai logged-in buka login/register/reset; sebagai unverified buka history/CSV dan deteksi. | Redirect/middleware tetap sesuai route; profil/verify memerlukan auth, history/CSV verified, deteksi tidak. Tidak ada redirect loop atau akses berubah karena shell auth baru. | AC-P05–AC-P10, AC-P03, AC-P16; IP-017–IP-021 |
 
+IP-017 menambah [subhasil login/register](LOGIN-REGISTER-IP-017.md): 23 unit/field-rule cases tambahan, 95 renders/760 layout samples serta account checks normal/no-JS/reduced. QA-AUTH-01–04 memiliki evidence UI/native serializer/keyboard, remember 1/off, terms, empty secret, credential/throttle/unique/confirmation display, focus/link, toggle/loading/Back/cancellation/double-submit. Field validator actual diuji tanpa unique SQL/authenticate. AuthenticationTest terblokir autoload repo; session/intended/limiter/Registered/mail/route guards aplikasi tetap belum diuji. QA aggregate tetap 3 audit pass/91 not_run; gate F4 belum ditutup.
+
 ### 6.8 Profil dan penghapusan akun
 
 **Prasyarat:** P10 akun test, email berbeda, password known; semua tindakan delete pada data test disposable.

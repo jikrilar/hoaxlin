@@ -330,6 +330,8 @@ IP-015 menerapkan [hasil final/evidence/provenance](RESULT-IP-015.md) melalui pr
 
 IP-016 menerapkan [actions/feedback](ACTIONS-IP-016.md) sebagai partial Blade dengan guard viewer verified/owner/final. PDF tersedia hanya final yang dapat diakses; history/CSV hanya verified dengan scope seluruh riwayat akun. Feedback memakai native radio required 1/0 dan textarea opsional 1000, old input escaped per submission, sent readonly dan duplicate/error persisten. Guest/admin access tidak menjadi ownership; unverified owner diarahkan ke verifikasi. Inline selectFeedback dan legacy actions dihapus. Form-submit existing menangani loading/double-submit/cleanup; radio native tidak membutuhkan module baru. Route/controller/middleware/authorization/export dan seluruh JS tetap sama.
 
+IP-017 menerapkan [login/register](LOGIN-REGISTER-IP-017.md) pada shell IP-010: native fields/autocomplete/required/terms, remember value=1 sesuai boolean validator, name/email old input string escaped dan password kosong. Ringkasan error menerima target field dari kedua view untuk autofocus/link; auth views lain memakai fallback generic. Strength meter/data-password-hints registrasi dihapus dari view, policy/confirmation tetap server. Password/form-submit existing tetap menangani toggle/loading/cleanup tanpa perubahan JS/backend. Intended/session/Registered/verifikasi/unique/limiter dipertahankan, belum menjadi klaim E2E dari receiver fixture.
+
 ### 9.3 Transport dan error
 
 Form utama tetap native POST/redirect; jangan mengubahnya menjadi AJAX tanpa kebutuhan yang dinyatakan. Fetch hanya untuk status existing atau enhancement yang memang tersedia.
