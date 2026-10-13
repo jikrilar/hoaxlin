@@ -315,6 +315,8 @@ IP-017 menambah [subhasil login/register](LOGIN-REGISTER-IP-017.md): 23 unit/fie
 
 IP-018 menambah [subhasil lupa/reset](PASSWORD-RESET-IP-018.md): 21 unit cases tambahan, controller actual/validator dengan broker fake, 110 renders/880 layout samples dan browser recovery normal/no-JS/reduced. QA-AUTH-05/06 memiliki evidence email/route token/confirmed password/CSRF serialization, broker status/error/throttled, GET no broker, invalid fields sebelum broker, empty secrets, recovery link/focus serta native loading/Back/double-submit. Real repository/expiry/password save/event/throttle/mail belum diuji; AuthenticationTest/MailConfigurationTest terblokir autoload repo. QA aggregate tetap 3 audit pass/91 not_run; F4 belum ditutup.
 
+IP-019 menambah [subhasil verifikasi email](EMAIL-VERIFICATION-IP-019.md): 14 unit cases tambahan, controller actual dengan notification/fulfillment doubles, authorize ID/hash dan URL signature valid/tampered/expired, route contract inspection; 11 state auth/88 browser layout samples dan 65 action checks normal/no-JS/reduced. QA-AUTH-07 memiliki evidence email/status escaped, single persistent flash, no auto resend, native CSRF-only resend/logout/profile GET, keyboard/mobile/200% text, independent loading/Back/cancellation/double-submit dan receiver 429. Receiver 429 bukan limiter Laravel; generic error flash bukan exception SMTP handler baru. AuthenticationTest/MailConfigurationTest terblokir autoload repo; actual HTTP auth/CSRF/throttle/session logout/DB/Verified/mail/profile reverify belum diuji. QA aggregate tetap 3 audit pass/91 not_run; F4 belum ditutup.
+
 ### 6.8 Profil dan penghapusan akun
 
 **Prasyarat:** P10 akun test, email berbeda, password known; semua tindakan delete pada data test disposable.

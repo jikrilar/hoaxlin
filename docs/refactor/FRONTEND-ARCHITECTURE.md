@@ -334,6 +334,8 @@ IP-017 menerapkan [login/register](LOGIN-REGISTER-IP-017.md) pada shell IP-010: 
 
 IP-018 menerapkan [forgot/reset password](PASSWORD-RESET-IP-018.md) dengan native fields/button/link/shell dan field error targets existing. Old/query email hanya string escaped, token dari route tetap hidden, password/confirmation tidak dipulihkan. GET tidak mengklaim token valid; error menyediakan request-reset/login recovery dan status tetap dari broker. Form-submit/password existing menangani loading/toggle/cleanup tanpa perubahan JS/CSS. Unit controller actual memakai request validation adapter dan broker fake; real DB expiry/User update/event/SMTP/middleware belum diverifikasi. Verifikasi/profil tetap task berikutnya.
 
+IP-019 menerapkan [verifikasi email](EMAIL-VERIFICATION-IP-019.md) dengan shell/button/link dan semantic CSS existing, email akun escaped/wrapping serta instruksi inbox/spam/expired. Tidak mengklaim pengiriman pada initial view; verification-link-sent hanya dari shared flash status. Resend/logout native POST + CSRF memakai independent form-submit loading; profile tetap GET. Auth/signed/throttle:6,1/ID-hash/verified intended-home dan success controller unchanged. Tidak ada module/countdown/auto resend baru. Controller doubles, authorize/URL signing actual serta browser receiver diuji; HTTP limiter/middleware/DB/Verified/mail belum diverifikasi. Migrasi profil tetap IP-020.
+
 ### 9.3 Transport dan error
 
 Form utama tetap native POST/redirect; jangan mengubahnya menjadi AJAX tanpa kebutuhan yang dinyatakan. Fetch hanya untuk status existing atau enhancement yang memang tersedia.

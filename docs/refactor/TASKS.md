@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-018 selesai; 18 dari 39 task selesai, IP-019–IP-039 pending |
+| Status | IP-001–IP-019 selesai; 19 dari 39 task selesai, IP-020–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-018 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-019 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -94,7 +94,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-016](#ip-016) | F3 | Migrasikan actions dan feedback hasil | done |
 | [IP-017](#ip-017) | F4 | Migrasikan login dan registrasi | done |
 | [IP-018](#ip-018) | F4 | Migrasikan lupa/reset password | done |
-| [IP-019](#ip-019) | F4 | Migrasikan verifikasi email | pending |
+| [IP-019](#ip-019) | F4 | Migrasikan verifikasi email | done |
 | [IP-020](#ip-020) | F4 | Migrasikan profil dan konfirmasi hapus akun | pending |
 | [IP-021](#ip-021) | F4 | Migrasikan riwayat, filter, dan pagination | pending |
 | [IP-022](#ip-022) | F4 | Verifikasi detail riwayat memakai hasil bersama | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-018 selesai, IP-019–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-019 selesai, IP-020–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -461,10 +461,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-018 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-09.
 - **Source/target:** `resources/views/auth/verify-email.blade.php`.
 
-- [ ] Jelaskan kebutuhan verifikasi dan email akun yang di-escape; sediakan resend, profil/ubah email dan logout.
-- [ ] Pertahankan resend POST + CSRF/throttle, verification-link-sent dan verified redirect.
-- [ ] Link verifikasi tetap signed + auth + throttle; expired/invalid link mengikuti respons server.
-- [ ] Jangan menambah timer inbox, auto resend atau jaminan SMTP; uji verified/unverified dan keyboard/mobile.
+- [x] Jelaskan kebutuhan verifikasi dan email akun yang di-escape; sediakan resend, profil/ubah email dan logout.
+- [x] Pertahankan resend POST + CSRF/throttle, verification-link-sent dan verified redirect.
+- [x] Link verifikasi tetap signed + auth + throttle; expired/invalid link mengikuti respons server.
+- [x] Jangan menambah timer inbox, auto resend atau jaminan SMTP; uji verified/unverified dan keyboard/mobile.
 
 **Validasi:** AuthenticationTest, MailConfigurationTest; verified/unverified.
 
@@ -1117,6 +1117,16 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence:** [PASSWORD-RESET-IP-018.md](PASSWORD-RESET-IP-018.md), AuthShellTest/AuthenticationTest dan /tmp/hoaxlin-ip018-sn6q0en3. 226 protected fingerprints dan seluruh JS/CSS unchanged.
 - **Batas:** AuthenticationTest/MailConfigurationTest exit 255 karena autoload repo hilang; feature invalid/expired-token tests baru belum dieksekusi. PHP 8.5/vendor sementara, request adapter dan broker/receiver fake bukan DB token expiry/User save/event/remember/CSRF/throttle/mail HTTP. Native normal run awal exit 143/warning timeout direstart dan diulang; run akhir tanpa console error. Back no-store bukan BFCache; password manager/screen reader/native zoom belum diuji. QA tetap 3 audit pass/91 not_run; F4 belum ditutup, tidak ada environment/data/deployment change.
 - **Berikutnya:** buat commit semantic dan berhenti pada IP-018; IP-019–IP-039 pending.
+
+### IP-019 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P09; FA-01/FA-02/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal e8cfc20; tree/index awal bersih.
+- **Perubahan:** verifikasi memakai shell/button/link/CSS existing, email escaped dan wrapping, instruksi akses/inbox/spam/expired tanpa klaim email terkirim awal. Native resend/logout POST + CSRF, Ubah email route profile, single verification-link-sent shared status; inline styles dihapus. Tidak ada timer/auto resend/SMTP guarantee. Auth/signed/throttle/verified intended-home dan controller existing dipertahankan.
+- **Validasi:** build pass 16 modules; seluruh unit 228 tests/1226 assertions, AuthShellTest 63/360 termasuk 14 cases baru; Node 61 pass; Pint dua tests/52 compiled syntax/diff pass. Controller actual dengan notification/fulfillment doubles, authorize ID/hash dan UrlGenerator valid/tampered/expired actual. 115 Blade renders; 11 targeted auth states/88 browser layout samples; 65 action checks normal/no-JS/reduced, keyboard/mobile/200% text/POST/CSRF/status/profile/logout/independent loading/Back/cancellation/double-submit pass, zero final console errors.
+- **Evidence:** [EMAIL-VERIFICATION-IP-019.md](EMAIL-VERIFICATION-IP-019.md), AuthShellTest/AuthenticationTest dan /tmp/hoaxlin-ip019-f4gm2xq5. 250 fingerprints protected source serta seluruh CSS/JS cocok.
+- **Batas:** AuthenticationTest/MailConfigurationTest exit 255 karena autoload repo hilang; feature tests baru belum berjalan. Unit tanpa kernel/DB/mail, fulfillment double tanpa persistence/Verified event; browser receiver 429 bukan limiter Laravel. Real auth/CSRF/throttle/session logout/DB/event/SMTP/profile reverify belum diverifikasi. Ekspektasi footer harness awal salah dikoreksi; final ulang lulus. PHP 8.5/vendor sementara, Back no-store bukan BFCache, native zoom/screen reader belum diuji. QA tetap 3 audit pass/91 not_run dan F4 belum ditutup; tidak ada environment/data/deployment change.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-019; IP-020–IP-039 pending.
 
 ### Format catatan berikutnya
 

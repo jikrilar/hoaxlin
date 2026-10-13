@@ -2,8 +2,11 @@
 
 namespace Tests\Unit;
 
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
+use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
@@ -22,6 +25,7 @@ use Illuminate\Events\EventServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemServiceProvider;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Foundation\Vite;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RoutingServiceProvider;
@@ -455,6 +459,156 @@ class AuthShellTest extends TestCase
         $view = (new NewPasswordController)->create($request);
         $this->assertSame('auth.reset-password', $view->name());
         $this->assertSame($request, $view->getData()['request']);
+    }
+
+    #[DataProvider('verificationMessages')]
+    public function test_verification_notice_has_safe_identity_native_actions_and_one_server_message(?string $key, ?string $message): void
+    {
+        $email = str_repeat('long', 70).'<script id="attack">literal</script>@example.test';
+        $this->user = new User;
+        $this->user->setRawAttributes(['email' => $email, 'email_verified_at' => null]);
+        $this->app['view']->share('errors', new ViewErrorBag);
+        if ($key) {
+            $this->session->put($key, $message);
+        }
+        $dom = $this->render('auth.verify-email', '/verify-email');
+        $this->assertSame('Verifikasi email', $dom->evaluate('string(//h1)'));
+        $this->assertSame($email, $dom->evaluate('string(//main//strong)'));
+        $this->assertSame(0, $dom->query('//*[@id="attack"] | //main//*[@style] | //main//input[not(@name="_token")]')->length);
+        $this->assertStringContainsString('riwayat dan mengirim umpan balik', $dom->evaluate('string(//main)'));
+        $this->assertStringContainsString('kotak masuk dan folder spam', $dom->evaluate('string(//main)'));
+        $this->assertStringContainsString('sudah kedaluwarsa', $dom->evaluate('string(//main)'));
+        $this->assertStringNotContainsString('telah dikirim', $dom->evaluate('string(//main)'));
+        $this->assertSame(1, $dom->query('//form[@id="verification-resend-form" and @method="POST" and @action="http://localhost/email/verification-notification"]/input[@name="_token" and @value="fixture-token"]')->length);
+        $this->assertSame('Kirim ulang tautan', trim($dom->evaluate('string(//button[@id="verification-resend-submit"])')));
+        $this->assertSame(1, $dom->query('//main//a[@href="http://localhost/profil"]')->length);
+        $this->assertSame(1, $dom->query('//form[@id="verification-logout-form" and @method="POST" and @action="http://localhost/logout"]/input[@name="_token" and @value="fixture-token"]')->length);
+        $this->assertSame($key ? 1 : 0, $dom->query('//*[@data-flash]')->length);
+        if ($key) {
+            $this->assertSame($key === 'error' ? 'alert' : 'status', $dom->evaluate('string(//*[@data-flash]/@role)'));
+            $this->assertStringContainsString($key === 'status' ? 'Tautan verifikasi baru telah dikirim.' : $message, $dom->evaluate('string(//*[@data-flash])'));
+        }
+    }
+
+    public static function verificationMessages(): array
+    {
+        return [[null, null], ['status', 'verification-link-sent'], ['error', 'Server <script id="attack">error</script>']];
+    }
+
+    #[DataProvider('verificationPromptStates')]
+    public function test_actual_verification_prompt_preserves_unverified_view_and_verified_intended_redirect(bool $verified, bool $intended): void
+    {
+        $user = $this->createMock(User::class);
+        $user->method('hasVerifiedEmail')->willReturn($verified);
+        $user->expects($this->never())->method('sendEmailVerificationNotification');
+        if ($intended) {
+            $this->session->put('url.intended', 'http://localhost/riwayat');
+        }
+        $request = $this->verificationRequest('/verify-email', 'GET', $user);
+        $response = (new EmailVerificationPromptController)($request);
+        if ($verified) {
+            $this->assertSame($intended ? 'http://localhost/riwayat' : 'http://localhost', $response->getTargetUrl());
+            $this->assertFalse($this->session->has('url.intended'));
+        } else {
+            $this->assertSame('auth.verify-email', $response->name());
+        }
+        $this->assertFalse($this->session->has('status'));
+    }
+
+    public static function verificationPromptStates(): array
+    {
+        return [[false, false], [true, false], [true, true]];
+    }
+
+    #[DataProvider('verificationStates')]
+    public function test_actual_verification_resend_only_notifies_an_unverified_user(bool $verified): void
+    {
+        $user = $this->createMock(User::class);
+        $user->method('hasVerifiedEmail')->willReturn($verified);
+        $user->expects($verified ? $this->never() : $this->once())->method('sendEmailVerificationNotification');
+        $request = $this->verificationRequest('/email/verification-notification', 'POST', $user);
+        $request->headers->set('referer', 'http://localhost/verify-email');
+        $response = (new EmailVerificationNotificationController)->store($request);
+        $this->assertSame($verified ? 'http://localhost' : 'http://localhost/verify-email', $response->getTargetUrl());
+        $this->assertSame($verified ? null : 'verification-link-sent', $this->session->get('status'));
+    }
+
+    #[DataProvider('verificationStates')]
+    public function test_actual_verify_controller_only_delegates_unverified_fulfillment_and_keeps_home_success(bool $verified): void
+    {
+        $user = $this->createMock(User::class);
+        $user->method('hasVerifiedEmail')->willReturn($verified);
+        $this->verificationRequest('/verify-email', 'GET', $user);
+        // Count delegation without performing User persistence or dispatching Verified.
+        $request = new class extends EmailVerificationRequest
+        {
+            public int $fulfillCalls = 0;
+
+            public function fulfill()
+            {
+                $this->fulfillCalls++;
+            }
+        };
+        $request->setUserResolver(fn () => $user);
+        $response = (new VerifyEmailController)($request);
+        $this->assertSame($verified ? 0 : 1, $request->fulfillCalls);
+        $this->assertSame('http://localhost', $response->getTargetUrl());
+        $this->assertSame('Alamat email berhasil diverifikasi.', $this->session->get('success'));
+    }
+
+    public static function verificationStates(): array
+    {
+        return [[false], [true]];
+    }
+
+    #[DataProvider('verificationIdentities')]
+    public function test_laravel_verification_request_requires_matching_account_id_and_email_hash(int $id, string $email, bool $allowed): void
+    {
+        $user = new User;
+        $user->setRawAttributes(['id' => 17, 'email' => 'fixture@example.test']);
+        $request = EmailVerificationRequest::create('http://localhost/verify-email/'.$id.'/'.sha1($email));
+        $route = $this->app['router']->getRoutes()->match($request);
+        $request->setRouteResolver(fn () => $route);
+        $request->setUserResolver(fn () => $user);
+        $this->assertSame($allowed, $request->authorize());
+    }
+
+    public static function verificationIdentities(): array
+    {
+        return [[17, 'fixture@example.test', true], [18, 'fixture@example.test', false], [17, 'old@example.test', false]];
+    }
+
+    public function test_verification_routes_retain_native_methods_auth_signature_and_server_throttle(): void
+    {
+        $routes = $this->app['router']->getRoutes();
+        foreach (['verification.notice', 'verification.send', 'verification.verify', 'logout', 'profile'] as $name) {
+            $this->assertContains('auth', $routes->getByName($name)->gatherMiddleware());
+        }
+        $this->assertSame(['POST'], $routes->getByName('verification.send')->methods());
+        $this->assertSame(['POST'], $routes->getByName('logout')->methods());
+        $this->assertContains('signed', $routes->getByName('verification.verify')->gatherMiddleware());
+        foreach (['verification.send', 'verification.verify'] as $name) {
+            $this->assertContains('throttle:6,1', $routes->getByName($name)->gatherMiddleware());
+        }
+        $this->app['url']->setKeyResolver(fn () => 'fixture-signing-key');
+        $parameters = ['id' => 17, 'hash' => sha1('fixture@example.test')];
+        $valid = $this->app['url']->temporarySignedRoute('verification.verify', now()->addMinutes(60), $parameters);
+        $expired = $this->app['url']->temporarySignedRoute('verification.verify', now()->subMinute(), $parameters);
+        $this->assertTrue($this->app['url']->hasValidSignature(Request::create($valid)));
+        $this->assertFalse($this->app['url']->hasValidSignature(Request::create($valid.'&tampered=1')));
+        $this->assertFalse($this->app['url']->hasValidSignature(Request::create($expired)));
+    }
+
+    private function verificationRequest(string $path, string $method, User $user): Request
+    {
+        $request = Request::create('http://localhost'.$path, $method);
+        $request->setLaravelSession($this->session);
+        $request->setUserResolver(fn () => $user);
+        $this->app->instance('request', $request);
+        $this->app['url']->setRequest($request);
+        $this->app['redirect']->setSession($this->session);
+
+        return $request;
     }
 
     private function brokerRequest(string $path, array $payload): Request

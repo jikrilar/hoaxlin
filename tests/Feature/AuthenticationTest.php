@@ -234,12 +234,68 @@ class AuthenticationTest extends TestCase
 
         $this->actingAs($user)->get(route('verification.notice'))->assertOk()
             ->assertSee('folder spam')
-            ->assertSee('Kirim Ulang Email Verifikasi');
+            ->assertSee('Kirim ulang tautan')
+            ->assertSee($user->email)
+            ->assertSee(route('profile'), false)
+            ->assertSee('action="'.route('logout').'"', false)
+            ->assertDontSee('Tautan verifikasi baru telah dikirim.');
+        Notification::assertNothingSent();
 
-        $this->actingAs($user)->post(route('verification.send'))
+        $this->from(route('verification.notice'))->post(route('verification.send'))
+            ->assertRedirect(route('verification.notice'))
             ->assertSessionHas('status', 'verification-link-sent');
-
         Notification::assertSentTo($user, VerifyEmail::class);
+        $this->get(route('verification.notice'))->assertOk()
+            ->assertSee('Tautan verifikasi baru telah dikirim.');
+        Notification::assertSentToTimes($user, VerifyEmail::class, 1);
+        $this->assertNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_verified_notice_redirects_home_or_to_the_intended_destination_without_notification(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('verification.notice'))->assertRedirect(route('home'));
+        $this->withSession(['url.intended' => route('riwayat')])->get(route('verification.notice'))
+            ->assertRedirect(route('riwayat'))->assertSessionMissing('url.intended');
+        Notification::assertNothingSent();
+    }
+
+    public function test_verification_notice_and_resend_require_authentication(): void
+    {
+        Notification::fake();
+        $this->get(route('verification.notice'))->assertRedirect(route('login'));
+        $this->post(route('verification.send'))->assertRedirect(route('login'));
+        Notification::assertNothingSent();
+    }
+
+    public function test_resend_rate_limit_stops_the_seventh_notification(): void
+    {
+        Notification::fake();
+        $user = User::factory()->unverified()->create();
+        $this->actingAs($user);
+        for ($attempt = 0; $attempt < 6; $attempt++) {
+            $this->from(route('verification.notice'))->post(route('verification.send'))
+                ->assertRedirect(route('verification.notice'))
+                ->assertSessionHas('status', 'verification-link-sent');
+        }
+        $this->post(route('verification.send'))->assertStatus(429)->assertHeader('Retry-After');
+        Notification::assertSentToTimes($user, VerifyEmail::class, 6);
+        $this->assertNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_signed_link_for_a_different_account_or_email_cannot_verify_current_user(): void
+    {
+        Event::fake([Verified::class]);
+        $user = User::factory()->unverified()->create();
+        $other = User::factory()->unverified()->create();
+        $this->actingAs($user);
+        foreach ([['id' => $other->id, 'hash' => sha1($other->email)], ['id' => $user->id, 'hash' => sha1('old@example.test')]] as $parameters) {
+            $this->get(URL::temporarySignedRoute('verification.verify', now()->addMinutes(60), $parameters))->assertForbidden();
+        }
+        $this->assertNull($user->fresh()->email_verified_at);
+        $this->assertNull($other->fresh()->email_verified_at);
+        Event::assertNotDispatched(Verified::class);
     }
 
     public function test_verified_user_does_not_receive_another_verification_email(): void
