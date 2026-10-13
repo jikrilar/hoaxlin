@@ -294,6 +294,8 @@ IP-015 menambah [subhasil final/evidence/provenance](RESULT-IP-015.md): 38 unit 
 | **QA-RESULT-08 — Media ada/hilang** | Buka preview/download media milik sendiri dan capability guest sah; ulangi file expired/tidak ada, serta akses non-owner. | Media melewati endpoint privat yang ada. Retention/file hilang dijelaskan tanpa public storage URL permanen, path internal atau janji penyimpanan baru. Error tidak merusak result yang masih tersedia. | AC-P02; IP-015, IP-016 |
 | **QA-RESULT-09 — Feedback dan actions** | Owner verified kirim is_correct true/false dengan komentar kosong, 1000/1001 karakter, markup dan duplicate; periksa PDF/back/history actions. | Boolean/komentar mengikuti rule; satu feedback user/submission. Komentar di-escape; success/error dapat dibaca. UI final menawarkan actions sesuai akses; feedback tidak mengubah label atau retrain model. | AC-P02, AC-P04; IP-016 |
 
+IP-016 menambah [subhasil actions/feedback](ACTIONS-IP-016.md): 29 unit/validator cases tambahan, 86 renders/688 layout samples dan 93 browser feedback checks normal/no-JS/reduced. QA-RESULT-09 mendapat evidence role-aware UI, native boolean/comment/CSRF serialization, 1000 typing limit, readonly/escaping, duplicate/error focus, loading/cancellation/Back/double-submit serta PDF final dan verified personal history/CSV. Validator existing untuk boolean/comment diuji terisolasi pada 1000/1001, tanpa exists/HTTP. Tiga suite feature terblokir autoload repo; middleware/ownership/CSRF/persistence/exports aktual dan screen reader belum ditutup. QA aggregate tetap 3 audit pass/91 not_run; gate F3 belum ditutup.
+
 ### 6.7 Login, registrasi, reset dan verifikasi
 
 **Prasyarat:** Guest session baru, akun sintetis, mail test transport dan URL reset/verify test yang sah/expired.

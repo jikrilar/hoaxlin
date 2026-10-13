@@ -106,6 +106,67 @@ class FeedbackTest extends TestCase
         $this->assertDatabaseEmpty('feedback');
     }
 
+    public function test_verified_owner_has_a_native_feedback_form_and_can_submit_a_thousand_character_comment(): void
+    {
+        [$user, $submission] = $this->submissionWithResult();
+        $this->actingAs($user)->get(route('hasil', $submission))
+            ->assertOk()
+            ->assertSee('id="feedback-form"', false)
+            ->assertSee('type="radio" name="is_correct" value="0" required', false)
+            ->assertSee('maxlength="1000"', false)
+            ->assertSee('Unduh seluruh riwayat CSV');
+
+        $this->post(route('feedback'), [
+            'submission_id' => $submission->id,
+            'is_correct' => '0',
+            'comment' => str_repeat('a', 1000),
+        ])->assertSessionHas('success');
+
+        $this->assertSame(str_repeat('a', 1000), Feedback::sole()->comment);
+        $this->get(route('hasil', $submission))
+            ->assertOk()
+            ->assertSee('Umpan balik sudah dikirim')
+            ->assertSee('Penilaian Anda: Tidak sesuai.')
+            ->assertDontSee('id="feedback-form"', false);
+    }
+
+    public function test_unverified_owner_gets_verification_link_without_feedback_or_verified_export_actions(): void
+    {
+        [$user, $submission] = $this->submissionWithResult();
+        $user->forceFill(['email_verified_at' => null])->save();
+
+        $this->actingAs($user)->get(route('hasil', $submission))
+            ->assertOk()
+            ->assertSee('Verifikasi email akun Anda')
+            ->assertSee(route('verification.notice'), false)
+            ->assertSee(route('hasil.pdf', $submission), false)
+            ->assertDontSee('id="feedback-form"', false)
+            ->assertDontSee(route('riwayat.csv'), false);
+
+        $this->post(route('feedback'), ['submission_id' => $submission->id, 'is_correct' => '1'])
+            ->assertRedirect(route('verification.notice'));
+        $this->assertDatabaseEmpty('feedback');
+    }
+
+    public function test_sent_feedback_escapes_comment_and_duplicate_error_remains_readable(): void
+    {
+        [$user, $submission] = $this->submissionWithResult();
+        Feedback::create(['submission_id' => $submission->id, 'user_id' => $user->id, 'is_correct' => true, 'comment' => '<script id="attack">literal</script>']);
+
+        $this->actingAs($user)->from(route('hasil', $submission))
+            ->post(route('feedback'), ['submission_id' => $submission->id, 'is_correct' => '0'])
+            ->assertSessionHasErrors('submission_id');
+
+        $this->get(route('hasil', $submission))
+            ->assertOk()
+            ->assertSee('Kamu sudah memberikan umpan balik untuk hasil ini.')
+            ->assertSee('Umpan balik sudah dikirim')
+            ->assertSee('&lt;script id=&quot;attack&quot;&gt;literal&lt;/script&gt;', false)
+            ->assertDontSee('<script id="attack">', false)
+            ->assertDontSee('id="feedback-form"', false);
+        $this->assertSame(1, Feedback::count());
+    }
+
     /**
      * @return array{User, Submission}
      */

@@ -51,7 +51,10 @@ class ResultEndpointAuthorizationTest extends TestCase
         [$foreign] = $this->registeredSubmission(media: true);
         Storage::disk('local')->put($foreign->media_path, 'media');
 
-        $this->actingAs($admin)->get(route('hasil', $foreign))->assertOk();
+        $this->actingAs($admin)->get(route('hasil', $foreign))->assertOk()
+            ->assertSee(route('hasil.pdf', $foreign), false)
+            ->assertSee('Unduh seluruh riwayat CSV')
+            ->assertDontSee('id="feedback-form"', false);
         $this->actingAs($admin)->getJson(route('hasil.status', $foreign))->assertOk();
         $this->actingAs($admin)->get(route('hasil.pdf', $foreign))->assertOk();
         $this->actingAs($admin)->get(route('hasil.media', $foreign))->assertRedirect();

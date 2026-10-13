@@ -2,8 +2,10 @@
 
 namespace Tests\Unit;
 
+use App\Http\Requests\StoreFeedbackRequest;
 use App\Models\DetectionResult;
 use App\Models\EvidenceReference;
+use App\Models\Feedback;
 use App\Models\Submission;
 use App\Models\User;
 use App\View\Presenters\DetectionPresentation;
@@ -28,8 +30,10 @@ use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Translation\TranslationServiceProvider;
+use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\View\Component;
 use Illuminate\View\ViewServiceProvider;
 use Livewire\Mechanisms\CompileLivewireTags\CompileLivewireTags;
@@ -275,6 +279,171 @@ class DetectionPresentationTest extends TestCase
         $this->assertSame(1, $dom->query('//time[starts-with(@datetime,"2026-09-01T13:45")]')->length);
     }
 
+    #[DataProvider('viewers')]
+    public function test_actions_and_feedback_follow_account_verification_ownership_and_final_state(?int $viewerId, ?int $ownerId, bool $verified, bool $admin, bool $final, bool $form): void
+    {
+        [$submission, $result] = $this->records();
+        $submission->user_id = $ownerId;
+        $submission->status = $final ? 'completed' : 'processing';
+        if ($viewerId !== null) {
+            $this->user = $this->viewer($viewerId, $verified, $admin);
+        }
+        $dom = $this->renderResult($submission, $result);
+        $this->assertSame($form ? 1 : 0, $dom->query('//form[@id="feedback-form"]')->length);
+        $this->assertSame($final ? 1 : 0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"/pdf")]')->length);
+        $this->assertSame($viewerId !== null && $verified ? 1 : 0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"/riwayat-export/csv")]')->length);
+        $this->assertSame($viewerId !== null && $verified ? 1 : 0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[normalize-space(.)="Kembali ke riwayat"]')->length);
+        $this->assertSame(1, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"#cek-berita")]')->length);
+        $text = $dom->evaluate('string(//main)');
+        $this->assertStringNotContainsString('Cetak / Simpan PDF', $text);
+        if ($viewerId !== null && $verified) {
+            $this->assertStringContainsString('Unduh seluruh riwayat CSV', $text);
+        }
+        if ($final && $ownerId === $viewerId && $viewerId !== null && ! $verified) {
+            $this->assertSame(1, $dom->query('//section[@aria-labelledby="feedback-heading"]//a[contains(@href,"/verify-email")]')->length);
+        }
+        if ($form) {
+            $this->assertSame('POST', $dom->evaluate('string(//form[@id="feedback-form"]/@method)'));
+            $this->assertStringEndsWith('/feedback', $dom->evaluate('string(//form[@id="feedback-form"]/@action)'));
+            $this->assertSame('fixture-token', $dom->evaluate('string(//form[@id="feedback-form"]//input[@name="_token"]/@value)'));
+            $this->assertSame('101', $dom->evaluate('string(//form[@id="feedback-form"]//input[@name="submission_id"]/@value)'));
+            $this->assertSame(2, $dom->query('//input[@type="radio" and @name="is_correct" and @required]')->length);
+            $this->assertSame(0, $dom->query('//input[@name="is_correct" and @checked]')->length);
+            $this->assertSame('1000', $dom->evaluate('string(//textarea[@name="comment"]/@maxlength)'));
+            $this->assertSame('Mengirim...', $dom->evaluate('string(//form[@id="feedback-form"]/@data-submit-label)'));
+            $this->assertStringContainsString('bukan voting kebenaran', $text);
+        }
+    }
+
+    public static function viewers(): array
+    {
+        return [
+            'anonymous guest capability' => [null, null, false, false, true, false],
+            'logged in guest capability' => [7, null, true, false, true, false],
+            'unverified guest capability' => [7, null, false, false, true, false],
+            'verified owner' => [7, 7, true, false, true, true],
+            'unverified owner' => [7, 7, false, false, true, false],
+            'admin viewing other owner' => [8, 7, true, true, true, false],
+            'unverified admin' => [8, 7, false, true, true, false],
+            'admin owns result' => [7, 7, true, true, true, true],
+            'nonfinal owner' => [7, 7, true, false, false, false],
+        ];
+    }
+
+    #[DataProvider('previousFeedback')]
+    public function test_feedback_error_recovery_preserves_native_boolean_choice_and_escaped_comment(mixed $choice, mixed $comment, mixed $submissionId, ?string $expectedChoice, string $expectedComment): void
+    {
+        [$submission, $result] = $this->records();
+        $submission->user_id = 7;
+        $this->user = $this->viewer(7);
+        $this->session->put('_old_input', ['submission_id' => $submissionId, 'is_correct' => $choice, 'comment' => $comment]);
+        $errors = new ViewErrorBag;
+        $errors->put('default', new MessageBag(['is_correct' => ['Pilih satu penilaian.'], 'comment' => ['Komentar terlalu panjang <script id="attack">x</script>.']]));
+        $this->app['view']->share('errors', $errors);
+        $dom = $this->renderResult($submission, $result);
+        $this->assertSame($expectedChoice === null ? 0 : 1, $dom->query('//input[@name="is_correct" and @checked]')->length);
+        if ($expectedChoice !== null) {
+            $this->assertSame($expectedChoice, $dom->evaluate('string(//input[@name="is_correct" and @checked]/@value)'));
+        }
+        $this->assertSame($expectedComment, $dom->evaluate('string(//textarea[@name="comment"])'));
+        $this->assertSame(1, $dom->query('//*[@id="feedback-errors" and @role="alert" and @autofocus]')->length);
+        $this->assertSame(1, $dom->query('//*[@id="feedback-errors"]//a[@href="#feedback-correct"]')->length);
+        $this->assertSame(1, $dom->query('//*[@id="feedback-errors"]//a[@href="#feedback-comment"]')->length);
+        $this->assertSame('true', $dom->evaluate('string(//textarea[@name="comment"]/@aria-invalid)'));
+        $this->assertStringContainsString('feedback-comment-error', $dom->evaluate('string(//textarea[@name="comment"]/@aria-describedby)'));
+        $this->assertSame(0, $dom->query('//*[@id="attack"]')->length);
+    }
+
+    public static function previousFeedback(): array
+    {
+        return [
+            ['0', 'Alasan <b>literal</b>', '101', '0', 'Alasan <b>literal</b>'],
+            ['1', null, 101, '1', ''],
+            [false, 'Tidak sesuai', 101, '0', 'Tidak sesuai'],
+            [['bad'], ['bad'], 101, null, ''],
+            ['invalid', 'Komentar', 101, null, 'Komentar'],
+            ['1', 'Other result draft', 999, null, ''],
+            ['1', 'Invalid result draft', ['101'], null, ''],
+        ];
+    }
+
+    #[DataProvider('feedbackChoices')]
+    public function test_existing_feedback_is_read_only_and_duplicate_error_is_visible(bool $correct): void
+    {
+        [$submission, $result] = $this->records();
+        $submission->user_id = 7;
+        $this->user = $this->viewer(7);
+        $feedback = new Feedback(['submission_id' => 101, 'user_id' => 7, 'is_correct' => $correct, 'comment' => 'Komentar <script id="attack">literal</script>']);
+        $feedback->created_at = '2026-09-02 10:00:00';
+        $errors = new ViewErrorBag;
+        $errors->put('default', new MessageBag(['submission_id' => ['Kamu sudah memberikan umpan balik untuk hasil ini.']]));
+        $this->app['view']->share('errors', $errors);
+        $dom = $this->renderResult($submission, $result, $feedback);
+        $this->assertSame(0, $dom->query('//form[@id="feedback-form"]')->length);
+        $this->assertSame(1, $dom->query('//*[@data-feedback-sent]')->length);
+        $this->assertStringContainsString($correct ? 'Penilaian Anda: Sesuai.' : 'Penilaian Anda: Tidak sesuai.', $dom->evaluate('string(//*[@data-feedback-sent])'));
+        $this->assertStringContainsString($feedback->comment, $dom->evaluate('string(//*[@data-feedback-sent])'));
+        $this->assertStringContainsString('sudah memberikan umpan balik', $dom->evaluate('string(//*[@id="feedback-errors"])'));
+        $this->assertSame(0, $dom->query('//*[@id="attack"]')->length);
+        $this->assertSame(1, $dom->query('//*[@data-feedback-sent]//time[starts-with(@datetime,"2026-09-02T10:00")]')->length);
+    }
+
+    public static function feedbackChoices(): array
+    {
+        return [[true], [false]];
+    }
+
+    #[DataProvider('foreignFeedback')]
+    public function test_feedback_from_another_user_or_submission_is_never_shown(int $userId, int $submissionId): void
+    {
+        [$submission, $result] = $this->records();
+        $submission->user_id = 7;
+        $this->user = $this->viewer(7);
+        $feedback = new Feedback(['submission_id' => $submissionId, 'user_id' => $userId, 'is_correct' => true, 'comment' => 'Private unrelated feedback']);
+        $dom = $this->renderResult($submission, $result, $feedback);
+        $this->assertStringNotContainsString('Private unrelated feedback', $dom->evaluate('string(//main)'));
+        $this->assertSame(0, $dom->query('//*[@data-feedback-sent]')->length);
+        $this->assertSame(1, $dom->query('//form[@id="feedback-form"]')->length);
+    }
+
+    public static function foreignFeedback(): array
+    {
+        return [[8, 101], [7, 999]];
+    }
+
+    #[DataProvider('feedbackPayloads')]
+    public function test_native_feedback_values_follow_existing_boolean_and_comment_rules(array $payload, bool $valid): void
+    {
+        // Exercise actual field rules without pretending to validate the DB exists rule or HTTP middleware.
+        $rules = (new StoreFeedbackRequest)->rules();
+        $validator = (new ValidationFactory($this->app['translator'], $this->app))
+            ->make($payload, ['is_correct' => $rules['is_correct'], 'comment' => $rules['comment']]);
+        $this->assertSame($valid, $validator->passes());
+    }
+
+    public static function feedbackPayloads(): array
+    {
+        return [
+            [['is_correct' => '1'], true],
+            [['is_correct' => '0', 'comment' => null], true],
+            [['is_correct' => true, 'comment' => str_repeat('a', 1000)], true],
+            [['is_correct' => false, 'comment' => str_repeat('é', 1000)], true],
+            [['is_correct' => 'invalid'], false],
+            [['comment' => 'Missing selection'], false],
+            [['is_correct' => '1', 'comment' => str_repeat('a', 1001)], false],
+            [['is_correct' => '1', 'comment' => ['bad']], false],
+            [['is_correct' => ['0']], false],
+        ];
+    }
+
+    private function viewer(int $id, bool $verified = true, bool $admin = false): User
+    {
+        $user = new User;
+        $user->forceFill(['id' => $id, 'name' => 'Fixture', 'email' => 'fixture@example.test', 'is_admin' => $admin, 'email_verified_at' => $verified ? '2026-09-01 12:00:00' : null]);
+
+        return $user;
+    }
+
     private function records(): array
     {
         $submission = new Submission(['status' => 'completed', 'input_type' => 'text', 'raw_input' => 'Fixture input']);
@@ -286,9 +455,9 @@ class DetectionPresentationTest extends TestCase
         return [$submission, $result];
     }
 
-    private function renderResult(Submission $submission, ?DetectionResult $result): DOMXPath
+    private function renderResult(Submission $submission, ?DetectionResult $result, ?Feedback $feedback = null): DOMXPath
     {
-        $html = $this->app['view']->make('hasil', ['submission' => $submission, 'result' => $result, 'feedback' => null, 'failureReason' => $submission->isFailed() ? 'Safe public failure' : null])->render();
+        $html = $this->app['view']->make('hasil', ['submission' => $submission, 'result' => $result, 'feedback' => $feedback, 'failureReason' => $submission->isFailed() ? 'Safe public failure' : null])->render();
         $document = new DOMDocument;
         @$document->loadHTML('<?xml encoding="UTF-8">'.$html);
 

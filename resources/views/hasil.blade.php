@@ -4,7 +4,13 @@
 @section('description', 'Baca prediksi model dan referensi terkait. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.')
 
 @section('content')
-@php $result = \App\View\Presenters\DetectionPresentation::finalResult($submission, $result); @endphp
+@php
+    $result = \App\View\Presenters\DetectionPresentation::finalResult($submission, $result);
+    $resultViewer = auth()->user();
+    $verifiedViewer = $resultViewer?->hasVerifiedEmail() ?? false;
+    $ownsResult = $resultViewer !== null && $submission->user_id !== null
+        && $resultViewer->getKey() === $submission->user_id;
+@endphp
 <div data-page="result" class="hl-result-page">
     <div class="container-app hl-result-page__inner">
         <a href="{{ request()->routeIs('riwayat.show') ? route('riwayat') : url('/') }}" class="hl-button hl-result-page__back" data-variant="tertiary">
@@ -34,42 +40,8 @@
             @endif
             @include('partials.result.provenance')
         </div>
-        @include('partials.result.actions-legacy')
+        @include('partials.result.feedback')
+        @include('partials.result.actions')
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-// Feedback selection
-function selectFeedback(isCorrect) {
-    document.getElementById('feedback-is-correct').value = isCorrect ? '1' : '0';
-    const btnCorrect = document.getElementById('fb-correct');
-    const btnWrong = document.getElementById('fb-wrong');
-    const commentArea = document.getElementById('feedback-comment-area');
-
-    if (isCorrect) {
-        btnCorrect.style.background = 'var(--ds-success-bg)';
-        btnCorrect.style.borderColor = 'var(--ds-success-fg)';
-        btnCorrect.style.color = 'var(--ds-success-fg)';
-        btnCorrect.setAttribute('aria-pressed', 'true');
-        btnWrong.style.background = 'transparent';
-        btnWrong.style.borderColor = 'var(--ds-border-control)';
-        btnWrong.style.color = 'var(--color-primary-light)';
-        btnWrong.setAttribute('aria-pressed', 'false');
-        commentArea.style.display = 'block';
-    } else {
-        btnWrong.style.background = 'var(--ds-danger-bg)';
-        btnWrong.style.borderColor = 'var(--ds-danger-fg)';
-        btnWrong.style.color = 'var(--ds-danger-fg)';
-        btnWrong.setAttribute('aria-pressed', 'true');
-        btnCorrect.style.background = 'transparent';
-        btnCorrect.style.borderColor = 'var(--ds-border-control)';
-        btnCorrect.style.color = 'var(--color-primary-light)';
-        btnCorrect.setAttribute('aria-pressed', 'false');
-        commentArea.style.display = 'block';
-        commentArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-}
-</script>
-@endpush
