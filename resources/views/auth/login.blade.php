@@ -12,7 +12,7 @@
     <div style="width:100%; max-width:440px; margin:0 auto; position:relative; transform-origin:center;">
 
         <!-- Card -->
-        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem);" role="main">
+        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem);">
 
             <!-- Logo & Title -->
             <div style="text-align:center; margin-bottom:2.25rem;">

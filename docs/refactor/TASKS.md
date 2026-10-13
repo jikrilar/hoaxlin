@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-007 selesai; 7 dari 39 task selesai, IP-008–IP-039 pending |
+| Status | IP-001–IP-008 selesai; 8 dari 39 task selesai, IP-009–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-007 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-008 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -83,7 +83,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-005](#ip-005) | F1 | Rapikan base CSS dan transisi legacy | done |
 | [IP-006](#ip-006) | F1 | Buat komponen dasar reusable | done |
 | [IP-007](#ip-007) | F1 | Bangun lifecycle dan helper JS | done |
-| [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | pending |
+| [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | done |
 | [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | pending |
 | [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | pending |
 | [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | pending |
@@ -259,10 +259,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-03.
 - **Source/target:** `resources/views/layouts/app.blade.php`, `resources/views/partials/head.blade.php`, `resources/views/partials/runtime.blade.php`.
 
-- [ ] Ekstrak head/runtime bersama tanpa mengubah view lookup, sections, yields dan stacks existing.
-- [ ] Pastikan @vite dan Livewire styles/scripts dimuat sekali; metadata memakai default aman tanpa isi submission.
-- [ ] Susun skip link/header/flash/satu main/footer; hapus landmark main tambahan pada child view yang dimigrasi.
-- [ ] Periksa load normal dan navigation lintas view; admin dan PDF tetap memakai renderer masing-masing.
+- [x] Ekstrak head/runtime bersama tanpa mengubah view lookup, sections, yields dan stacks existing.
+- [x] Pastikan @vite dan Livewire styles/scripts dimuat sekali; metadata memakai default aman tanpa isi submission.
+- [x] Susun skip link/header/flash/satu main/footer; hapus landmark main tambahan pada child view yang dimigrasi.
+- [x] Periksa load normal dan navigation lintas view; admin dan PDF tetap memakai renderer masing-masing.
 
 **Validasi:** Blade/build; source DOM; lintas view.
 
@@ -991,6 +991,18 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Batas:** artisan feature tests exit 255 karena vendor/autoload.php repo tidak tersedia. Renderer/PHPUnit memakai vendor lock sementara IP-005; bukan runtime PHP aplikasi yang didukung. Livewire browser memakai JS runtime asli dan HTML fixture, tanpa hydration/polling/authorization aplikasi. POST hanya receiver sintetis loopback; tidak mengirim login/mail/delete aplikasi. QA aggregate tetap 3 pass/91 not_run. Handler halaman welcome/hasil/progress belum dimigrasi; ownership/polling/preview dan QA lengkap tetap task turunannya.
 - **Perlindungan:** protected tracked fingerprints backend/config/routes/DB/lock/font/vendor/admin/PDF cocok baseline; tidak mengubah environment, data, model atau kontrak keamanan. Tidak menjalankan migration/seed/deploy.
 - **Berikutnya:** berhenti pada IP-007; buat commit semantic. IP-008–IP-039 tetap pending.
+
+### IP-008 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; AC-P00 shell, FA-01/FA-02/FA-03.
+- **Checkout:** frontend-refactor/public-shell-auth, HEAD awal 61a9a87; tree/index bersih, instruksi root dibaca; tidak ada AGENTS subtree.
+- **Perubahan:** partial head/runtime, layout header/skip/main target, CSS skip link dan penghapusan role main pada delapan child view. Region hasil tetap bernama. Handler anchor welcome mengecualikan skip link. PublicHeadTest melindungi metadata/default/escaping; dokumen architecture/plan/QA/status diselaraskan.
+- **Perilaku:** sections/view lookup/content yield dan stacks existing tetap bekerja. Title/description di-escape tanpa double encoding; Open Graph konsisten dan default tidak membaca submission. Skip link native memindahkan focus ke main; Vite/Livewire dimuat sekali; tidak menambah runtime/module/global baru. Admin/PDF tetap terpisah; redesign nav/footer/flash/auth bukan bagian task ini.
+- **Validasi:** npm build pass (11 modules), PHPUnit standalone 24 tests/64 assertions pass, Pint test pass; 19 JS lifecycle tests pass. 25 source DOM render termasuk fixture stacks, 24 baseline native form contracts dan compiled PHP syntax pass. Firefox 157.0.1: 144 smoke viewport samples, 96 shell/skip samples normal/no-JS dan 26 checks actual wire:navigate (delapan body swap plus Back/Forward); tanpa console error. Vite/Livewire satu per body, runtime identity sama, metadata/stacks/skip keyboard bekerja; screenshot ditinjau.
+- **Evidence:** [SHELL-IP-008.md](SHELL-IP-008.md), [PublicHeadTest](../../tests/Unit/PublicHeadTest.php), partials/source dan artefak /tmp/hoaxlin-ip008-1jzbxb1w.
+- **Batas:** artisan view:cache exit 255 karena vendor/autoload.php repo tidak tersedia. Renderer/PHPUnit memakai vendor lock sementara IP-005 pada PHP host 8.5; bukan runtime aplikasi yang didukung. Output asset memakai factory Livewire asli dan SupportNavigate, tanpa hydration/polling/HTTP authorization/DB/AI atau admin/PDF renderer run. Tidak mengirim POST aplikasi. Autofocus existing dipertahankan; native first Tab diperiksa pada fixture tanpa autofocus. QA aggregate tetap 3 pass/91 not_run.
+- **Perlindungan:** fingerprints backend/routes/config/DB/shared JS/font/vendor/admin/PDF/lock/AGENTS cocok baseline. Tidak mengubah contract, dependency, environment, data atau deployment.
+- **Berikutnya:** berhenti pada IP-008; buat commit semantic. IP-009–IP-039 tetap pending.
 
 ### Format catatan berikutnya
 

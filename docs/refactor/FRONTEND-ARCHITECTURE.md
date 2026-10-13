@@ -164,6 +164,8 @@ Anonymous components menggunakan namespace seperti `x-ui.button` dan `x-results.
 
 `layouts.app` mengelola urutan skip link → header/navigation → flash → satu main → footer. `layouts.auth` memakai wordmark dan form ringkas; tidak membawa hero, sidebar manfaat, atau footer besar.
 
+Fondasi head/runtime telah diekstrak pada [IP-008](SHELL-IP-008.md). `layouts.app` memakai `partials.head` untuk metadata/CSRF/Vite/Livewire styles/styles stack dan `partials.runtime` untuk Livewire scripts/scripts stack. Sections title/description tetap dibaca melalui yieldContent; normalisasi entity lalu escaped Blade menjaga text/attribute context. Layout menyediakan header, skip link native ke main-content (tabindex=-1), flash, satu main dan footer. Delapan child role main sudah dibersihkan. Layout auth dan migrasi navigation/footer/flash tetap IP-010/IP-009; admin/PDF tidak memakai partial ini.
+
 Kedua layout berbagi fondasi head/runtime, bukan menggandakan script init. Tetap gunakan pola `@extends`, `@section`, `@yield`, dan `@stack` yang sudah ada; tidak perlu mengganti seluruh template menjadi layout component sekaligus.
 
 | Contract | Aturan |

@@ -12,7 +12,7 @@
     <div style="width:100%; max-width:440px; position:relative;">
 
         <!-- Card -->
-        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem);" role="main">
+        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem);">
 
             <!-- Back to Login -->
             <a href="{{ route('login') }}" class="btn-ghost" style="display:inline-flex; margin-bottom:1.75rem; padding:0; color:var(--color-text-muted); font-size:0.875rem;" aria-label="Kembali ke halaman masuk">

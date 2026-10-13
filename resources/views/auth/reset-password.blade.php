@@ -6,7 +6,7 @@
 <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem;">
 
     <div style="width:100%; max-width:440px; position:relative;">
-        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem);" role="main">
+        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem);">
             <div style="text-align:center; margin-bottom:2rem;">
                 <a href="{{ route('home') }}" class="nav-logo" style="display:inline-block; font-size:1.75rem; margin-bottom:1rem;">hoaxlin.id</a>
                 <h1 style="font-size:1.5rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.375rem;">Buat Kata Sandi Baru</h1>

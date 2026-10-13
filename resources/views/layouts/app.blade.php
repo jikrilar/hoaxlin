@@ -1,131 +1,111 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-legacy-tokens>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <!-- SEO -->
-    <title>@yield('title', 'hoaxlin.id') — Sistem Deteksi Berita Hoax Berbasis BERT</title>
-    <meta name="description" content="@yield('description', 'Periksa kebenaran berita dengan teknologi AI BERT. Deteksi hoax dari teks, gambar, video, atau tautan berita secara instan.')">
-    <meta name="keywords" content="cek hoax, deteksi hoax, berita hoax, BERT, AI, fact check, verifikasi berita">
-    <meta name="author" content="Muhamad Jikril Aryanda">
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="@yield('title', 'hoaxlin.id — Deteksi Berita Hoax dengan AI')">
-    <meta property="og:description" content="Periksa kebenaran berita dengan teknologi AI BERT berbahasa Indonesia.">
-    <meta property="og:type" content="website">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
-
-    <!-- Licensed Inter/Newsreader fonts are self-hosted through the Vite stylesheet. -->
-
-    <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    @livewireStyles
-    @stack('styles')
+    @include('partials.head')
 </head>
 <body>
+    <a class="hl-skip-link" href="#main-content">Lewati ke konten utama</a>
 
-    <!-- Navbar -->
-    <nav class="navbar" id="main-navbar" aria-label="Main navigation">
-        <div class="container-app">
-            <div style="display:flex; align-items:center; justify-content:space-between;">
+    <header>
+        <!-- Navbar -->
+        <nav class="navbar" id="main-navbar" aria-label="Main navigation">
+            <div class="container-app">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
 
-                <!-- Logo -->
-                <a href="{{ url('/') }}" class="nav-logo" aria-label="hoaxlin.id beranda">
-                    <span style="display:inline-flex; align-items:center; gap:0.5rem;">
-                        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <circle cx="16" cy="16" r="14" fill="var(--ds-bg-selected)" opacity="0.15"/>
-                            <path d="M8 12l8-5 8 5v8l-8 5-8-5V12z" stroke="var(--ds-action-primary)" stroke-width="2" fill="none"/>
-                            <path d="M13 15l2 2 4-4" stroke="var(--ds-action-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        hoaxlin<span style="color:var(--ds-link); background:none;">.id</span>
-                    </span>
-                </a>
+                    <!-- Logo -->
+                    <a href="{{ url('/') }}" class="nav-logo" aria-label="hoaxlin.id beranda">
+                        <span style="display:inline-flex; align-items:center; gap:0.5rem;">
+                            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <circle cx="16" cy="16" r="14" fill="var(--ds-bg-selected)" opacity="0.15"/>
+                                <path d="M8 12l8-5 8 5v8l-8 5-8-5V12z" stroke="var(--ds-action-primary)" stroke-width="2" fill="none"/>
+                                <path d="M13 15l2 2 4-4" stroke="var(--ds-action-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            hoaxlin<span style="color:var(--ds-link); background:none;">.id</span>
+                        </span>
+                    </a>
 
-                <!-- Desktop Nav -->
-                <div id="nav-desktop" style=" align-items:center; gap:2rem;" aria-label="Desktop navigation">
-                    <a href="{{ url('/') }}" class="nav-link {{ request()->is('/') ? 'active' : '' }}">Beranda</a>
-                    <a href="{{ url('/cara-kerja') }}" class="nav-link {{ request()->is('cara-kerja') ? 'active' : '' }}">Cara Kerja</a>
-                    <a href="{{ url('/tentang') }}" class="nav-link {{ request()->is('tentang') ? 'active' : '' }}">Tentang</a>
-                </div>
+                    <!-- Desktop Nav -->
+                    <div id="nav-desktop" style=" align-items:center; gap:2rem;" aria-label="Desktop navigation">
+                        <a href="{{ url('/') }}" class="nav-link {{ request()->is('/') ? 'active' : '' }}">Beranda</a>
+                        <a href="{{ url('/cara-kerja') }}" class="nav-link {{ request()->is('cara-kerja') ? 'active' : '' }}">Cara Kerja</a>
+                        <a href="{{ url('/tentang') }}" class="nav-link {{ request()->is('tentang') ? 'active' : '' }}">Tentang</a>
+                    </div>
 
-                <!-- Auth Buttons -->
-                <div id="nav-auth" style="display:flex; align-items:center; gap:0.75rem;">
-                    @auth
-                        <!-- User dropdown -->
-                        <div style="position:relative;" id="user-menu-wrapper">
-                            <button id="user-menu-btn"
-                                type="button"
-                               style="display:flex; align-items:center; gap:0.625rem; padding:0.375rem 0.75rem 0.375rem 0.5rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:2rem; cursor:pointer; transition:all 0.2s ease;"
-                                onmouseover="this.style.background='var(--ds-bg-selected)'" onmouseout="this.style.background='var(--ds-bg-selected)'"
-                                aria-expanded="false" aria-controls="user-dropdown">
-                                <div style="width:1.75rem; height:1.75rem; border-radius:50%; background:var(--ds-action-primary); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:0.75rem; font-weight:var(--ds-font-weight-semibold); color:var(--ds-text-inverse); flex-shrink:0;" aria-hidden="true">
-                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    <!-- Auth Buttons -->
+                    <div id="nav-auth" style="display:flex; align-items:center; gap:0.75rem;">
+                        @auth
+                            <!-- User dropdown -->
+                            <div style="position:relative;" id="user-menu-wrapper">
+                                <button id="user-menu-btn"
+                                    type="button"
+                                   style="display:flex; align-items:center; gap:0.625rem; padding:0.375rem 0.75rem 0.375rem 0.5rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:2rem; cursor:pointer; transition:all 0.2s ease;"
+                                    onmouseover="this.style.background='var(--ds-bg-selected)'" onmouseout="this.style.background='var(--ds-bg-selected)'"
+                                    aria-expanded="false" aria-controls="user-dropdown">
+                                    <div style="width:1.75rem; height:1.75rem; border-radius:50%; background:var(--ds-action-primary); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:0.75rem; font-weight:var(--ds-font-weight-semibold); color:var(--ds-text-inverse); flex-shrink:0;" aria-hidden="true">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    </div>
+                                    <span style="color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                        {{ auth()->user()->name }}
+                                    </span>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--color-text-muted); transition:transform 0.2s;" id="user-menu-chevron" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                                </button>
+
+                                <!-- Dropdown -->
+                                <div id="user-dropdown" style="display:none; position:absolute; top:calc(100% + 0.5rem); right:0; min-width:180px; background:var(--ds-bg-surface); border:1px solid var(--color-border); border-radius:0.875rem; padding:0.5rem; box-shadow:0 8px 32px rgb(var(--p-ink-rgb) / 10%); z-index:101; ">
+                                    <a href="{{ route('profile') }}" class="dropdown-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                        Profil Saya
+                                    </a>
+                                    <a href="{{ route('riwayat') }}" class="dropdown-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        Riwayat Pengecekan
+                                    </a>
+                                    <div style="height:1px; background:var(--color-border-light); margin:0.375rem 0;"></div>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; color:var(--ds-danger-fg);">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                                            Keluar
+                                        </button>
+                                    </form>
                                 </div>
-                                <span style="color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                    {{ auth()->user()->name }}
-                                </span>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--color-text-muted); transition:transform 0.2s;" id="user-menu-chevron" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-                            </button>
-
-                            <!-- Dropdown -->
-                            <div id="user-dropdown" style="display:none; position:absolute; top:calc(100% + 0.5rem); right:0; min-width:180px; background:var(--ds-bg-surface); border:1px solid var(--color-border); border-radius:0.875rem; padding:0.5rem; box-shadow:0 8px 32px rgb(var(--p-ink-rgb) / 10%); z-index:101; ">
-                                <a href="{{ route('profile') }}" class="dropdown-item">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                    Profil Saya
-                                </a>
-                                <a href="{{ route('riwayat') }}" class="dropdown-item">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    Riwayat Pengecekan
-                                </a>
-                                <div style="height:1px; background:var(--color-border-light); margin:0.375rem 0;"></div>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; color:var(--ds-danger-fg);">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                                        Keluar
-                                    </button>
-                                </form>
                             </div>
-                        </div>
-                    @else
-                        <a href="{{ route('login') }}" class="btn-ghost">Masuk</a>
-                        <a href="{{ route('register') }}" class="btn-primary">
-                            <span>Daftar Gratis</span>
-                        </a>
-                    @endauth
+                        @else
+                            <a href="{{ route('login') }}" class="btn-ghost">Masuk</a>
+                            <a href="{{ route('register') }}" class="btn-primary">
+                                <span>Daftar Gratis</span>
+                            </a>
+                        @endauth
 
-                    <!-- Mobile Menu Toggle -->
-                    <button id="menu-toggle" class="btn-ghost" style="display:none; padding:0.5rem;" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
-                        <svg id="menu-icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-                        <svg id="menu-icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;" aria-hidden="true"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
+                        <!-- Mobile Menu Toggle -->
+                        <button id="menu-toggle" class="btn-ghost" style="display:none; padding:0.5rem;" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+                            <svg id="menu-icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                            <svg id="menu-icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;" aria-hidden="true"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="mobile-menu" role="dialog" aria-modal="true" aria-label="Mobile navigation">
-        <a href="{{ url('/') }}" class="nav-logo" style="font-size:1.75rem;">hoaxlin.id</a>
-        <div style="display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
-            <a href="{{ url('/') }}" class="nav-link" style="font-size:1.25rem;">Beranda</a>
-            <a href="{{ url('/cara-kerja') }}" class="nav-link" style="font-size:1.25rem;">Cara Kerja</a>
-            <a href="{{ url('/tentang') }}" class="nav-link" style="font-size:1.25rem;">Tentang</a>
-            @auth
-                <a href="{{ route('profile') }}" class="nav-link" style="font-size:1.25rem;">Profil Saya</a>
-                <a href="{{ route('riwayat') }}" class="nav-link" style="font-size:1.25rem;">Riwayat</a>
-                <form method="POST" action="{{ route('logout') }}">@csrf<button class="btn-ghost" style="font-size:1.125rem; color:var(--ds-danger-fg);">Keluar</button></form>
-            @else
-                <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
-                <a href="{{ route('register') }}" class="btn-primary"><span>Daftar Gratis</span></a>
-            @endauth
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+            <a href="{{ url('/') }}" class="nav-logo" style="font-size:1.75rem;">hoaxlin.id</a>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
+                <a href="{{ url('/') }}" class="nav-link" style="font-size:1.25rem;">Beranda</a>
+                <a href="{{ url('/cara-kerja') }}" class="nav-link" style="font-size:1.25rem;">Cara Kerja</a>
+                <a href="{{ url('/tentang') }}" class="nav-link" style="font-size:1.25rem;">Tentang</a>
+                @auth
+                    <a href="{{ route('profile') }}" class="nav-link" style="font-size:1.25rem;">Profil Saya</a>
+                    <a href="{{ route('riwayat') }}" class="nav-link" style="font-size:1.25rem;">Riwayat</a>
+                    <form method="POST" action="{{ route('logout') }}">@csrf<button class="btn-ghost" style="font-size:1.125rem; color:var(--ds-danger-fg);">Keluar</button></form>
+                @else
+                    <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
+                    <a href="{{ route('register') }}" class="btn-primary"><span>Daftar Gratis</span></a>
+                @endauth
+            </div>
         </div>
-    </div>
+
+    </header>
 
     <!-- Global Flash Messages -->
     @if(session('success') || session('error') || session('status'))
@@ -159,7 +139,7 @@
     @endif
 
     <!-- Page Content -->
-    <main id="main-content">
+    <main id="main-content" tabindex="-1">
         @yield('content')
     </main>
 
@@ -231,7 +211,6 @@
         </div>
     </footer>
 
-    @livewireScripts
-    @stack('scripts')
+    @include('partials.runtime')
 </body>
 </html>

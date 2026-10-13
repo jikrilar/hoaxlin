@@ -1,5 +1,24 @@
 /* Public reusable components. Legacy classes remain isolated during migration. */
 @layer components {
+    .hl-skip-link {
+        position: fixed;
+        inset-block-start: var(--ds-space-4);
+        inset-inline-start: var(--ds-space-4);
+        z-index: var(--ds-z-toast);
+        max-inline-size: calc(100% - var(--ds-space-8));
+        padding: var(--ds-space-3) var(--ds-space-4);
+        border: var(--ds-border-width) solid var(--ds-border-control);
+        border-radius: var(--ds-radius-md);
+        background: var(--ds-bg-surface);
+        color: var(--ds-link);
+        font-weight: var(--ds-font-weight-semibold);
+        transform: translateY(calc(-100% - var(--ds-space-8)));
+    }
+
+    .hl-skip-link:focus {
+        transform: translateY(0);
+    }
+
     /* Native dialog owns focus trapping and Escape; JS owns its scroll lock. */
     .hl-dialog {
         margin: auto;

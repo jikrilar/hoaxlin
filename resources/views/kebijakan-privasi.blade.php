@@ -12,7 +12,7 @@
             Kembali
         </a>
 
-        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-12));" role="main">
+        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-12));">
             <h1 class="hl-heading-editorial" style="margin-bottom:0.5rem;">Kebijakan Privasi</h1>
             <p style="color:var(--color-text-muted); font-size:0.9375rem; margin-bottom:2.5rem;">Terakhir diperbarui: 18 September 2026</p>
 

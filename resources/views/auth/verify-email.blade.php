@@ -6,7 +6,7 @@
 <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem;">
 
     <div style="width:100%; max-width:480px; position:relative;">
-        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem); text-align:center;" role="main">
+        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem); text-align:center;">
             <div style="font-size:2.5rem; margin-bottom:1rem;" aria-hidden="true">✉️</div>
             <h1 style="font-size:1.5rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">Verifikasi Alamat Email</h1>
             <p style="color:var(--color-text-muted); line-height:1.7; margin-bottom:1.5rem;">
