@@ -305,6 +305,8 @@ Cleanup juga mencakup timer, request in-flight, object URL, chart, dialog, dan s
 
 DOM yang dimorph Livewire tetap dimiliki Livewire. JS publik tidak mengganti innerHTML komponen progress atau menulis field snapshot/wire attributes. Native interaction pada bagian itu sebaiknya berada di view/component Livewire atau handler yang tahan replacement DOM.
 
+Implementasi fondasi tersedia pada [IP-007](LIFECYCLE-IP-007.md): `bootstrap.js` memakai registry ES modules dan `installLifecycle`; `core/lifecycle.js` mengelola body aktif, guard import dan hooks; `core/scope.js` menyediakan `defineModule`, `createScope` dan `lockScroll`. Module shared navigation/form-submit/password/dialog mempunyai consumer nyata; `pages/statistics.js` dipilih melalui data-page dan menjaga late library load serta destroy chart. window.Hoaxlin/window.axios telah diaudit tanpa consumer dan dihapus. Handler khusus welcome/hasil/progress belum dimigrasi; table di atas tetap target bagi task halaman berikutnya, bukan bukti seluruh resource legacy telah dimiliki lifecycle.
+
 ### 9.3 Transport dan error
 
 Form utama tetap native POST/redirect; jangan mengubahnya menjadi AJAX tanpa kebutuhan yang dinyatakan. Fetch hanya untuk status existing atau enhancement yang memang tersedia.

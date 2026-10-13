@@ -41,7 +41,7 @@
             @endif
 
             <!-- Login Form -->
-            <form method="POST" action="{{ route('login.store') }}" id="login-form" novalidate>
+            <form method="POST" action="{{ route('login.store') }}" id="login-form" data-submit-label="Memproses..." novalidate>
                 @csrf
 
                 <!-- Email -->
@@ -86,7 +86,7 @@
                             aria-describedby="{{ $errors->has('password') ? 'password-error' : '' }}"
                             aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
                         >
-                        <button type="button" id="toggle-password" onclick="togglePassword()"
+                        <button type="button" id="toggle-password" data-password-toggle="password"
                                style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer; padding:0.25rem;"
                                 aria-label="Tampilkan/sembunyikan kata sandi">
                             <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -144,26 +144,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-function togglePassword() {
-    const input = document.getElementById('password');
-    const icon = document.getElementById('eye-icon');
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
-    } else {
-        input.type = 'password';
-        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-    }
-}
-
-// Prevent double submit
-document.getElementById('login-form').addEventListener('submit', (e) => {
-    const btn = document.getElementById('login-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span>Memproses...</span><div class="spinner" style="width:1rem;height:1rem;border-width:2px;" aria-hidden="true"></div>';
-});
-</script>
-@endpush

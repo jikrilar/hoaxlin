@@ -68,7 +68,7 @@
                 Informasi Profil
             </h2>
 
-            <form method="POST" action="{{ route('profile.update') }}" id="profile-form" novalidate>
+            <form method="POST" action="{{ route('profile.update') }}" id="profile-form" data-submit-label="Menyimpan..." novalidate>
                 @csrf
                 @method('PATCH')
 
@@ -124,7 +124,7 @@
                 Ubah Kata Sandi
             </h2>
 
-            <form method="POST" action="{{ route('password.update') }}" id="password-form" novalidate>
+            <form method="POST" action="{{ route('password.update') }}" id="password-form" data-submit-label="Memperbarui..." data-password-hints="profile" novalidate>
                 @csrf
                 @method('PUT')
 
@@ -143,7 +143,7 @@
                            style="padding-right:3rem;"
                             aria-invalid="{{ $errors->has('current_password') ? 'true' : 'false' }}"
                         >
-                        <button type="button" onclick="togglePwd('current_password', this)" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
+                        <button type="button" data-password-toggle="current_password" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
@@ -167,7 +167,7 @@
                            style="padding-right:3rem;"
                             aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
                         >
-                        <button type="button" onclick="togglePwd('password', this)" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
+                        <button type="button" data-password-toggle="password" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
@@ -176,7 +176,7 @@
                     @enderror
 
                     <!-- Password strength bar -->
-                    <div style="margin-top:0.75rem;" id="strength-container" style="display:none;">
+                    <div id="strength-container" style="margin-top:0.75rem; display:none;">
                         <div style="display:flex; gap:0.25rem; margin-bottom:0.25rem;">
                             <div id="strength-bar-1" style="flex:1; height:3px; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
                             <div id="strength-bar-2" style="flex:1; height:3px; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
@@ -201,7 +201,7 @@
                             placeholder="Ulangi kata sandi baru"
                            style="padding-right:3rem;"
                         >
-                        <button type="button" onclick="togglePwd('password_confirmation', this)" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
+                        <button type="button" data-password-toggle="password_confirmation" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
@@ -224,7 +224,7 @@
                 Menghapus akun bersifat permanen dan tidak dapat dibatalkan. Seluruh riwayat pengecekan dan data kamu akan dihapus selamanya.
             </p>
             <button type="button"
-                    onclick="document.getElementById('delete-modal').style.display='flex'"
+                    data-dialog-open="delete-modal"
                    style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.625rem 1.25rem; background:var(--ds-danger-bg); border:1px solid var(--ds-danger-fg); border-radius:0.75rem; color:var(--ds-danger-fg); font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s ease;"
                     onmouseover="this.style.background='var(--ds-danger-bg)'" onmouseout="this.style.background='var(--ds-danger-bg)'"
                     id="delete-account-btn">
@@ -236,7 +236,7 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="delete-modal" style="display:none; position:fixed; inset:0; z-index:200; background:var(--ds-bg-surface);  align-items:center; justify-content:center; padding:1rem;" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+<dialog id="delete-modal" data-dialog class="hl-dialog" aria-labelledby="delete-modal-title">
     <div class="glass-card-solid" style="padding:2rem; max-width:420px; width:100%; animation:scaleIn 0.3s ease;">
         <div style="text-align:center; margin-bottom:1.5rem;">
             <div style="font-size:2.5rem; margin-bottom:0.75rem;" aria-hidden="true">⚠️</div>
@@ -253,7 +253,7 @@
                 <input type="password" id="confirm-password" name="password" class="auth-input" placeholder="Kata sandi kamu" required>
             </div>
             <div style="display:flex; gap:0.75rem;">
-                <x-ui.button variant="secondary" class="flex-1" onclick="document.getElementById('delete-modal').style.display='none'">
+                <x-ui.button variant="secondary" class="flex-1" data-dialog-close autofocus>
                     Batal
                 </x-ui.button>
                 <x-ui.button type="submit" variant="destructive" class="flex-1">
@@ -262,63 +262,5 @@
             </div>
         </form>
     </div>
-</div>
+</dialog>
 @endsection
-
-@push('scripts')
-<script>
-function togglePwd(fieldId, btn) {
-    const input = document.getElementById(fieldId);
-    const isHidden = input.type === 'password';
-    input.type = isHidden ? 'text' : 'password';
-    btn.querySelector('svg').innerHTML = isHidden
-        ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
-        : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-}
-
-// Password strength indicator
-const pwdInput = document.getElementById('password');
-const bars = [1,2,3,4].map(i => document.getElementById('strength-bar-' + i));
-const strengthLabel = document.getElementById('strength-label');
-
-if (pwdInput) {
-    pwdInput.addEventListener('input', () => {
-        const val = pwdInput.value;
-        document.getElementById('strength-container').style.display = val ? 'block' : 'none';
-        let score = 0;
-        if (val.length >= 8) score++;
-        if (/[A-Z]/.test(val)) score++;
-        if (/[0-9]/.test(val)) score++;
-        if (/[^A-Za-z0-9]/.test(val)) score++;
-
-        const colors = ['var(--ds-danger-fg)', 'var(--ds-warning-fg)', 'var(--ds-warning-fg)', 'var(--ds-success-fg)'];
-        const labels = ['Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
-        bars.forEach((bar, i) => {
-            bar.style.background = i < score ? colors[score - 1] : 'var(--ds-bg-subtle)';
-        });
-        strengthLabel.textContent = score > 0 ? labels[score - 1] : '';
-        strengthLabel.style.color = score > 0 ? colors[score - 1] : 'var(--color-text-muted)';
-    });
-}
-
-// Prevent double submit
-document.getElementById('profile-form')?.addEventListener('submit', (e) => {
-    const btn = document.getElementById('save-profile-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span>Menyimpan...</span><div class="spinner" style="width:1rem;height:1rem;border-width:2px;" aria-hidden="true"></div>';
-});
-
-document.getElementById('password-form')?.addEventListener('submit', (e) => {
-    const btn = document.getElementById('save-password-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span>Memperbarui...</span><div class="spinner" style="width:1rem;height:1rem;border-width:2px;" aria-hidden="true"></div>';
-});
-
-// Close modal on backdrop click
-document.getElementById('delete-modal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('delete-modal')) {
-        document.getElementById('delete-modal').style.display = 'none';
-    }
-});
-</script>
-@endpush

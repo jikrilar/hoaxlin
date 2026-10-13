@@ -39,7 +39,7 @@
             @endif
 
             <!-- Register Form -->
-            <form method="POST" action="{{ route('register.store') }}" id="register-form" novalidate>
+            <form method="POST" action="{{ route('register.store') }}" id="register-form" data-password-hints="register" data-submit-label="Membuat akun..." novalidate>
                 @csrf
 
                 <!-- Name -->
@@ -94,11 +94,10 @@
                             autocomplete="new-password"
                             placeholder="Minimal 8 karakter"
                            style="padding-right:3rem;"
-                            oninput="checkPasswordStrength()"
                             aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
                             aria-describedby="password-strength"
                         >
-                        <button type="button" onclick="togglePass('password')"
+                        <button type="button" data-password-toggle="password"
                                style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;"
                                 aria-label="Tampilkan/sembunyikan kata sandi">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -134,10 +133,9 @@
                             autocomplete="new-password"
                             placeholder="Ulangi kata sandi"
                            style="padding-right:3rem;"
-                            oninput="checkPasswordMatch()"
                             aria-describedby="confirm-match"
                         >
-                        <button type="button" onclick="togglePass('password_confirmation')"
+                        <button type="button" data-password-toggle="password_confirmation"
                                style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;"
                                 aria-label="Tampilkan/sembunyikan konfirmasi kata sandi">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -187,69 +185,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-function togglePass(id) {
-    const input = document.getElementById(id);
-    input.type = input.type === 'password' ? 'text' : 'password';
-}
-
-function checkPasswordStrength() {
-    const pass = document.getElementById('password').value;
-    const indicator = document.getElementById('password-strength');
-
-    if (pass.length === 0) { indicator.style.display = 'none'; return; }
-    indicator.style.display = 'block';
-
-    let score = 0;
-    if (pass.length >= 8) score++;
-    if (pass.length >= 12) score++;
-    if (/[A-Z]/.test(pass) && /[a-z]/.test(pass)) score++;
-    if (/[0-9]/.test(pass) && /[^A-Za-z0-9]/.test(pass)) score++;
-
-    const colors = ['var(--ds-danger-fg)', 'var(--ds-warning-fg)', 'var(--ds-info-fg)', 'var(--ds-success-fg)'];
-    const labels = ['Lemah', 'Sedang', 'Kuat', 'Sangat Kuat'];
-
-    for (let i = 1; i <= 4; i++) {
-        const el = document.getElementById(`ps-${i}`);
-        el.style.background = i <= score ? colors[score - 1] : 'var(--ds-bg-subtle)';
-    }
-    document.getElementById('ps-label').textContent = labels[score - 1] || '';
-    document.getElementById('ps-label').style.color = colors[score - 1] || 'var(--color-text-muted)';
-}
-
-function checkPasswordMatch() {
-    const pass = document.getElementById('password').value;
-    const confirm = document.getElementById('password_confirmation').value;
-    const el = document.getElementById('confirm-match');
-
-    if (confirm.length === 0) { el.style.display = 'none'; return; }
-    el.style.display = 'block';
-
-    if (pass === confirm) {
-        el.textContent = '✓ Kata sandi cocok';
-        el.style.color = 'var(--ds-success-fg)';
-    } else {
-        el.textContent = '✗ Kata sandi tidak cocok';
-        el.style.color = 'var(--ds-danger-fg)';
-    }
-}
-
-// Prevent double submit
-document.getElementById('register-form').addEventListener('submit', (e) => {
-    const pass = document.getElementById('password').value;
-    const confirm = document.getElementById('password_confirmation').value;
-    if (pass !== confirm) {
-        e.preventDefault();
-        document.getElementById('confirm-match').style.display = 'block';
-        document.getElementById('confirm-match').textContent = '✗ Kata sandi tidak cocok';
-        document.getElementById('confirm-match').style.color = 'var(--ds-danger-fg)';
-        return;
-    }
-    const btn = document.getElementById('register-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span>Membuat akun...</span><div class="spinner" style="width:1rem;height:1rem;border-width:2px;" aria-hidden="true"></div>';
-});
-</script>
-@endpush

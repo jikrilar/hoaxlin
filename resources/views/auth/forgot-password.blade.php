@@ -45,7 +45,7 @@
             @endif
 
             <!-- Form -->
-            <form method="POST" action="{{ route('password.email') }}" id="forgot-form" novalidate>
+            <form method="POST" action="{{ route('password.email') }}" id="forgot-form" data-submit-label="Mengirim..." novalidate>
                 @csrf
 
                 <x-ui.field id="email" label="Alamat Email"
@@ -94,13 +94,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-document.getElementById('forgot-form').addEventListener('submit', (e) => {
-    const btn = document.getElementById('reset-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span>Mengirim...</span><div class="spinner" style="width:1rem;height:1rem;border-width:2px;" aria-hidden="true"></div>';
-});
-</script>
-@endpush

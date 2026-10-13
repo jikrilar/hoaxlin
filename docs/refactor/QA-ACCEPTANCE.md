@@ -21,6 +21,8 @@ IP-005 menambah [subhasil base publik](BASE-IP-005.md): 19 render Blade dan smok
 
 IP-006 menambah [subhasil komponen](COMPONENTS-IP-006.md): 20 unit tests/45 assertions serta render/state/keyboard review pada tiga profile browser. Kasus QA halaman tetap not_run secara agregat; kelulusan ini tidak mencakup seluruh authorization/pipeline/lifecycle/admin/PDF.
 
+IP-007 menambah [subhasil lifecycle](LIFECYCLE-IP-007.md): 19 JS tests, scoped Blade/component review, normal/no-JS browser smoke, BFCache aktual serta runtime wire:navigate dari versi lock. Shared handlers dan resource cleanup yang dimigrasi lulus; QA-ASSET-03 dan QA halaman tetap not_run secara agregat karena preview/polling/halaman legacy dan hydration/authorization aplikasi belum mencakup seluruh varian wajib. Jumlah tetap 3 pass audit/inventaris dan 91 not_run.
+
 File ini berada di `docs/refactor/` bersama [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md). [AGENTS.md](../../AGENTS.md) tetap di root repository.
 
 ## 1. Tujuan dan otoritas dokumen

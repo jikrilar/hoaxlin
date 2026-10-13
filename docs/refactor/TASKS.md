@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-006 selesai; 6 dari 39 task selesai, IP-007–IP-039 pending |
+| Status | IP-001–IP-007 selesai; 7 dari 39 task selesai, IP-008–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-006 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-007 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -82,7 +82,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-004](#ip-004) | F1 | Implementasikan tokens, bridge Tailwind, dan font | done |
 | [IP-005](#ip-005) | F1 | Rapikan base CSS dan transisi legacy | done |
 | [IP-006](#ip-006) | F1 | Buat komponen dasar reusable | done |
-| [IP-007](#ip-007) | F1 | Bangun lifecycle dan helper JS | pending |
+| [IP-007](#ip-007) | F1 | Bangun lifecycle dan helper JS | done |
 | [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | pending |
 | [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | pending |
 | [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | pending |
@@ -239,10 +239,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-04, FA-05, FA-09, FA-10.
 - **Source/target:** `resources/js/app.js`, `resources/js/bootstrap.js`, `resources/js/core/lifecycle.js`, `resources/js/components/`.
 
-- [ ] Sediakan mount(root) dan cleanup per module; registrasi global sekali dan guard init per root/instance.
-- [ ] Tangani load biasa, livewire:navigating/navigated, async import setelah root berubah, dan browser back/forward restore.
-- [ ] Cleanup listener/timer/request/object URL/chart/dialog/scroll lock yang dibuat; data sensitif tidak disimpan di browser storage.
-- [ ] Audit pemakai window.Hoaxlin/window.axios; ekstrak handler berulang tanpa menambah global baru, dan hapus global lama hanya setelah tidak dipakai.
+- [x] Sediakan mount(root) dan cleanup per module; registrasi global sekali dan guard init per root/instance.
+- [x] Tangani load biasa, livewire:navigating/navigated, async import setelah root berubah, dan browser back/forward restore.
+- [x] Cleanup listener/timer/request/object URL/chart/dialog/scroll lock yang dibuat; data sensitif tidak disimpan di browser storage.
+- [x] Audit pemakai window.Hoaxlin/window.axios; ekstrak handler berulang tanpa menambah global baru, dan hapus global lama hanya setelah tidak dipakai.
 
 **Validasi:** Load normal, navigate, back/forward, console.
 
@@ -979,6 +979,18 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Batas:** PHP host 8.5 dengan dependency sementara dari lock yang platform checks-nya diabaikan pada IP-005. Unit suite komponen dijalankan; suite aplikasi/DB, Blade artisan, Livewire mount/authorization/polling, admin/PDF/provider tidak dijalankan. QA aggregate tetap 3 pass/91 not_run. Text resize bukan native zoom/screen reader audit.
 - **Perlindungan:** route/action/CSRF/input/method/old values/escaping/labels/skor/final guards dijaga; backend/config/env/lock/font/vendor/admin/PDF tidak diedit. Tidak ada migration/seed/mail/POST/deploy atau dependency baru.
 - **Berikutnya:** berhenti pada IP-006 dan commit semantic; IP-007–IP-039 tetap pending, tanpa mengerjakan lifecycle atau fase shell berikutnya.
+
+### IP-007 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; FA-04/FA-05/FA-09/FA-10, lifecycle publik.
+- **Checkout:** frontend-refactor/foundation, HEAD awal 9168554; tree/index bersih, instruksi root berlaku.
+- **Perubahan:** core lifecycle/resource scope, registry dynamic imports, shared navigation/native submit/password/dialog dan statistics module; consumer hooks menggantikan handler inline berulang. Audit tanpa consumer memungkinkan penghapusan window.Hoaxlin/window.axios beserta dead debounce/counter; dependency/lock tidak berubah.
+- **Perilaku:** registrasi sekali, mount/cleanup idempotent, instance/body guard pada import, cleanup sebelum navigate/pagehide serta restore BFCache. Listener/timer/request dengan signal/object URL/custom disposer dimiliki scope. Form native mempertahankan named submitter, loading hanya setelah validation/serialization dan dipulihkan saat cleanup. Dialog mengelola focus/scroll; chart menunggu library bila load terlambat dan destroy saat cleanup. Error/flash tidak hilang otomatis; tidak ada global helper/framework/storage baru.
+- **Validasi:** node --test 19 pass; npm build pass (11 modules); PHPUnit komponen scoped 20 tests/45 assertions pass; 24 render Blade/native form comparison dan compiled PHP syntax pass. Firefox 157.0.1: 144 viewport samples normal/no-JS, 44 checks lifecycle (termasuk BFCache persisted=true dan POST receiver fixture), 15 checks runtime Livewire locked (enam navigate dan Back/Forward), tanpa console error. Screenshot dialog mobile ditinjau. Focus boundary serta late chart load race ditemukan dan dituntaskan.
+- **Evidence:** [LIFECYCLE-IP-007.md](LIFECYCLE-IP-007.md), [tests frontend](../../tests/Frontend/lifecycle.test.mjs), source modules dan artefak /tmp/hoaxlin-ip007-n5yi0xec.
+- **Batas:** artisan feature tests exit 255 karena vendor/autoload.php repo tidak tersedia. Renderer/PHPUnit memakai vendor lock sementara IP-005; bukan runtime PHP aplikasi yang didukung. Livewire browser memakai JS runtime asli dan HTML fixture, tanpa hydration/polling/authorization aplikasi. POST hanya receiver sintetis loopback; tidak mengirim login/mail/delete aplikasi. QA aggregate tetap 3 pass/91 not_run. Handler halaman welcome/hasil/progress belum dimigrasi; ownership/polling/preview dan QA lengkap tetap task turunannya.
+- **Perlindungan:** protected tracked fingerprints backend/config/routes/DB/lock/font/vendor/admin/PDF cocok baseline; tidak mengubah environment, data, model atau kontrak keamanan. Tidak menjalankan migration/seed/deploy.
+- **Berikutnya:** berhenti pada IP-007; buat commit semantic. IP-008–IP-039 tetap pending.
 
 ### Format catatan berikutnya
 

@@ -59,10 +59,10 @@
                         <!-- User dropdown -->
                         <div style="position:relative;" id="user-menu-wrapper">
                             <button id="user-menu-btn"
-                                onclick="toggleUserMenu()"
+                                type="button"
                                style="display:flex; align-items:center; gap:0.625rem; padding:0.375rem 0.75rem 0.375rem 0.5rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:2rem; cursor:pointer; transition:all 0.2s ease;"
                                 onmouseover="this.style.background='var(--ds-bg-selected)'" onmouseout="this.style.background='var(--ds-bg-selected)'"
-                                aria-haspopup="true" aria-expanded="false" aria-controls="user-dropdown">
+                                aria-expanded="false" aria-controls="user-dropdown">
                                 <div style="width:1.75rem; height:1.75rem; border-radius:50%; background:var(--ds-action-primary); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:0.75rem; font-weight:var(--ds-font-weight-semibold); color:var(--ds-text-inverse); flex-shrink:0;" aria-hidden="true">
                                     {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                                 </div>
@@ -73,19 +73,19 @@
                             </button>
 
                             <!-- Dropdown -->
-                            <div id="user-dropdown" style="display:none; position:absolute; top:calc(100% + 0.5rem); right:0; min-width:180px; background:var(--ds-bg-surface); border:1px solid var(--color-border); border-radius:0.875rem; padding:0.5rem; box-shadow:0 8px 32px rgb(var(--p-ink-rgb) / 10%); z-index:101; " role="menu">
-                                <a href="{{ route('profile') }}" class="dropdown-item" role="menuitem">
+                            <div id="user-dropdown" style="display:none; position:absolute; top:calc(100% + 0.5rem); right:0; min-width:180px; background:var(--ds-bg-surface); border:1px solid var(--color-border); border-radius:0.875rem; padding:0.5rem; box-shadow:0 8px 32px rgb(var(--p-ink-rgb) / 10%); z-index:101; ">
+                                <a href="{{ route('profile') }}" class="dropdown-item">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                     Profil Saya
                                 </a>
-                                <a href="{{ route('riwayat') }}" class="dropdown-item" role="menuitem">
+                                <a href="{{ route('riwayat') }}" class="dropdown-item">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     Riwayat Pengecekan
                                 </a>
                                 <div style="height:1px; background:var(--color-border-light); margin:0.375rem 0;"></div>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="dropdown-item" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; color:var(--ds-danger-fg);" role="menuitem">
+                                    <button type="submit" class="dropdown-item" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; color:var(--ds-danger-fg);">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
                                         Keluar
                                     </button>
@@ -129,12 +129,12 @@
 
     <!-- Global Flash Messages -->
     @if(session('success') || session('error') || session('status'))
-    <div id="flash-banner" style="position:fixed; top:5rem; left:50%; transform:translateX(-50%); z-index:150; min-width:320px; max-width:560px; width:calc(100% - 2rem); " role="status" aria-live="polite">
+    <div id="flash-banner" data-flash style="position:fixed; top:5rem; left:50%; transform:translateX(-50%); z-index:150; min-width:320px; max-width:560px; width:calc(100% - 2rem); " role="status" aria-live="polite">
         @if(session('success'))
         <div style="padding:0.875rem 1.25rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:0.875rem; display:flex; align-items:center; gap:0.75rem;  box-shadow:0 4px 24px rgb(var(--p-ink-rgb) / 10%);">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-success-fg)" stroke-width="2.5" style="flex-shrink:0;" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             <span style="color:var(--ds-success-fg); font-size:0.875rem; font-weight:500; flex:1;">{{ session('success') }}</span>
-            <button onclick="document.getElementById('flash-banner').remove()" style="background:none; border:none; color:var(--ds-success-fg); cursor:pointer; padding:0.125rem; opacity:0.7;" aria-label="Tutup">
+            <button type="button" data-dismiss-flash style="background:none; border:none; color:var(--ds-success-fg); cursor:pointer; padding:0.125rem; opacity:0.7;" aria-label="Tutup">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
         </div>
@@ -142,7 +142,7 @@
         <div style="padding:0.875rem 1.25rem; background:var(--ds-danger-bg); border:1px solid var(--ds-danger-fg); border-radius:0.875rem; display:flex; align-items:center; gap:0.75rem;  box-shadow:0 4px 24px rgb(var(--p-ink-rgb) / 10%);">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-danger-fg)" stroke-width="2.5" style="flex-shrink:0;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span style="color:var(--ds-danger-fg); font-size:0.875rem; font-weight:500; flex:1;">{{ session('error') }}</span>
-            <button onclick="document.getElementById('flash-banner').remove()" style="background:none; border:none; color:var(--ds-danger-fg); cursor:pointer; padding:0.125rem; opacity:0.7;" aria-label="Tutup">
+            <button type="button" data-dismiss-flash style="background:none; border:none; color:var(--ds-danger-fg); cursor:pointer; padding:0.125rem; opacity:0.7;" aria-label="Tutup">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
         </div>
@@ -150,7 +150,7 @@
         <div style="padding:0.875rem 1.25rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:0.875rem; display:flex; align-items:center; gap:0.75rem;  box-shadow:0 4px 24px rgb(var(--p-ink-rgb) / 10%);">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-link)" stroke-width="2.5" style="flex-shrink:0;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span style="color:var(--color-primary-light); font-size:0.875rem; font-weight:500; flex:1;">{{ session('status') }}</span>
-            <button onclick="document.getElementById('flash-banner').remove()" style="background:none; border:none; color:var(--color-primary-light); cursor:pointer; padding:0.125rem; opacity:0.7;" aria-label="Tutup">
+            <button type="button" data-dismiss-flash style="background:none; border:none; color:var(--color-primary-light); cursor:pointer; padding:0.125rem; opacity:0.7;" aria-label="Tutup">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
         </div>
@@ -230,86 +230,6 @@
             </div>
         </div>
     </footer>
-
-    <script>
-        // Navbar scroll effect
-        const navbar = document.getElementById('main-navbar');
-        window.addEventListener('scroll', () => {
-            navbar.classList.toggle('scrolled', window.scrollY > 30);
-        });
-
-        // Mobile menu toggle
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const menuIconOpen = document.getElementById('menu-icon-open');
-        const menuIconClose = document.getElementById('menu-icon-close');
-
-        if (menuToggle) {
-            menuToggle.addEventListener('click', () => {
-                const isOpen = mobileMenu.classList.toggle('open');
-                menuIconOpen.style.display = isOpen ? 'none' : 'block';
-                menuIconClose.style.display = isOpen ? 'block' : 'none';
-                menuToggle.setAttribute('aria-expanded', isOpen);
-                document.body.style.overflow = isOpen ? 'hidden' : '';
-            });
-
-            // Close on nav link click
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.remove('open');
-                    menuIconOpen.style.display = 'block';
-                    menuIconClose.style.display = 'none';
-                    document.body.style.overflow = '';
-                });
-            });
-        }
-
-        // Show mobile menu button on small screens
-        function updateNav() {
-            const isSmall = window.innerWidth < 900;
-            if (menuToggle) menuToggle.style.display = isSmall ? 'flex' : 'none';
-            const navDesktop = document.getElementById('nav-desktop');
-            if (navDesktop) navDesktop.style.display = isSmall ? 'none' : 'flex';
-        }
-        updateNav();
-        window.addEventListener('resize', updateNav);
-
-        // User dropdown menu
-        function toggleUserMenu() {
-            const dropdown = document.getElementById('user-dropdown');
-            const chevron  = document.getElementById('user-menu-chevron');
-            const btn      = document.getElementById('user-menu-btn');
-            if (!dropdown) return;
-            const isOpen = dropdown.style.display === 'block';
-            dropdown.style.display = isOpen ? 'none' : 'block';
-            if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-            if (btn) btn.setAttribute('aria-expanded', !isOpen);
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            const wrapper  = document.getElementById('user-menu-wrapper');
-            const dropdown = document.getElementById('user-dropdown');
-            if (wrapper && dropdown && !wrapper.contains(e.target)) {
-                dropdown.style.display = 'none';
-                const chevron = document.getElementById('user-menu-chevron');
-                if (chevron) chevron.style.transform = 'rotate(0deg)';
-                const btn = document.getElementById('user-menu-btn');
-                if (btn) btn.setAttribute('aria-expanded', false);
-            }
-        });
-
-        // Auto-dismiss flash banner after 4 seconds
-        const flashBanner = document.getElementById('flash-banner');
-        if (flashBanner) {
-            setTimeout(() => {
-                flashBanner.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                flashBanner.style.opacity = '0';
-                flashBanner.style.transform = 'translateX(-50%) translateY(-8px)';
-                setTimeout(() => flashBanner.remove(), 500);
-            }, 4000);
-        }
-    </script>
 
     @livewireScripts
     @stack('scripts')

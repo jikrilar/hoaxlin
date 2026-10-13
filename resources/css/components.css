@@ -1,5 +1,22 @@
 /* Public reusable components. Legacy classes remain isolated during migration. */
 @layer components {
+    /* Native dialog owns focus trapping and Escape; JS owns its scroll lock. */
+    .hl-dialog {
+        margin: auto;
+        max-width: calc(100% - 2rem);
+        max-height: calc(100% - 2rem);
+        overflow: auto;
+        border: 0;
+        padding: 0;
+        background: var(--ds-bg-surface);
+        color: var(--ds-text-body);
+        border-radius: var(--ds-radius-lg);
+    }
+
+    .hl-dialog::backdrop {
+        background: rgb(var(--p-ink-rgb) / 40%);
+    }
+
     .hl-button {
         display: inline-flex;
         align-items: center;
