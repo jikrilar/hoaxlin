@@ -127,7 +127,7 @@ Pertahankan nama top-level view dan controller agar route/view lookup existing t
 | `resources/js/components/password.js` | Tersedia IP-007/IP-010 | Toggle password aksesibel, hints dan secret cleanup |
 | `resources/js/components/dialog.js` | Baru bila dipakai | Dialog penghapusan; focus/Escape/focus return |
 | `resources/js/pages/submission-form.js` | Tersedia IP-011 | Batas/counter/recovery teks, submit status, cleanup draft/CAPTCHA |
-| `resources/js/pages/submission-legacy-inputs.js` | Transisi IP-011 | Adapter selector/preview media existing tanpa global/inline handler; redesign IP-012 |
+| `resources/js/pages/submission-media.js` | Tersedia IP-012 | Selector progressive, URL/file validation advisory, preview dan cleanup |
 | `resources/js/pages/result.js` | Baru bila diperlukan | Enhancement halaman hasil dan koordinasi lifecycle |
 | `resources/js/pages/statistics.js` | Baru bila chart dipertahankan | Chart enhancement khusus statistik |
 | `resources/js/progress/fallback.js` | Baru | Polling fallback, in-flight guard, stop/resume, terminal transition |
@@ -148,7 +148,7 @@ Module yang tidak melakukan apa-apa setelah markup native disederhanakan tidak p
 | `resources/views/components/ui/` | Baru | Button, link, alert, field, empty state, disclosure |
 | `resources/views/components/forms/` | Baru bila reusable | Password field, upload field, CAPTCHA presentation |
 | `resources/views/components/results/` | Baru | Prediction label, confidence metadata, evidence item, provenance |
-| `resources/views/partials/submission/` | Tersedia IP-011 | text/errors/input-types/legacy-media; partial media tetap transisi IP-012 |
+| `resources/views/partials/submission/` | Tersedia IP-011 | text/errors/input-types/media/url/upload/security; lima native forms |
 | `resources/views/partials/result/` | Baru | Komposisi hasil yang dipakai `hasil.blade.php` |
 | `resources/views/livewire/submission-progress.blade.php` | Existing | View progress, menggunakan token/komponen yang cocok |
 | `resources/views/auth/*.blade.php` | Existing | Form auth; migrasi ke shell auth |
@@ -318,7 +318,13 @@ Implementasi fondasi tersedia pada [IP-007](LIFECYCLE-IP-007.md): `bootstrap.js`
 
 IP-011 menerapkan [form teks beranda](TEXT-FORM-IP-011.md). Registry memilih submission-form hanya untuk body dengan data-page=submission. Partial text memakai native POST/CSRF, input_type=text, raw_input 50–50.000, website dan CAPTCHA; error summary/field dan old input escaped. Guest langsung memakai teks tanpa single-tab control. Pengantar/form mendahului bantuan/model disclosure; statistik dari controller tetap berkonteks. Tidak ada overlay/timer tahap analisis sebelum respons; form-submit memberi guard/label mengirim, page module memberi polite request status setelah event tidak dibatalkan.
 
-Counter/validasi teks menghitung code points setelah trim; native minlength/maxlength tetap tersedia tanpa JS. Error summary autofocus dan link field bekerja native; module menjaga focus setelah body swap. Cleanup memulihkan validitas/status, mengosongkan CAPTCHA, dan mencerminkan hanya draft textarea lewat defaultValue (DOM text setter) sebelum Livewire menyimpan outerHTML. Tidak ada localStorage/sessionStorage atau nilai CAPTCHA/file/password dalam cached attribute. Adapter media mempertahankan forms/domain/batas existing, memindahkan handlers ke scope, menulis filename sebagai text dan melepaskan object URL. Layout/format/limit/duration/no-JS path media lengkap masih IP-012; hasil/progress tetap IP-013–IP-016.
+Counter/validasi teks menghitung code points setelah trim; native minlength/maxlength tetap tersedia tanpa JS. Error summary autofocus dan link field bekerja native; module menjaga focus setelah body swap. Cleanup memulihkan validitas/status, mengosongkan CAPTCHA, dan mencerminkan hanya draft textarea lewat defaultValue (DOM text setter) sebelum Livewire menyimpan outerHTML. Tidak ada localStorage/sessionStorage atau nilai CAPTCHA/file/password dalam cached attribute. Adapter media mempertahankan forms/domain/batas existing, memindahkan handlers ke scope, menulis filename sebagai text dan melepaskan object URL. Adapter/partial legacy media digantikan pada IP-012 yang dijelaskan di bawah; hasil/progress tetap IP-013–IP-016.
+
+IP-012 menerapkan [URL/gambar/video](MEDIA-FORM-IP-012.md). HomeController memberi submissionOptions dari App\Support\SubmissionFormOptions: aturan image/url diambil dari StoreSubmissionRequest, opsi video upload/remote/ukuran/durasi dari TranscriptionMediaContract dan blocked hosts dari config. Tidak ada query/policy baru. Upload-field berada di ui/field, file input native tetap visible, accept/error/hint/options terhubung dan nilai file tidak dipulihkan.
+
+Empat kategori Teks/Tautan artikel/Gambar/Video memakai fragment links native, dengan dua fragment links untuk video upload/direct URL. Lima forms masing-masing memiliki domain konstan, CAPTCHA/honeypot/CSRF dan hanya payload terkait; dua uploads multipart. Tanpa JS semua form akun terlihat/aktif, guest hanya teks. Mount upgrade links ke tabs dengan arrows/Home/End/Space/Enter; panel lain hidden dan fieldset disabled, cleanup memulihkan fallback. Chosen category/subtype dan safe URL draft dipertahankan dalam DOM snapshot, CAPTCHA/file dikosongkan.
+
+submission-media.js melakukan validasi advisory HTTP/HTTPS/maxlength, direct host/extension, file size/format/MIME dan metadata dimensions/duration bila browser dapat membacanya. Server tetap memvalidasi content/signature/SSRF dan seluruh policy. Preview URL hanya hostname text, tanpa request remote; filename textContent, local image/video blob URLs dicabut saat ganti/hapus/cleanup. Tidak ada AJAX/provider/global baru. Legacy input-tabs/upload-zone/tab-content serta adapter IP-011 tanpa consumer dihapus.
 
 ### 9.3 Transport dan error
 

@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-011 selesai; 11 dari 39 task selesai, IP-012–IP-039 pending |
+| Status | IP-001–IP-012 selesai; 12 dari 39 task selesai, IP-013–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-011 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-012 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -87,7 +87,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | done |
 | [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | done |
 | [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | done |
-| [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | pending |
+| [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | done |
 | [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | pending |
 | [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | pending |
 | [IP-015](#ip-015) | F3 | Migrasikan hasil final, evidence, dan provenance | pending |
@@ -333,10 +333,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04, FA-09.
 - **Source/target:** `resources/views/welcome.blade.php`, `resources/views/partials/submission/`, `resources/js/pages/submission-form.js`, `app/Http/Controllers/HomeController.php` (view data bila diperlukan).
 
-- [ ] Sediakan empat kategori presentasi dan dua pilihan Video dengan lima nilai domain tetap: text/image/video/video_url/url.
-- [ ] Ambil limit/format/durasi/blocked hosts dari request/service/config; tambah structured view data bila perlu, tanpa mengubah policy/validator.
-- [ ] Jaga media_file/source_url/multipart/required state dan input inactive; no-JS path dapat ditemukan dan guest tetap hanya teks.
-- [ ] Preview filename/URL memakai textContent/escaping; revoke object URL; invalid file/URL/host memiliki recovery dan file harus dipilih ulang.
+- [x] Sediakan empat kategori presentasi dan dua pilihan Video dengan lima nilai domain tetap: text/image/video/video_url/url.
+- [x] Ambil limit/format/durasi/blocked hosts dari request/service/config; tambah structured view data bila perlu, tanpa mengubah policy/validator.
+- [x] Jaga media_file/source_url/multipart/required state dan input inactive; no-JS path dapat ditemukan dan guest tetap hanya teks.
+- [x] Preview filename/URL memakai textContent/escaping; revoke object URL; invalid file/URL/host memiliki recovery dan file harus dipilih ulang.
 
 **Validasi:** VideoMediaContractTest, ExternalUrlSecurityTest, SubmissionTest.
 
@@ -1040,6 +1040,19 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Batas:** SubmissionTest/AtomicCaptchaQuotaTest dan suite artisan exit 255 sebelum bootstrap karena vendor/autoload.php repo tidak ada; vendor lock sementara IP-005/PHP host 8.5 bukan runtime aplikasi yang didukung. Tidak menjalankan controller/DB/CAPTCHA reservation/quota/throttle HTTP/queue/AI/ownership/admin/PDF atau hydration/polling. Native receiver hanya fixture serialization/redirect; text resize bukan native zoom/screen reader. QA aggregate tetap 3 pass/91 not_run.
 - **Perlindungan:** backend/routes/config/database/lock/font/vendor/admin/PDF/AGENTS tidak berubah; tidak ada perubahan environment/data, POST aplikasi, migration/seed atau deployment.
 - **Berikutnya:** berhenti pada IP-011 dan buat commit semantic; IP-012–IP-039 tetap pending.
+
+### IP-012 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; AC-P01 semua input/G01 data presentasi; FA-01/FA-02/FA-04/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 55f94b0; tree/index bersih, instruksi root berlaku.
+- **Perubahan:** HomeController/SubmissionFormOptions menyajikan rules/config existing tanpa policy/query baru; upload-field primitive, partials media/url/upload/security, dan submission-media module mengganti adapter/partial legacy IP-011. Legacy input-tabs/upload-zone/tab-content tanpa consumer dihapus. Assertions markup feature Submission/VideoMedia disesuaikan dengan native links/state/options, seluruh assertions keamanan backend tetap.
+- **Contract:** empat kategori Teks/Tautan artikel/Gambar/Video dan dua pilihan Video; lima native POST domains text/url/image/video/video_url, payload field terpisah, dua multipart, CSRF/CAPTCHA/honeypot tetap. Guest hanya teks; no-JS semua form akun visible/active dan dapat dinavigasi via fragment link. Dengan JS, tabs keyboard/ARIA, hidden panels dan disabled inactive fieldsets; error summary/inline, escaped old URL/non-string kosong, file dipilih ulang. G01 options mencakup ukuran/dimensi/MIME/format gambar, upload/remote formats, durasi/ukuran video, batas URL dan blocked hosts.
+- **Perilaku:** advisory URL/file/metadatum validation memberi koreksi/ganti/hapus; backend MIME/signature/SSRF/policy tetap otoritatif. URL preview hostname text tanpa network request, filename textContent, object URL revoke saat ganti/hapus/navigation. Unsupported browser preview tetap membolehkan validasi server. Cleanup memulihkan loading/native fallback, mengosongkan file/CAPTCHA, menjaga chosen category/subtype dan safe URL/text draft tanpa browser storage/AJAX/global baru.
+- **Validasi:** npm build 13 modules, 53 standalone PHP tests/380 assertions, 34 JS tests, Pint lima PHP files dan diff check pass. 36 render scenarios/43 compiled syntax; 28 native baseline contracts di luar pemisahan media cocok. Firefox: 288 cross-page samples, media normal/reduced 34 checks masing-masing/no-JS 19, dan 18 Livewire checks pass. Kelima domains dikirim satu native POST/303 ke receiver loopback, upload bytes multipart dan field isolation tercatat; keyboard, old subtype, file/URL error recovery, image width >8000, video duration >300, size >24MiB, source revoke dan Back/Forward diperiksa. Screenshot mobile/no-JS ditinjau; console final tanpa error.
+- **Evidence:** [MEDIA-FORM-IP-012.md](MEDIA-FORM-IP-012.md), SubmissionFormPresentationTest, frontend media tests dan artefak /tmp/hoaxlin-ip012-plpw5hsc.
+- **Batas:** artisan VideoMediaContractTest/ExternalUrlSecurityTest/SubmissionTest serta suite penuh exit 255 karena vendor/autoload.php repo tidak tersedia. Vendor lock sementara IP-005/PHP 8.5 bukan runtime aplikasi didukung; tidak menjalankan controller/DB/middleware/CAPTCHA reservation/quota/SSRF HTTP/queue/AI/admin/PDF/hydration. Receiver tidak membuktikan pipeline aplikasi; text resize bukan native zoom/screen reader. QA aggregate tetap 3 pass/91 not_run.
+- **Perlindungan:** 253 existing fingerprints backend/routes/config/database/lock/font/vendor/admin/PDF/AGENTS cocok; hanya HomeController view data dan Support presentation helper ditambahkan. Validator/service policy/domain/schema/access tetap; tidak ada POST aplikasi, migration/seed, dependency/environment/data/deployment change.
+- **Berikutnya:** berhenti pada IP-012 dan buat commit semantic; IP-013–IP-039 tetap pending.
 
 ### Format catatan berikutnya
 

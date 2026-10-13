@@ -25,7 +25,7 @@
         $previousSourceUrl = is_string($previousSourceUrl) ? $previousSourceUrl : '';
     @endphp
 
-    <section id="cek-berita" class="hl-submission-surface" aria-labelledby="submission-title">
+    <section id="cek-berita" class="hl-submission-surface" aria-labelledby="submission-title" data-submission-selector data-active-input="{{ $activeTab }}" data-active-video="{{ $videoUrlActive ? 'url' : 'upload' }}">
         <h2 id="submission-title">Pemeriksaan informasi</h2>
         @include('partials.submission.errors')
         @auth
@@ -34,10 +34,11 @@
         @guest
             <p class="hl-submission-access">Kamu dapat memeriksa teks tanpa akun. <x-ui.link :href="route('login')">Masuk</x-ui.link> untuk menggunakan URL, gambar, atau video.</p>
         @endguest
-        <div id="panel-teks" class="tab-content {{ $activeTab === 'teks' ? 'active' : '' }}" @auth role="tabpanel" aria-labelledby="tab-teks" @endauth>
+        <div id="panel-teks" class="hl-input-panel" data-input-panel="teks">
+            @auth <h3>Teks</h3> @endauth
             @include('partials.submission.text')
         </div>
-        @include('partials.submission.legacy-media')
+        @include('partials.submission.media')
         <p class="hl-submission-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif. Periksa kembali informasi melalui sumber terpercaya.</p>
     </section>
 

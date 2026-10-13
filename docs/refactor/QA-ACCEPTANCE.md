@@ -31,6 +31,8 @@ IP-010 menambah [subhasil shell auth/form](AUTH-SHELL-IP-010.md): 45 tests/282 a
 
 IP-011 menambah [subhasil beranda/teks](TEXT-FORM-IP-011.md): 50 tests/335 assertions, 30 JS tests, native guest POST/Enter/no-JS ke receiver, boundary 49/50/50.000/50.001, error focus, loading/BFCache dan Livewire draft recovery. QA-INPUT teks mendapat evidence presentasi; SubmissionTest/AtomicCaptchaQuotaTest dan suite aplikasi tetap terhambat vendor repo. Media/pipeline/authorization belum menjadi kelulusan baru; jumlah tetap 3 pass audit/inventaris dan 91 not_run secara agregat.
 
+IP-012 menambah [subhasil URL/media](MEDIA-FORM-IP-012.md): 53 tests/380 assertions, 34 JS tests, 288 browser smoke samples, 87 media checks normal/no-JS/reduced dan 18 actual Livewire checks. Semua lima forms mengirim native POST/CSRF/CAPTCHA/honeypot terpisah ke receiver fixture, dua upload multipart. Policy options/field states/recovery/preview cleanup diverifikasi; G01 data presentasi ditutup. VideoMediaContractTest/ExternalUrlSecurityTest/SubmissionTest serta suite HTTP/DB/pipeline tetap terhambat vendor repo, sehingga agregat tetap 3 pass audit/inventaris dan 91 not_run.
+
 File ini berada di `docs/refactor/` bersama [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md). [AGENTS.md](../../AGENTS.md) tetap di root repository.
 
 ## 1. Tujuan dan otoritas dokumen

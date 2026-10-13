@@ -2,7 +2,7 @@
     @php
         $errorTargets = [
             'raw_input' => 'teks-input',
-            'captcha_answer' => 'captcha-'.$activeTab,
+            'captcha_answer' => 'captcha-'.($videoUrlActive ? 'video-url' : $activeTab),
             'media_file' => $activeTab === 'gambar' ? 'gambar-input' : 'video-file-input',
             'source_url' => $videoUrlActive ? 'video-url-input' : 'url-input',
         ];

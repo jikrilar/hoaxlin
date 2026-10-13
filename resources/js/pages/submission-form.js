@@ -1,5 +1,5 @@
 import { defineModule } from '../core/scope.js';
-import { mountLegacyInputs } from './submission-legacy-inputs.js';
+import { mountMediaInputs } from './submission-media.js';
 
 export const countText = value => Array.from(value.trim()).length;
 export function textError(value, minimum, maximum) {
@@ -11,7 +11,7 @@ export function textError(value, minimum, maximum) {
 }
 
 export const mount = defineModule((root, scope) => {
-    mountLegacyInputs(root, scope);
+    mountMediaInputs(root, scope);
     const form = root.querySelector('[data-text-submission]');
     if (!form) return;
     const input = form.querySelector('[name="raw_input"]');

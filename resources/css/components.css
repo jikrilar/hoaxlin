@@ -5,7 +5,14 @@
     .hl-submission-intro p { max-inline-size: var(--ds-reading-measure); margin-block-start: var(--ds-space-3); color: var(--ds-text-muted); }
     .hl-submission-surface { padding: clamp(var(--ds-space-4), 4vw, var(--ds-space-6)); background: var(--ds-bg-surface); border: var(--ds-border-width) solid var(--ds-border-subtle); border-radius: var(--ds-radius-lg); }
     .hl-submission-surface > h2 { margin-block-end: var(--ds-space-4); }
-    .hl-submission-surface .input-tabs { margin-block-end: var(--ds-space-4); }
+    .hl-input-selector { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); margin-block-end: var(--ds-space-5); }
+    .hl-input-option { display: inline-flex; align-items: center; justify-content: center; min-block-size: 2.75rem; padding: var(--ds-space-2) var(--ds-space-3); border: var(--ds-border-width) solid var(--ds-border-control); border-radius: var(--ds-radius-md); color: var(--ds-link); text-decoration: none; font-size: var(--ds-type-body-sm-size); }
+    .hl-input-option:hover, .hl-input-option[aria-selected="true"] { background: var(--ds-bg-selected); border-color: var(--ds-action-primary); }
+    .hl-input-panel + .hl-input-panel, [data-video-panel] + [data-video-panel] { margin-block-start: var(--ds-space-6); }
+    [data-submission-selector][data-enhanced] .hl-input-panel, [data-submission-selector][data-enhanced] [data-video-panel] { margin-block-start: 0; }
+    .hl-input-panel > h3, [data-video-panel] > h4 { margin-block-end: var(--ds-space-4); }
+    .hl-upload__input::file-selector-button { margin-inline-end: var(--ds-space-3); padding: var(--ds-space-2); border: var(--ds-border-width) solid var(--ds-border-control); border-radius: var(--ds-radius-sm); background: var(--ds-bg-subtle); color: var(--ds-text-primary); cursor: pointer; }
+    .hl-upload__preview { max-inline-size: 100%; max-block-size: 16rem; margin-block: var(--ds-space-3); border-radius: var(--ds-radius-md); }
     .hl-submission-access { margin-block-end: var(--ds-space-5); color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
     .hl-input.hl-submission-textarea { min-block-size: 10rem; resize: vertical; }
     .hl-submission-security { margin-block: var(--ds-space-5); padding: var(--ds-space-4); background: var(--ds-bg-subtle); border-radius: var(--ds-radius-md); }

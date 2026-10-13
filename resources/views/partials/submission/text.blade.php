@@ -1,5 +1,6 @@
 <form id="form-teks" action="{{ route('deteksi') }}" method="POST" data-text-submission data-submit-label="Mengirim...">
     @csrf
+    <fieldset data-submission-fields>
     <input type="hidden" name="input_type" value="text">
 
     <x-ui.field id="teks-input" label="Teks informasi"
@@ -14,15 +15,9 @@
         <output id="teks-count" for="teks-input" class="hl-field__hint" data-text-count>{{ mb_strlen($previousRawInput) }} karakter</output>
     </x-ui.field>
 
-    <input type="text" name="website" class="hl-submission-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <div class="hl-submission-security">
-        <x-ui.field id="captcha-teks" :label="'Keamanan: Berapa '.$captchaQuestion.'?'"
-            hint="Jawab pertanyaan ini untuk mengirim pemeriksaan."
-            :error="$errors->first('captcha_answer')">
-            <x-forms.input type="number" name="captcha_answer" required inputmode="numeric" autocomplete="off" />
-        </x-ui.field>
-    </div>
+    @include('partials.submission.security', ['suffix' => 'teks', 'type' => 'text'])
 
     <x-ui.button type="submit" id="submit-teks" class="w-full">Periksa informasi</x-ui.button>
     <p class="hl-field__hint" role="status" aria-live="polite" data-submission-status></p>
+    </fieldset>
 </form>

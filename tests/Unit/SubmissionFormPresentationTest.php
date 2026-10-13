@@ -4,6 +4,8 @@ namespace Tests\Unit;
 
 use App\Http\Requests\StoreSubmissionRequest;
 use App\Models\User;
+use App\Services\Media\TranscriptionMediaContract;
+use App\Support\SubmissionFormOptions;
 use DOMDocument;
 use DOMXPath;
 use Illuminate\Auth\AuthManager;
@@ -67,6 +69,7 @@ class SubmissionFormPresentationTest extends TestCase
         $root = dirname(__DIR__, 2);
         $this->app = new Application($root);
         $this->app->instance('config', new Repository([
+            'media' => require $root.'/config/media.php',
             'app' => ['url' => 'http://localhost', 'locale' => 'id'],
             'view' => ['paths' => [$root.'/resources/views'], 'compiled' => $this->compiledPath],
             'database' => ['default' => 'sqlite', 'connections' => ['sqlite' => ['driver' => 'sqlite', 'database' => ':memory:']]],
@@ -133,7 +136,7 @@ class SubmissionFormPresentationTest extends TestCase
         $this->assertContains('max:'.$dom->evaluate('string(//textarea/@maxlength)'), $rules);
         $this->assertSame('POST', $dom->evaluate('string(//form[@id="form-teks"]/@method)'));
         $this->assertSame('http://localhost/deteksi', $dom->evaluate('string(//form[@id="form-teks"]/@action)'));
-        $this->assertSame('text', $dom->evaluate('string(//form[@id="form-teks"]/input[@name="input_type"]/@value)'));
+        $this->assertSame('text', $dom->evaluate('string(//form[@id="form-teks"]//input[@name="input_type"]/@value)'));
         $this->assertSame('fixture-token', $dom->evaluate('string(//form[@id="form-teks"]/input[@name="_token"]/@value)'));
         $this->assertSame(1, $dom->query('//form[@id="form-teks"]//textarea[@name="raw_input" and @required]')->length);
         $this->assertSame(1, $dom->query('//input[@name="captcha_answer" and @required and @autocomplete="off"]')->length);
@@ -179,17 +182,73 @@ class SubmissionFormPresentationTest extends TestCase
         $this->session->put('_old_input', ['input_type' => 'video_url', 'source_url' => 'https://example.test/video.mp4']);
         $dom = $this->render();
         $this->assertSame(4, $dom->query('//*[@data-input-tab]')->length);
-        $this->assertSame('true', $dom->evaluate('string(//*[@id="tab-video"]/@aria-selected)'));
-        $this->assertSame('tab-content active', $dom->evaluate('string(//*[@id="panel-video"]/@class)'));
-        $this->assertSame('video_url', $dom->evaluate('string(//*[@id="video-input-type"]/@value)'));
+        $this->assertSame('video', $dom->evaluate('string(//*[@data-submission-selector]/@data-active-input)'));
+        $this->assertSame('url', $dom->evaluate('string(//*[@data-submission-selector]/@data-active-video)'));
+        $this->assertSame(0, $dom->query('//*[@data-input-panel or @data-video-panel]/@hidden')->length);
+        $this->assertSame('video_url', $dom->evaluate('string(//form[@id="form-video-url"]//input[@name="input_type"]/@value)'));
         $this->assertSame('https://example.test/video.mp4', $dom->evaluate('string(//*[@id="video-url-input"]/@value)'));
         $this->assertSame(2, $dom->query('//form[@enctype="multipart/form-data"]')->length);
-        $this->assertSame(4, $dom->query('//main//form[@method="POST" and @action="http://localhost/deteksi" and @data-submit-label]/input[@name="_token"]')->length);
+        $this->assertSame(5, $dom->query('//main//form[@method="POST" and @action="http://localhost/deteksi" and @data-submit-label]/input[@name="_token"]')->length);
+    }
+
+    public function test_media_presentation_follows_config_and_request_rules_without_restoring_files(): void
+    {
+        $this->user = new User;
+        $this->app['config']->set('media.transcription.max_bytes', 2 * 1048576);
+        $this->app['config']->set('media.transcription.max_duration_seconds', 17);
+        $this->app['config']->set('media.transcription.upload_types', ['webm' => ['video/webm']]);
+        $this->app['config']->set('media.transcription.blocked_platform_hosts', ['custom.example']);
+        $this->session->put('_old_input', ['input_type' => 'image', 'media_file' => 'secret-file-marker']);
+        $dom = $this->render();
+        $video = json_decode($dom->evaluate('string(//*[@data-kind="video"]/@data-file-options)'), true);
+        $image = json_decode($dom->evaluate('string(//*[@data-kind="image"]/@data-file-options)'), true);
+        $direct = json_decode($dom->evaluate('string(//*[@data-direct-url-options]/@data-direct-url-options)'), true);
+
+        $this->assertSame(2097152, $video['maxBytes']);
+        $this->assertSame(17, $video['maxDurationSeconds']);
+        $this->assertSame(['.webm', 'video/webm'], $video['accept']);
+        $this->assertSame(['custom.example'], $direct['blockedHosts']);
+        $this->assertSame(10485760, $image['maxBytes']);
+        $this->assertSame(8000, $image['maxWidth']);
+        $this->assertSame(8000, $image['maxHeight']);
+        $this->assertContains('.heic', $image['accept']);
+        $this->assertContains('.heif', $image['accept']);
+        $this->assertSame(2, $dom->query('//input[@type="url" and @maxlength="2048" and @required]')->length);
+        $this->assertSame(0, $dom->query('//input[@type="file"]/@value')->length);
+        $this->assertStringNotContainsString('secret-file-marker', $dom->document->saveHTML());
+        foreach (['form-teks' => 'text', 'form-url' => 'url', 'form-gambar' => 'image', 'form-video' => 'video', 'form-video-url' => 'video_url'] as $id => $domain) {
+            $this->assertSame($domain, $dom->evaluate('string(//form[@id="'.$id.'"]//input[@name="input_type"]/@value)'));
+            $this->assertSame(1, $dom->query('//form[@id="'.$id.'"]//input[@name="captcha_answer" and @required]')->length);
+            $this->assertSame(1, $dom->query('//form[@id="'.$id.'"]//input[@name="website"]')->length);
+            $this->assertSame(0, $dom->query('//form[@id="'.$id.'"]//fieldset/@disabled')->length);
+        }
+    }
+
+    #[DataProvider('oldUrls')]
+    public function test_media_url_recovery_is_escaped_and_non_strings_are_empty(mixed $url, string $expected): void
+    {
+        $this->user = new User;
+        $this->session->put('_old_input', ['input_type' => 'video_url', 'source_url' => $url, 'captcha_answer' => '5']);
+        $errors = new ViewErrorBag;
+        $errors->put('default', new MessageBag(['source_url' => ['URL salah.'], 'captcha_answer' => ['Jawaban salah.']]));
+        $this->app['view']->share('errors', $errors);
+        $dom = $this->render();
+        $this->assertSame($expected, $dom->evaluate('string(//*[@id="video-url-input"]/@value)'));
+        $this->assertSame(0, $dom->query('//script[@id="attack"]')->length);
+        $this->assertSame(1, $dom->query('//*[@id="submission-errors"]//a[@href="#captcha-video-url"]')->length);
+        $this->assertSame('true', $dom->evaluate('string(//*[@id="video-url-input"]/@aria-invalid)'));
+        $this->assertStringContainsString('video-url-input-error', $dom->evaluate('string(//*[@id="video-url-input"]/@aria-describedby)'));
+        $this->assertSame(0, $dom->query('//input[@name="captcha_answer"]/@value')->length);
+    }
+
+    public static function oldUrls(): array
+    {
+        return ['array' => [['invalid'], ''], 'markup' => ['" /><script id="attack">x</script>', '" /><script id="attack">x</script>']];
     }
 
     private function render(): DOMXPath
     {
-        $html = $this->app['view']->make('welcome', ['captchaQuestion' => '2 + 3', 'modelStatistics' => [['label' => 'Model', 'value' => 'fixture', 'description' => 'Data sintetis']], 'videoMaxBytes' => 1024, 'videoMaxLabel' => '1 KiB', 'blockedVideoHosts' => ['youtube.com']])->render();
+        $html = $this->app['view']->make('welcome', ['captchaQuestion' => '2 + 3', 'modelStatistics' => [['label' => 'Model', 'value' => 'fixture', 'description' => 'Data sintetis']], 'submissionOptions' => SubmissionFormOptions::from(new TranscriptionMediaContract)])->render();
         $previous = libxml_use_internal_errors(true);
         try {
             $document = new DOMDocument;
