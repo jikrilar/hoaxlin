@@ -113,18 +113,6 @@
         color: var(--ds-text-primary);
         border-color: var(--ds-border-subtle);
     }
-    /* Auth wordmark remains until its final consumers migrate. */
-
-    .nav-logo {
-        white-space: nowrap;
-        flex-shrink: 0;
-        font-family: var(--ds-font-ui);
-        font-weight: var(--ds-font-weight-semibold);
-        font-size: 1.375rem;
-        text-decoration: none;
-        color: var(--ds-action-primary);
-    }
-
     /* ─── Input Tab Switcher ─── */
 
     .input-tabs {

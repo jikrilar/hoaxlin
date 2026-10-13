@@ -141,6 +141,22 @@ class UiComponentsTest extends TestCase
         }
     }
 
+    public function test_password_fields_keep_native_attributes_and_hide_inert_toggles(): void
+    {
+        $dom = $this->render('<x-ui.field id="current" label="Kata Sandi" hint="Gunakan kata sandi akun." error="Kata sandi salah."><x-forms.password name="password" autocomplete="current-password" required /></x-ui.field><x-ui.field id="new" label="Kata Sandi Baru"><x-forms.password name="password_confirmation" /></x-ui.field>');
+
+        $this->assertSame('password', $dom->evaluate('string(//*[@id="current"]/@type)'));
+        $this->assertSame('password', $dom->evaluate('string(//*[@id="current"]/@name)'));
+        $this->assertSame('current-password', $dom->evaluate('string(//*[@id="current"]/@autocomplete)'));
+        $this->assertSame('new-password', $dom->evaluate('string(//*[@id="new"]/@autocomplete)'));
+        $this->assertSame('current-hint current-error', $dom->evaluate('string(//*[@id="current"]/@aria-describedby)'));
+        $this->assertSame('true', $dom->evaluate('string(//*[@id="current"]/@aria-invalid)'));
+        $this->assertSame(1, $dom->query('//*[@id="current"]/@required')->length);
+        $this->assertSame(0, $dom->query('//input/@value')->length);
+        $this->assertSame(2, $dom->query('//button[@type="button" and @hidden and @aria-pressed="false" and @aria-label="Tampilkan kata sandi"]')->length);
+        $this->assertSame('current', $dom->evaluate('string(//button[@data-password-toggle="current"]/@aria-controls)'));
+    }
+
     public static function invalidContracts(): array
     {
         return [
@@ -157,6 +173,9 @@ class UiComponentsTest extends TestCase
             'input context override' => ['<x-ui.field id="one" label="Email" error="Error"><x-forms.input error="" /></x-ui.field>'],
             'input without field' => ['<x-ui.disclosure id="one" title="Detail"><x-forms.input name="email" /></x-ui.disclosure>'],
             'input type' => ['<x-ui.field id="one" label="Email"><x-forms.input type="hidden" /></x-ui.field>'],
+            'password restore' => ['<x-ui.field id="one" label="Password"><x-forms.password name="password" value="secret" /></x-ui.field>'],
+            'password type' => ['<x-ui.field id="one" label="Password"><x-forms.password name="password" type="text" /></x-ui.field>'],
+            'password autocomplete' => ['<x-ui.field id="one" label="Password"><x-forms.password name="password" autocomplete="email" /></x-ui.field>'],
             'alert tone' => ['<x-ui.alert tone="prediction" />'],
             'open boolean' => ['<x-ui.disclosure title="Detail" open="false" />'],
         ];

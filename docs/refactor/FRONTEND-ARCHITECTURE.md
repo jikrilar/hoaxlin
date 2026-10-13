@@ -124,7 +124,7 @@ Pertahankan nama top-level view dan controller agar route/view lookup existing t
 | `resources/js/core/lifecycle.js` | Baru | Mount, cleanup, guard init, navigasi |
 | `resources/js/components/navigation.js` | Baru | Disclosure navigasi/akun |
 | `resources/js/components/form-submit.js` | Baru | Loading dan perlindungan double submit pada form native |
-| `resources/js/components/password-toggle.js` | Baru | Toggle password yang aksesibel |
+| `resources/js/components/password.js` | Tersedia IP-007/IP-010 | Toggle password aksesibel, hints dan secret cleanup |
 | `resources/js/components/dialog.js` | Baru bila dipakai | Dialog penghapusan; focus/Escape/focus return |
 | `resources/js/pages/submission-form.js` | Baru | Selector input, preview, validasi ringan, cleanup |
 | `resources/js/pages/result.js` | Baru bila diperlukan | Enhancement halaman hasil dan koordinasi lifecycle |
@@ -139,7 +139,7 @@ Module yang tidak melakukan apa-apa setelah markup native disederhanakan tidak p
 | Path | Status | Tanggung jawab |
 | --- | --- | --- |
 | `resources/views/layouts/app.blade.php` | Existing | Shell publik |
-| `resources/views/layouts/auth.blade.php` | Baru | Shell auth ringkas, memakai fondasi head/runtime bersama |
+| `resources/views/layouts/auth.blade.php` | Tersedia IP-010 | Shell auth ringkas, memakai fondasi head/runtime bersama |
 | `resources/views/partials/head.blade.php` | Baru | Metadata, font, Vite CSS/JS, Livewire styles dan stack style |
 | `resources/views/partials/runtime.blade.php` | Baru | Livewire scripts dan stack script, sekali per dokumen |
 | `resources/views/partials/navigation.blade.php` | Baru | Navigation publik dan akun |
@@ -164,9 +164,9 @@ Anonymous components menggunakan namespace seperti `x-ui.button` dan `x-results.
 
 `layouts.app` mengelola urutan skip link → header/navigation → flash → satu main → footer. `layouts.auth` memakai wordmark dan form ringkas; tidak membawa hero, sidebar manfaat, atau footer besar.
 
-Fondasi head/runtime telah diekstrak pada [IP-008](SHELL-IP-008.md). `layouts.app` memakai `partials.head` untuk metadata/CSRF/Vite/Livewire styles/styles stack dan `partials.runtime` untuk Livewire scripts/scripts stack. Sections title/description tetap dibaca melalui yieldContent; normalisasi entity lalu escaped Blade menjaga text/attribute context. Layout menyediakan header, skip link native ke main-content (tabindex=-1), flash, satu main dan footer. Delapan child role main sudah dibersihkan. Layout auth tetap IP-010; migrasi navigation/footer/flash dicatat di bawah. Admin/PDF tidak memakai partial ini.
+Fondasi head/runtime telah diekstrak pada [IP-008](SHELL-IP-008.md). `layouts.app` memakai `partials.head` untuk metadata/CSRF/Vite/Livewire styles/styles stack dan `partials.runtime` untuk Livewire scripts/scripts stack. Sections title/description tetap dibaca melalui yieldContent; normalisasi entity lalu escaped Blade menjaga text/attribute context. Layout menyediakan header, skip link native ke main-content (tabindex=-1), flash, satu main dan footer. Delapan child role main sudah dibersihkan. Shell auth menggunakan partial yang sama pada IP-010; migrasi navigation/footer/flash dicatat di bawah. Admin/PDF tidak memakai partial ini.
 
-Navigation/footer/flash telah dimigrasi pada [IP-009](NAVIGATION-IP-009.md). `partials.navigation` menyediakan satu panel responsive, account details native dan destinations dari role/status server; logout tetap POST/CSRF. `components/navigation.js` menangani nonmodal disclosure dan cleanup listeners/media query tanpa scroll/focus lock, serta dismiss flash dengan focus return. `partials.footer` memakai route informasi nyata; `partials.flash` memakai alert/status escaped yang persisten. No-JS nav/account tetap tersedia, tombol enhancement tersembunyi. CSS legacy nav/footer/overlay sudah dihapus setelah consumer pindah; nav-logo auth tetap ada. Shell auth masih IP-010.
+Navigation/footer/flash telah dimigrasi pada [IP-009](NAVIGATION-IP-009.md). `partials.navigation` menyediakan satu panel responsive, account details native dan destinations dari role/status server; logout tetap POST/CSRF. `components/navigation.js` menangani nonmodal disclosure dan cleanup listeners/media query tanpa scroll/focus lock, serta dismiss flash dengan focus return. `partials.footer` memakai route informasi nyata; `partials.flash` memakai alert/status escaped yang persisten. No-JS nav/account tetap tersedia, tombol enhancement tersembunyi. CSS legacy nav/footer/overlay sudah dihapus setelah consumer pindah; nav-logo auth juga dihapus pada IP-010 setelah kelima consumer memakai hl-wordmark.
 
 Kedua layout berbagi fondasi head/runtime, bukan menggandakan script init. Tetap gunakan pola `@extends`, `@section`, `@yield`, dan `@stack` yang sudah ada; tidak perlu mengganti seluruh template menjadi layout component sekaligus.
 
@@ -184,6 +184,10 @@ Kedua layout berbagi fondasi head/runtime, bukan menggandakan script init. Tetap
 | Error pages | Minimal shell yang tidak mengandalkan user/submission variable atau layanan AI |
 
 Admin login/dashboard/resources memakai layout Filament. PDF tidak memakai kedua shell web.
+
+Shell auth telah diterapkan pada [IP-010](AUTH-SHELL-IP-010.md). Kelima auth views extend layouts.auth: skip → wordmark → flash → main/form/error summary → dua footer links → runtime. Lebar container auth 28rem, satu main, tanpa nav publik/hero/sidebar/footer besar. Error summary dan flash di-escape dan persisten. Styles/scripts stacks, metadata, Vite dan Livewire dibagi dengan shell publik; admin/PDF tetap terpisah.
+
+`forms/password` harus di dalam `ui/field`; name/required/autocomplete tetap native, autocomplete hanya current-password/new-password dan value/type override ditolak. Tombol type=button tersembunyi sampai module password memasang listener; aria-controls/pressed/nama dan input type diperbarui bersama. Module password.js existing dipakai kembali alih-alih membuat password-toggle.js kedua. Mount mempertahankan autofill; cleanup mengosongkan/mask password sebelum snapshot navigation, reset menyelaraskan toggle/hints. form-submit.js memulihkan nodes/disabled/aria-busy pada reset dan lifecycle cleanup; reset/submit yang dibatalkan tidak merusak recovery. Form auth tetap POST/CSRF, broker token dan named submitter tetap terkirim; tidak ada browser storage/AJAX/provider baru. Profile memakai helper yang sama, redesign profil tetap IP-020.
 
 ### 6.2 Progressive enhancement
 

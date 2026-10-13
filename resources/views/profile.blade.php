@@ -135,7 +135,7 @@
                            style="padding-right:3rem;"
                             aria-invalid="{{ $errors->has('current_password') ? 'true' : 'false' }}"
                         >
-                        <button type="button" data-password-toggle="current_password" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
+                        <button type="button" data-password-toggle="current_password" hidden style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
@@ -159,7 +159,7 @@
                            style="padding-right:3rem;"
                             aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
                         >
-                        <button type="button" data-password-toggle="password" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
+                        <button type="button" data-password-toggle="password" hidden style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
@@ -193,7 +193,7 @@
                             placeholder="Ulangi kata sandi baru"
                            style="padding-right:3rem;"
                         >
-                        <button type="button" data-password-toggle="password_confirmation" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
+                        <button type="button" data-password-toggle="password_confirmation" hidden style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;" aria-label="Tampilkan/sembunyikan">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>

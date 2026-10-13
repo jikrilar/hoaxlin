@@ -1,187 +1,87 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('title', 'Daftar Akun — hoaxlin.id')
 @section('description', 'Buat akun gratis di hoaxlin.id untuk menyimpan riwayat pengecekan berita.')
 
 @section('content')
-<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:6rem 1rem 3rem; width:100%; box-sizing:border-box; position:relative; ">
+<!-- Title -->
+<div class="hl-auth-title">
+    <h1>Buat Akun Gratis</h1>
+    <p>Bergabung dan mulai cek berita lebih cerdas.</p>
+</div>
 
+<!-- Register Form -->
+<form method="POST" action="{{ route('register.store') }}" id="register-form" data-password-hints="register" data-submit-label="Membuat akun..." novalidate>
+    @csrf
 
-    <div style="width:100%; max-width:480px; margin:0 auto; position:relative; transform-origin:center;">
+    <!-- Name -->
+    <x-ui.field id="name" label="Nama Lengkap" :error="$errors->first('name')">
+        <x-forms.input type="text" name="name" :value="old('name')" required
+            autocomplete="name" autofocus placeholder="Nama Kamu" />
+    </x-ui.field>
 
-        <div class="glass-card-solid" style="padding:clamp(var(--ds-space-4), 4vw, 2.75rem);">
+    <!-- Email -->
+    <x-ui.field id="email" label="Alamat Email" :error="$errors->first('email')">
+        <x-forms.input type="email" name="email" :value="old('email')" required
+            autocomplete="email" placeholder="kamu@email.com" />
+    </x-ui.field>
 
-            <!-- Logo & Title -->
-            <div style="text-align:center; margin-bottom:2.25rem;">
-                <a href="{{ url('/') }}" class="nav-logo" style="display:inline-block; font-size:1.75rem; margin-bottom:1rem;" aria-label="hoaxlin.id beranda">hoaxlin.id</a>
-                <h1 style="font-size:1.5rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.375rem;">Buat Akun Gratis</h1>
-                <p style="color:var(--color-text-muted); font-size:0.9375rem;">Bergabung dan mulai cek berita lebih cerdas.</p>
+    <!-- Password -->
+    <div style="margin-bottom:1.125rem;">
+        <x-ui.field id="password" label="Kata Sandi" :error="$errors->first('password')">
+            <x-forms.password name="password" required autocomplete="new-password" placeholder="Minimal 8 karakter" aria-describedby="password-strength" />
+        </x-ui.field>
+
+        <!-- Password Strength Indicator -->
+        <div id="password-strength" style="margin-top:0.5rem; display:none;" aria-live="polite">
+            <div style="display:flex; gap:0.25rem; margin-bottom:0.375rem;">
+                <div id="ps-1" style="height:3px; flex:1; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
+                <div id="ps-2" style="height:3px; flex:1; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
+                <div id="ps-3" style="height:3px; flex:1; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
+                <div id="ps-4" style="height:3px; flex:1; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
             </div>
-
-            <!-- Benefits Pills -->
-            <div style="display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; margin-bottom:2rem;" aria-label="Manfaat mendaftar">
-                @foreach(['🕐 Simpan Riwayat', '📊 Lihat Statistik', '💬 Beri Umpan Balik', '📎 Input URL & Media'] as $benefit)
-                <span style="padding:0.25rem 0.75rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:2rem; color:var(--color-text-secondary); font-size:0.78125rem;">
-                    {{ $benefit }}
-                </span>
-                @endforeach
-            </div>
-
-            <!-- Validation Errors -->
-            @if($errors->any())
-            <div style="padding:0.875rem 1rem; background:var(--ds-danger-bg); border:1px solid var(--ds-danger-fg); border-radius:0.75rem; margin-bottom:1.5rem;" role="alert">
-                <ul style="list-style:none; display:flex; flex-direction:column; gap:0.25rem;">
-                    @foreach($errors->all() as $error)
-                    <li style="color:var(--ds-danger-fg); font-size:0.875rem;">• {{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
-
-            <!-- Register Form -->
-            <form method="POST" action="{{ route('register.store') }}" id="register-form" data-password-hints="register" data-submit-label="Membuat akun..." novalidate>
-                @csrf
-
-                <!-- Name -->
-                <div style="margin-bottom:1.125rem;">
-                    <label for="name" class="auth-label">Nama Lengkap</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        class="auth-input"
-                        value="{{ old('name') }}"
-                        required
-                        autocomplete="name"
-                        autofocus
-                        placeholder="Nama Kamu"
-                        aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}"
-                    >
-                    @error('name')
-                        <p class="auth-error" role="alert">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Email -->
-                <div style="margin-bottom:1.125rem;">
-                    <label for="email" class="auth-label">Alamat Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        class="auth-input"
-                        value="{{ old('email') }}"
-                        required
-                        autocomplete="email"
-                        placeholder="kamu@email.com"
-                        aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
-                    >
-                    @error('email')
-                        <p class="auth-error" role="alert">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Password -->
-                <div style="margin-bottom:1.125rem;">
-                    <label for="password" class="auth-label">Kata Sandi</label>
-                    <div style="position:relative;">
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="auth-input"
-                            required
-                            autocomplete="new-password"
-                            placeholder="Minimal 8 karakter"
-                           style="padding-right:3rem;"
-                            aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
-                            aria-describedby="password-strength"
-                        >
-                        <button type="button" data-password-toggle="password"
-                               style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;"
-                                aria-label="Tampilkan/sembunyikan kata sandi">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
-
-                    <!-- Password Strength Indicator -->
-                    <div id="password-strength" style="margin-top:0.5rem; display:none;" aria-live="polite">
-                        <div style="display:flex; gap:0.25rem; margin-bottom:0.375rem;">
-                            <div id="ps-1" style="height:3px; flex:1; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
-                            <div id="ps-2" style="height:3px; flex:1; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
-                            <div id="ps-3" style="height:3px; flex:1; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
-                            <div id="ps-4" style="height:3px; flex:1; border-radius:2px; background:var(--ds-bg-subtle); transition:background 0.3s;"></div>
-                        </div>
-                        <span id="ps-label" style="font-size:0.75rem; color:var(--color-text-muted);"></span>
-                    </div>
-
-                    @error('password')
-                        <p class="auth-error" role="alert">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Confirm Password -->
-                <div style="margin-bottom:1.5rem;">
-                    <label for="password_confirmation" class="auth-label">Konfirmasi Kata Sandi</label>
-                    <div style="position:relative;">
-                        <input
-                            type="password"
-                            id="password_confirmation"
-                            name="password_confirmation"
-                            class="auth-input"
-                            required
-                            autocomplete="new-password"
-                            placeholder="Ulangi kata sandi"
-                           style="padding-right:3rem;"
-                            aria-describedby="confirm-match"
-                        >
-                        <button type="button" data-password-toggle="password_confirmation"
-                               style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--color-text-muted); cursor:pointer;"
-                                aria-label="Tampilkan/sembunyikan konfirmasi kata sandi">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
-                    <p id="confirm-match" style="font-size:0.75rem; margin-top:0.375rem; display:none;" aria-live="polite"></p>
-                </div>
-
-                <!-- Terms -->
-                <div style="display:flex; align-items:flex-start; gap:0.625rem; margin-bottom:1.5rem;">
-                    <input type="checkbox" id="terms" name="terms" required
-                          style="width:1rem; height:1rem; accent-color:var(--color-primary); cursor:pointer; margin-top:2px; flex-shrink:0;">
-                    <label for="terms" style="color:var(--color-text-secondary); font-size:0.875rem; cursor:pointer; line-height:1.5;">
-                        Saya menyetujui
-                        <a href="{{ url('/kebijakan-privasi') }}" style="color:var(--color-primary-light); text-decoration:none; font-weight:500;">Kebijakan Privasi</a>
-                        dan memahami bahwa hasil deteksi bersifat indikatif.
-                    </label>
-                </div>
-                @error('terms')
-                    <p class="auth-error" role="alert" style="margin-top:-1rem; margin-bottom:1rem;">{{ $message }}</p>
-                @enderror
-
-                <!-- Submit -->
-                <button type="submit" class="btn-primary" id="register-btn" style="width:100%; justify-content:center; font-size:1rem; padding:0.875rem;">
-                    <span>Buat Akun Sekarang</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </button>
-            </form>
-
-            <div style="display:flex; align-items:center; gap:1rem; margin:1.75rem 0;" aria-hidden="true">
-                <div class="divider" style="flex:1;"></div>
-                <span style="color:var(--color-text-muted); font-size:0.8125rem;">sudah punya akun?</span>
-                <div class="divider" style="flex:1;"></div>
-            </div>
-
-            <div style="text-align:center;">
-                <a href="{{ route('login') }}" class="btn-secondary" style="display:inline-flex; justify-content:center; width:100%;">
-                    Masuk ke Akun
-                </a>
-            </div>
+            <span id="ps-label" style="font-size:0.75rem; color:var(--color-text-muted);"></span>
         </div>
-
-        <p style="text-align:center; color:var(--color-text-muted); font-size:0.8125rem; margin-top:1.25rem; display:flex; align-items:center; justify-content:center; gap:0.375rem;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Koneksi aman & terenkripsi · Tidak ada spam
-        </p>
     </div>
+
+    <!-- Confirm Password -->
+    <div style="margin-bottom:1.5rem;">
+        <x-ui.field id="password_confirmation" label="Konfirmasi Kata Sandi" :error="$errors->first('password_confirmation')">
+            <x-forms.password name="password_confirmation" required autocomplete="new-password" placeholder="Ulangi kata sandi" aria-describedby="confirm-match" />
+        </x-ui.field>
+        <p id="confirm-match" style="font-size:0.75rem; margin-top:0.375rem; display:none;" aria-live="polite"></p>
+    </div>
+
+    <!-- Terms -->
+    <div class="hl-auth-choice">
+        <input type="checkbox" id="terms" name="terms" required aria-invalid="{{ $errors->has('terms') ? 'true' : 'false' }}" @if($errors->has('terms')) aria-describedby="terms-error" @endif
+              style="width:1rem; height:1rem; accent-color:var(--color-primary); cursor:pointer; margin-top:2px; flex-shrink:0;">
+        <label for="terms" style="color:var(--color-text-secondary); font-size:0.875rem; cursor:pointer; line-height:1.5;">
+            Saya menyetujui
+            <a href="{{ url('/kebijakan-privasi') }}" style="color:var(--color-primary-light); text-decoration:none; font-weight:500;">Kebijakan Privasi</a>
+            dan memahami bahwa hasil deteksi bersifat indikatif.
+        </label>
+    </div>
+    @error('terms')
+        <p id="terms-error" class="auth-error" role="alert" style="margin-top:-1rem; margin-bottom:1rem;">{{ $message }}</p>
+    @enderror
+
+    <!-- Submit -->
+    <button type="submit" class="btn-primary" id="register-btn" style="width:100%; justify-content:center; font-size:1rem; padding:0.875rem;">
+        <span>Buat Akun Sekarang</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+</form>
+
+<div style="display:flex; align-items:center; gap:1rem; margin:1.75rem 0;" aria-hidden="true">
+    <div class="divider" style="flex:1;"></div>
+    <span style="color:var(--color-text-muted); font-size:0.8125rem;">sudah punya akun?</span>
+    <div class="divider" style="flex:1;"></div>
+</div>
+
+<div style="text-align:center;">
+    <a href="{{ route('login') }}" class="btn-secondary" style="display:inline-flex; justify-content:center; width:100%;">
+        Masuk ke Akun
+    </a>
 </div>
 @endsection

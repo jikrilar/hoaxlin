@@ -15,6 +15,7 @@ export const mount = defineModule((root, scope) => {
             busy = false;
         };
         scope.own(restore);
+        scope.listen(form, 'reset', event => scope.timeout(() => { if (!event.defaultPrevented) restore(); }, 0));
         scope.listen(form, 'submit', event => {
             if (event.defaultPrevented) return;
             if (busy) { event.preventDefault(); return; }

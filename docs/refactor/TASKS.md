@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-009 selesai; 9 dari 39 task selesai, IP-010–IP-039 pending |
+| Status | IP-001–IP-010 selesai; 10 dari 39 task selesai, IP-011–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-009 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-010 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -85,7 +85,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-007](#ip-007) | F1 | Bangun lifecycle dan helper JS | done |
 | [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | done |
 | [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | done |
-| [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | pending |
+| [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | done |
 | [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | pending |
 | [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | pending |
 | [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | pending |
@@ -293,12 +293,12 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Dependensi:** [IP-006](#ip-006), [IP-007](#ip-007), [IP-008](#ip-008).
 - **Acceptance:** Fondasi AC-P05–AC-P09; helper AC-P10.
 - **Arsitektur:** FA-01, FA-02, FA-04.
-- **Source/target:** `resources/views/layouts/auth.blade.php`, `resources/js/components/password-toggle.js`, `resources/js/components/form-submit.js`.
+- **Source/target:** `resources/views/layouts/auth.blade.php`, `resources/js/components/password.js`, `resources/views/components/forms/password.blade.php`, `resources/js/components/form-submit.js`.
 
-- [ ] Buat shell auth ringkas yang berbagi head/runtime, wordmark, reading/form width dan feedback error.
-- [ ] Ekstrak password toggle aksesibel dengan id/name/autocomplete yang benar; tidak memulihkan password dari old input.
-- [ ] Loading/double-submit guard bekerja pada form native; reset disabled/loading pada restore navigation yang relevan.
-- [ ] Periksa no-JS, Enter, autofill, keyboard dan mobile; jangan menambah marketing sidebar atau login provider.
+- [x] Buat shell auth ringkas yang berbagi head/runtime, wordmark, reading/form width dan feedback error.
+- [x] Ekstrak password toggle aksesibel dengan id/name/autocomplete yang benar; tidak memulihkan password dari old input.
+- [x] Loading/double-submit guard bekerja pada form native; reset disabled/loading pada restore navigation yang relevan.
+- [x] Periksa no-JS, Enter, autofill, keyboard dan mobile; jangan menambah marketing sidebar atau login provider.
 
 **Validasi:** Blade; native submit, autocomplete, no-JS.
 
@@ -1015,6 +1015,18 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Batas:** artisan auth/profile tests exit 255 karena vendor/autoload.php repo tidak tersedia; vendor lock sementara IP-005 pada PHP 8.5 bukan runtime aplikasi yang didukung. Source routes/User/provider diperiksa, tetapi middleware/authorization HTTP/DB, hydration/polling/AI/admin/PDF runtime belum dijalankan. Tidak ada POST aplikasi. QA aggregate tetap 3 pass/91 not_run; resize teks bukan native zoom/screen reader audit.
 - **Perlindungan:** backend/routes/config/DB/lock/font/vendor/admin/PDF cocok fingerprints awal; tidak mengubah kontrak akses, pipeline, dependency, environment, data atau deployment.
 - **Berikutnya:** berhenti pada IP-009; buat commit semantic. IP-010–IP-039 tetap pending.
+
+### IP-010 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; fondasi AC-P05–AC-P09, helper AC-P10; FA-01/FA-02/FA-04.
+- **Checkout:** frontend-refactor/public-shell-auth, HEAD awal 902b101; tree/index awal bersih; instruksi root berlaku.
+- **Perubahan:** layouts.auth memakai head/runtime/flash bersama, satu wordmark, skip/main native, lebar form 28rem dan footer ringkas. Lima view auth memakai shell ini; wrapper/brand/benefit dekoratif dan nav-logo tanpa consumer dihapus. Error summary escaped/persisten dipusatkan; login/register memakai field primitives untuk label/error dan password component bersama. Profile hanya menyembunyikan tiga toggle SSR sampai enhancement siap.
+- **Perilaku:** forms/password mempertahankan name/id/autocomplete, required dan deskripsi field; menolak value/type override dan tidak membaca old password. Toggle type=button, hidden no-JS, aria-controls/pressed/nama serta target 44px; mount mempertahankan autofill, cleanup navigation mengosongkan/mask semua input password. Form reset mengembalikan state dan hints. Native POST/CSRF/reset token/remember/terms dan actions tetap; form-submit menjaga double submit tanpa AJAX, mempertahankan named submitter, pulih pada reset/BFCache/Livewire dan tidak mengunci form yang submit/reset-nya dibatalkan.
+- **Validasi:** npm build, Pint --test, git diff --check pass. PHPUnit standalone 45 tests/282 assertions dan 25 JS tests pass. 26 skenario halaman + fixture shell/role/stacks; compiled PHP syntax pass dan 24 native form contracts cocok baseline. Firefox: 208 smoke samples normal/no-JS/reduced, 96 auth checks, 13 pemeriksaan tambahan serta 32 Livewire checks pass; console tanpa error. Enter pada field/tombol mengirim native POST ke receiver loopback; CSRF/kredensial/confirmation/token/named submitter/remember/terms tercatat sebagai boolean. BFCache aktual persisted=true memulihkan tombol dan mengosongkan password; sembilan wire:navigate lintas shell lalu Back/Forward menjaga runtime, stacks, dialog/chart dan secrets kosong. Screenshot auth mobile ditinjau.
+- **Evidence:** [AUTH-SHELL-IP-010.md](AUTH-SHELL-IP-010.md), AuthShellTest, UiComponentsTest dan tests/Frontend; artefak /tmp/hoaxlin-ip010-5buki5f0.
+- **Batas:** artisan auth/profile/mail tests exit 255 karena vendor/autoload.php repo tidak tersedia. Renderer/unit memakai vendor lock sementara IP-005, PHP host 8.5 bukan runtime aplikasi yang didukung. Native receiver menguji serialization/redirect browser, bukan controller/middleware/session/DB/mail/throttle/broker/signed verify. Autofill disimulasikan sebelum mount; tidak memakai password manager akun nyata. QA aggregate tetap 3 pass/91 not_run; IP-017–IP-020 tetap diperlukan untuk alur halaman/backend lengkap. Tidak ada POST aplikasi, migration/seed/deploy atau perubahan environment/data.
+- **Perlindungan:** 254 fingerprints backend/routes/config/database/lock/font/vendor/admin/PDF/AGENTS cocok baseline; route/auth/domain/pipeline/dependency tidak diubah.
+- **Berikutnya:** berhenti pada IP-010 dan buat commit semantic; IP-011–IP-039 tetap pending.
 
 ### Format catatan berikutnya
 
