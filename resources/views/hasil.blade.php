@@ -14,7 +14,7 @@
         </a>
 
         <!-- Result Header -->
-        <div class="glass-card animate-fade-in-up" style="padding:2.5rem; margin-bottom:1.5rem;" role="main" aria-label="Hasil deteksi berita">
+        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10)); margin-bottom:1.5rem;" role="main" aria-label="Hasil deteksi berita">
             @if(! $submission->isCompleted())
                 {{-- Livewire polling progress bar (wire:poll.2s.visible) with JS fallback via /hasil/{id}/status --}}
                 <div id="submission-progress-wrapper" data-submission-id="{{ $submission->id }}">
@@ -69,7 +69,7 @@
                 </script>
                 @endif
                 <div class="divider" style="margin:1.5rem 0;"></div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:1.5rem;">
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 150px), 1fr)); gap:1rem; margin-bottom:1.5rem;">
                     <div>
                         <p style="color:var(--color-text-muted); font-size:0.75rem; text-transform:uppercase; margin-bottom:0.375rem;">Jenis Input</p>
                         <p style="color:var(--color-text-secondary);">{{ ucfirst($submission->input_type) }}</p>
@@ -80,17 +80,17 @@
                     </div>
                 </div>
                 @if($submission->raw_input)
-                    <div style="padding:1.25rem; background:rgba(8,11,20,0.6); border:1px solid var(--color-border-light); border-radius:0.875rem;">
+                    <div style="padding:1.25rem; background:var(--ds-bg-surface); border:1px solid var(--color-border-light); border-radius:0.875rem;">
                         <p style="color:var(--color-text-muted); font-size:0.75rem; text-transform:uppercase; margin-bottom:0.625rem;">Teks Dikirim</p>
                         <p style="color:var(--color-text-secondary); line-height:1.7; white-space:pre-wrap;">{{ $submission->raw_input }}</p>
                     </div>
                 @elseif($submission->source_url)
-                    <div style="padding:1.25rem; background:rgba(8,11,20,0.6); border:1px solid var(--color-border-light); border-radius:0.875rem; word-break:break-all;">
+                    <div style="padding:1.25rem; background:var(--ds-bg-surface); border:1px solid var(--color-border-light); border-radius:0.875rem; word-break:break-all;">
                         <p style="color:var(--color-text-muted); font-size:0.75rem; text-transform:uppercase; margin-bottom:0.625rem;">URL Dikirim</p>
                         <a href="{{ $submission->source_url }}" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary-light);">{{ $submission->source_url }}</a>
                     </div>
                 @elseif($submission->media_path)
-                    <div style="padding:1.25rem; background:rgba(8,11,20,0.6); border:1px solid var(--color-border-light); border-radius:0.875rem;">
+                    <div style="padding:1.25rem; background:var(--ds-bg-surface); border:1px solid var(--color-border-light); border-radius:0.875rem;">
                         <p style="color:var(--color-text-muted); font-size:0.75rem; text-transform:uppercase; margin-bottom:0.625rem;">Media Tersimpan</p>
                         <p style="color:var(--color-text-secondary); margin-bottom:0.75rem;">File {{ $submission->input_type }} berhasil disimpan secara privat.</p>
                         @if($submission->input_type === 'image')
@@ -113,7 +113,7 @@
             <!-- Label Badge & Score -->
             <div style="display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:1.5rem; margin-bottom:2rem;">
                 <div>
-                    <h1 style="color:var(--color-text-primary); font-size:1.25rem; font-weight:700; margin-bottom:0.25rem;">Hasil Deteksi</h1>
+                    <h1 style="color:var(--color-text-primary); font-size:1.25rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.25rem;">Hasil Deteksi</h1>
                     <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.06em;">Status Verifikasi</p>
                     @php
                         $label = $result->label ?? 'meragukan';
@@ -141,7 +141,7 @@
                 <div style="text-align:right;">
                     <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:0.375rem;">Skor Keyakinan Model</p>
                     @php $confidence = (float) ($result->confidence_score ?? 0); @endphp
-                    <p style="font-family:var(--font-display); font-size:2.5rem; font-weight:800; line-height:1;" aria-label="{{ round($confidence * 100) }} persen">
+                    <p style="font-family:var(--font-display); font-size:2.5rem; font-weight:var(--ds-font-weight-semibold); line-height:1;" aria-label="{{ round($confidence * 100) }} persen">
                         <span class="gradient-text">{{ round($confidence * 100) }}%</span>
                     </p>
                 </div>
@@ -173,20 +173,20 @@
                 $inputType = $submission->input_type ?? 'text';
                 $inputInfo = $inputTypes[$inputType] ?? $inputTypes['text'];
                 @endphp
-                <span style="padding:0.25rem 0.75rem; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); border-radius:2rem; color:var(--color-primary-light); font-size:0.8125rem;" role="status">
+                <span style="padding:0.25rem 0.75rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:2rem; color:var(--color-primary-light); font-size:0.8125rem;" role="status">
                     {{ $inputInfo['icon'] }} {{ $inputInfo['label'] }}
                 </span>
                 @if(isset($result->model_version))
-                <span style="padding:0.25rem 0.75rem; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2); border-radius:2rem; color:#22d3ee; font-size:0.8125rem;" title="Model version">
+                <span style="padding:0.25rem 0.75rem; background:var(--ds-info-bg); border:1px solid var(--ds-info-fg); border-radius:2rem; color:var(--ds-info-fg); font-size:0.8125rem;" title="Model version">
                     Model v{{ $result->model_version }}
                 </span>
                 @endif
                 @if($submission->source_language === 'en' && filled($submission->translated_text))
-                <span style="padding:0.25rem 0.75rem; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:2rem; color:#34d399; font-size:0.8125rem;" title="Teks Inggris diterjemahkan sebelum klasifikasi">
+                <span style="padding:0.25rem 0.75rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:2rem; color:var(--ds-success-fg); font-size:0.8125rem;" title="Teks Inggris diterjemahkan sebelum klasifikasi">
                     EN → ID · {{ $submission->translation_model }}
                 </span>
                 @endif
-                <span style="padding:0.25rem 0.75rem; background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.2); border-radius:2rem; color:#c4b5fd; font-size:0.8125rem;" title="Prompt version">
+                <span style="padding:0.25rem 0.75rem; background:var(--ds-info-bg); border:1px solid var(--ds-info-fg); border-radius:2rem; color:var(--ds-info-fg); font-size:0.8125rem;" title="Prompt version">
                     Prompt v{{ config('services.openai.prompt_version', '1.0') }}
                 </span>
                 <span style="color:var(--color-text-muted); font-size:0.8125rem; margin-left:auto;">
@@ -196,9 +196,9 @@
 
             @php $explanationStatus = $result->explanation_status ?? 'pending'; @endphp
             <!-- AI Explanation -->
-            <div style="padding:1.5rem; background:rgba(13,17,23,0.8); border:1px solid var(--color-border); border-radius:1rem; margin-bottom:1.5rem;" role="region" aria-label="Penjelasan AI">
+            <div style="padding:1.5rem; background:var(--ds-bg-surface); border:1px solid var(--color-border); border-radius:1rem; margin-bottom:1.5rem;" role="region" aria-label="Penjelasan AI">
                 <div style="display:flex; gap:0.75rem; align-items:flex-start; margin-bottom:1rem;">
-                    <div style="width:2rem; height:2rem; background:rgba(99,102,241,0.12); border-radius:0.5rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;" aria-hidden="true">🤖</div>
+                    <div style="width:2rem; height:2rem; background:var(--ds-bg-selected); border-radius:0.5rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;" aria-hidden="true">🤖</div>
                     <div>
                         <p style="color:var(--color-text-primary); font-size:0.875rem; font-weight:600;">
                             {{ $explanationStatus === 'ready' ? 'Penjelasan AI' : ($explanationStatus === 'unavailable' ? 'Penjelasan AI Tidak Tersedia' : 'Penjelasan Belum Tersedia') }}
@@ -221,11 +221,9 @@
 
             <!-- Retrieved evidence references -->
             <section class="evidence-section" role="region" aria-labelledby="evidence-heading">
-                <h2 id="evidence-heading" style="font-size:1.0625rem; font-weight:700; margin-bottom:0.5rem;">Bukti/Rujukan Terkait</h2>
+                <h2 id="evidence-heading" style="font-size:1.0625rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.5rem;">Bukti/Rujukan Terkait</h2>
                 @if($submission->evidenceReferences->isEmpty())
-                    <p role="status" aria-live="polite" style="color:var(--color-text-muted); font-size:0.875rem; line-height:1.6;">
-                        Tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini.
-                    </p>
+                    <x-ui.empty-state message="Tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini." role="status" aria-live="polite" />
                 @else
                     <ol class="evidence-list">
                         @foreach($submission->evidenceReferences as $evidenceReference)
@@ -268,21 +266,15 @@
 
             <!-- Extracted Text (if applicable) -->
             @if(isset($submission->extracted_text) && $inputType !== 'text')
-            <div style="margin-bottom:1.5rem;">
-                <button id="toggle-extracted" onclick="toggleExtracted()" style="display:flex; align-items:center; gap:0.5rem; background:none; border:none; color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; cursor:pointer; padding:0;" aria-expanded="false" aria-controls="extracted-text-panel">
-                    <svg id="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.2s;" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-                    Lihat Teks yang Diekstraksi
-                </button>
-                <div id="extracted-text-panel" style="display:none; margin-top:1rem; padding:1.25rem; background:rgba(8,11,20,0.6); border:1px solid var(--color-border-light); border-radius:0.875rem; max-height:200px; overflow-y:auto;">
-                    <p style="color:var(--color-text-secondary); font-size:0.875rem; line-height:1.7; white-space:pre-wrap;">{{ $submission->extracted_text }}</p>
-                </div>
-            </div>
+                <x-ui.disclosure title="Lihat Teks yang Diekstraksi" id="extracted-text-disclosure">
+                    <p id="extracted-text-panel" style="white-space:pre-wrap; max-height:200px; overflow-y:auto;">{{ $submission->extracted_text }}</p>
+                </x-ui.disclosure>
             @endif
 
             @if(filled($submission->translated_text))
-            <div style="margin-bottom:1.5rem; padding:1.25rem; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:0.875rem;">
+            <div style="margin-bottom:1.5rem; padding:1.25rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:0.875rem;">
                 <div style="display:flex; justify-content:space-between; gap:1rem; margin-bottom:0.75rem;">
-                    <p style="color:#34d399; font-size:0.875rem; font-weight:600;">Terjemahan Bahasa Indonesia untuk IndoBERT</p>
+                    <p style="color:var(--ds-success-fg); font-size:0.875rem; font-weight:600;">Terjemahan Bahasa Indonesia untuk IndoBERT</p>
                     <span style="color:var(--color-text-muted); font-size:0.75rem;">{{ $submission->translation_model }}{{ $submission->translation_cached ? ' · cache' : '' }}</span>
                 </div>
                 <p style="color:var(--color-text-secondary); font-size:0.875rem; line-height:1.7; white-space:pre-wrap; max-height:240px; overflow-y:auto;">{{ $submission->translated_text }}</p>
@@ -295,16 +287,16 @@
 
         <!-- Feedback Section -->
         @if($result)
-        <div class="glass-card animate-fade-in-up delay-200" style="padding:2rem; margin-bottom:1.5rem;" role="region" aria-label="Umpan balik">
-            <h2 style="font-size:1.0625rem; font-weight:700; margin-bottom:0.5rem;">Apakah hasil ini akurat?</h2>
+        <div class="glass-card" style="padding:2rem; margin-bottom:1.5rem;" role="region" aria-label="Umpan balik">
+            <h2 style="font-size:1.0625rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.5rem;">Apakah hasil ini akurat?</h2>
             <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:1.25rem;">
                 Umpan balikmu membantu evaluasi dan pengembangan model BERT di masa depan.
             </p>
 
             @auth
             @if($feedback ?? null)
-                <div style="padding:1.25rem; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:0.875rem;">
-                    <p style="color:#34d399; font-weight:600; margin-bottom:0.375rem;">
+                <div style="padding:1.25rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:0.875rem;">
+                    <p style="color:var(--ds-success-fg); font-weight:600; margin-bottom:0.375rem;">
                         {{ $feedback->is_correct ? '✅ Prediksi ditandai benar' : '❌ Prediksi ditandai tidak benar' }}
                     </p>
                     @if($feedback->comment)
@@ -364,7 +356,7 @@
         @endif
 
         <!-- Action Buttons -->
-        <div class="animate-fade-in-up delay-300" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap:1rem;">
             <a href="{{ url('/') }}#cek-berita" class="btn-secondary" style="justify-content:center;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 Cek Berita Lain
@@ -413,17 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Toggle extracted text
-function toggleExtracted() {
-    const panel = document.getElementById('extracted-text-panel');
-    const icon = document.getElementById('toggle-icon');
-    const btn = document.getElementById('toggle-extracted');
-    const isOpen = panel.style.display !== 'none';
-    panel.style.display = isOpen ? 'none' : 'block';
-    icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
-    btn.setAttribute('aria-expanded', !isOpen);
-}
-
 // Feedback selection
 function selectFeedback(isCorrect) {
     document.getElementById('feedback-is-correct').value = isCorrect ? '1' : '0';
@@ -432,22 +413,22 @@ function selectFeedback(isCorrect) {
     const commentArea = document.getElementById('feedback-comment-area');
 
     if (isCorrect) {
-        btnCorrect.style.background = 'rgba(16,185,129,0.15)';
-        btnCorrect.style.borderColor = 'rgba(16,185,129,0.3)';
-        btnCorrect.style.color = '#34d399';
+        btnCorrect.style.background = 'var(--ds-success-bg)';
+        btnCorrect.style.borderColor = 'var(--ds-success-fg)';
+        btnCorrect.style.color = 'var(--ds-success-fg)';
         btnCorrect.setAttribute('aria-pressed', 'true');
         btnWrong.style.background = 'transparent';
-        btnWrong.style.borderColor = 'rgba(99,102,241,0.4)';
+        btnWrong.style.borderColor = 'var(--ds-border-control)';
         btnWrong.style.color = 'var(--color-primary-light)';
         btnWrong.setAttribute('aria-pressed', 'false');
         commentArea.style.display = 'block';
     } else {
-        btnWrong.style.background = 'rgba(239,68,68,0.15)';
-        btnWrong.style.borderColor = 'rgba(239,68,68,0.3)';
-        btnWrong.style.color = '#f87171';
+        btnWrong.style.background = 'var(--ds-danger-bg)';
+        btnWrong.style.borderColor = 'var(--ds-danger-fg)';
+        btnWrong.style.color = 'var(--ds-danger-fg)';
         btnWrong.setAttribute('aria-pressed', 'true');
         btnCorrect.style.background = 'transparent';
-        btnCorrect.style.borderColor = 'rgba(99,102,241,0.4)';
+        btnCorrect.style.borderColor = 'var(--ds-border-control)';
         btnCorrect.style.color = 'var(--color-primary-light)';
         btnCorrect.setAttribute('aria-pressed', 'false');
         commentArea.style.display = 'block';

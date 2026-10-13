@@ -191,16 +191,17 @@ Tanpa JS, status dapat dilihat dengan refresh manual. Baseline memiliki meta ref
 
 ## 7. API dan aturan komponen Blade
 
-Komponen reusable dibentuk oleh kebutuhan berulang atau state yang perlu konsisten. Hindari komponen yang hanya membungkus satu `div` tanpa manfaat.
+API yang telah diterapkan dan batasnya dicatat pada [IP-006](COMPONENTS-IP-006.md). Komponen reusable dibentuk oleh kebutuhan berulang atau state yang perlu konsisten. Hindari komponen yang hanya membungkus satu `div` tanpa manfaat.
 
 | Komponen target | Props/slot utama | Tanggung jawab |
 | --- | --- | --- |
-| `x-ui.button` | variant, type, disabled, slot | Button native; type eksplisit; default aman `button` |
+| `x-ui.button` | variant, type, disabled/loading, slot | Button native; type eksplisit; default aman `button` |
 | `x-ui.link` | href, variant, slot | Link navigation; tidak diberi disabled palsu |
 | `x-ui.alert` | tone, title opsional, slot | Pesan/semantik sesuai konteks; tidak semua memakai alert assertive |
-| `x-ui.field` | id, name, label, hint, error, slot | Label dan hubungan hint/error; input tetap eksplisit |
+| `x-ui.field` | id, label, hint, error, slot | Label dan hubungan hint/error; input tetap eksplisit |
 | `x-ui.empty-state` | title, message, action slot | Keadaan kosong dengan tindakan nyata |
 | `x-ui.disclosure` | title, open, slot | Native disclosure bila sesuai; tidak selalu perlu JS |
+| `x-forms.input` | type, native attributes; id/hint/error dari field | Input native reusable; name/value pada kontrol |
 | `x-forms.password-field` | id, name, autocomplete, error | Field password + toggle sebagai enhancement |
 | `x-forms.upload-field` | id, name, accept, limits, error | Input file native + bantuan/preview; bukan validator keamanan |
 | `x-results.prediction-label` | label domain | Mapping teks/tone; final guard tetap pada komposisi |
@@ -303,6 +304,8 @@ Untuk halaman biasa, initializer harus tetap bekerja pada load normal. Jika mema
 Cleanup juga mencakup timer, request in-flight, object URL, chart, dialog, dan scroll lock. Browser back/forward cache perlu memulihkan submit button/loading state dengan aman. Jangan menyimpan password atau input untuk keperluan restore di localStorage.
 
 DOM yang dimorph Livewire tetap dimiliki Livewire. JS publik tidak mengganti innerHTML komponen progress atau menulis field snapshot/wire attributes. Native interaction pada bagian itu sebaiknya berada di view/component Livewire atau handler yang tahan replacement DOM.
+
+Implementasi fondasi tersedia pada [IP-007](LIFECYCLE-IP-007.md): `bootstrap.js` memakai registry ES modules dan `installLifecycle`; `core/lifecycle.js` mengelola body aktif, guard import dan hooks; `core/scope.js` menyediakan `defineModule`, `createScope` dan `lockScroll`. Module shared navigation/form-submit/password/dialog mempunyai consumer nyata; `pages/statistics.js` dipilih melalui data-page dan menjaga late library load serta destroy chart. window.Hoaxlin/window.axios telah diaudit tanpa consumer dan dihapus. Handler khusus welcome/hasil/progress belum dimigrasi; table di atas tetap target bagi task halaman berikutnya, bukan bukti seluruh resource legacy telah dimiliki lifecycle.
 
 ### 9.3 Transport dan error
 

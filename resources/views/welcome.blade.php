@@ -8,18 +8,14 @@
 <!-- ═══════════════════════════════════════════════
      HERO SECTION
 ══════════════════════════════════════════════════ -->
-<section id="hero" style="position:relative; overflow:hidden; padding: 9rem 0 5rem;" aria-label="Hero section">
-    <!-- Glow Orbs -->
-    <div class="glow-orb glow-orb-1" aria-hidden="true"></div>
-    <div class="glow-orb glow-orb-2" aria-hidden="true"></div>
+<section id="hero" style="position:relative;  padding: 9rem 0 5rem;" aria-label="Hero section">
 
-    <!-- Animated grid background -->
-    <div aria-hidden="true" style="position:absolute; inset:0; background-image: linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px); background-size:60px 60px; pointer-events:none;"></div>
+
 
     <div class="container-app" style="position:relative; z-index:1; text-align:center;">
 
         <!-- Badge -->
-        <div class="animate-fade-in-up" style="display:flex; justify-content:center; margin-bottom:2rem;">
+        <div style="display:flex; justify-content:center; margin-bottom:2rem;">
             <div class="hero-badge" role="status">
                 <span class="hero-badge-dot" aria-hidden="true"></span>
                 Didukung Model BERT Bahasa Indonesia
@@ -27,18 +23,18 @@
         </div>
 
         <!-- Headline -->
-        <h1 class="animate-fade-in-up delay-100" style="font-size:clamp(2.5rem, 6vw, 4.5rem); font-weight:900; margin-bottom:1.5rem; letter-spacing:-0.02em; line-height:1.1;">
+        <h1 class="hl-heading-display" style="margin-bottom:1.5rem;">
             Perangi Hoax dengan<br>
             <span class="gradient-text">Kecerdasan Buatan</span>
         </h1>
 
         <!-- Subtitle -->
-        <p class="animate-fade-in-up delay-200" style="font-size:clamp(1rem, 2vw, 1.25rem); color:var(--color-text-secondary); max-width:640px; margin:0 auto 2.5rem; line-height:1.7;">
+        <p style="font-size:clamp(1rem, 2vw, 1.25rem); color:var(--color-text-secondary); max-width:640px; margin:0 auto 2.5rem; line-height:1.7;">
             Unggah berita yang kamu terima — berupa teks, foto, video, atau tautan — dan sistem kami akan menganalisisnya menggunakan model BERT yang terlatih khusus untuk bahasa Indonesia.
         </p>
 
         <!-- CTAs -->
-        <div class="animate-fade-in-up delay-300" style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:4rem;">
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:4rem;">
             <a href="#cek-berita" class="btn-primary" style="font-size:1rem; padding:0.875rem 2rem;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <span>Cek Berita Sekarang</span>
@@ -50,7 +46,7 @@
         </div>
 
         <!-- Stats Row -->
-        <div class="animate-fade-in-up delay-400" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:1rem; max-width:900px; margin:0 auto;" role="region" aria-label="Statistik runtime dan evaluasi">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap:1rem; max-width:900px; margin:0 auto;" role="region" aria-label="Statistik runtime dan evaluasi">
             @foreach($modelStatistics as $stat)
             <div class="stat-card">
                 <div class="stat-value" aria-label="{{ $stat['label'] }}: {{ $stat['value'] }}">{{ $stat['value'] }}</div>
@@ -69,7 +65,7 @@
 <section id="cek-berita" style="padding:4rem 0 6rem;" aria-label="Form cek berita">
     <div class="container-app" style="max-width:860px;">
 
-        <div class="glass-card" style="padding:2.5rem;" role="main">
+        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10));" role="main">
 
             @php
                 $previousInputType = old('input_type');
@@ -88,7 +84,7 @@
 
             <!-- Form Header -->
             <div style="margin-bottom:2rem;">
-                <h2 style="font-size:1.625rem; font-weight:700; margin-bottom:0.5rem;">
+                <h2 style="font-size:1.625rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.5rem;">
                     Cek Kebenaran Berita
                 </h2>
                 <p style="color:var(--color-text-muted); font-size:0.9375rem;">
@@ -97,8 +93,8 @@
             </div>
 
             @if ($errors->any())
-                <div id="submission-errors" role="alert" tabindex="-1" style="padding:1rem 1.25rem; margin-bottom:1.5rem; border:1px solid rgba(239,68,68,0.5); border-radius:0.75rem; background:rgba(239,68,68,0.1);">
-                    <h3 style="font-size:1rem; font-weight:700; margin-bottom:0.5rem;">Periksa kembali input kamu:</h3>
+                <div id="submission-errors" role="alert" tabindex="-1" style="padding:1rem 1.25rem; margin-bottom:1.5rem; border:1px solid var(--ds-danger-fg); border-radius:0.75rem; background:var(--ds-danger-bg);">
+                    <h3 style="font-size:1rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.5rem;">Periksa kembali input kamu:</h3>
                     <ul style="padding-left:1.25rem; margin:0; line-height:1.6;">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -151,7 +147,7 @@
                         id="teks-input"
                         name="raw_input"
                         class="form-textarea"
-                        style="height:220px;"
+                       style="height:220px;"
                         placeholder="Tempel atau ketik teks berita yang ingin kamu verifikasi di sini...
 
 Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
@@ -167,9 +163,9 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
 
                     <!-- Honeypot + CAPTCHA (C17) -->
                     <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.12); border-radius:0.75rem;">
+                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:0.75rem;">
                         <div>
-                            <label for="captcha-teks" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:#f87171;">*</span></label>
+                            <label for="captcha-teks" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:var(--ds-danger-fg);">*</span></label>
                             <input type="number" id="captcha-teks" name="captcha_answer" class="form-input" style="max-width:140px;" placeholder="?" required inputmode="numeric" autocomplete="off">
                         </div>
                         <span style="color:var(--color-text-muted); font-size:0.75rem; padding-bottom:0.625rem;">Batas: 30/hari (IP), 100/hari (akun)</span>
@@ -195,7 +191,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                         Unggah Foto / Tangkapan Layar Berita
                     </label>
 
-                    <div class="upload-zone" id="gambar-zone" onclick="document.getElementById('gambar-input').click()" role="button" tabindex="0" aria-label="Klik atau seret gambar ke sini"
+                    <label class="upload-zone" id="gambar-zone" for="gambar-input" aria-label="Klik atau seret gambar ke sini"
                          onkeydown="if(event.key==='Enter'||event.key===' ') document.getElementById('gambar-input').click()"
                          ondragover="event.preventDefault(); this.classList.add('dragover')"
                          ondragleave="this.classList.remove('dragover')"
@@ -209,7 +205,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                             <div class="upload-zone-subtitle">PNG, JPG, WEBP, HEIC hingga 10MB</div>
                         </div>
                         <img id="gambar-preview-img" src="" alt="" style="display:none; max-height:200px; border-radius:0.5rem; object-fit:contain;">
-                    </div>
+                    </label>
 
                     <div class="info-box" style="margin-top:1rem;" role="note">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:1px;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -217,9 +213,9 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                     </div>
 
                     <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.12); border-radius:0.75rem;">
+                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:0.75rem;">
                         <div>
-                            <label for="captcha-gambar" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:#f87171;">*</span></label>
+                            <label for="captcha-gambar" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:var(--ds-danger-fg);">*</span></label>
                             <input type="number" id="captcha-gambar" name="captcha_answer" class="form-input" style="max-width:140px;" placeholder="?" required inputmode="numeric" autocomplete="off">
                         </div>
                         <span style="color:var(--color-text-muted); font-size:0.75rem; padding-bottom:0.625rem;">Batas: 30/hari (IP)</span>
@@ -243,12 +239,12 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                     <!-- Video sub-tabs -->
                     <div style="display:flex; gap:0.5rem; margin-bottom:1.25rem;" role="group" aria-label="Jenis input video">
                         <button type="button" id="video-tab-upload" onclick="switchVideoTab('upload')"
-                            style="padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid {{ $videoUrlActive ? 'var(--color-border)' : 'rgba(99,102,241,0.3)' }}; background:{{ $videoUrlActive ? 'transparent' : 'rgba(99,102,241,0.15)' }}; color:{{ $videoUrlActive ? 'var(--color-text-muted)' : 'var(--color-primary-light)' }}; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s;"
+                           style="padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid {{ $videoUrlActive ? 'var(--color-border)' : 'var(--ds-border-control)' }}; background:{{ $videoUrlActive ? 'transparent' : 'var(--ds-bg-selected)' }}; color:{{ $videoUrlActive ? 'var(--color-text-muted)' : 'var(--color-primary-light)' }}; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s;"
                             aria-pressed="{{ $videoUrlActive ? 'false' : 'true' }}">
                             Unggah File Video
                         </button>
                         <button type="button" id="video-tab-url" onclick="switchVideoTab('url')"
-                            style="padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid {{ $videoUrlActive ? 'rgba(99,102,241,0.3)' : 'var(--color-border)' }}; background:{{ $videoUrlActive ? 'rgba(99,102,241,0.15)' : 'transparent' }}; color:{{ $videoUrlActive ? 'var(--color-primary-light)' : 'var(--color-text-muted)' }}; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s;"
+                           style="padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid {{ $videoUrlActive ? 'var(--ds-bg-selected)' : 'var(--color-border)' }}; background:{{ $videoUrlActive ? 'var(--ds-bg-selected)' : 'transparent' }}; color:{{ $videoUrlActive ? 'var(--color-primary-light)' : 'var(--color-text-muted)' }}; font-size:0.875rem; font-weight:500; cursor:pointer; transition:all 0.2s;"
                             aria-pressed="{{ $videoUrlActive ? 'true' : 'false' }}">
                             Tautan Video
                         </button>
@@ -257,7 +253,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                     <!-- Upload Video -->
                     <div id="video-upload-panel" @if ($videoUrlActive) style="display:none;" @endif>
                         <label for="video-file-input" style="display:block; color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; margin-bottom:0.625rem;">File Video</label>
-                        <div class="upload-zone" onclick="document.getElementById('video-file-input').click()" role="button" tabindex="0" aria-label="Klik atau seret file video ke sini"
+                        <label class="upload-zone" for="video-file-input" aria-label="Klik atau seret file video ke sini"
                              ondragover="event.preventDefault(); this.classList.add('dragover')"
                              ondragleave="this.classList.remove('dragover')"
                              ondrop="handleFileDrop(event, 'video')">
@@ -269,8 +265,8 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                                 <div class="upload-zone-title">Klik atau Seret Video ke Sini</div>
                                 <div class="upload-zone-subtitle">MP4, MPEG, atau WEBM hingga {{ $videoMaxLabel }}</div>
                             </div>
-                        </div>
-                        <p id="video-size-error" role="alert" hidden style="color:#f87171; font-size:0.875rem; margin-top:0.625rem;">Ukuran video melebihi batas {{ $videoMaxLabel }}. Pilih file yang lebih kecil.</p>
+                        </label>
+                        <p id="video-size-error" role="alert" hidden style="color:var(--ds-danger-fg); font-size:0.875rem; margin-top:0.625rem;">Ukuran video melebihi batas {{ $videoMaxLabel }}. Pilih file yang lebih kecil.</p>
                     </div>
 
                     <!-- URL Video -->
@@ -280,7 +276,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                                placeholder="https://cdn.example.com/rekaman.mp4"
                                aria-describedby="video-url-hint video-url-platform-error" value="{{ $previousInputType === 'video_url' ? $previousSourceUrl : '' }}" @if ($videoUrlActive) required @endif>
                         <p id="video-url-hint" style="color:var(--color-text-muted); font-size:0.75rem; margin-top:0.5rem;">Gunakan tautan langsung ke file, bukan halaman YouTube atau media sosial. Mendukung FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, dan WEBM hingga {{ $videoMaxLabel }}.</p>
-                        <p id="video-url-platform-error" role="alert" hidden style="color:#f87171; font-size:0.875rem; margin-top:0.625rem;">Platform video tidak didukung. Gunakan URL langsung ke file audio/video.</p>
+                        <p id="video-url-platform-error" role="alert" hidden style="color:var(--ds-danger-fg); font-size:0.875rem; margin-top:0.625rem;">Platform video tidak didukung. Gunakan URL langsung ke file audio/video.</p>
                     </div>
 
                     <div class="warning-box" style="margin-top:1rem;" role="note">
@@ -289,9 +285,9 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                     </div>
 
                     <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.12); border-radius:0.75rem;">
+                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:0.75rem;">
                         <div>
-                            <label for="captcha-video" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:#f87171;">*</span></label>
+                            <label for="captcha-video" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:var(--ds-danger-fg);">*</span></label>
                             <input type="number" id="captcha-video" name="captcha_answer" class="form-input" style="max-width:140px;" placeholder="?" required inputmode="numeric" autocomplete="off">
                         </div>
                         <span style="color:var(--color-text-muted); font-size:0.75rem; padding-bottom:0.625rem;">Batas: 30/hari (IP)</span>
@@ -330,9 +326,9 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                     </p>
 
                     <!-- URL Preview -->
-                    <div id="url-preview" style="display:none; margin-top:1rem; padding:1rem; background:rgba(20,28,46,0.8); border:1px solid var(--color-border); border-radius:0.875rem;" aria-live="polite">
+                    <div id="url-preview" style="display:none; margin-top:1rem; padding:1rem; background:var(--ds-bg-surface); border:1px solid var(--color-border); border-radius:0.875rem;" aria-live="polite">
                         <div style="display:flex; gap:0.75rem; align-items:flex-start;">
-                            <div style="width:2.5rem; height:2.5rem; background:rgba(99,102,241,0.1); border-radius:0.5rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;" aria-hidden="true">
+                            <div style="width:2.5rem; height:2.5rem; background:var(--ds-bg-selected); border-radius:0.5rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;" aria-hidden="true">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
                             </div>
                             <div>
@@ -343,9 +339,9 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                     </div>
 
                     <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.12); border-radius:0.75rem;">
+                    <div style="display:grid; grid-template-columns:1fr auto; gap:0.75rem; align-items:end; margin-top:1rem; padding:0.875rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:0.75rem;">
                         <div>
-                            <label for="captcha-url" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:#f87171;">*</span></label>
+                            <label for="captcha-url" style="display:block; color:var(--color-text-secondary); font-size:0.8125rem; font-weight:500; margin-bottom:0.375rem;">Keamanan: Berapa {{ $captchaQuestion }} <span style="color:var(--ds-danger-fg);">*</span></label>
                             <input type="number" id="captcha-url" name="captcha_answer" class="form-input" style="max-width:140px;" placeholder="?" required inputmode="numeric" autocomplete="off">
                         </div>
                         <span style="color:var(--color-text-muted); font-size:0.75rem; padding-bottom:0.625rem;">Batas: 30/hari (IP)</span>
@@ -418,7 +414,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                 <span class="hero-badge-dot"></span>
                 Teknologi Kami
             </div>
-            <h2 style="font-size:clamp(1.875rem, 4vw, 2.75rem); font-weight:800; margin-bottom:1rem;">
+            <h2 style="font-size:clamp(1.875rem, 4vw, 2.75rem); font-weight:var(--ds-font-weight-semibold); margin-bottom:1rem;">
                 Bagaimana <span class="gradient-text">hoaxlin.id</span> Bekerja?
             </h2>
             <p style="color:var(--color-text-secondary); max-width:560px; margin:0 auto; font-size:1.0625rem; line-height:1.7;">
@@ -427,37 +423,37 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
         </div>
 
         <!-- Process Steps -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1.5rem; margin-bottom:4rem;" role="list" aria-label="Langkah-langkah proses">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:1.5rem; margin-bottom:4rem;" role="list" aria-label="Langkah-langkah proses">
 
             @php
             $steps = [
-                ['num'=>'01', 'icon'=>'📥', 'title'=>'Input Berita', 'desc'=>'Masukkan berita melalui teks, foto tangkapan layar, video, atau tautan artikel.', 'color'=>'rgba(99,102,241,0.12)'],
-                ['num'=>'02', 'icon'=>'🔬', 'title'=>'Ekstraksi Teks', 'desc'=>'Untuk gambar: OCR. Untuk video: transkripsi audio. Untuk URL: scraping artikel secara otomatis.', 'color'=>'rgba(6,182,212,0.12)'],
-                ['num'=>'03', 'icon'=>'🧠', 'title'=>'Analisis BERT', 'desc'=>'Model IndoBERT yang di-fine-tune mengklasifikasikan teks ke kelas Valid, Hoax, atau Meragukan.', 'color'=>'rgba(168,85,247,0.12)'],
-                ['num'=>'04', 'icon'=>'📊', 'title'=>'Hasil & Penjelasan', 'desc'=>'Ditampilkan label, confidence score, dan narasi penjelasan yang mudah dipahami awam.', 'color'=>'rgba(16,185,129,0.12)'],
+                ['num'=>'01', 'icon'=>'📥', 'title'=>'Input Berita', 'desc'=>'Masukkan berita melalui teks, foto tangkapan layar, video, atau tautan artikel.', 'color'=>'var(--ds-bg-selected)'],
+                ['num'=>'02', 'icon'=>'🔬', 'title'=>'Ekstraksi Teks', 'desc'=>'Untuk gambar: OCR. Untuk video: transkripsi audio. Untuk URL: scraping artikel secara otomatis.', 'color'=>'var(--ds-info-bg)'],
+                ['num'=>'03', 'icon'=>'🧠', 'title'=>'Analisis BERT', 'desc'=>'Model IndoBERT yang di-fine-tune mengklasifikasikan teks ke kelas Valid, Hoax, atau Meragukan.', 'color'=>'var(--ds-info-bg)'],
+                ['num'=>'04', 'icon'=>'📊', 'title'=>'Hasil & Penjelasan', 'desc'=>'Ditampilkan label, confidence score, dan narasi penjelasan yang mudah dipahami awam.', 'color'=>'var(--ds-success-bg)'],
             ];
             @endphp
 
             @foreach($steps as $step)
-            <article class="feature-card" style="background:rgba(13,17,23,0.7);" role="listitem">
+            <article class="feature-card" style="background:var(--ds-bg-surface);" role="listitem">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
                     <div class="feature-icon" style="background:{{ $step['color'] }}; font-size:1.625rem;" aria-hidden="true">{{ $step['icon'] }}</div>
-                    <span style="color:rgba(99,102,241,0.3); font-family:var(--font-display); font-weight:800; font-size:1.5rem;" aria-hidden="true">{{ $step['num'] }}</span>
+                    <span style="color:var(--ds-link); font-family:var(--font-display); font-weight:var(--ds-font-weight-semibold); font-size:1.5rem;" aria-hidden="true">{{ $step['num'] }}</span>
                 </div>
-                <h3 style="font-size:1.0625rem; font-weight:700; margin-bottom:0.625rem;">{{ $step['title'] }}</h3>
+                <h3 style="font-size:1.0625rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.625rem;">{{ $step['title'] }}</h3>
                 <p style="color:var(--color-text-muted); font-size:0.875rem; line-height:1.65;">{{ $step['desc'] }}</p>
             </article>
             @endforeach
         </div>
 
         <!-- BERT Explanation Card -->
-        <div class="glass-card" style="padding:2.5rem; display:grid; grid-template-columns:1fr 1fr; gap:2.5rem; align-items:center;" role="complementary" aria-label="Tentang BERT">
+        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10)); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap:2.5rem; align-items:center;" role="complementary" aria-label="Tentang BERT">
             <div>
                 <div class="hero-badge" style="display:inline-flex; margin-bottom:1.25rem;">
                     <span class="hero-badge-dot" aria-hidden="true"></span>
                     Powered by BERT
                 </div>
-                <h3 style="font-size:1.5rem; font-weight:700; margin-bottom:1rem;">
+                <h3 style="font-size:1.5rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:1rem;">
                     Mengapa <span class="gradient-text">BERT</span>?
                 </h3>
                 <p style="color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.7; margin-bottom:1.25rem;">
@@ -468,24 +464,24 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                 </p>
                 <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
                     @foreach(['Analisis kontekstual', 'Bahasa Indonesia', 'Fine-tuned', 'Open-source'] as $tag)
-                    <span style="padding:0.25rem 0.75rem; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); border-radius:2rem; color:var(--color-primary-light); font-size:0.8125rem; font-weight:500;">{{ $tag }}</span>
+                    <span style="padding:0.25rem 0.75rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:2rem; color:var(--color-primary-light); font-size:0.8125rem; font-weight:500;">{{ $tag }}</span>
                     @endforeach
                 </div>
             </div>
             <div>
                 <!-- Model Architecture Visual -->
-                <div style="background:rgba(13,17,23,0.9); border:1px solid var(--color-border); border-radius:1rem; padding:1.75rem;" aria-label="Visualisasi arsitektur model">
+                <div style="background:var(--ds-bg-surface); border:1px solid var(--color-border); border-radius:1rem; padding:1.75rem;" aria-label="Visualisasi arsitektur model">
                     <div style="text-align:center; margin-bottom:1.25rem;">
                         <span style="color:var(--color-text-muted); font-size:0.8125rem; text-transform:uppercase; letter-spacing:0.06em;">Arsitektur Model</span>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:0.625rem;">
                         @php
                         $layers = [
-                            ['label'=>'Input Teks Berita', 'bg'=>'rgba(99,102,241,0.12)', 'border'=>'rgba(99,102,241,0.3)', 'color'=>'#818cf8'],
-                            ['label'=>'Tokenizer (WordPiece)', 'bg'=>'rgba(99,102,241,0.08)', 'border'=>'rgba(99,102,241,0.2)', 'color'=>'#a5b4fc'],
-                            ['label'=>'BERT Encoder (12 layers)', 'bg'=>'rgba(6,182,212,0.12)', 'border'=>'rgba(6,182,212,0.3)', 'color'=>'#22d3ee'],
-                            ['label'=>'Classifier Layer', 'bg'=>'rgba(168,85,247,0.12)', 'border'=>'rgba(168,85,247,0.25)', 'color'=>'#c084fc'],
-                            ['label'=>'Valid / Hoax / Meragukan', 'bg'=>'rgba(16,185,129,0.12)', 'border'=>'rgba(16,185,129,0.3)', 'color'=>'#34d399'],
+                            ['label'=>'Input Teks Berita', 'bg'=>'var(--ds-bg-selected)', 'border'=>'var(--ds-bg-selected)', 'color'=>'var(--ds-link)'],
+                            ['label'=>'Tokenizer (WordPiece)', 'bg'=>'var(--ds-bg-selected)', 'border'=>'var(--ds-bg-selected)', 'color'=>'var(--ds-link)'],
+                            ['label'=>'BERT Encoder (12 layers)', 'bg'=>'var(--ds-info-bg)', 'border'=>'var(--ds-info-bg)', 'color'=>'var(--ds-info-fg)'],
+                            ['label'=>'Classifier Layer', 'bg'=>'var(--ds-info-bg)', 'border'=>'var(--ds-info-bg)', 'color'=>'var(--ds-info-fg)'],
+                            ['label'=>'Valid / Hoax / Meragukan', 'bg'=>'var(--ds-success-bg)', 'border'=>'var(--ds-success-bg)', 'color'=>'var(--ds-success-fg)'],
                         ];
                         @endphp
                         @foreach($layers as $i => $layer)
@@ -494,7 +490,7 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
                             <span style="color:{{ $layer['color'] }}; font-size:0.8125rem; font-weight:500;">{{ $layer['label'] }}</span>
                         </div>
                         @if($i < count($layers)-1)
-                        <div style="text-align:center; color:rgba(99,102,241,0.4); font-size:0.75rem;" aria-hidden="true">↓</div>
+                        <div style="text-align:center; color:var(--ds-link); font-size:0.75rem;" aria-hidden="true">↓</div>
                         @endif
                         @endforeach
                     </div>
@@ -508,11 +504,11 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
 <!-- ═══════════════════════════════════════════════
      FEATURES
 ══════════════════════════════════════════════════ -->
-<section style="padding:5rem 0; background:linear-gradient(180deg, transparent 0%, rgba(13,17,23,0.5) 100%);" aria-label="Fitur-fitur unggulan">
+<section style="padding:5rem 0; background:var(--ds-bg-subtle);" aria-label="Fitur-fitur unggulan">
     <div class="container-app">
 
         <div style="text-align:center; margin-bottom:3.5rem;">
-            <h2 style="font-size:clamp(1.875rem, 4vw, 2.75rem); font-weight:800; margin-bottom:1rem;">
+            <h2 style="font-size:clamp(1.875rem, 4vw, 2.75rem); font-weight:var(--ds-font-weight-semibold); margin-bottom:1rem;">
                 Fitur <span class="gradient-text">Unggulan</span>
             </h2>
             <p style="color:var(--color-text-secondary); max-width:520px; margin:0 auto; font-size:1.0625rem;">
@@ -520,22 +516,22 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
             </p>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem;" role="list">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:1.5rem;" role="list">
             @php
             $features = [
-                ['icon'=>'🔤', 'color'=>'rgba(99,102,241,0.12)', 'title'=>'Input Teks Langsung', 'desc'=>'Tempel teks berita dan dapatkan hasil analisis dalam hitungan detik. Tidak perlu daftar untuk menggunakannya.'],
-                ['icon'=>'🖼️', 'color'=>'rgba(6,182,212,0.12)', 'title'=>'OCR Gambar Otomatis', 'desc'=>'Unggah foto tangkapan layar berita dari WhatsApp atau media sosial. Teks diekstraksi otomatis menggunakan AI.'],
-                ['icon'=>'🎬', 'color'=>'rgba(168,85,247,0.12)', 'title'=>'Transkripsi Video', 'desc'=>'Unggah video atau masukkan URL langsung file audio/video. Bahasa audio dideteksi otomatis sebelum analisis.'],
-                ['icon'=>'🔗', 'color'=>'rgba(16,185,129,0.12)', 'title'=>'Analisis Tautan', 'desc'=>'Tempel URL artikel berita. Sistem mengambil dan mengekstraksi konten artikel secara otomatis.'],
-                ['icon'=>'📈', 'color'=>'rgba(245,158,11,0.12)', 'title'=>'Skor Keyakinan', 'desc'=>'Setiap hasil dilengkapi confidence score yang menunjukkan seberapa yakin model terhadap prediksinya.'],
-                ['icon'=>'📋', 'color'=>'rgba(239,68,68,0.12)', 'title'=>'Riwayat Pengecekan', 'desc'=>'Daftarkan akun gratis untuk menyimpan riwayat pengecekan dan memberikan umpan balik hasil analisis.'],
+                ['icon'=>'🔤', 'color'=>'var(--ds-bg-selected)', 'title'=>'Input Teks Langsung', 'desc'=>'Tempel teks berita dan dapatkan hasil analisis dalam hitungan detik. Tidak perlu daftar untuk menggunakannya.'],
+                ['icon'=>'🖼️', 'color'=>'var(--ds-info-bg)', 'title'=>'OCR Gambar Otomatis', 'desc'=>'Unggah foto tangkapan layar berita dari WhatsApp atau media sosial. Teks diekstraksi otomatis menggunakan AI.'],
+                ['icon'=>'🎬', 'color'=>'var(--ds-info-bg)', 'title'=>'Transkripsi Video', 'desc'=>'Unggah video atau masukkan URL langsung file audio/video. Bahasa audio dideteksi otomatis sebelum analisis.'],
+                ['icon'=>'🔗', 'color'=>'var(--ds-success-bg)', 'title'=>'Analisis Tautan', 'desc'=>'Tempel URL artikel berita. Sistem mengambil dan mengekstraksi konten artikel secara otomatis.'],
+                ['icon'=>'📈', 'color'=>'var(--ds-warning-bg)', 'title'=>'Skor Keyakinan', 'desc'=>'Setiap hasil dilengkapi confidence score yang menunjukkan seberapa yakin model terhadap prediksinya.'],
+                ['icon'=>'📋', 'color'=>'var(--ds-danger-bg)', 'title'=>'Riwayat Pengecekan', 'desc'=>'Daftarkan akun gratis untuk menyimpan riwayat pengecekan dan memberikan umpan balik hasil analisis.'],
             ];
             @endphp
 
             @foreach($features as $f)
             <article class="feature-card" role="listitem">
                 <div class="feature-icon" style="background:{{ $f['color'] }};" aria-hidden="true">{{ $f['icon'] }}</div>
-                <h3 style="font-size:1.0625rem; font-weight:700; margin-bottom:0.625rem;">{{ $f['title'] }}</h3>
+                <h3 style="font-size:1.0625rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.625rem;">{{ $f['title'] }}</h3>
                 <p style="color:var(--color-text-muted); font-size:0.875rem; line-height:1.65;">{{ $f['desc'] }}</p>
             </article>
             @endforeach
@@ -550,10 +546,10 @@ Contoh: 'Pemerintah mengumumkan kebijakan baru terkait...' "
 <section style="padding:5rem 0;" aria-label="Call to action">
     <div class="container-app" style="max-width:700px; text-align:center;">
         <div class="glass-card" style="padding:3.5rem 2rem; position:relative; overflow:hidden;">
-            <div style="position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 60%); pointer-events:none;" aria-hidden="true"></div>
+            <div style="position:absolute; inset:0; background:none; pointer-events:none;" aria-hidden="true"></div>
             <div style="position:relative;">
                 <div style="font-size:3.5rem; margin-bottom:1rem;" aria-hidden="true">🛡️</div>
-                <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); font-weight:800; margin-bottom:1rem;">
+                <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); font-weight:var(--ds-font-weight-semibold); margin-bottom:1rem;">
                     Jangan Sebarkan<br><span class="gradient-text">Sebelum Dicek!</span>
                 </h2>
                 <p style="color:var(--color-text-secondary); margin-bottom:2rem; font-size:1.0625rem; line-height:1.7; max-width:480px; margin-left:auto; margin-right:auto;">
@@ -637,14 +633,14 @@ function switchVideoTab(type) {
     const uploadBtn = document.getElementById('video-tab-upload');
     const urlBtn = document.getElementById('video-tab-url');
 
-    uploadBtn.style.background = isUpload ? 'rgba(99,102,241,0.15)' : 'transparent';
+    uploadBtn.style.background = isUpload ? 'var(--ds-bg-selected)' : 'transparent';
     uploadBtn.style.color = isUpload ? 'var(--color-primary-light)' : 'var(--color-text-muted)';
-    uploadBtn.style.borderColor = isUpload ? 'rgba(99,102,241,0.3)' : 'var(--color-border)';
+    uploadBtn.style.borderColor = isUpload ? 'var(--ds-bg-selected)' : 'var(--color-border)';
     uploadBtn.setAttribute('aria-pressed', isUpload);
 
-    urlBtn.style.background = !isUpload ? 'rgba(99,102,241,0.15)' : 'transparent';
+    urlBtn.style.background = !isUpload ? 'var(--ds-bg-selected)' : 'transparent';
     urlBtn.style.color = !isUpload ? 'var(--color-primary-light)' : 'var(--color-text-muted)';
-    urlBtn.style.borderColor = !isUpload ? 'rgba(99,102,241,0.3)' : 'var(--color-border)';
+    urlBtn.style.borderColor = !isUpload ? 'var(--ds-bg-selected)' : 'var(--color-border)';
     urlBtn.setAttribute('aria-pressed', !isUpload);
 
     document.getElementById('video-input-type').value = isUpload ? 'video' : 'video_url';
@@ -807,26 +803,10 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
         const target = document.querySelector(link.getAttribute('href'));
         if (target) {
             e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
         }
     });
 });
 
-// ── Intersection Observer for animations ──
-const animateEls = document.querySelectorAll('.feature-card, .stat-card');
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, { threshold: 0.1 });
-animateEls.forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-    observer.observe(el);
-});
 </script>
 @endpush

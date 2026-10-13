@@ -1,0 +1,17 @@
+/* Temporary aliases for public views only. Inventory: docs/refactor/BASE-IP-005.md.
+ * Remove with their last consumer; new styles use --ds-* directly. */
+[data-legacy-tokens] {
+    --font-display: var(--ds-font-ui);
+
+    /* Brand colors */
+    --color-primary: var(--ds-action-primary);
+    --color-primary-light: var(--ds-link);
+    --color-success: var(--ds-success-fg);
+
+    --color-text-primary: var(--ds-text-primary);
+    --color-text-secondary: var(--ds-text-body);
+    --color-text-muted: var(--ds-text-muted);
+
+    --color-border: var(--ds-border-subtle);
+    --color-border-light: var(--ds-border-subtle);
+}

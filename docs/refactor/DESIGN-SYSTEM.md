@@ -3,19 +3,23 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 11 Oktober 2026 |
-| Status | Spesifikasi target refactoring; belum diterapkan ke aplikasi |
+| Tanggal | 13 Oktober 2026 |
+| Status | Fondasi IP-004/005 dan komponen reusable IP-006 diterapkan; lifecycle/halaman/admin/PDF masih pending |
 | Arah visual | Warm Editorial Intelligence |
 | Theme | Light-only, publik dan admin |
 | Stack target | Laravel 12, Blade, Tailwind CSS 4, Vite, Livewire 4, Filament 5 |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Dokumen terkait | [AGENTS.md](../../AGENTS.md), [OVERVIEW.md](OVERVIEW.md) |
 
+Base publik/light/focus dan compatibility kini diterapkan pada [laporan IP-005](BASE-IP-005.md). Smoke fixture seluruh view publik tidak menutup seluruh acceptance state/interaksi aplikasi.
+
 ## 1. Tujuan dan otoritas desain
 
 Dokumen ini menetapkan token, hierarchy, komponen, state, responsive rules, dan pola presentasi Hoaxlin. Codex menggunakan nilai di sini untuk implementasi yang konsisten. `AGENTS.md` tetap mengatur workflow dan kontrak teknis; `OVERVIEW.md` menjelaskan scope dan tujuan proyek.
 
 Arah desain mengambil kehangatan editorial, serif–sans hierarchy, whitespace, dan kesederhanaan antarmuka Claude. Identitas Hoaxlin memakai evergreen, Newsreader, dan alur pemeriksaan informasi yang terstruktur. `DESIGN.md` referensi Claude bukan sumber token final.
+
+Fondasi IP-004 tersedia pada [design-tokens.css](../../resources/css/design-tokens.css), [bridge publik](../../resources/css/theme.css) dan [font berlisensi](../../resources/fonts/README.md), dengan [evidence dan batas transisi](FOUNDATION-IP-004.md). Status ini tidak menandai seluruh checklist design system atau halaman sebagai lulus.
 
 Spesifikasi ini mengatur presentasi. Jangan mengubah authorization, schema, classifier, threshold, retrieval, prompt, quota, atau state machine agar sesuai rancangan. Nilai domain serta data server tetap menjadi sumber kebenaran.
 
@@ -246,7 +250,7 @@ Focus outline harus terlihat dan tidak terpotong oleh parent overflow. Primary b
 
 ## 7. Komponen inti
 
-Semua nama komponen berikut adalah target reusable, belum merupakan file/API yang tersedia. Utamakan anonymous Blade components bila tidak membutuhkan logic server tambahan. Filament tetap memakai komponen native-nya.
+Tujuh API UI/form dasar kini tersedia dan dipakai pada [IP-006](COMPONENTS-IP-006.md); komponen hasil/upload/password khusus berikut masih target task turunan. Utamakan anonymous Blade components bila tidak membutuhkan logic server tambahan. Filament tetap memakai komponen native-nya.
 
 ### 7.1 Button dan link
 

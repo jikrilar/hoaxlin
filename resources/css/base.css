@@ -1,0 +1,52 @@
+/* Public defaults. Tailwind preflight supplies the reset; utilities may override these. */
+@layer base {
+    html {
+        scroll-padding-top: var(--ds-space-16);
+    }
+
+    body {
+        min-block-size: 100vh;
+        background: var(--ds-bg-canvas);
+        color: var(--ds-text-body);
+        font-family: var(--ds-font-ui);
+        font-size: var(--ds-type-body-size);
+        font-weight: var(--ds-type-body-weight);
+        line-height: var(--ds-type-body-leading);
+        overflow-wrap: anywhere;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--ds-text-primary);
+        font-family: var(--ds-font-ui);
+        font-weight: var(--ds-font-weight-semibold);
+        line-height: var(--ds-type-page-title-leading);
+        text-wrap: balance;
+    }
+
+    h1 { font-size: var(--ds-type-page-title-size); }
+    h2 { font-size: var(--ds-type-section-title-size); }
+    h3 { font-size: var(--ds-type-item-title-size); }
+
+    a { color: var(--ds-link); }
+    button, input, select, textarea { font: inherit; }
+    input, select, textarea { accent-color: var(--ds-action-primary); }
+    textarea { resize: vertical; }
+    img, video, canvas { max-inline-size: 100%; }
+    pre { overflow-x: auto; }
+    [hidden] { display: none !important; }
+
+    :focus-visible {
+        outline: var(--ds-focus-width) solid var(--ds-focus);
+        outline-offset: var(--ds-focus-offset);
+    }
+
+    /* Inline page transitions must also respect this preference during migration. */
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0s !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
