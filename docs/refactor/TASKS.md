@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-014 selesai; 14 dari 39 task selesai, IP-015–IP-039 pending |
+| Status | IP-001–IP-015 selesai; 15 dari 39 task selesai, IP-016–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-014 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-015 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -90,7 +90,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | done |
 | [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | done |
 | [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | done |
-| [IP-015](#ip-015) | F3 | Migrasikan hasil final, evidence, dan provenance | pending |
+| [IP-015](#ip-015) | F3 | Migrasikan hasil final, evidence, dan provenance | done |
 | [IP-016](#ip-016) | F3 | Migrasikan actions dan feedback hasil | pending |
 | [IP-017](#ip-017) | F4 | Migrasikan login dan registrasi | pending |
 | [IP-018](#ip-018) | F4 | Migrasikan lupa/reset password | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-005–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-015 selesai, IP-016–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -387,10 +387,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-02, FA-04, FA-09.
 - **Source/target:** `resources/views/hasil.blade.php`, `resources/views/components/results/`, `resources/views/partials/result/`, `app/View/Presenters/DetectionPresentation.php` (opsional).
 
-- [ ] Komposisikan progress/failed/completed tanpa result/final berdasarkan data server; hasil final hanya saat completed dan result sah.
-- [ ] Terapkan label/tone/disclaimer yang sama: valid neutral, hoax danger, meragukan warning dengan copy abstention; unknown/null tidak menjadi hasil buatan.
-- [ ] Tampilkan confidence classifier sebagai metadata, explanation states, evidence nyata berurutan rank/document_id, dan link/kutipan aman.
-- [ ] Tambahkan disclosure input/provenance dari data tersedia; presenter opsional hanya mapping tanpa query, threshold, inference atau authorization baru.
+- [x] Komposisikan progress/failed/completed tanpa result/final berdasarkan data server; hasil final hanya saat completed dan result sah.
+- [x] Terapkan label/tone/disclaimer yang sama: valid neutral, hoax danger, meragukan warning dengan copy abstention; unknown/null tidak menjadi hasil buatan.
+- [x] Tampilkan confidence classifier sebagai metadata, explanation states, evidence nyata berurutan rank/document_id, dan link/kutipan aman.
+- [x] Tambahkan disclosure input/provenance dari data tersedia; presenter opsional hanya mapping tanpa query, threshold, inference atau authorization baru.
 
 **Validasi:** ResultEvidencePresentationTest, FinalResultStateTest, GroundedExplanationTest, ExplanationDegradationTest.
 
@@ -1075,6 +1075,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence:** [POLLING-IP-014.md](POLLING-IP-014.md), progress.test.mjs, SubmissionProgressPresentationTest dan /tmp/hoaxlin-ip014-87avom0p; 257 protected fingerprints cocok.
 - **Batas:** artisan tiga feature suites exit 255 karena autoload repo hilang. Browser memakai checksum/transport fixture; bukan controller/DB/session/checksum HTTP aplikasi atau AI/admin/PDF. Invalid JSON native yang sengaja diinjeksi menghasilkan parser log SDK yang diharapkan, tanpa modal unsafe; run akhir tanpa error cleanup/import tak diharapkan. QA aggregate tetap 3 audit pass/91 not_run; F3 belum ditutup.
 - **Berikutnya:** commit semantic dan berhenti pada IP-014; IP-015–IP-039 pending.
+
+### IP-015 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P02/AC-P04 final result; FA-02/FA-04/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 2028c82; tree/index awal bersih.
+- **Perubahan:** presenter mapping murni, components/results dan partials/result, CSS result semantic. Final hanya completed/result dengan submission ID cocok; label neutral/danger/warning, disclaimer dan abstention utuh; unknown/null jujur dan score nol tetap nyata. Explanation ready/pending/unavailable/unknown, evidence rank/document_id/link/escaping, serta full input/extraction/translation dan metadata tersimpan dalam disclosure native.
+- **Contract:** classifier confidence bukan factual truth/retrieval similarity; tidak ada meter/animasi confidence atau provenance buatan. Private media tetap endpoint existing tanpa storage path/janji retensi. Timestamp memakai timezone record. Progress/JS IP-014 tetap; actions/feedback diekstrak verbatim, migrasinya tetap IP-016.
+- **Validasi:** build 16 modules, seluruh unit terisolasi 141 tests/816 assertions (result 38/129), 61 Node tests, Pint lima PHP files, 50 compiled syntax dan diff check pass. 67 renders/536 browser samples dan 51 result checks, disclosure native normal/no-JS/reduced, teks >40.000 karakter, safe source, partial guard dan provenance pass. Regresi native 12/fallback 13 checks pass. Screenshot menemukan tautan kembali tertutup fixed header; CSS scoped diperbaiki dan layout diulang.
+- **Evidence:** [RESULT-IP-015.md](RESULT-IP-015.md), DetectionPresentationTest dan /tmp/hoaxlin-ip015-67qogt3y. 225 protected existing fingerprints cocok; seluruh source JS unchanged, legacy actions verbatim.
+- **Batas:** empat suite feature task exit 255 karena autoload repo hilang; tiga feature files hanya menyesuaikan assertion markup. Unit/vendor lock sementara/PHP 8.5 dan browser checksum/transport fixture bukan HTTP aplikasi/DB/provider/AI/admin/export. Native JSON fault mencatat parser error SDK yang diharapkan; result/layout biasa tanpa error. Screen reader/native zoom belum diuji; QA tetap 3 audit pass/91 not_run, F3 belum ditutup.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-015; IP-016–IP-039 pending.
 
 ### Format catatan berikutnya
 

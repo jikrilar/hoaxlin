@@ -25,7 +25,7 @@ class GuestSubmissionAccessTest extends TestCase
         $this->get(route('hasil', $submission))
             ->assertOk()
             ->assertSee('wire:poll.2s.visible', false)
-            ->assertDontSee('class="result-badge', false);
+            ->assertDontSee('data-result-label', false);
         $this->getJson(route('hasil.status', $submission))
             ->assertOk()
             ->assertJson([

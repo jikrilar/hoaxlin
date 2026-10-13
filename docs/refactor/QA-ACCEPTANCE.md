@@ -276,6 +276,8 @@ IP-014 menambah [subhasil polling](POLLING-IP-014.md): 27 Node progress tests, 1
 | **QA-PROGRESS-08 — Transport/session error** | Simulasikan offline, timeout, response non-JSON, 403/404/419/429 dan server error; pulihkan koneksi sesuai jalur recovery implementasi. | Error transport bukan status domain failed. Pesan aman; unauthorized/session error menghentikan loop sesuai konteks; retry/backoff tidak menjadi storm. Respons gagal tidak dipakai sebagai final result. | AC-P02, AC-E01; IP-014, IP-026 |
 | **QA-PROGRESS-09 — Hasil tanpa JS** | Matikan JS, buka nonterminal lalu terminal; gunakan reload/manual refresh yang disediakan. | Status SSR dan tindakan refresh nyata terlihat; tidak ada spinner tanpa penjelasan atau janji auto-update ketika JS mati. Hasil final tetap terbaca tanpa enhancement. | AC-P02, AC-P04; IP-013–IP-015 |
 
+IP-015 menambah [subhasil final/evidence/provenance](RESULT-IP-015.md): 38 unit tests/129 assertions result, 67 renders/536 layout samples serta result/disclosure checks normal/no-JS/reduced. QA-RESULT-01–07 dan markup private media QA-RESULT-08 memiliki evidence presenter/Blade/client, termasuk partial/mismatched guard, score nol/null, explanation states, safe rank/link/escaping dan metadata tersimpan. Regresi native/fallback IP-014 lulus. Empat suite feature task terblokir autoload repo; authorization/pipeline HTTP, expired media/admin/export/history dan screen reader belum ditutup. Actions/feedback tetap IP-016; QA aggregate tetap 3 audit pass/91 not_run dan F3 belum ditutup.
+
 ### 6.6 Hasil, evidence, provenance dan feedback
 
 **Prasyarat:** Setiap label, completed dengan/tanpa result, nonterminal dengan result parsial, serta explanation/evidence bervariasi.
