@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -183,12 +184,47 @@ class AuthenticationTest extends TestCase
                 'email' => $user->email,
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
-            ])->assertRedirect(route('login'));
+            ])->assertRedirect(route('login'))->assertSessionHas('status', __(Password::PASSWORD_RESET));
+            $this->assertGuest();
 
             return true;
         });
 
         $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
+    }
+
+    public function test_invalid_reset_token_get_is_a_form_and_post_has_recovery_without_mutating_password(): void
+    {
+        $user = User::factory()->create(['password' => 'original-password']);
+        $resetUrl = route('password.reset', ['token' => 'invalid-token', 'email' => $user->email]);
+        $this->get($resetUrl)->assertOk()->assertSee('name="token" value="invalid-token"', false);
+
+        $this->from($resetUrl)->post(route('password.store'), [
+            'email' => $user->email, 'token' => 'invalid-token', 'password' => 'new-password', 'password_confirmation' => 'new-password',
+        ])->assertSessionHasErrors('email')
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.password_confirmation');
+        $this->get($resetUrl)->assertOk()
+            ->assertSee(__(Password::INVALID_TOKEN))
+            ->assertSee('Minta tautan reset baru')
+            ->assertSee(route('password.request'), false);
+        $this->assertTrue(Hash::check('original-password', $user->fresh()->password));
+        $this->assertGuest();
+    }
+
+    public function test_expired_reset_token_cannot_change_password_or_log_in_the_user(): void
+    {
+        $user = User::factory()->create(['password' => 'original-password']);
+        $token = Password::createToken($user);
+        $brokerName = config('auth.defaults.passwords');
+        $expiry = (int) config('auth.passwords.'.$brokerName.'.expire');
+        $this->travelTo(now()->addMinutes($expiry + 1), function () use ($user, $token): void {
+            $this->post(route('password.store'), [
+                'email' => $user->email, 'token' => $token, 'password' => 'new-password', 'password_confirmation' => 'new-password',
+            ])->assertSessionHasErrors('email');
+            $this->assertTrue(Hash::check('original-password', $user->fresh()->password));
+            $this->assertGuest();
+        });
     }
 
     public function test_unverified_user_can_resend_verification_email(): void

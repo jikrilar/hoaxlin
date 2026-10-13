@@ -332,6 +332,8 @@ IP-016 menerapkan [actions/feedback](ACTIONS-IP-016.md) sebagai partial Blade de
 
 IP-017 menerapkan [login/register](LOGIN-REGISTER-IP-017.md) pada shell IP-010: native fields/autocomplete/required/terms, remember value=1 sesuai boolean validator, name/email old input string escaped dan password kosong. Ringkasan error menerima target field dari kedua view untuk autofocus/link; auth views lain memakai fallback generic. Strength meter/data-password-hints registrasi dihapus dari view, policy/confirmation tetap server. Password/form-submit existing tetap menangani toggle/loading/cleanup tanpa perubahan JS/backend. Intended/session/Registered/verifikasi/unique/limiter dipertahankan, belum menjadi klaim E2E dari receiver fixture.
 
+IP-018 menerapkan [forgot/reset password](PASSWORD-RESET-IP-018.md) dengan native fields/button/link/shell dan field error targets existing. Old/query email hanya string escaped, token dari route tetap hidden, password/confirmation tidak dipulihkan. GET tidak mengklaim token valid; error menyediakan request-reset/login recovery dan status tetap dari broker. Form-submit/password existing menangani loading/toggle/cleanup tanpa perubahan JS/CSS. Unit controller actual memakai request validation adapter dan broker fake; real DB expiry/User update/event/SMTP/middleware belum diverifikasi. Verifikasi/profil tetap task berikutnya.
+
 ### 9.3 Transport dan error
 
 Form utama tetap native POST/redirect; jangan mengubahnya menjadi AJAX tanpa kebutuhan yang dinyatakan. Fetch hanya untuk status existing atau enhancement yang memang tersedia.

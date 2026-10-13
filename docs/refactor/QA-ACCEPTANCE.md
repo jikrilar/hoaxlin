@@ -313,6 +313,8 @@ IP-016 menambah [subhasil actions/feedback](ACTIONS-IP-016.md): 29 unit/validato
 
 IP-017 menambah [subhasil login/register](LOGIN-REGISTER-IP-017.md): 23 unit/field-rule cases tambahan, 95 renders/760 layout samples serta account checks normal/no-JS/reduced. QA-AUTH-01–04 memiliki evidence UI/native serializer/keyboard, remember 1/off, terms, empty secret, credential/throttle/unique/confirmation display, focus/link, toggle/loading/Back/cancellation/double-submit. Field validator actual diuji tanpa unique SQL/authenticate. AuthenticationTest terblokir autoload repo; session/intended/limiter/Registered/mail/route guards aplikasi tetap belum diuji. QA aggregate tetap 3 audit pass/91 not_run; gate F4 belum ditutup.
 
+IP-018 menambah [subhasil lupa/reset](PASSWORD-RESET-IP-018.md): 21 unit cases tambahan, controller actual/validator dengan broker fake, 110 renders/880 layout samples dan browser recovery normal/no-JS/reduced. QA-AUTH-05/06 memiliki evidence email/route token/confirmed password/CSRF serialization, broker status/error/throttled, GET no broker, invalid fields sebelum broker, empty secrets, recovery link/focus serta native loading/Back/double-submit. Real repository/expiry/password save/event/throttle/mail belum diuji; AuthenticationTest/MailConfigurationTest terblokir autoload repo. QA aggregate tetap 3 audit pass/91 not_run; F4 belum ditutup.
+
 ### 6.8 Profil dan penghapusan akun
 
 **Prasyarat:** P10 akun test, email berbeda, password known; semua tindakan delete pada data test disposable.
