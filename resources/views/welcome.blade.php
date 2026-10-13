@@ -65,7 +65,7 @@
 <section id="cek-berita" style="padding:4rem 0 6rem;" aria-label="Form cek berita">
     <div class="container-app" style="max-width:860px;">
 
-        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10));" role="main">
+        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10));">
 
             @php
                 $previousInputType = old('input_type');
@@ -798,7 +798,7 @@ function submitForm(event, type) {
 }
 
 // ── Smooth scroll for anchor links ──
-document.querySelectorAll('a[href^="#"]').forEach(link => {
+document.querySelectorAll('a[href^="#"]:not(.hl-skip-link)').forEach(link => {
     link.addEventListener('click', (e) => {
         const target = document.querySelector(link.getAttribute('href'));
         if (target) {

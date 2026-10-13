@@ -1,61 +1,76 @@
-import { defineModule, lockScroll } from '../core/scope.js';
+import { defineModule } from '../core/scope.js';
 
 export const mount = defineModule((root, scope) => {
     const doc = root.ownerDocument;
-    const view = doc.defaultView;
-    const navbar = root.querySelector('#main-navbar');
-    const toggle = root.querySelector('#menu-toggle');
-    const mobile = root.querySelector('#mobile-menu');
-    const user = root.querySelector('#user-menu-btn');
-    const dropdown = root.querySelector('#user-dropdown');
-    let unlock;
-    function setMobile(open, focus = false) {
-        if (!toggle || !mobile) return;
-        mobile.classList.toggle('open', open);
-        toggle.setAttribute('aria-expanded', String(open));
-        root.querySelector('#menu-icon-open').style.display = open ? 'none' : 'block';
-        root.querySelector('#menu-icon-close').style.display = open ? 'block' : 'none';
-        if (open && !unlock) unlock = scope.own(lockScroll(root));
-        if (!open && unlock) { unlock(); unlock = undefined; }
-        if (focus) toggle.focus();
+    const header = root.querySelector('[data-navigation]');
+    const panel = header?.querySelector('[data-navigation-panel]');
+    const toggle = header?.querySelector('[data-mobile-toggle]');
+    const account = header?.querySelector('[data-account]');
+    const summary = account?.querySelector('summary');
+    const media = doc.defaultView.matchMedia('(max-width: 56.25rem)');
+    let expanded = false;
+
+    for (const button of root.querySelectorAll('[data-dismiss-flash]')) {
+        button.hidden = false;
+        scope.own(() => { button.hidden = true; });
     }
-    function setUser(open, focus = false) {
-        if (!user || !dropdown) return;
-        dropdown.style.display = open ? 'block' : 'none';
-        user.setAttribute('aria-expanded', String(open));
-        const chevron = root.querySelector('#user-menu-chevron');
-        if (chevron) chevron.style.transform = open ? 'rotate(180deg)' : '';
-        if (focus) user.focus();
-    }
-    const scroll = () => navbar?.classList.toggle('scrolled', view.scrollY > 30);
-    const resize = () => {
-        const small = view.innerWidth < 900;
-        if (toggle) toggle.style.display = small ? 'flex' : 'none';
-        const desktop = root.querySelector('#nav-desktop');
-        if (desktop) desktop.style.display = small ? 'none' : 'flex';
-        if (!small) setMobile(false);
+
+    const setAccount = (open, focus = false) => {
+        if (!account) return;
+        account.open = open;
+        summary.setAttribute('aria-expanded', String(open));
+        if (focus) summary.focus();
     };
-    if (navbar) scope.listen(view, 'scroll', scroll, { passive: true });
-    scope.listen(view, 'resize', resize);
-    if (toggle && mobile) scope.listen(toggle, 'click', () => setMobile(!mobile.classList.contains('open')));
-    if (mobile) scope.listen(mobile, 'click', event => { if (event.target.closest('a')) setMobile(false); });
-    if (user && dropdown) scope.listen(user, 'click', () => setUser(user.getAttribute('aria-expanded') !== 'true'));
-    scope.listen(doc, 'click', event => {
-        if (!root.querySelector('#user-menu-wrapper')?.contains(event.target)) setUser(false);
-        const dismiss = event.target.closest('[data-dismiss-flash]');
-        if (dismiss && root.contains(dismiss)) {
-            const banner = dismiss.closest('[data-flash]');
-            if (banner) { navbar?.querySelector('a')?.focus(); banner.remove(); }
-        }
-    });
+    const sync = () => {
+        if (!panel || !toggle) return;
+        toggle.hidden = !media.matches;
+        panel.hidden = media.matches && !expanded;
+        toggle.setAttribute('aria-expanded', String(media.matches && expanded));
+        if (panel.hidden && panel.contains(doc.activeElement)) toggle.focus();
+        if (toggle.hidden && doc.activeElement === toggle) header.querySelector('[data-brand]').focus();
+    };
+    const close = (focus = false) => {
+        expanded = false;
+        setAccount(false);
+        sync();
+        if (focus && !toggle.hidden) toggle.focus();
+    };
+    if (header && panel && toggle) {
+        header.setAttribute('data-navigation-ready', '');
+        scope.listen(toggle, 'click', () => { expanded = !expanded; if (!expanded) setAccount(false); sync(); });
+        scope.listen(media, 'change', () => close());
+        scope.listen(panel, 'click', event => { if (event.target.closest('a')) close(); });
+        scope.listen(header, 'focusout', event => { if (event.relatedTarget && !header.contains(event.relatedTarget)) close(); });
+        sync();
+        scope.own(() => {
+            panel.hidden = false;
+            toggle.hidden = true;
+            toggle.setAttribute('aria-expanded', 'false');
+            header.removeAttribute('data-navigation-ready');
+        });
+    }
+    if (account) {
+        scope.listen(account, 'toggle', () => summary.setAttribute('aria-expanded', String(account.open)));
+        scope.listen(account, 'focusout', event => { if (event.relatedTarget && !account.contains(event.relatedTarget)) setAccount(false); });
+        setAccount(false);
+        scope.own(() => { account.open = false; summary.removeAttribute('aria-expanded'); });
+    }
     scope.listen(doc, 'keydown', event => {
         if (event.key !== 'Escape') return;
-        if (mobile?.classList.contains('open')) setMobile(false, true);
-        if (user?.getAttribute('aria-expanded') === 'true') setUser(false, true);
+        if (account?.open) { event.preventDefault(); setAccount(false, true); }
+        else if (expanded) { event.preventDefault(); close(true); }
     });
-    scope.own(() => { setMobile(false); setUser(false); });
-    setMobile(false);
-    setUser(false);
-    resize();
-    scroll();
+    scope.listen(doc, 'click', event => {
+        if (account?.open && !account.contains(event.target)) setAccount(false);
+        if (expanded && !header.contains(event.target)) close();
+        const dismiss = event.target.closest?.('[data-dismiss-flash]');
+        if (!dismiss || !root.contains(dismiss)) return;
+        const message = dismiss.closest('[data-flash]');
+        if (!message) return;
+        const list = message.parentElement;
+        message.remove();
+        const next = list.querySelector('[data-dismiss-flash]');
+        (next ?? root.querySelector('#main-content'))?.focus();
+        if (!next) list.remove();
+    });
 });

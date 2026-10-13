@@ -14,7 +14,7 @@
         </a>
 
         <!-- Result Header -->
-        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10)); margin-bottom:1.5rem;" role="main" aria-label="Hasil deteksi berita">
+        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10)); margin-bottom:1.5rem;" role="region" aria-label="Hasil deteksi berita">
             @if(! $submission->isCompleted())
                 {{-- Livewire polling progress bar (wire:poll.2s.visible) with JS fallback via /hasil/{id}/status --}}
                 <div id="submission-progress-wrapper" data-submission-id="{{ $submission->id }}">

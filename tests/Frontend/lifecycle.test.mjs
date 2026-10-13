@@ -359,3 +359,30 @@ test('double submit is blocked; cleanup restores original nodes and attributes',
     assert.equal(button.disabled, false);
     assert.deepEqual(button.childNodes, nodes);
 });
+
+test('native reset releases a busy form and allows another submission', async () => {
+    const { form, root, button, nodes } = formFixture();
+    const cleanup = mountForms(root);
+    form.dispatchEvent(submitEvent());
+    await nextTask();
+    assert.equal(button.disabled, true);
+    form.dispatchEvent(new Event('reset', { cancelable: true }));
+    await nextTask();
+    assert.equal(button.disabled, false);
+    assert.deepEqual(button.childNodes, nodes);
+    assert.equal(form.dispatchEvent(submitEvent()), true);
+    cleanup();
+});
+
+test('cancelled reset retains the double-submit guard', async () => {
+    const { form, root, button } = formFixture();
+    const cleanup = mountForms(root);
+    form.dispatchEvent(submitEvent());
+    await nextTask();
+    form.addEventListener('reset', event => event.preventDefault());
+    form.dispatchEvent(new Event('reset', { cancelable: true }));
+    await nextTask();
+    assert.equal(button.disabled, true);
+    assert.equal(form.dispatchEvent(submitEvent()), false);
+    cleanup();
+});

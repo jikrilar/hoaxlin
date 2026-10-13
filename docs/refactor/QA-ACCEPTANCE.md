@@ -23,6 +23,12 @@ IP-006 menambah [subhasil komponen](COMPONENTS-IP-006.md): 20 unit tests/45 asse
 
 IP-007 menambah [subhasil lifecycle](LIFECYCLE-IP-007.md): 19 JS tests, scoped Blade/component review, normal/no-JS browser smoke, BFCache aktual serta runtime wire:navigate dari versi lock. Shared handlers dan resource cleanup yang dimigrasi lulus; QA-ASSET-03 dan QA halaman tetap not_run secara agregat karena preview/polling/halaman legacy dan hydration/authorization aplikasi belum mencakup seluruh varian wajib. Jumlah tetap 3 pass audit/inventaris dan 91 not_run.
 
+IP-008 menambah [subhasil shell](SHELL-IP-008.md): metadata/default/escaping tests, 25 Blade/source DOM renders, normal/no-JS keyboard skip link dan delapan navigasi Livewire dengan Vite/Livewire satu per body serta stacks/metadata yang tetap bekerja. QA-SHELL-01 mendapat evidence presentasi fixture; kasus agregat tetap not_run sampai runtime aplikasi dan cakupan QA lengkap diverifikasi. Tidak mengubah jumlah 3 pass audit/inventaris dan 91 not_run.
+
+IP-009 menambah [subhasil navigation/flash](NAVIGATION-IP-009.md): role/current-route/escaping tests, 31 renders, navigation nonmodal/no-JS/reduced, native account keyboard/focus, flash persistence/dismissal dan navigasi Livewire. QA-SHELL-02–04 memiliki evidence fixture tanpa mengklaim middleware/authorization HTTP atau seluruh QA aplikasi; jumlah tetap 3 pass audit/inventaris dan 91 not_run secara agregat.
+
+IP-010 menambah [subhasil shell auth/form](AUTH-SHELL-IP-010.md): 45 tests/282 assertions, 25 JS tests, native POST/no-JS/Enter ke receiver loopback, autofill fixture, BFCache secret/loading recovery dan Livewire lintas shell. QA-SHELL-05/QA-AUTH-04 mendapat evidence helper; auth controller/DB/mail/throttle/broker dan acceptance halaman lengkap tetap belum dijalankan. Jumlah tetap 3 pass audit/inventaris dan 91 not_run secara agregat.
+
 File ini berada di `docs/refactor/` bersama [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md). [AGENTS.md](../../AGENTS.md) tetap di root repository.
 
 ## 1. Tujuan dan otoritas dokumen
