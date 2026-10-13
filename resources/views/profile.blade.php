@@ -54,10 +54,10 @@
                 </p>
             </div>
             <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-                <a href="{{ url('/riwayat') }}" class="btn-secondary" style="font-size:0.875rem; padding:0.625rem 1.25rem;">
+                <x-ui.link :href="url('/riwayat')" variant="secondary">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Riwayat Saya
-                </a>
+                </x-ui.link>
             </div>
         </div>
 
@@ -253,13 +253,12 @@
                 <input type="password" id="confirm-password" name="password" class="auth-input" placeholder="Kata sandi kamu" required>
             </div>
             <div style="display:flex; gap:0.75rem;">
-                <button type="button" onclick="document.getElementById('delete-modal').style.display='none'" class="btn-secondary" style="flex:1; justify-content:center;">
+                <x-ui.button variant="secondary" class="flex-1" onclick="document.getElementById('delete-modal').style.display='none'">
                     Batal
-                </button>
-                <button type="submit" style="flex:1; display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.75rem 1rem; background:var(--ds-danger-bg); border:1px solid var(--ds-danger-fg); border-radius:0.75rem; color:var(--ds-danger-fg); font-weight:600; cursor:pointer; transition:all 0.2s; font-size:0.9375rem;"
-                        onmouseover="this.style.background='var(--ds-danger-bg)'" onmouseout="this.style.background='var(--ds-danger-bg)'">
+                </x-ui.button>
+                <x-ui.button type="submit" variant="destructive" class="flex-1">
                     Ya, Hapus Akun
-                </button>
+                </x-ui.button>
             </div>
         </form>
     </div>

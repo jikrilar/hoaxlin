@@ -4,7 +4,7 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | Fondasi IP-004 dan base publik IP-005 diterapkan; komponen reusable/halaman/admin/PDF masih pending |
+| Status | Fondasi IP-004/005 dan komponen reusable IP-006 diterapkan; lifecycle/halaman/admin/PDF masih pending |
 | Arah visual | Warm Editorial Intelligence |
 | Theme | Light-only, publik dan admin |
 | Stack target | Laravel 12, Blade, Tailwind CSS 4, Vite, Livewire 4, Filament 5 |
@@ -250,7 +250,7 @@ Focus outline harus terlihat dan tidak terpotong oleh parent overflow. Primary b
 
 ## 7. Komponen inti
 
-Semua nama komponen berikut adalah target reusable, belum merupakan file/API yang tersedia. Utamakan anonymous Blade components bila tidak membutuhkan logic server tambahan. Filament tetap memakai komponen native-nya.
+Tujuh API UI/form dasar kini tersedia dan dipakai pada [IP-006](COMPONENTS-IP-006.md); komponen hasil/upload/password khusus berikut masih target task turunan. Utamakan anonymous Blade components bila tidak membutuhkan logic server tambahan. Filament tetap memakai komponen native-nya.
 
 ### 7.1 Button dan link
 

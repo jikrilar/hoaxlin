@@ -223,9 +223,7 @@
             <section class="evidence-section" role="region" aria-labelledby="evidence-heading">
                 <h2 id="evidence-heading" style="font-size:1.0625rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.5rem;">Bukti/Rujukan Terkait</h2>
                 @if($submission->evidenceReferences->isEmpty())
-                    <p role="status" aria-live="polite" style="color:var(--color-text-muted); font-size:0.875rem; line-height:1.6;">
-                        Tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini.
-                    </p>
+                    <x-ui.empty-state message="Tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini." role="status" aria-live="polite" />
                 @else
                     <ol class="evidence-list">
                         @foreach($submission->evidenceReferences as $evidenceReference)
@@ -268,15 +266,9 @@
 
             <!-- Extracted Text (if applicable) -->
             @if(isset($submission->extracted_text) && $inputType !== 'text')
-            <div style="margin-bottom:1.5rem;">
-                <button id="toggle-extracted" onclick="toggleExtracted()" style="display:flex; align-items:center; gap:0.5rem; background:none; border:none; color:var(--color-text-secondary); font-size:0.875rem; font-weight:500; cursor:pointer; padding:0;" aria-expanded="false" aria-controls="extracted-text-panel">
-                    <svg id="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.2s;" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-                    Lihat Teks yang Diekstraksi
-                </button>
-                <div id="extracted-text-panel" style="display:none; margin-top:1rem; padding:1.25rem; background:var(--ds-bg-surface); border:1px solid var(--color-border-light); border-radius:0.875rem; max-height:200px; overflow-y:auto;">
-                    <p style="color:var(--color-text-secondary); font-size:0.875rem; line-height:1.7; white-space:pre-wrap;">{{ $submission->extracted_text }}</p>
-                </div>
-            </div>
+                <x-ui.disclosure title="Lihat Teks yang Diekstraksi" id="extracted-text-disclosure">
+                    <p id="extracted-text-panel" style="white-space:pre-wrap; max-height:200px; overflow-y:auto;">{{ $submission->extracted_text }}</p>
+                </x-ui.disclosure>
             @endif
 
             @if(filled($submission->translated_text))
@@ -412,17 +404,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
 });
-
-// Toggle extracted text
-function toggleExtracted() {
-    const panel = document.getElementById('extracted-text-panel');
-    const icon = document.getElementById('toggle-icon');
-    const btn = document.getElementById('toggle-extracted');
-    const isOpen = panel.style.display !== 'none';
-    panel.style.display = isOpen ? 'none' : 'block';
-    icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
-    btn.setAttribute('aria-expanded', !isOpen);
-}
 
 // Feedback selection
 function selectFeedback(isCorrect) {

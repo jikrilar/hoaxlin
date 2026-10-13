@@ -19,6 +19,8 @@ IP-004 menambah subhasil fondasi pada [FOUNDATION-IP-004.md](FOUNDATION-IP-004.m
 
 IP-005 menambah [subhasil base publik](BASE-IP-005.md): 19 render Blade dan smoke seluruh view publik pada tiga profile browser. QA-ASSET/QA-A11Y dan kasus halaman tetap not_run secara agregat; controller/authorization/pipeline, semua varian interaksi dan renderer admin/PDF belum diverifikasi.
 
+IP-006 menambah [subhasil komponen](COMPONENTS-IP-006.md): 20 unit tests/45 assertions serta render/state/keyboard review pada tiga profile browser. Kasus QA halaman tetap not_run secara agregat; kelulusan ini tidak mencakup seluruh authorization/pipeline/lifecycle/admin/PDF.
+
 File ini berada di `docs/refactor/` bersama [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md). [AGENTS.md](../../AGENTS.md) tetap di root repository.
 
 ## 1. Tujuan dan otoritas dokumen

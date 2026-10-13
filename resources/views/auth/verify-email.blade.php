@@ -15,21 +15,21 @@
             </p>
 
             @if (session('status') === 'verification-link-sent')
-                <div style="padding:0.875rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:0.75rem; color:var(--ds-success-fg); font-size:0.875rem; margin-bottom:1.25rem;" role="status">
+                <x-ui.alert tone="success" role="status">
                     Tautan verifikasi baru telah dikirim.
-                </div>
+                </x-ui.alert>
             @endif
 
             <form method="POST" action="{{ route('verification.send') }}" style="margin-bottom:1rem;">
                 @csrf
-                <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Kirim Ulang Email Verifikasi</button>
+                <x-ui.button type="submit" class="w-full">Kirim Ulang Email Verifikasi</x-ui.button>
             </form>
 
             <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
-                <a href="{{ route('profile') }}" class="btn-ghost">Ubah Email</a>
+                <x-ui.link :href="route('profile')" variant="tertiary">Ubah Email</x-ui.link>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="btn-ghost">Keluar</button>
+                    <x-ui.button type="submit" variant="tertiary">Keluar</x-ui.button>
                 </form>
             </div>
         </div>

@@ -4,7 +4,7 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-005 selesai; 5 dari 39 task done, IP-006–IP-039 pending |
+| Status | IP-001–IP-006 selesai; 6 dari 39 task done, IP-007–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Arah desain | Warm Editorial Intelligence; light-only |
@@ -17,7 +17,7 @@ Dokumen terkait: [AGENTS.md](../../AGENTS.md), [OVERVIEW.md](OVERVIEW.md), [DESI
 
 Rencana ini mengubah spesifikasi desain, halaman, dan arsitektur menjadi tugas yang dapat dikerjakan, ditinjau, dan diverifikasi. Ia bukan daftar fitur baru maupun bukti bahwa refactor sudah diterapkan.
 
-IP-001–IP-003 memiliki bukti pada [audit checkout](AUDIT-IP-001.md), [baseline historis IP-002](BASELINE-IP-002.md), [inventaris fixture IP-003](FIXTURES-IP-003.md) dan [jurnal eksekusi](TASKS.md#ip-003--catatan-eksekusi). Catatan IP-002 dipulihkan dari commit 2b8284d yang belum masuk branch ini; tidak menjalankan ulang baseline tersebut. Build frontend host pada sesi IP-002 lulus, tetapi Blade/PHPUnit dan smoke aplikasi belum tersedia; probe Firefox hanya menilai engine. IP-003 memetakan setup/oracle dan gap, tanpa eksekusi fixture runtime atau perubahan aplikasi. IP-004 kini selesai pada [laporan fondasi](FOUNDATION-IP-004.md): semantic tokens/Tailwind bridge/font self-hosted diterapkan dan diverifikasi lewat build, contrast serta browser specimen. IP-005 menyelesaikan [base publik dan transisi legacy](BASE-IP-005.md), termasuk smoke render seluruh view publik. Komponen reusable/shell/halaman/admin/PDF dan QA aplikasi masih pekerjaan berikutnya. IP-006–IP-039 tetap pending.
+IP-001–IP-003 memiliki bukti pada [audit checkout](AUDIT-IP-001.md), [baseline historis IP-002](BASELINE-IP-002.md), [inventaris fixture IP-003](FIXTURES-IP-003.md) dan [jurnal eksekusi](TASKS.md#ip-003--catatan-eksekusi). Catatan IP-002 dipulihkan dari commit 2b8284d yang belum masuk branch ini; tidak menjalankan ulang baseline tersebut. Build frontend host pada sesi IP-002 lulus, tetapi Blade/PHPUnit dan smoke aplikasi belum tersedia; probe Firefox hanya menilai engine. IP-003 memetakan setup/oracle dan gap, tanpa eksekusi fixture runtime atau perubahan aplikasi. IP-004 kini selesai pada [laporan fondasi](FOUNDATION-IP-004.md): semantic tokens/Tailwind bridge/font self-hosted diterapkan dan diverifikasi lewat build, contrast serta browser specimen. IP-005 menyelesaikan [base publik dan transisi legacy](BASE-IP-005.md), termasuk smoke render seluruh view publik. IP-006 menyediakan [komponen UI/form reusable](COMPONENTS-IP-006.md) dengan pemakai nyata dan unit/browser review. Lifecycle/shell/halaman/admin/PDF serta QA aplikasi masih pekerjaan berikutnya. IP-007–IP-039 tetap pending.
 
 Kerjakan dependency sebelum task turunannya. Tuntaskan satu alur dengan error, empty, akses, mobile, dan keyboard sebelum memperluas perubahan. Untuk layout/CSS bersama, cek pula halaman yang masih memakai presentasi lama.
 

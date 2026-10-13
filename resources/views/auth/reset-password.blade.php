@@ -17,24 +17,19 @@
                 @csrf
                 <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
-                <div style="margin-bottom:1.25rem;">
-                    <label for="email" class="auth-label">Alamat Email</label>
-                    <input id="email" class="auth-input" type="email" name="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="email">
-                    @error('email')<p class="auth-error" role="alert">{{ $message }}</p>@enderror
-                </div>
+                <x-ui.field id="email" label="Alamat Email" :error="$errors->first('email')">
+                    <x-forms.input type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="email" />
+                </x-ui.field>
 
-                <div style="margin-bottom:1.25rem;">
-                    <label for="password" class="auth-label">Kata Sandi Baru</label>
-                    <input id="password" class="auth-input" type="password" name="password" required autocomplete="new-password">
-                    @error('password')<p class="auth-error" role="alert">{{ $message }}</p>@enderror
-                </div>
+                <x-ui.field id="password" label="Kata Sandi Baru" :error="$errors->first('password')">
+                    <x-forms.input type="password" name="password" required autocomplete="new-password" />
+                </x-ui.field>
 
-                <div style="margin-bottom:1.5rem;">
-                    <label for="password_confirmation" class="auth-label">Konfirmasi Kata Sandi</label>
-                    <input id="password_confirmation" class="auth-input" type="password" name="password_confirmation" required autocomplete="new-password">
-                </div>
+                <x-ui.field id="password_confirmation" label="Konfirmasi Kata Sandi" :error="$errors->first('password_confirmation')">
+                    <x-forms.input type="password" name="password_confirmation" required autocomplete="new-password" />
+                </x-ui.field>
 
-                <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Reset Kata Sandi</button>
+                <x-ui.button type="submit" class="w-full">Reset Kata Sandi</x-ui.button>
             </form>
         </div>
     </div>

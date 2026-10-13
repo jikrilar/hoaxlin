@@ -31,55 +31,35 @@
 
             <!-- Status Message -->
             @if (session('status'))
-            <div style="padding:1rem 1.25rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:0.875rem; margin-bottom:1.5rem; display:flex; gap:0.625rem; align-items:center;" role="status">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-success-fg)" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <p style="color:var(--ds-success-fg); font-size:0.875rem;">{{ session('status') }}</p>
-            </div>
+                <x-ui.alert tone="success" role="status">{{ session('status') }}</x-ui.alert>
             @endif
 
-            <!-- Error -->
             @if($errors->any())
-            <div style="padding:0.875rem 1rem; background:var(--ds-danger-bg); border:1px solid var(--ds-danger-fg); border-radius:0.75rem; margin-bottom:1.5rem;" role="alert">
-                @foreach($errors->all() as $error)
-                <p style="color:var(--ds-danger-fg); font-size:0.875rem;">{{ $error }}</p>
-                @endforeach
-            </div>
+                <x-ui.alert tone="danger" role="alert">
+                    <ul>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </x-ui.alert>
             @endif
 
             <!-- Form -->
             <form method="POST" action="{{ route('password.email') }}" id="forgot-form" novalidate>
                 @csrf
 
-                <!-- Email -->
-                <div style="margin-bottom:1.5rem;">
-                    <label for="email" class="auth-label">Alamat Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        class="auth-input"
-                        value="{{ old('email') }}"
-                        required
-                        autocomplete="email"
-                        autofocus
-                        placeholder="kamu@email.com"
-                        aria-describedby="{{ $errors->has('email') ? 'email-error' : 'email-hint' }}"
-                        aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
-                    >
-                    @error('email')
-                        <p id="email-error" class="auth-error" role="alert">{{ $message }}</p>
-                    @else
-                        <p id="email-hint" style="color:var(--color-text-muted); font-size:0.8125rem; margin-top:0.375rem;">
-                            Masukkan email yang kamu gunakan saat mendaftar.
-                        </p>
-                    @enderror
-                </div>
+                <x-ui.field id="email" label="Alamat Email"
+                    hint="Masukkan email yang kamu gunakan saat mendaftar."
+                    :error="$errors->first('email')">
+                    <x-forms.input type="email" name="email" :value="old('email')"
+                        required autocomplete="email" autofocus placeholder="kamu@email.com" />
+                </x-ui.field>
 
                 <!-- Submit -->
-                <button type="submit" class="btn-primary" id="reset-btn" style="width:100%; justify-content:center; font-size:1rem; padding:0.875rem;">
+                <x-ui.button type="submit" id="reset-btn" class="w-full">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                     <span>Kirim Tautan Reset</span>
-                </button>
+                </x-ui.button>
             </form>
 
             <!-- Divider -->
@@ -93,15 +73,15 @@
             <div style="text-align:center;">
                 <p style="color:var(--color-text-muted); font-size:0.9375rem; margin-bottom:0.75rem;">
                     Ingat kata sandimu?
-                    <a href="{{ route('login') }}" style="color:var(--color-primary-light); font-weight:600; text-decoration:none; margin-left:0.25rem;">
+                    <x-ui.link :href="route('login')">
                         Masuk Sekarang
-                    </a>
+                    </x-ui.link>
                 </p>
                 <p style="color:var(--color-text-muted); font-size:0.875rem;">
                     Belum punya akun?
-                    <a href="{{ route('register') }}" style="color:var(--color-primary-light); font-weight:600; text-decoration:none; margin-left:0.25rem;">
+                    <x-ui.link :href="route('register')">
                         Daftar Gratis
-                    </a>
+                    </x-ui.link>
                 </p>
             </div>
         </div>

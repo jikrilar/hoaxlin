@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-005 selesai; 5 dari 39 task selesai, IP-006–IP-039 pending |
+| Status | IP-001–IP-006 selesai; 6 dari 39 task selesai, IP-007–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-005 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-006 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -81,7 +81,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-003](#ip-003) | F0 | Susun inventaris state dan data QA | done |
 | [IP-004](#ip-004) | F1 | Implementasikan tokens, bridge Tailwind, dan font | done |
 | [IP-005](#ip-005) | F1 | Rapikan base CSS dan transisi legacy | done |
-| [IP-006](#ip-006) | F1 | Buat komponen dasar reusable | pending |
+| [IP-006](#ip-006) | F1 | Buat komponen dasar reusable | done |
 | [IP-007](#ip-007) | F1 | Bangun lifecycle dan helper JS | pending |
 | [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | pending |
 | [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | pending |
@@ -221,10 +221,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-02, FA-03.
 - **Source/target:** `resources/views/components/ui/`, `resources/views/components/forms/`, `resources/css/components.css`.
 
-- [ ] Buat pola yang dipakai: button/link, field, alert, empty state, disclosure, serta field form yang memang reusable; jangan membangun pustaka tanpa pemakai.
-- [ ] Tentukan props/slots/variants kecil dan tertutup; button type eksplisit, id unik, dan atribut internal tidak bocor ke HTML.
-- [ ] Hubungkan label/hint/error melalui for/id/aria-describedby/aria-invalid; pertahankan escaping dan cegah nested form.
-- [ ] Gunakan native details/radio bila cocok; tidak ada query Eloquent, service AI, atau keputusan akses di komponen.
+- [x] Buat pola yang dipakai: button/link, field, alert, empty state, disclosure, serta field form yang memang reusable; jangan membangun pustaka tanpa pemakai.
+- [x] Tentukan props/slots/variants kecil dan tertutup; button type eksplisit, id unik, dan atribut internal tidak bocor ke HTML.
+- [x] Hubungkan label/hint/error melalui for/id/aria-describedby/aria-invalid; pertahankan escaping dan cegah nested form.
+- [x] Gunakan native details/radio bila cocok; tidak ada query Eloquent, service AI, atau keputusan akses di komponen.
 
 **Validasi:** Blade compile; form/keyboard/state review.
 
@@ -967,6 +967,18 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Batas:** dependency sementara memakai lockfile dengan platform requirements diabaikan karena PHP host 8.5 dan ekstensi tidak lengkap; bukan environment aplikasi yang didukung. Tidak ada runtime controller/middleware/DB/POST, Livewire mount/poll authorization, PHPUnit, admin, PDF atau AI/provider run. QA aggregate tetap pass=3/not_run=91. Text resize bukan native zoom audit.
 - **Perlindungan:** backend/tests/routes/config/env/lockfile/AGENTS/font assets/vendor/Filament/PDF dibandingkan snapshot; tidak mengubah kontrak, migration, dependency proyek, seed/data atau deployment. Komponen Blade reusable dan lifecycle baru belum dikerjakan.
 - **Berikutnya:** berhenti pada IP-005; commit semantic sesuai instruksi. IP-006–IP-039 pending.
+
+### IP-006 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; FA-02/FA-03, komponen UI/form.
+- **Checkout:** frontend-refactor/foundation, HEAD awal fae25e0; tree/index bersih, AGENTS dibaca; tidak ada instruksi subtree.
+- **Perubahan:** tujuh anonymous components (button/link/field/input/alert/empty-state/disclosure), components.css semantic dalam layer components, import entry. Enam view consumer: forgot/reset/verify-email, profile, riwayat dan hasil. Unit test baru melindungi kontrak markup/escaping/URL/atribut/state; status/API didokumentasikan pada COMPONENTS-IP-006.md dan dokumen plan/design/architecture/QA.
+- **Perilaku:** variants tertutup, tombol non-submit default, loading native disabled/aria-busy, link navigation aman, label/hint/error terhubung dan IDs eksplisit unik; input tidak mengizinkan context override. Alert role ditentukan caller; evidence empty mempertahankan copy/status. Native details menggantikan JS toggle ekstraksi beserta dead handler. Tidak ada form/query/authorization di komponen.
+- **Validasi:** npm build exit 0; PHPUnit scoped 20 tests/45 assertions pass, Pint test pass. 24 render Blade, 19 baseline form/native value comparison, tiga profile Firefox 157.0.1/192 viewport samples tanpa overflow/ID leak/label/error target rusak/console error; input >=16px dan control >=44px. Native Space disclosure, Tab editable/readonly/button, disabled/loading/reduced motion, text resize 200% dan screenshots diperiksa. Review akhir lulus: 345 tautan lokal/134 anchor, 6 done/33 pending, 94 QA IDs lengkap; 12 tracked files berubah dan 10 file baru sesuai scope. Protected fingerprints/.env/lock/font/backend cocok awal, 23 compiled PHP dan 41 inline scripts lolos syntax, secret scan lulus. git diff --check dan git diff --cached --check exit 0.
+- **Evidence:** [COMPONENTS-IP-006.md](COMPONENTS-IP-006.md), source/test/API dan artefak /tmp/hoaxlin-ip006-_x_qy91s. Seluruh view asli di-render melalui fixture; ini bukan E2E controller/middleware/pipeline.
+- **Batas:** PHP host 8.5 dengan dependency sementara dari lock yang platform checks-nya diabaikan pada IP-005. Unit suite komponen dijalankan; suite aplikasi/DB, Blade artisan, Livewire mount/authorization/polling, admin/PDF/provider tidak dijalankan. QA aggregate tetap 3 pass/91 not_run. Text resize bukan native zoom/screen reader audit.
+- **Perlindungan:** route/action/CSRF/input/method/old values/escaping/labels/skor/final guards dijaga; backend/config/env/lock/font/vendor/admin/PDF tidak diedit. Tidak ada migration/seed/mail/POST/deploy atau dependency baru.
+- **Berikutnya:** berhenti pada IP-006 dan commit semantic; IP-007–IP-039 tetap pending, tanpa mengerjakan lifecycle atau fase shell berikutnya.
 
 ### Format catatan berikutnya
 

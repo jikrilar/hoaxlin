@@ -155,18 +155,13 @@
         @endif
 
         @else
-        <!-- Empty State -->
-        <div class="glass-card" style="padding:5rem 2rem; text-align:center;">
-            <div style="font-size:4rem; margin-bottom:1.25rem;" aria-hidden="true">🔍</div>
-            <h2 style="font-size:1.375rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">{{ request()->hasAny(['search', 'label', 'input_type', 'status']) ? 'Riwayat Tidak Ditemukan' : 'Belum Ada Riwayat' }}</h2>
-            <p style="color:var(--color-text-muted); max-width:400px; margin:0 auto 1.75rem; font-size:0.9375rem; line-height:1.65;">
-                {{ request()->hasAny(['search', 'label', 'input_type', 'status']) ? 'Coba ubah kata kunci atau filter yang digunakan.' : 'Kamu belum pernah mengecek berita. Mulai cek berita pertamamu sekarang!' }}
-            </p>
-            <a href="{{ url('/') }}#cek-berita" class="btn-primary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <span>Cek Berita Sekarang</span>
-            </a>
-        </div>
+        <x-ui.empty-state
+            :title="request()->hasAny(['search', 'label', 'input_type', 'status']) ? 'Riwayat Tidak Ditemukan' : 'Belum Ada Riwayat'"
+            :message="request()->hasAny(['search', 'label', 'input_type', 'status']) ? 'Coba ubah kata kunci atau filter yang digunakan.' : 'Kamu belum pernah mengecek berita. Mulai cek berita pertamamu sekarang!'">
+            <x-slot:actions>
+                <x-ui.link :href="url('/').'#cek-berita'" variant="primary">Cek Berita Sekarang</x-ui.link>
+            </x-slot:actions>
+        </x-ui.empty-state>
         @endif
 
         <!-- Stats Summary -->

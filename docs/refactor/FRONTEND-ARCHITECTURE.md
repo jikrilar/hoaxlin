@@ -191,16 +191,17 @@ Tanpa JS, status dapat dilihat dengan refresh manual. Baseline memiliki meta ref
 
 ## 7. API dan aturan komponen Blade
 
-Komponen reusable dibentuk oleh kebutuhan berulang atau state yang perlu konsisten. Hindari komponen yang hanya membungkus satu `div` tanpa manfaat.
+API yang telah diterapkan dan batasnya dicatat pada [IP-006](COMPONENTS-IP-006.md). Komponen reusable dibentuk oleh kebutuhan berulang atau state yang perlu konsisten. Hindari komponen yang hanya membungkus satu `div` tanpa manfaat.
 
 | Komponen target | Props/slot utama | Tanggung jawab |
 | --- | --- | --- |
-| `x-ui.button` | variant, type, disabled, slot | Button native; type eksplisit; default aman `button` |
+| `x-ui.button` | variant, type, disabled/loading, slot | Button native; type eksplisit; default aman `button` |
 | `x-ui.link` | href, variant, slot | Link navigation; tidak diberi disabled palsu |
 | `x-ui.alert` | tone, title opsional, slot | Pesan/semantik sesuai konteks; tidak semua memakai alert assertive |
-| `x-ui.field` | id, name, label, hint, error, slot | Label dan hubungan hint/error; input tetap eksplisit |
+| `x-ui.field` | id, label, hint, error, slot | Label dan hubungan hint/error; input tetap eksplisit |
 | `x-ui.empty-state` | title, message, action slot | Keadaan kosong dengan tindakan nyata |
 | `x-ui.disclosure` | title, open, slot | Native disclosure bila sesuai; tidak selalu perlu JS |
+| `x-forms.input` | type, native attributes; id/hint/error dari field | Input native reusable; name/value pada kontrol |
 | `x-forms.password-field` | id, name, autocomplete, error | Field password + toggle sebagai enhancement |
 | `x-forms.upload-field` | id, name, accept, limits, error | Input file native + bantuan/preview; bukan validator keamanan |
 | `x-results.prediction-label` | label domain | Mapping teks/tone; final guard tetap pada komposisi |
