@@ -29,11 +29,6 @@
                 </p>
             </div>
 
-            <!-- Status Message -->
-            @if (session('status'))
-                <x-ui.alert tone="success" role="status">{{ session('status') }}</x-ui.alert>
-            @endif
-
             @if($errors->any())
                 <x-ui.alert tone="danger" role="alert">
                     <ul>

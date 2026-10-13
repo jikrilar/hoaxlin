@@ -14,12 +14,6 @@
                 Jika belum terlihat, periksa kotak masuk dan folder spam, atau minta tautan baru di bawah.
             </p>
 
-            @if (session('status') === 'verification-link-sent')
-                <x-ui.alert tone="success" role="status">
-                    Tautan verifikasi baru telah dikirim.
-                </x-ui.alert>
-            @endif
-
             <form method="POST" action="{{ route('verification.send') }}" style="margin-bottom:1rem;">
                 @csrf
                 <x-ui.button type="submit" class="w-full">Kirim Ulang Email Verifikasi</x-ui.button>

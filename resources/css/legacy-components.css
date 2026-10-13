@@ -2,9 +2,6 @@
 
 @layer components {
 
-    .footer-grid-4col {
-        grid-template-columns: 2fr 1fr 1fr 1fr;
-    }
     /* ─── Glass Card ─── */
 
     .glass-card {
@@ -116,26 +113,7 @@
         color: var(--ds-text-primary);
         border-color: var(--ds-border-subtle);
     }
-    /* ─── Navbar ─── */
-
-    .navbar {
-        background: var(--ds-bg-canvas);
-        border-bottom: var(--ds-border-width) solid var(--ds-border-subtle);
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: var(--ds-z-header);
-        padding: 1rem 0;
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-    }
-
-    .navbar.scrolled {
-        background: var(--ds-bg-surface);
-        padding: 0.75rem 0;
-        top: 0;
-        margin-top: 0;
-    }
+    /* Auth wordmark remains until its final consumers migrate. */
 
     .nav-logo {
         white-space: nowrap;
@@ -147,23 +125,6 @@
         color: var(--ds-action-primary);
     }
 
-    .nav-link {
-        color: var(--ds-text-body);
-        text-decoration: none;
-        font-size: 0.9375rem;
-        font-weight: 500;
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-        padding: 0.25rem 0;
-        position: relative;
-    }
-
-    .nav-link:hover {
-        color: var(--ds-text-primary);
-    }
-
-    .nav-link.active {
-        color: var(--ds-text-primary);
-    }
     /* ─── Input Tab Switcher ─── */
 
     .input-tabs {
@@ -596,20 +557,7 @@
     .step-icon.pending {
         background: var(--ds-bg-selected);
     }
-    /* ─── Footer ─── */
 
-    .footer {
-        background: var(--ds-bg-surface);
-        border-top: 1px solid var(--ds-border-subtle);
-    }
-
-    .footer-logo {
-        font-family: var(--ds-font-ui);
-        font-weight: var(--ds-font-weight-semibold);
-        font-size: 1.25rem;
-        color: var(--ds-action-primary);
-        text-decoration: none;
-    }
     /* ─── Auth Forms ─── */
 
     .auth-input {
@@ -675,69 +623,20 @@
             font-size: 1.75rem;
         }
     }
-    /* ─── Mobile Menu ─── */
 
-    .mobile-menu {
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: var(--ds-z-dialog);
-        background: var(--ds-bg-surface);
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 2rem;
-    }
-
-    .mobile-menu.open {
-        display: flex;
-    }
     /* ─── Misc ─── */
 
     .divider {
         height: 1px;
         background: var(--ds-border-subtle);
     }
-    /* ─── Dropdown Menu ─── */
 
-    .dropdown-item {
-        display: flex;
-        align-items: center;
-        gap: 0.625rem;
-        padding: 0.625rem 0.875rem;
-        color: var(--ds-text-body);
-        font-size: 0.875rem;
-        font-weight: 500;
-        text-decoration: none;
-        border-radius: var(--ds-radius-md);
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-        white-space: nowrap;
-    }
-
-    .dropdown-item:hover {
-        background: var(--ds-bg-selected);
-        color: var(--ds-text-primary);
-    }
     /* ─── Mobile History Cards ─── */
-    /* ─── Responsive footer ─── */
 
-    @media (max-width: 768px) {
-
-        .footer-grid-4col {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-
-    @media (max-width: 480px) {
-
-        .footer-grid-4col {
-            grid-template-columns: 1fr;
-        }
-    }
     /* ─── Profile Page ─── */
     /* Integration states while these legacy class names still have consumers. */
 
-    .container-app :is(.history-row, .history-header) > *, .footer-grid-4col > * {
+    .container-app :is(.history-row, .history-header) > * {
         min-width: 0;
     }
 
@@ -755,30 +654,6 @@
             gap: var(--ds-space-2);
         }
     }
-    /* CSS establishes usable layout before scripts run and with JS disabled. */
-
-    #nav-desktop {
-        display: flex;
-    }
-
-    @media (max-width: 56.25rem) {
-
-        #nav-desktop {
-            display: none;
-        }
-
-        #nav-auth > .btn-primary {
-            display: none;
-        }
-    }
-
-    @media (max-width: 30rem) {
-
-        #user-menu-btn > span {
-            display: none;
-        }
-    }
-
     .history-header {
         display: grid;
         grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)) minmax(0, 100px);

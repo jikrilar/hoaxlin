@@ -25,6 +25,8 @@ IP-007 menambah [subhasil lifecycle](LIFECYCLE-IP-007.md): 19 JS tests, scoped B
 
 IP-008 menambah [subhasil shell](SHELL-IP-008.md): metadata/default/escaping tests, 25 Blade/source DOM renders, normal/no-JS keyboard skip link dan delapan navigasi Livewire dengan Vite/Livewire satu per body serta stacks/metadata yang tetap bekerja. QA-SHELL-01 mendapat evidence presentasi fixture; kasus agregat tetap not_run sampai runtime aplikasi dan cakupan QA lengkap diverifikasi. Tidak mengubah jumlah 3 pass audit/inventaris dan 91 not_run.
 
+IP-009 menambah [subhasil navigation/flash](NAVIGATION-IP-009.md): role/current-route/escaping tests, 31 renders, navigation nonmodal/no-JS/reduced, native account keyboard/focus, flash persistence/dismissal dan navigasi Livewire. QA-SHELL-02–04 memiliki evidence fixture tanpa mengklaim middleware/authorization HTTP atau seluruh QA aplikasi; jumlah tetap 3 pass audit/inventaris dan 91 not_run secara agregat.
+
 File ini berada di `docs/refactor/` bersama [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md). [AGENTS.md](../../AGENTS.md) tetap di root repository.
 
 ## 1. Tujuan dan otoritas dokumen

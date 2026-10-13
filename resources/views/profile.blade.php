@@ -17,14 +17,6 @@
             </p>
         </div>
 
-        <!-- Flash Messages -->
-        @if(session('success'))
-        <div style="padding:1rem 1.25rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:0.875rem; margin-bottom:1.5rem; display:flex; gap:0.625rem; align-items:center; " role="status">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-success-fg)" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <p style="color:var(--ds-success-fg); font-size:0.875rem;">{{ session('success') }}</p>
-        </div>
-        @endif
-
         @if($errors->any())
         <div style="padding:0.875rem 1rem; background:var(--ds-danger-bg); border:1px solid var(--ds-danger-fg); border-radius:0.75rem; margin-bottom:1.5rem;" role="alert">
             @foreach($errors->all() as $error)

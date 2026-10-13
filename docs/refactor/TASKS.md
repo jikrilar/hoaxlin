@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-008 selesai; 8 dari 39 task selesai, IP-009–IP-039 pending |
+| Status | IP-001–IP-009 selesai; 9 dari 39 task selesai, IP-010–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-008 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-009 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -84,7 +84,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-006](#ip-006) | F1 | Buat komponen dasar reusable | done |
 | [IP-007](#ip-007) | F1 | Bangun lifecycle dan helper JS | done |
 | [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | done |
-| [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | pending |
+| [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | done |
 | [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | pending |
 | [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | pending |
 | [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | pending |
@@ -277,10 +277,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-02, FA-04.
 - **Source/target:** `resources/views/partials/navigation.blade.php`, `resources/views/partials/footer.blade.php`, `resources/js/components/navigation.js`.
 
-- [ ] Migrasikan wordmark/nav/account/footer memakai route nyata, active state dan aria-current; tampilkan akses sesuai status server.
-- [ ] Pertahankan logout form POST + CSRF; context verified/admin tidak membuka route yang tidak sah.
-- [ ] Implementasikan disclosure mobile/akun dengan keyboard, aria-expanded, Escape/focus return sesuai pola; focus trap hanya jika benar-benar modal.
-- [ ] Ganti flash dekoratif/auto-dismiss penting dengan alert/status yang jelas dan kontrol tutup aksesibel; hapus social/action placeholder tanpa tujuan.
+- [x] Migrasikan wordmark/nav/account/footer memakai route nyata, active state dan aria-current; tampilkan akses sesuai status server.
+- [x] Pertahankan logout form POST + CSRF; context verified/admin tidak membuka route yang tidak sah.
+- [x] Implementasikan disclosure mobile/akun dengan keyboard, aria-expanded, Escape/focus return sesuai pola; focus trap hanya jika benar-benar modal.
+- [x] Ganti flash dekoratif/auto-dismiss penting dengan alert/status yang jelas dan kontrol tutup aksesibel; hapus social/action placeholder tanpa tujuan.
 
 **Validasi:** Guest/user/admin navigation; keyboard/mobile.
 
@@ -1003,6 +1003,18 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Batas:** artisan view:cache exit 255 karena vendor/autoload.php repo tidak tersedia. Renderer/PHPUnit memakai vendor lock sementara IP-005 pada PHP host 8.5; bukan runtime aplikasi yang didukung. Output asset memakai factory Livewire asli dan SupportNavigate, tanpa hydration/polling/HTTP authorization/DB/AI atau admin/PDF renderer run. Tidak mengirim POST aplikasi. Autofocus existing dipertahankan; native first Tab diperiksa pada fixture tanpa autofocus. QA aggregate tetap 3 pass/91 not_run.
 - **Perlindungan:** fingerprints backend/routes/config/DB/shared JS/font/vendor/admin/PDF/lock/AGENTS cocok baseline. Tidak mengubah contract, dependency, environment, data atau deployment.
 - **Berikutnya:** berhenti pada IP-008; buat commit semantic. IP-009–IP-039 tetap pending.
+
+### IP-009 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; AC-P00 navigation/flash, FA-02/FA-04.
+- **Checkout:** frontend-refactor/public-shell-auth, HEAD awal c75e7c8; tree/index bersih, instruksi root berlaku.
+- **Perubahan:** navigation/footer/flash partials, semantic shell CSS dan module navigation dengan resource cleanup. Legacy nav/footer/grid/overlay selectors kehilangan consumer dan dihapus; auth nav-logo tetap ada. Duplicate local flash blocks pada login/forgot/verify/profile dihapus. PublicNavigationTest baru melindungi role/routes/active/escaping/flash.
+- **Perilaku:** satu nav untuk desktop/mobile, route names/aria-current; guest/user/admin context dari server, verified history dan native admin link. Header logout POST/CSRF tunggal. Mobile nonmodal dan account details native; no-JS routes tetap terlihat, Escape/Space/Tab/focus/outside/resize/navigation cleanup bekerja. Footer punya empat destinations nyata dan tidak mengklaim status service; placeholder social/fitur dihapus. Flash tidak auto-dismiss, error role alert, status/success polite, semua pesan escaped dan dismissal menjaga focus/error field.
+- **Validasi:** npm build pass (11 modules); PHPUnit standalone 36 tests/153 assertions, Pint test dan 19 JS lifecycle tests pass. 31 render HTML, compiled PHP syntax dan 24 baseline page form comparison pass (fixture CSRF/reset-token dinormalisasi; logout header diperiksa terpisah). Firefox: 144 smoke samples, 40 role samples/386 checks normal/no-JS/reduced, empat Space/field-error checks tambahan, dan 26 Livewire navigate/Back/Forward checks pass; console tanpa error. Screenshot mobile menu admin serta pesan panjang ditinjau.
+- **Evidence:** [NAVIGATION-IP-009.md](NAVIGATION-IP-009.md), [PublicNavigationTest](../../tests/Unit/PublicNavigationTest.php), partials/module/CSS dan artefak /tmp/hoaxlin-ip009-hqtjw9vt.
+- **Batas:** artisan auth/profile tests exit 255 karena vendor/autoload.php repo tidak tersedia; vendor lock sementara IP-005 pada PHP 8.5 bukan runtime aplikasi yang didukung. Source routes/User/provider diperiksa, tetapi middleware/authorization HTTP/DB, hydration/polling/AI/admin/PDF runtime belum dijalankan. Tidak ada POST aplikasi. QA aggregate tetap 3 pass/91 not_run; resize teks bukan native zoom/screen reader audit.
+- **Perlindungan:** backend/routes/config/DB/lock/font/vendor/admin/PDF cocok fingerprints awal; tidak mengubah kontrak akses, pipeline, dependency, environment, data atau deployment.
+- **Berikutnya:** berhenti pada IP-009; buat commit semantic. IP-010–IP-039 tetap pending.
 
 ### Format catatan berikutnya
 

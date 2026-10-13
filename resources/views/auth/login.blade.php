@@ -33,13 +33,6 @@
             </div>
             @endif
 
-            <!-- Session Status -->
-            @if(session('status'))
-            <div style="padding:0.875rem 1rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:0.75rem; margin-bottom:1.5rem;" role="status">
-                <p style="color:var(--ds-success-fg); font-size:0.875rem;">{{ session('status') }}</p>
-            </div>
-            @endif
-
             <!-- Login Form -->
             <form method="POST" action="{{ route('login.store') }}" id="login-form" data-submit-label="Memproses..." novalidate>
                 @csrf
