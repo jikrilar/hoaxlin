@@ -256,6 +256,8 @@ Bukti default: ID kasus, commit/build, fixture/role, langkah aktual, mode, expec
 | **QA-ACCESS-04 — Riwayat dan CSV** | Uji guest, unverified, verified owner, verified non-owner dan admin pada P03/P04/P16; coba ID milik orang lain pada P04. | Auth/verified guards tetap. P04 memakai query forUser: hasil orang lain 404 termasuk admin; bukan aturan bypass admin pada /hasil. CSV hanya data user peminta. | AC-P03, AC-P04, AC-P16; IP-021, IP-022, IP-034 |
 | **QA-ACCESS-05 — Akses feedback** | Coba POST sebagai guest/unverified, owner verified, non-owner verified, admin bukan owner dan pemilik capability guest yang baru login. | Middleware auth+verified serta query owner akun/relasi result bertahan. Akses admin ke hasil orang lain tidak memberi hak feedback; capability guest tidak menjadi akun milik pengguna. | AC-P02; IP-016 |
 
+IP-013 menambah [subhasil view progress](PROGRESS-IP-013.md): 27 unit tests/276 assertions menjalankan component/access nyata tanpa SQL, 57 render Blade/456 browser samples dan refresh GET native di normal/no-JS/reduced. QA-PROGRESS-01/09, QA-ACCESS-03 dan QA-A11Y-03 mendapat evidence terbatas pada component/render/DOM; hydration/network polling, controller/DB/session middleware dan screen reader belum dijalankan. Feature suites terblokir oleh autoload repo. QA-PROGRESS/ACCESS tetap not_run secara agregat; jumlah 3 audit pass/91 not_run tidak berubah. Pemilik fallback/terminal transition tetap IP-014.
+
 ### 6.5 Progress, lifecycle dan fallback
 
 **Prasyarat:** P02/P04 nonterminal, state fixture dapat diubah terkontrol, runtime Livewire dan endpoint status tersedia.

@@ -6,6 +6,7 @@
 @import './base.css';
 @import './legacy-components.css';
 @import './components.css';
+@import './submission-progress.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

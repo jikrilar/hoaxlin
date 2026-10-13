@@ -19,14 +19,9 @@
                 {{-- Livewire polling progress bar (wire:poll.2s.visible) with JS fallback via /hasil/{id}/status --}}
                 <div id="submission-progress-wrapper" data-submission-id="{{ $submission->id }}">
                     <livewire:submission-progress :submission="$submission" />
-                    {{-- Fallback for no-JS / Livewire failure: static bar + meta refresh --}}
+                    {{-- Without JavaScript, the native refresh action remains available. --}}
                     <noscript>
-                        <div style="text-align:center; padding:1rem; color:var(--color-text-muted); font-size:0.875rem;">
-                            JavaScript dinonaktifkan — <a href="{{ route('hasil', $submission->id) }}" style="color:var(--color-primary-light);">muat ulang</a> untuk melihat progress terbaru.
-                        </div>
-                        @if(! $submission->isTerminal())
-                            <meta http-equiv="refresh" content="5;url={{ route('hasil', $submission->id) }}">
-                        @endif
+                        <p class="hl-submission-progress__hint">JavaScript dinonaktifkan. Gunakan “Muat ulang status” untuk melihat pembaruan.</p>
                     </noscript>
                 </div>
                 {{-- Vanilla JS polling fallback (if Livewire not loaded, polls /hasil/{id}/status) --}}
@@ -44,10 +39,11 @@
                                 if (! res.ok) return;
                                 const data = await res.json();
                                 const bar = wrapper.querySelector('[role="progressbar"]');
-                                const pctEl = wrapper.querySelector('[aria-live="polite"]');
+                                const pctEl = wrapper.querySelector('[data-progress-percent]');
                                 const stageEl = wrapper.querySelector('[data-stage-label]');
                                 if (bar && typeof data.progress === 'number') {
                                     bar.setAttribute('aria-valuenow', data.progress);
+                                    bar.setAttribute('aria-valuetext', `${data.progress} persen; ${data.stage_label || 'tahap belum tersedia'}; status ${data.status || 'belum tersedia'}`);
                                     const fill = bar.firstElementChild;
                                     if (fill) {
                                         fill.style.width = data.progress + '%';

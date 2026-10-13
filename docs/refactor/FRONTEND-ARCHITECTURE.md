@@ -344,6 +344,8 @@ Persen mengikuti backend/enum dan fallback existing; jangan menghitung durasi at
 
 Endpoint `hasil.status` tetap digunakan dengan kredensial session. Field yang dipakai adalah state/progress/stage serta boolean completed/failed dari respons existing; kontrak tidak diganti oleh frontend.
 
+IP-013 menerapkan [view progress](PROGRESS-IP-013.md) dengan CSS semantic, satu live region status/tahap dan data-progress-percent terpisah untuk fallback existing. Null/unknown tahap tidak diberi label palsu; failed tidak merender meter dan completed belum menjamin result tersedia. Native GET refresh mempertahankan konteks hasil/riwayat, no-JS tanpa meta refresh; wire:poll.2s.visible tetap hanya nonterminal. Component refresh/enum/access/backend tidak diubah. Kepemilikan fallback dan terminal reload global existing masih target IP-014; render fixture bukan bukti hydration/network polling aplikasi.
+
 ### 10.2 Pemilik tunggal
 
 | Kondisi | Pemilik | Ketentuan |

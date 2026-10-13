@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-012 selesai; 12 dari 39 task selesai, IP-013–IP-039 pending |
+| Status | IP-001–IP-013 selesai; 13 dari 39 task selesai, IP-014–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-012 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-013 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -88,7 +88,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | done |
 | [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | done |
 | [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | done |
-| [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | pending |
+| [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | done |
 | [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | pending |
 | [IP-015](#ip-015) | F3 | Migrasikan hasil final, evidence, dan provenance | pending |
 | [IP-016](#ip-016) | F3 | Migrasikan actions dan feedback hasil | pending |
@@ -351,10 +351,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-02, FA-05.
 - **Source/target:** `resources/views/livewire/submission-progress.blade.php`, `app/Livewire/SubmissionProgress.php` (bila perlu presentasi).
 
-- [ ] Migrasikan typography/status/progress tanpa mengubah enum stage atau persen backend.
-- [ ] Pertahankan SubmissionAccess pada setiap refresh; result parsial tidak ditampilkan sebagai final.
-- [ ] Jaga wire:poll.2s.visible hanya untuk nonterminal; failed tidak disajikan sebagai sukses 100%.
-- [ ] Sediakan live-region perubahan bermakna dan refresh manual; hilangkan dekorasi/countdown dan baca status unknown/unavailable secara jujur.
+- [x] Migrasikan typography/status/progress tanpa mengubah enum stage atau persen backend.
+- [x] Pertahankan SubmissionAccess pada setiap refresh; result parsial tidak ditampilkan sebagai final.
+- [x] Jaga wire:poll.2s.visible hanya untuk nonterminal; failed tidak disajikan sebagai sukses 100%.
+- [x] Sediakan live-region perubahan bermakna dan refresh manual; hilangkan dekorasi/countdown dan baca status unknown/unavailable secara jujur.
 
 **Validasi:** SubmissionProgressTest, FinalResultStateTest, PublicPipelineErrorTest.
 
@@ -1053,6 +1053,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Batas:** artisan VideoMediaContractTest/ExternalUrlSecurityTest/SubmissionTest serta suite penuh exit 255 karena vendor/autoload.php repo tidak tersedia. Vendor lock sementara IP-005/PHP 8.5 bukan runtime aplikasi didukung; tidak menjalankan controller/DB/middleware/CAPTCHA reservation/quota/SSRF HTTP/queue/AI/admin/PDF/hydration. Receiver tidak membuktikan pipeline aplikasi; text resize bukan native zoom/screen reader. QA aggregate tetap 3 pass/91 not_run.
 - **Perlindungan:** 253 existing fingerprints backend/routes/config/database/lock/font/vendor/admin/PDF/AGENTS cocok; hanya HomeController view data dan Support presentation helper ditambahkan. Validator/service policy/domain/schema/access tetap; tidak ada POST aplikasi, migration/seed, dependency/environment/data/deployment change.
 - **Berikutnya:** berhenti pada IP-012 dan buat commit semantic; IP-013–IP-039 tetap pending.
+
+### IP-013 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P02/AC-P04 progress; FA-02/FA-05 view.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 7a58e77; tree/index awal bersih.
+- **Perubahan:** progress Blade/CSS semantic, heading/status/stage/meter, satu live region tanpa persen, native refresh kontekstual dan tindakan form baru saat failed. Emoji/skala hardcoded/inline layout/animasi dihapus; no-JS tanpa meta refresh. Parent fallback hanya menyesuaikan marker persen dan aria-valuetext.
+- **Contract:** enum/persen/status dan authorization tiap refresh tetap; pending/processing null 5/30, unknown jujur, processing done bukan final. Failed tidak memiliki meter/persen sukses meski backend done/100; completed tanpa result unavailable. Polling attribute hanya nonterminal; result parsial tidak final.
+- **Validasi:** build, 80 standalone PHP tests/656 assertions (27/276 progress), 34 Node tests, Pint dua test files dan diff check pass. 57 renders/456 Firefox samples pada normal/no-JS/reduced; manual GET lewat Enter 60→75 dan final guards di ketiga profile pass. Mobile screenshots ditinjau; final console tanpa error.
+- **Evidence:** [PROGRESS-IP-013.md](PROGRESS-IP-013.md), unit/feature regressions dan /tmp/hoaxlin-ip013-9ogzjcgb. 257 protected fingerprints cocok; app/routes/config/database/locks/admin/PDF tetap.
+- **Batas:** artisan tiga feature suites exit 255 karena autoload repo hilang; feature regressions belum dieksekusi. Unit menggunakan vendor lock sementara dan refresh double tanpa SQL; browser tanpa component snapshot/hydration. HTTP aplikasi/DB/network polling/session middleware/AI/admin/PDF/screen reader/native zoom belum diverifikasi. QA tetap 3 audit pass/91 not_run.
+- **Berikutnya:** berhenti dan buat commit semantic untuk IP-013; kepemilikan fallback dan terminal reload existing tetap IP-014. IP-014–IP-039 pending.
 
 ### Format catatan berikutnya
 
