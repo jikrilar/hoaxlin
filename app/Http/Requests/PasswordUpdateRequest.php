@@ -7,6 +7,8 @@ use Illuminate\Validation\Rules\Password;
 
 class PasswordUpdateRequest extends FormRequest
 {
+    protected $errorBag = 'passwordUpdate';
+
     public function authorize(): bool
     {
         return true;

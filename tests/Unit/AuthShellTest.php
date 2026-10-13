@@ -9,6 +9,9 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\PasswordUpdateRequest;
+use App\Http\Requests\ProfileDeleteRequest;
+use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\User;
 use DOMDocument;
 use DOMXPath;
@@ -26,7 +29,9 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Foundation\Vite;
+use Illuminate\Hashing\HashManager;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Session\ArraySessionHandler;
@@ -37,6 +42,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Translation\TranslationServiceProvider;
 use Illuminate\Validation\Factory as ValidationFactory;
+use Illuminate\Validation\PresenceVerifierInterface;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\Component;
 use Illuminate\View\ViewServiceProvider;
@@ -597,6 +603,146 @@ class AuthShellTest extends TestCase
         $this->assertTrue($this->app['url']->hasValidSignature(Request::create($valid)));
         $this->assertFalse($this->app['url']->hasValidSignature(Request::create($valid.'&tampered=1')));
         $this->assertFalse($this->app['url']->hasValidSignature(Request::create($expired)));
+    }
+
+    #[DataProvider('verificationStates')]
+    public function test_profile_preserves_three_native_actions_and_verified_access_without_restoring_secrets(bool $verified): void
+    {
+        $this->user = new User;
+        $this->user->setRawAttributes(['id' => 17, 'name' => 'Pengguna', 'email' => 'fixture@example.test', 'email_verified_at' => $verified ? '2026-10-13 00:00:00' : null]);
+        $this->app['view']->share('errors', new ViewErrorBag);
+        $dom = $this->render('profile', '/profil');
+        $this->assertSame(3, $dom->query('//main//form')->length);
+        foreach (['profile-form' => 'PATCH', 'password-form' => 'PUT', 'delete-account-form' => 'DELETE'] as $id => $method) {
+            $this->assertSame(1, $dom->query('//form[@id="'.$id.'" and @method="POST" and @data-submit-label]/input[@name="_method" and @value="'.$method.'"]')->length);
+            $this->assertSame(1, $dom->query('//form[@id="'.$id.'"]/input[@name="_token" and @value="fixture-token"]')->length);
+        }
+        $this->assertSame('http://localhost/profil', $dom->evaluate('string(//form[@id="profile-form"]/@action)'));
+        $this->assertSame('http://localhost/profil/password', $dom->evaluate('string(//form[@id="password-form"]/@action)'));
+        $this->assertSame('http://localhost/profil', $dom->evaluate('string(//form[@id="delete-account-form"]/@action)'));
+        $this->assertSame('Nama <script id="attack">x</script>', $dom->evaluate('string(//input[@name="name"]/@value)'));
+        $this->assertSame('email"@example.test', $dom->evaluate('string(//input[@name="email"]/@value)'));
+        $this->assertSame(0, $dom->query('//main//*[@style or @onmouseover or @novalidate] | //*[@id="attack"] | //*[@id="strength-container"]')->length);
+        $this->assertSame(4, $dom->query('//main//input[@type="password" and @required and not(@value)]')->length);
+        $this->assertSame(2, $dom->query('//main//input[@autocomplete="current-password"]')->length);
+        $this->assertSame(2, $dom->query('//main//input[@autocomplete="new-password"]')->length);
+        $this->assertStringNotContainsString('secret-marker', $dom->document->saveHTML());
+        $this->assertSame(1, $dom->query('//details[@id="delete-confirmation"]//form[@id="delete-account-form"]')->length);
+        $this->assertSame(1, $dom->query('//button[@id="delete-account-btn" and @hidden]')->length);
+        $this->assertSame(0, $dom->query('//dialog//form | //details/@open')->length);
+        $this->assertStringContainsString($verified ? 'Email terverifikasi' : 'Email belum terverifikasi', $dom->evaluate('string(//main//header)'));
+        $this->assertSame(1, $dom->query('//main//header//a[@href="http://localhost/'.($verified ? 'riwayat' : 'verify-email').'"]')->length);
+        $this->assertStringContainsString('verifikasi ulang', $dom->evaluate('string(//main)'));
+        $this->assertStringNotContainsString('Seluruh data', $dom->evaluate('string(//main)'));
+    }
+
+    #[DataProvider('profileErrorBags')]
+    public function test_profile_errors_stay_in_their_action_and_delete_errors_have_native_recovery(array $bags): void
+    {
+        $this->user = new User;
+        $this->user->setRawAttributes(['id' => 17, 'name' => 'Pengguna', 'email' => 'fixture@example.test']);
+        $errors = new ViewErrorBag;
+        foreach ($bags as $bag => $messages) {
+            $errors->put($bag, new MessageBag($messages));
+        }
+        $this->app['view']->share('errors', $errors);
+        $dom = $this->render('profile', '/profil');
+        foreach (['profile' => 'profile-errors', 'passwordUpdate' => 'password-errors', 'accountDeletion' => 'delete-errors'] as $bag => $id) {
+            $this->assertSame(isset($bags[$bag]) ? 1 : 0, $dom->query('//*[@id="'.$id.'" and @role="alert"]')->length);
+        }
+        $this->assertSame(isset($bags['passwordUpdate']['password']) ? 1 : 0, $dom->query('//*[@id="password-error"]')->length);
+        $this->assertSame(isset($bags['accountDeletion']['password']) ? 1 : 0, $dom->query('//*[@id="confirm-password-error"]')->length);
+        $this->assertSame(isset($bags['accountDeletion']) ? 1 : 0, $dom->query('//details[@id="delete-confirmation" and @open]')->length);
+        $this->assertSame(isset($bags['accountDeletion']) ? 1 : 0, $dom->query('//dialog[@data-dialog-auto-open]')->length);
+        $this->assertSame(1, $dom->query('//main//*[@autofocus and not(@hidden)]')->length);
+        foreach ($dom->query('//*[contains(@class,"hl-profile-errors")]//a') as $link) {
+            $id = substr($link->getAttribute('href'), 1);
+            $this->assertSame(1, $dom->query('//input[@id="'.$id.'"]')->length);
+        }
+        $this->assertSame(0, $dom->query('//*[@id="attack"]')->length);
+        $this->assertStringNotContainsString('secret-marker', $dom->document->saveHTML());
+    }
+
+    public static function profileErrorBags(): array
+    {
+        return [
+            [['profile' => ['email' => 'Email <script id="attack">error</script>']]],
+            [['passwordUpdate' => ['current_password' => 'Kata sandi saat ini salah.', 'password' => 'Konfirmasi berbeda.']]],
+            [['accountDeletion' => ['password' => 'Kata sandi penghapusan salah.']]],
+            [['profile' => ['name' => 'Nama diperlukan.'], 'passwordUpdate' => ['password' => 'Konfirmasi berbeda.'], 'accountDeletion' => ['password' => 'Kata sandi penghapusan salah.']]],
+        ];
+    }
+
+    public function test_profile_malformed_old_identity_is_empty_instead_of_rendering_array_values(): void
+    {
+        $this->user = new User;
+        $this->user->setRawAttributes(['name' => 'Pengguna', 'email' => 'fixture@example.test']);
+        $this->session->put('_old_input', ['name' => ['bad'], 'email' => ['bad']]);
+        $this->app['view']->share('errors', new ViewErrorBag);
+        $dom = $this->render('profile', '/profil');
+        $this->assertSame('', $dom->evaluate('string(//input[@name="name"]/@value)'));
+        $this->assertSame('', $dom->evaluate('string(//input[@name="email"]/@value)'));
+    }
+
+    #[DataProvider('invalidProfileRequests')]
+    public function test_profile_form_requests_use_real_validation_and_the_action_error_bag(string $class, array $payload, string $field, string $bag): void
+    {
+        $request = $this->profileRequest($class, $payload);
+        try {
+            $request->validateResolved();
+            $this->fail('Invalid profile fields must fail in the matching action bag.');
+        } catch (ValidationException $exception) {
+            $this->assertSame($bag, $exception->errorBag);
+            $this->assertArrayHasKey($field, $exception->errors());
+        }
+    }
+
+    #[DataProvider('validProfileRequests')]
+    public function test_profile_form_requests_accept_valid_account_fields_without_unrelated_operations(string $class, array $payload, array $expected): void
+    {
+        $request = $this->profileRequest($class, $payload + ['is_admin' => '1', 'notification_preferences' => '1']);
+        $request->validateResolved();
+        $this->assertSame($expected, $request->validated());
+    }
+
+    public static function validProfileRequests(): array
+    {
+        return [
+            [ProfileUpdateRequest::class, ['name' => 'Pengguna', 'email' => 'fixture@example.test'], ['name' => 'Pengguna', 'email' => 'fixture@example.test']],
+            [PasswordUpdateRequest::class, ['current_password' => 'Current-123!', 'password' => 'New-123!', 'password_confirmation' => 'New-123!'], ['current_password' => 'Current-123!', 'password' => 'New-123!']],
+            [ProfileDeleteRequest::class, ['password' => 'Current-123!'], ['password' => 'Current-123!']],
+        ];
+    }
+
+    private function profileRequest(string $class, array $payload): FormRequest
+    {
+        $this->user = new User;
+        $this->user->setRawAttributes(['id' => 17, 'email' => 'fixture@example.test', 'password' => password_hash('Current-123!', PASSWORD_BCRYPT, ['cost' => 4])]);
+        $this->app['config']->set('hashing.driver', 'bcrypt');
+        $this->app->instance('hash', new HashManager($this->app));
+        $factory = new ValidationFactory($this->app['translator'], $this->app);
+        $presence = $this->createMock(PresenceVerifierInterface::class);
+        $presence->method('getCount')->willReturn(0);
+        $factory->setPresenceVerifier($presence);
+        $this->app->instance('validator', $factory);
+        $request = $class::create('http://localhost/profil', 'POST', $payload);
+        $request->setUserResolver(fn () => $this->user);
+        $request->setContainer($this->app)->setRedirector($this->app['redirect']);
+        $this->app['url']->setRequest($request);
+
+        return $request;
+    }
+
+    public static function invalidProfileRequests(): array
+    {
+        return [
+            [ProfileUpdateRequest::class, ['name' => '', 'email' => 'fixture@example.test'], 'name', 'profile'],
+            [ProfileUpdateRequest::class, ['name' => 'Pengguna', 'email' => 'invalid'], 'email', 'profile'],
+            [PasswordUpdateRequest::class, ['current_password' => 'wrong', 'password' => 'New-123!', 'password_confirmation' => 'New-123!'], 'current_password', 'passwordUpdate'],
+            [PasswordUpdateRequest::class, ['current_password' => 'Current-123!', 'password' => 'New-123!', 'password_confirmation' => 'different'], 'password', 'passwordUpdate'],
+            [ProfileDeleteRequest::class, ['password' => 'wrong'], 'password', 'accountDeletion'],
+            [ProfileDeleteRequest::class, [], 'password', 'accountDeletion'],
+        ];
     }
 
     private function verificationRequest(string $path, string $method, User $user): Request

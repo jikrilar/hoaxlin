@@ -38,6 +38,66 @@ class ProfileTest extends TestCase
         $this->assertSame('baru@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
         Notification::assertSentTo($user, VerifyEmail::class);
+        $this->get(route('verification.notice'))->assertOk()->assertSee('Tautan verifikasi baru telah dikirim.');
+    }
+
+    public function test_unchanged_verified_email_keeps_verification_and_does_not_resend(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+        $verifiedAt = $user->email_verified_at;
+        $this->actingAs($user)->from(route('profile'))->patch(route('profile.update'), ['name' => 'Nama Baru', 'email' => $user->email])
+            ->assertRedirect(route('profile'))->assertSessionHas('success', 'Profil berhasil diperbarui.');
+        $this->assertTrue($verifiedAt->equalTo($user->fresh()->email_verified_at));
+        Notification::assertNothingSent();
+    }
+
+    public function test_unverified_identity_save_returns_to_verification_with_a_notification(): void
+    {
+        Notification::fake();
+        $user = User::factory()->unverified()->create();
+        $this->actingAs($user)->patch(route('profile.update'), ['name' => 'Nama Baru', 'email' => $user->email])
+            ->assertRedirect(route('verification.notice'))->assertSessionHas('status', 'verification-link-sent');
+        Notification::assertSentToTimes($user, VerifyEmail::class, 1);
+        $this->assertNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_identity_errors_use_the_profile_bag_and_recover_safe_input(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user)->from(route('profile'))->patch(route('profile.update'), ['name' => 'Nama <script id="attack">literal</script>', 'email' => 'invalid'])
+            ->assertSessionHasErrors(['email'], null, 'profile');
+        $this->get(route('profile'))->assertOk()
+            ->assertSee('id="profile-errors"', false)->assertSee('id="email-error"', false)
+            ->assertSee('Nama &lt;script id=&quot;attack&quot;&gt;literal&lt;/script&gt;', false)
+            ->assertDontSee('<script id="attack">', false)
+            ->assertDontSee('id="password-errors"', false)->assertDontSee('id="delete-errors"', false);
+        $this->assertSame($user->email, $user->fresh()->email);
+    }
+
+    public function test_password_errors_stay_out_of_deletion_and_never_restore_secrets(): void
+    {
+        $user = User::factory()->create(['password' => 'original-password']);
+        $this->actingAs($user)->from(route('profile'))->put(route('password.update'), [
+            'current_password' => 'secret-marker', 'password' => 'secret-marker', 'password_confirmation' => 'different-marker',
+        ])->assertSessionHasErrors(['current_password', 'password'], null, 'passwordUpdate')
+            ->assertSessionMissing('_old_input.current_password')->assertSessionMissing('_old_input.password')->assertSessionMissing('_old_input.password_confirmation');
+        $this->get(route('profile'))->assertOk()->assertSee('id="password-errors"', false)
+            ->assertSee('id="current_password-error"', false)->assertDontSee('id="delete-errors"', false)
+            ->assertDontSee('data-dialog-auto-open', false)->assertDontSee('secret-marker');
+        $this->assertTrue(Hash::check('original-password', $user->fresh()->password));
+    }
+
+    public function test_wrong_delete_password_recovers_confirmation_without_deleting_or_logging_out(): void
+    {
+        $user = User::factory()->create(['password' => 'original-password']);
+        $this->actingAs($user)->from(route('profile'))->delete(route('profile.destroy'), ['password' => 'secret-marker'])
+            ->assertSessionHasErrors(['password'], null, 'accountDeletion')->assertSessionMissing('_old_input.password');
+        $this->get(route('profile'))->assertOk()->assertSee('id="delete-errors"', false)
+            ->assertSee('id="confirm-password-error"', false)->assertSee('data-dialog-auto-open', false)
+            ->assertDontSee('id="password-errors"', false)->assertDontSee('secret-marker');
+        $this->assertModelExists($user);
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_user_can_update_password(): void

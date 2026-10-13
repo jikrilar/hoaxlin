@@ -6,6 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ProfileDeleteRequest extends FormRequest
 {
+    protected $errorBag = 'accountDeletion';
+
     public function authorize(): bool
     {
         return true;

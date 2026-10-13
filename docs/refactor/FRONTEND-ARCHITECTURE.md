@@ -336,6 +336,8 @@ IP-018 menerapkan [forgot/reset password](PASSWORD-RESET-IP-018.md) dengan nativ
 
 IP-019 menerapkan [verifikasi email](EMAIL-VERIFICATION-IP-019.md) dengan shell/button/link dan semantic CSS existing, email akun escaped/wrapping serta instruksi inbox/spam/expired. Tidak mengklaim pengiriman pada initial view; verification-link-sent hanya dari shared flash status. Resend/logout native POST + CSRF memakai independent form-submit loading; profile tetap GET. Auth/signed/throttle:6,1/ID-hash/verified intended-home dan success controller unchanged. Tidak ada module/countdown/auto resend baru. Controller doubles, authorize/URL signing actual serta browser receiver diuji; HTTP limiter/middleware/DB/Verified/mail belum diverifikasi. Migrasi profil tetap IP-020.
 
+IP-020 menerapkan [profil dan konfirmasi hapus](PROFILE-IP-020.md): section/divider/profile.css, native PATCH/PUT/DELETE ber-CSRF, field/password helpers existing dan named FormRequest bags profile/passwordUpdate/accountDeletion. Identitas string escaped, password tidak dipulihkan, verified/reverify mengikuti controller. Dialog mengambil satu panel/form dari details fallback, mengungkap trigger/Batal dan menjaga fokus/Escape/Tab/scroll/reset/return focus; cleanup mengembalikan fallback dan queued close tidak mengganggu reopen. Tanpa JS/API modal, details tetap native. Tidak mengubah rules/service/authorization/session contract atau menambah preferences. FormRequest/validator dan browser diuji terisolasi; DB/session/deletion/notification HTTP serta Firefox process warnings masih gap QA.
+
 ### 9.3 Transport dan error
 
 Form utama tetap native POST/redirect; jangan mengubahnya menjadi AJAX tanpa kebutuhan yang dinyatakan. Fetch hanya untuk status existing atau enhancement yang memang tersedia.

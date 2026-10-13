@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-019 selesai; 19 dari 39 task selesai, IP-020–IP-039 pending |
+| Status | IP-001–IP-020 selesai; 20 dari 39 task selesai, IP-021–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-019 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-020 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -95,7 +95,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-017](#ip-017) | F4 | Migrasikan login dan registrasi | done |
 | [IP-018](#ip-018) | F4 | Migrasikan lupa/reset password | done |
 | [IP-019](#ip-019) | F4 | Migrasikan verifikasi email | done |
-| [IP-020](#ip-020) | F4 | Migrasikan profil dan konfirmasi hapus akun | pending |
+| [IP-020](#ip-020) | F4 | Migrasikan profil dan konfirmasi hapus akun | done |
 | [IP-021](#ip-021) | F4 | Migrasikan riwayat, filter, dan pagination | pending |
 | [IP-022](#ip-022) | F4 | Verifikasi detail riwayat memakai hasil bersama | pending |
 | [IP-023](#ip-023) | F4 | Migrasikan Cara kerja dan Tentang | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-019 selesai, IP-020–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-020 selesai, IP-021–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -479,10 +479,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-019 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04, FA-09.
 - **Source/target:** `resources/views/profile.blade.php`, `resources/js/components/dialog.js`, `resources/js/components/password-toggle.js`, `resources/js/components/form-submit.js`.
 
-- [ ] Pisahkan section identitas/password/penghapusan dengan form PATCH, PUT, DELETE dan method spoofing/CSRF yang benar.
-- [ ] Jaga fields name/email, current_password/password confirmation, dan password konfirmasi delete; error dekat tindakan yang tepat.
-- [ ] Tampilkan status verified/unverified dan state email change/reverification; tidak menambah notification preference.
-- [ ] Dialog delete memiliki akibat sesuai service, focus/Escape/return focus, password validation dan fallback native; uji pada data test.
+- [x] Pisahkan section identitas/password/penghapusan dengan form PATCH, PUT, DELETE dan method spoofing/CSRF yang benar.
+- [x] Jaga fields name/email, current_password/password confirmation, dan password konfirmasi delete; error dekat tindakan yang tepat.
+- [x] Tampilkan status verified/unverified dan state email change/reverification; tidak menambah notification preference.
+- [x] Dialog delete memiliki akibat sesuai service, focus/Escape/return focus, password validation dan fallback native; uji pada data test.
 
 **Validasi:** ProfileTest; keyboard, validation, deletion di test data.
 
@@ -1127,6 +1127,16 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence:** [EMAIL-VERIFICATION-IP-019.md](EMAIL-VERIFICATION-IP-019.md), AuthShellTest/AuthenticationTest dan /tmp/hoaxlin-ip019-f4gm2xq5. 250 fingerprints protected source serta seluruh CSS/JS cocok.
 - **Batas:** AuthenticationTest/MailConfigurationTest exit 255 karena autoload repo hilang; feature tests baru belum berjalan. Unit tanpa kernel/DB/mail, fulfillment double tanpa persistence/Verified event; browser receiver 429 bukan limiter Laravel. Real auth/CSRF/throttle/session logout/DB/event/SMTP/profile reverify belum diverifikasi. Ekspektasi footer harness awal salah dikoreksi; final ulang lulus. PHP 8.5/vendor sementara, Back no-store bukan BFCache, native zoom/screen reader belum diuji. QA tetap 3 audit pass/91 not_run dan F4 belum ditutup; tidak ada environment/data/deployment change.
 - **Berikutnya:** buat commit semantic dan berhenti pada IP-019; IP-020–IP-039 pending.
+
+### IP-020 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P10; FA-01/FA-02/FA-04/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal b551cd8; tree/index awal bersih.
+- **Perubahan:** tiga section/form PATCH/PUT/DELETE native ber-CSRF; identity escaped/string/max255, password current/new/confirmation kosong/autocomplete; named request bags profile/passwordUpdate/accountDeletion agar error hanya dekat tindakannya. Verified links/copy reverify sesuai controller existing. Delete memakai satu panel/form details native yang dipindah ke dialog saat JS, Batal/error focus, Tab/Escape/return focus/reset/scroll/cleanup/remount; copy terbatas akun/riwayat/media sesuai service. Hapus inline styles/handlers/glass/emoji/strength meter; CSS tokens/profile/header clearance. Rules/authorization/controllers/service/routes/schema unchanged.
+- **Validasi:** build pass 16 modules; seluruh unit 244/1338, AuthShellTest 79/472 termasuk 16 profile cases; FormRequest/validator/current password actual dengan fake unique presence. Node 66 pass termasuk 5 dialog tests; Pint lima PHP files/53 compiled syntax/diff pass. 128 renders, 20 targeted states/160 layout samples; browser 126 action checks normal46/no-JS34/reduced46 lulus untuk native serialization/context/validation/loading/Back/dialog/no-JS/cleanup, tanpa console error pada report lengkap.
+- **Evidence:** [PROFILE-IP-020.md](PROFILE-IP-020.md), AuthShellTest/ProfileTest/dialog.test.mjs serta /tmp/hoaxlin-ip020-ab6zb5m9. Fingerprint protected source berubah hanya pada tiga errorBag properties dan presentation/helper yang disengaja.
+- **Batas:** ProfileTest exit 255 karena autoload repo hilang; real DB unique/User saves/delete/service/media/cascade/notification/HTTP auth-CSRF/session-logout belum diuji. Receiver redirect/reverify bukan controller execution. PHP 8.5/vendor sementara; process-log Firefox timeout warnings dan retry fresh normal exit143 dicatat, normal report lengkap tetap dari source final sama. BFCache/native zoom/screen reader belum diuji. QA tetap 3 audit pass/91 not_run; F4 belum ditutup; tidak ada data/environment/deploy change.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-020; IP-021–IP-039 pending.
 
 ### Format catatan berikutnya
 
