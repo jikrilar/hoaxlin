@@ -85,7 +85,7 @@ class AtomicCaptchaQuotaTest extends TestCase
         $page->assertSee('Jawaban CAPTCHA salah.')
             ->assertSee(trim($payload['raw_input']))
             ->assertSee('id="submission-errors" role="alert"', false)
-            ->assertSee('id="tab-teks" class="input-tab active"', false)
+            ->assertSee('name="input_type" value="text"', false)
             ->assertDontSee('validation.captcha_answer');
         $this->assertDoesNotMatchRegularExpression('/name="captcha_answer"[^>]*value=/', $page->getContent());
 

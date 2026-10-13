@@ -126,7 +126,8 @@ Pertahankan nama top-level view dan controller agar route/view lookup existing t
 | `resources/js/components/form-submit.js` | Baru | Loading dan perlindungan double submit pada form native |
 | `resources/js/components/password.js` | Tersedia IP-007/IP-010 | Toggle password aksesibel, hints dan secret cleanup |
 | `resources/js/components/dialog.js` | Baru bila dipakai | Dialog penghapusan; focus/Escape/focus return |
-| `resources/js/pages/submission-form.js` | Baru | Selector input, preview, validasi ringan, cleanup |
+| `resources/js/pages/submission-form.js` | Tersedia IP-011 | Batas/counter/recovery teks, submit status, cleanup draft/CAPTCHA |
+| `resources/js/pages/submission-legacy-inputs.js` | Transisi IP-011 | Adapter selector/preview media existing tanpa global/inline handler; redesign IP-012 |
 | `resources/js/pages/result.js` | Baru bila diperlukan | Enhancement halaman hasil dan koordinasi lifecycle |
 | `resources/js/pages/statistics.js` | Baru bila chart dipertahankan | Chart enhancement khusus statistik |
 | `resources/js/progress/fallback.js` | Baru | Polling fallback, in-flight guard, stop/resume, terminal transition |
@@ -147,7 +148,7 @@ Module yang tidak melakukan apa-apa setelah markup native disederhanakan tidak p
 | `resources/views/components/ui/` | Baru | Button, link, alert, field, empty state, disclosure |
 | `resources/views/components/forms/` | Baru bila reusable | Password field, upload field, CAPTCHA presentation |
 | `resources/views/components/results/` | Baru | Prediction label, confidence metadata, evidence item, provenance |
-| `resources/views/partials/submission/` | Baru | Bagian khusus form beranda |
+| `resources/views/partials/submission/` | Tersedia IP-011 | text/errors/input-types/legacy-media; partial media tetap transisi IP-012 |
 | `resources/views/partials/result/` | Baru | Komposisi hasil yang dipakai `hasil.blade.php` |
 | `resources/views/livewire/submission-progress.blade.php` | Existing | View progress, menggunakan token/komponen yang cocok |
 | `resources/views/auth/*.blade.php` | Existing | Form auth; migrasi ke shell auth |
@@ -313,7 +314,11 @@ Cleanup juga mencakup timer, request in-flight, object URL, chart, dialog, dan s
 
 DOM yang dimorph Livewire tetap dimiliki Livewire. JS publik tidak mengganti innerHTML komponen progress atau menulis field snapshot/wire attributes. Native interaction pada bagian itu sebaiknya berada di view/component Livewire atau handler yang tahan replacement DOM.
 
-Implementasi fondasi tersedia pada [IP-007](LIFECYCLE-IP-007.md): `bootstrap.js` memakai registry ES modules dan `installLifecycle`; `core/lifecycle.js` mengelola body aktif, guard import dan hooks; `core/scope.js` menyediakan `defineModule`, `createScope` dan `lockScroll`. Module shared navigation/form-submit/password/dialog mempunyai consumer nyata; `pages/statistics.js` dipilih melalui data-page dan menjaga late library load serta destroy chart. window.Hoaxlin/window.axios telah diaudit tanpa consumer dan dihapus. Handler khusus welcome/hasil/progress belum dimigrasi; table di atas tetap target bagi task halaman berikutnya, bukan bukti seluruh resource legacy telah dimiliki lifecycle.
+Implementasi fondasi tersedia pada [IP-007](LIFECYCLE-IP-007.md): `bootstrap.js` memakai registry ES modules dan `installLifecycle`; `core/lifecycle.js` mengelola body aktif, guard import dan hooks; `core/scope.js` menyediakan `defineModule`, `createScope` dan `lockScroll`. Module shared navigation/form-submit/password/dialog mempunyai consumer nyata; `pages/statistics.js` dipilih melalui data-page dan menjaga late library load serta destroy chart. window.Hoaxlin/window.axios telah diaudit tanpa consumer dan dihapus. Handler beranda kini dimiliki module IP-011 yang dijelaskan di bawah; hasil/progress belum dimigrasi; table di atas tetap target bagi task halaman berikutnya, bukan bukti seluruh resource legacy telah dimiliki lifecycle.
+
+IP-011 menerapkan [form teks beranda](TEXT-FORM-IP-011.md). Registry memilih submission-form hanya untuk body dengan data-page=submission. Partial text memakai native POST/CSRF, input_type=text, raw_input 50–50.000, website dan CAPTCHA; error summary/field dan old input escaped. Guest langsung memakai teks tanpa single-tab control. Pengantar/form mendahului bantuan/model disclosure; statistik dari controller tetap berkonteks. Tidak ada overlay/timer tahap analisis sebelum respons; form-submit memberi guard/label mengirim, page module memberi polite request status setelah event tidak dibatalkan.
+
+Counter/validasi teks menghitung code points setelah trim; native minlength/maxlength tetap tersedia tanpa JS. Error summary autofocus dan link field bekerja native; module menjaga focus setelah body swap. Cleanup memulihkan validitas/status, mengosongkan CAPTCHA, dan mencerminkan hanya draft textarea lewat defaultValue (DOM text setter) sebelum Livewire menyimpan outerHTML. Tidak ada localStorage/sessionStorage atau nilai CAPTCHA/file/password dalam cached attribute. Adapter media mempertahankan forms/domain/batas existing, memindahkan handlers ke scope, menulis filename sebagai text dan melepaskan object URL. Layout/format/limit/duration/no-JS path media lengkap masih IP-012; hasil/progress tetap IP-013–IP-016.
 
 ### 9.3 Transport dan error
 

@@ -1,5 +1,29 @@
 /* Public reusable components. Legacy classes remain isolated during migration. */
 @layer components {
+    .hl-submission-page { max-inline-size: 52rem; padding-block: calc(var(--ds-space-16) + var(--ds-space-6)) var(--ds-space-12); }
+    .hl-submission-intro { margin-block-end: var(--ds-space-6); }
+    .hl-submission-intro p { max-inline-size: var(--ds-reading-measure); margin-block-start: var(--ds-space-3); color: var(--ds-text-muted); }
+    .hl-submission-surface { padding: clamp(var(--ds-space-4), 4vw, var(--ds-space-6)); background: var(--ds-bg-surface); border: var(--ds-border-width) solid var(--ds-border-subtle); border-radius: var(--ds-radius-lg); }
+    .hl-submission-surface > h2 { margin-block-end: var(--ds-space-4); }
+    .hl-submission-surface .input-tabs { margin-block-end: var(--ds-space-4); }
+    .hl-submission-access { margin-block-end: var(--ds-space-5); color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .hl-input.hl-submission-textarea { min-block-size: 10rem; resize: vertical; }
+    .hl-submission-security { margin-block: var(--ds-space-5); padding: var(--ds-space-4); background: var(--ds-bg-subtle); border-radius: var(--ds-radius-md); }
+    .hl-submission-security .hl-field { margin-block-end: 0; }
+    .hl-submission-security input { max-inline-size: 10rem; }
+    .hl-submission-honeypot { display: none; }
+    .hl-submission-errors { margin-block-end: var(--ds-space-5); padding: var(--ds-space-4); border: var(--ds-border-width) solid var(--ds-danger-fg); border-radius: var(--ds-radius-md); color: var(--ds-danger-fg); background: var(--ds-danger-bg); }
+    .hl-submission-errors ul { padding-inline-start: var(--ds-space-5); list-style: disc; margin-block-start: var(--ds-space-2); }
+    .hl-submission-errors a { color: inherit; }
+    .hl-submission-errors p { margin-block-start: var(--ds-space-3); }
+    .hl-submission-note { margin-block-start: var(--ds-space-5); padding-block-start: var(--ds-space-4); border-block-start: var(--ds-border-width) solid var(--ds-border-subtle); color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .hl-submission-help { margin-block: var(--ds-space-8); }
+    .hl-submission-help ol { padding-inline-start: var(--ds-space-5); list-style: decimal; margin-block: var(--ds-space-4); }
+    .hl-submission-help li + li { margin-block-start: var(--ds-space-2); }
+    .hl-submission-statistics { margin-block: var(--ds-space-4); }
+    .hl-submission-statistics > div + div { margin-block-start: var(--ds-space-4); }
+    .hl-submission-statistics dt { font-weight: var(--ds-font-weight-medium); }
+    .hl-submission-statistics dd span { display: block; color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
     .hl-auth-shell { display: flex; flex-direction: column; min-block-size: 100svh; }
     .hl-auth-header { display: flex; justify-content: center; padding: var(--ds-space-8) var(--ds-space-4); }
     .hl-auth-header .hl-wordmark { display: inline-flex; align-items: center; min-block-size: 2.75rem; }

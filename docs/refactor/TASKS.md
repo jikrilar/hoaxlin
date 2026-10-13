@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-010 selesai; 10 dari 39 task selesai, IP-011–IP-039 pending |
+| Status | IP-001–IP-011 selesai; 11 dari 39 task selesai, IP-012–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-010 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-011 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -86,7 +86,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | done |
 | [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | done |
 | [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | done |
-| [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | pending |
+| [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | done |
 | [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | pending |
 | [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | pending |
 | [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | pending |
@@ -315,10 +315,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04.
 - **Source/target:** `resources/views/welcome.blade.php`, `resources/views/partials/submission/`, `resources/js/pages/submission-form.js`.
 
-- [ ] Tempatkan pengantar singkat dan form sebagai fokus awal; statistik/cara kerja menjadi konteks sekunder.
-- [ ] Migrasikan POST deteksi untuk guest teks: raw_input, input_type=text, CSRF, captcha_answer dan honeypot website tetap.
-- [ ] Jaga batas 50–50.000 karakter, error summary/inline, old input aman, dan focus recovery.
-- [ ] Tampilkan loading mengirim dan cegah double submit; hapus timer yang berpura-pura menandai tahap analisis sebelum respons backend.
+- [x] Tempatkan pengantar singkat dan form sebagai fokus awal; statistik/cara kerja menjadi konteks sekunder.
+- [x] Migrasikan POST deteksi untuk guest teks: raw_input, input_type=text, CSRF, captcha_answer dan honeypot website tetap.
+- [x] Jaga batas 50–50.000 karakter, error summary/inline, old input aman, dan focus recovery.
+- [x] Tampilkan loading mengirim dan cegah double submit; hapus timer yang berpura-pura menandai tahap analisis sebelum respons backend.
 
 **Validasi:** SubmissionTest, AtomicCaptchaQuotaTest; browser.
 
@@ -1027,6 +1027,19 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Batas:** artisan auth/profile/mail tests exit 255 karena vendor/autoload.php repo tidak tersedia. Renderer/unit memakai vendor lock sementara IP-005, PHP host 8.5 bukan runtime aplikasi yang didukung. Native receiver menguji serialization/redirect browser, bukan controller/middleware/session/DB/mail/throttle/broker/signed verify. Autofill disimulasikan sebelum mount; tidak memakai password manager akun nyata. QA aggregate tetap 3 pass/91 not_run; IP-017–IP-020 tetap diperlukan untuk alur halaman/backend lengkap. Tidak ada POST aplikasi, migration/seed/deploy atau perubahan environment/data.
 - **Perlindungan:** 254 fingerprints backend/routes/config/database/lock/font/vendor/admin/PDF/AGENTS cocok baseline; route/auth/domain/pipeline/dependency tidak diubah.
 - **Berikutnya:** berhenti pada IP-010 dan buat commit semantic; IP-011–IP-039 tetap pending.
+
+### IP-011 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; AC-P01 teks; FA-01/FA-02/FA-04.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal db985dc, tree/index bersih; instruksi root berlaku.
+- **Perubahan:** welcome menjadi pengantar singkat → form → catatan → bantuan/link → native model disclosure. Hero/KPI/marketing/model architecture sebelum/sekitar form dihapus; statistik controller tetap berkonteks. Partials text/errors/input-types/legacy-media, registry submission-form dan scoped adapter media menggantikan inline globals. CSS semantic halaman dan textarea nyaman; dead progress-step/step-icon dihapus.
+- **Contract:** guest hanya form teks native POST deteksi/CSRF/input_type=text/raw_input/CAPTCHA/website; textarea required/minlength 50/maxlength 50000. Label/hint/error terhubung, old string escaped/non-string kosong, CAPTCHA/honeypot/file tidak direpopulasi. Summary autofocus/field links dan module focus recovery. Domain/routes/multipart/old URL/required media existing tetap; media layout/limits/duration/no-JS lengkap tetap IP-012. AtomicCaptchaQuotaTest hanya mengganti assertion single guest tab dengan input_type=text; assertions backend lain utuh.
+- **Perilaku:** form tetap terlihat dan draft tidak dihapus saat mengirim; shared native double-submit guard dan polite request status menggantikan overlay serta timer tahap BERT/penjelasan palsu. Canceled/invalid submit tidak loading. Cleanup memulihkan tombol/status/validitas, mengosongkan CAPTCHA dan mencerminkan safe textarea draft melalui DOM defaultValue agar Livewire outerHTML snapshot memulihkannya; tidak ada browser storage/AJAX. Adapter legacy media memiliki listener/object URL cleanup dan filename text aman.
+- **Validasi:** build 13 modules, 50 standalone PHP tests/335 assertions, 30 JS tests, Pint dua PHP tests, diff check pass. 32 skenario render, 38 compiled PHP syntax dan 26 native baseline form comparisons pass; 254 protected fingerprints cocok. Firefox: 256 cross-page smoke samples dan 64 final homepage-state samples; normal/reduced 19 native form checks masing-masing, no-JS 10; 21 actual locked Livewire checks, tujuh navigate lalu Back/Forward pass. Boundary user-typed 49/50, maxlength 50000, JS 50001, Enter satu POST/303 ke receiver loopback, summary/field focus, persistence, no fake stages, BFCache persisted=true dan textarea draft recovery diperiksa. Screenshot mobile ditinjau; console final tanpa error.
+- **Evidence:** [TEXT-FORM-IP-011.md](TEXT-FORM-IP-011.md), SubmissionFormPresentationTest, frontend submission tests dan artefak /tmp/hoaxlin-ip011-bq9t6pyl.
+- **Batas:** SubmissionTest/AtomicCaptchaQuotaTest dan suite artisan exit 255 sebelum bootstrap karena vendor/autoload.php repo tidak ada; vendor lock sementara IP-005/PHP host 8.5 bukan runtime aplikasi yang didukung. Tidak menjalankan controller/DB/CAPTCHA reservation/quota/throttle HTTP/queue/AI/ownership/admin/PDF atau hydration/polling. Native receiver hanya fixture serialization/redirect; text resize bukan native zoom/screen reader. QA aggregate tetap 3 pass/91 not_run.
+- **Perlindungan:** backend/routes/config/database/lock/font/vendor/admin/PDF/AGENTS tidak berubah; tidak ada perubahan environment/data, POST aplikasi, migration/seed atau deployment.
+- **Berikutnya:** berhenti pada IP-011 dan buat commit semantic; IP-012–IP-039 tetap pending.
 
 ### Format catatan berikutnya
 
