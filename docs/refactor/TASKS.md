@@ -3,15 +3,15 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-020 selesai; 20 dari 39 task selesai, IP-021–IP-039 pending |
+| Tanggal | 14 Oktober 2026 |
+| Status | IP-001–IP-021 selesai; 21 dari 39 task selesai, IP-022–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-020 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-021 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -96,7 +96,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-018](#ip-018) | F4 | Migrasikan lupa/reset password | done |
 | [IP-019](#ip-019) | F4 | Migrasikan verifikasi email | done |
 | [IP-020](#ip-020) | F4 | Migrasikan profil dan konfirmasi hapus akun | done |
-| [IP-021](#ip-021) | F4 | Migrasikan riwayat, filter, dan pagination | pending |
+| [IP-021](#ip-021) | F4 | Migrasikan riwayat, filter, dan pagination | done |
 | [IP-022](#ip-022) | F4 | Verifikasi detail riwayat memakai hasil bersama | pending |
 | [IP-023](#ip-023) | F4 | Migrasikan Cara kerja dan Tentang | pending |
 | [IP-024](#ip-024) | F4 | Rapikan halaman privasi berdasarkan praktik aktual | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-020 selesai, IP-021–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-021 selesai, IP-022–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -497,10 +497,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-020 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04.
 - **Source/target:** `resources/views/riwayat.blade.php`, `resources/views/components/ui/`.
 
-- [ ] Migrasikan heading/toolbar, summary, tabel/list, empty state dan pagination tanpa filter client-side.
-- [ ] Pertahankan GET search/label/input_type/status/sort existing, query string dan pagination 15; filter change kembali ke page awal.
-- [ ] Jelaskan summary seluruh riwayat dan CSV seluruh riwayat; jangan menambah opsi video_url atau menganggap Video mencakup domain itu.
-- [ ] Label/confidence nonfinal memakai unavailable, bukan valid/0%; mobile tabel scroll lokal atau list semantik.
+- [x] Migrasikan heading/toolbar, summary, tabel/list, empty state dan pagination tanpa filter client-side.
+- [x] Pertahankan GET search/label/input_type/status/sort existing, query string dan pagination 15; filter change kembali ke page awal.
+- [x] Jelaskan summary seluruh riwayat dan CSV seluruh riwayat; jangan menambah opsi video_url atau menganggap Video mencakup domain itu.
+- [x] Label/confidence nonfinal memakai unavailable, bukan valid/0%; mobile tabel scroll lokal atau list semantik.
 
 **Validasi:** SubmissionHistoryTest; filter/pagination/mobile.
 
@@ -1137,6 +1137,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence:** [PROFILE-IP-020.md](PROFILE-IP-020.md), AuthShellTest/ProfileTest/dialog.test.mjs serta /tmp/hoaxlin-ip020-ab6zb5m9. Fingerprint protected source berubah hanya pada tiga errorBag properties dan presentation/helper yang disengaja.
 - **Batas:** ProfileTest exit 255 karena autoload repo hilang; real DB unique/User saves/delete/service/media/cascade/notification/HTTP auth-CSRF/session-logout belum diuji. Receiver redirect/reverify bukan controller execution. PHP 8.5/vendor sementara; process-log Firefox timeout warnings dan retry fresh normal exit143 dicatat, normal report lengkap tetap dari source final sama. BFCache/native zoom/screen reader belum diuji. QA tetap 3 audit pass/91 not_run; F4 belum ditutup; tidak ada data/environment/deploy change.
 - **Berikutnya:** buat commit semantic dan berhenti pada IP-020; IP-021–IP-039 pending.
+
+### IP-021 — Catatan eksekusi
+
+- **Status:** done; 14 Oktober 2026, Asia/Jakarta; AC-P03/action AC-P16; G02/G03; FA-01/FA-02/FA-04.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 94f9b9a; tree/index awal bersih.
+- **Perubahan:** heading/toolbar/whole-history summary, lima GET filter fields sekaligus mempertahankan label/reset page, shared aware select dan native query pagination; semantic list/dl/time/mobile/empty/recovery. Presenter final guard/label/confidence IP-015 dipakai, preview/errors escaped dan nonfinal/null unavailable. Video hanya unggahan, CSV entire-history tanpa filter. Inline/gradient/glass/emoji/pseudo rows dihapus, unused history CSS dibuang. HistoryRequest menjaga nonscalar search untuk string validation tanpa cast warning; query/controller/rules/guards/15 pagination/export/JS unchanged.
+- **Validasi:** build pass 16 modules; seluruh unit 275/1474, HistoryPresentationTest 31/136; Request actual trims/100-limit/default-sort/invalid enums+array, paginator query/edges dan final/mismatch/empty/escaping cases. Node 66/Pint 3 PHP files/55 compiled syntax/diff pass. 139 Blade renders, 18 states/144 layout samples; normal/no-JS/reduced masing-masing 29 browser checks (87) untuk keyboard/filter GET/page reset/prev-next/CSV href/error/native empty/long, zero report console errors.
+- **Evidence:** [HISTORY-IP-021.md](HISTORY-IP-021.md), HistoryPresentationTest/SubmissionHistoryTest serta /tmp/hoaxlin-ip021-2qkpfjxb. Protected source berubah hanya HistoryRequest normalization; seluruh JS unchanged.
+- **Resume 14 Oktober:** source tetap; artefak /tmp/vendor sementara sesi 13 tidak tersedia lagi. Build, Node 66, syntax source PHP dan diff check diulang; PHPUnit/Pint/compiled Blade/browser tidak diulang. Test Laravel tetap blocked autoload.
+- **Batas:** SubmissionHistoryTest/CsvExportTest exit 255 karena autoload repo hilang; feature cases baru belum dieksekusi. Unit/browser tanpa HTTP kernel/SQL owner-filter-sort-summary/CSV delivery. Receiver fixed response hanya serializer/navigation; no detail acceptance IP-022 atau export acceptance IP-034. PHP 8.5/vendor sementara; process-log Firefox cleanup timeout warning dicatat, native zoom/screen reader/BFCache belum diuji. QA tetap 3 audit pass/91 not_run; F4 belum ditutup, no data/env/deploy changes.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-021; IP-022–IP-039 pending.
 
 ### Format catatan berikutnya
 

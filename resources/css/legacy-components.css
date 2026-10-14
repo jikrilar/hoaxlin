@@ -272,24 +272,6 @@
         font-size: 1.375rem;
         margin-bottom: 1.25rem;
     }
-    /* ─── History Table ─── */
-
-    .history-row {
-        border-bottom: 1px solid var(--ds-border-subtle);
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-        display: grid;
-        grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)) minmax(0, 100px);
-        gap: var(--ds-space-4);
-        align-items: center;
-    }
-
-    .history-row:hover {
-        background: var(--ds-bg-selected);
-    }
-
-    .history-row:last-child {
-        border-bottom: none;
-    }
     /* ─── Loading Spinner ─── */
 
     .spinner {
@@ -367,36 +349,4 @@
         background: var(--ds-border-subtle);
     }
 
-    /* ─── Mobile History Cards ─── */
-
-    /* ─── Profile Page ─── */
-    /* Integration states while these legacy class names still have consumers. */
-
-    .container-app :is(.history-row, .history-header) > * {
-        min-width: 0;
-    }
-
-
-    @media (max-width: 48rem) {
-
-        .history-row {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: var(--ds-space-2);
-        }
-    }
-    .history-header {
-        display: grid;
-        grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)) minmax(0, 100px);
-        gap: var(--ds-space-4);
-        align-items: center;
-    }
-
-    @media (max-width: 48rem) {
-
-        .history-header {
-            display: none;
-        }
-    }
 }
