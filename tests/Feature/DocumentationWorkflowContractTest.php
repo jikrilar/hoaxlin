@@ -8,6 +8,7 @@ use App\Support\SubmissionFormOptions;
 use App\View\Presenters\DetectionPresentation;
 use DOMDocument;
 use DOMXPath;
+use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -41,6 +42,11 @@ class DocumentationWorkflowContractTest extends TestCase
                 $this->assertNotContains($id, $ids);
                 $ids[] = $id;
             }
+            if ($route === 'kebijakan-privasi') {
+                $accountRoute = $verified === null ? 'login' : 'profile';
+                $this->assertSame(1, $dom->query('//main//a[@href="'.route($accountRoute).'"]')->length);
+                $this->assertSame(1, $dom->query('//main//a[@href="https://developers.openai.com/api/docs/guides/your-data" and @target="_blank" and contains(@rel,"noopener") and contains(@rel,"noreferrer")]')->length);
+            }
         } finally {
             libxml_clear_errors();
             libxml_use_internal_errors($previous);
@@ -50,13 +56,59 @@ class DocumentationWorkflowContractTest extends TestCase
     public static function informationPages(): array
     {
         $cases = [];
-        foreach (['cara-kerja' => 'Cara kerja Hoaxlin', 'tentang' => 'Tentang Hoaxlin'] as $route => $title) {
+        foreach (['cara-kerja' => 'Cara kerja Hoaxlin', 'tentang' => 'Tentang Hoaxlin', 'kebijakan-privasi' => 'Kebijakan privasi'] as $route => $title) {
             foreach (['guest' => null, 'unverified' => false, 'verified' => true] as $viewer => $verified) {
                 $cases[$route.' '.$viewer] = [$route, $title, $verified];
             }
         }
 
         return $cases;
+    }
+
+    #[DataProvider('mediaRetentionSettings')]
+    public function test_privacy_retention_matches_the_configured_media_cutoff_without_promising_a_deletion_deadline(int $configured, int $hours): void
+    {
+        config(['data_retention.media_hours' => $configured]);
+        $this->get(route('kebijakan-privasi'))->assertOk()
+            ->assertSee('selesai atau gagal menjadi layak dihapus setelah '.$hours.' jam sejak waktu akhir pemrosesan tercatat')
+            ->assertSee('bergantung pada scheduler')->assertSee('keberhasilan penghapusan file')
+            ->assertSee('bukan jaminan bahwa file pasti hilang tepat pada batas waktu')
+            ->assertSee('masih diproses tidak dibersihkan')->assertSee('bukan teks, terjemahan, hasil, referensi terkait, atau akun')
+            ->assertSee('termasuk milik tamu')->assertDontSee('maksimal 24 jam');
+    }
+
+    public static function mediaRetentionSettings(): array
+    {
+        return ['default' => [24, 24], 'custom' => [72, 72], 'zero clamped' => [0, 1], 'negative clamped' => [-8, 1]];
+    }
+
+    public function test_privacy_revision_date_is_explicit_and_does_not_follow_the_request_date(): void
+    {
+        $this->travelTo('2032-01-06 12:00:00');
+        $this->get(route('kebijakan-privasi'))->assertOk()
+            ->assertSee('<time datetime="2026-10-14">14 Oktober 2026</time>', false)
+            ->assertDontSee('18 September 2026');
+    }
+
+    public function test_privacy_copy_preserves_actual_data_provider_access_and_deletion_boundaries(): void
+    {
+        Http::preventStrayRequests();
+        $this->get(route('kebijakan-privasi'))->assertOk()
+            ->assertSeeInOrder(['Data yang diproses', 'Pemrosesan dan layanan pendukung', 'Penyimpanan dan akses', 'Retensi media dan data lain', 'Pilihan akun dan penghapusan', 'Pembaruan kebijakan'])
+            ->assertSee('kata sandi yang disimpan sebagai hash')->assertSee('verifikasi dan pemulihan kata sandi')
+            ->assertSee('file media untuk transkripsi')->assertSee('teks untuk terjemahan Inggris ke Indonesia')
+            ->assertSee('prediksi, cuplikan teks, dan referensi')->assertSee('tidak berlangsung hanya di perangkatmu')
+            ->assertSee('Alamat IP digunakan untuk pembatasan permintaan')->assertSee('informasi sesi dan perangkat')
+            ->assertSee('pemilik dan admin sesuai izin aplikasi')->assertSee('termasuk ketika peminta adalah admin')
+            ->assertSee('memerlukan email terverifikasi')->assertSee('ID submission saja bukan izin berbagi publik')
+            ->assertSee('tidak menghapus data pemeriksaan dari server')->assertSee('cache')->assertSee('Log dan catatan penggunaan')
+            ->assertSee('tidak otomatis menjadi data training model')->assertSee('kata sandi saat ini dan konfirmasi')
+            ->assertSee('referensi terkait, feedback terkait, catatan pemrosesan, dan file media terkait')
+            ->assertSee('tidak menjalankan pembersihan menyeluruh pada cache, log, atau cadangan')
+            ->assertSee('tidak mengirim permintaan penghapusan ke layanan eksternal')
+            ->assertDontSee('tanpa identitas personal')->assertDontSee('form di halaman Tentang')
+            ->assertDontSee('Perubahan material akan diumumkan');
+        Http::assertNothingSent();
     }
 
     public function test_how_it_works_explains_the_real_pipeline_and_preserves_result_semantics(): void
