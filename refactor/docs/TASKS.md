@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 15 Oktober 2026 |
-| Status | IP-001–IP-033 selesai; 33 dari 39 task selesai, IP-034–IP-039 pending |
+| Status | IP-001–IP-034 selesai; 34 dari 39 task selesai, IP-035–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-032 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-034 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -109,14 +109,14 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-031](#ip-031) | F5 | Migrasikan resources baca/detail | done |
 | [IP-032](#ip-032) | F5 | Migrasikan monitoring events dan admin logs | done |
 | [IP-033](#ip-033) | F5 | Migrasikan dan render PDF hasil | done |
-| [IP-034](#ip-034) | F5 | Verifikasi tindakan dan kontrak ekspor CSV | pending |
+| [IP-034](#ip-034) | F5 | Verifikasi tindakan dan kontrak ekspor CSV | done |
 | [IP-035](#ip-035) | F6 | Cleanup setelah seluruh pemakai dimigrasi | pending |
 | [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | pending |
 | [IP-037](#ip-037) | F6 | Lengkapi QA browser lintas halaman/state | pending |
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-033 selesai, IP-034–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-034 selesai, IP-035–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -733,10 +733,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-033 selesai, IP-
 - **Arsitektur:** FA-01, FA-07, FA-09.
 - **Source/target:** `resources/views/riwayat.blade.php`, `resources/views/hasil.blade.php`.
 
-- [ ] Gunakan copy Unduh seluruh riwayat CSV pada actions; tidak menjanjikan scope filter atau satu hasil.
-- [ ] Baca/uji exporter existing untuk ownership/verified/final field placeholders/header/confidence scale/excerpt.
-- [ ] Pertahankan BOM/CRLF/delimiter dan CsvCellSanitizer; UI styling tidak menjadi alasan mengubah format data.
-- [ ] Verifikasi empty/header-only, nonfinal, translation provenance dan formula-injection input melalui test data; hindari perubahan exporter jika tidak diperlukan.
+- [x] Gunakan copy Unduh seluruh riwayat CSV pada actions; tidak menjanjikan scope filter atau satu hasil.
+- [x] Baca/uji exporter existing untuk ownership/verified/final field placeholders/header/confidence scale/excerpt.
+- [x] Pertahankan BOM/CRLF/delimiter dan CsvCellSanitizer; UI styling tidak menjadi alasan mengubah format data.
+- [x] Verifikasi empty/header-only, nonfinal, translation provenance dan formula-injection input melalui test data; hindari perubahan exporter jika tidak diperlukan.
 
 **Validasi:** CsvExportTest, TranslationProvenanceExportTest, CsvCellSanitizerTest.
 
@@ -1277,6 +1277,16 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence/validasi:** [PDF-IP-033.md](../reports/PDF-IP-033.md). Empat belas cases baru; suites terkait 63 passed/428 assertions sebelum penguatan tambahan access, suite penuh final 763 cases/5051 assertions: 759 passed/4 real-BERT skips, tanpa failure/warning. Sembilan PDF aktual/18 halaman; A4/font embedded/bounds/no overlap/teks Unicode dan URL/akhir explanation lengkap. Firefox PDF viewer 9 samples 360/768/1280, halaman terakhir, keyboard dan zoom 200%; build host/Docker awal, 69 Node, Pint 3, Blade cache/clear dan diff pass.
 - **Batas:** PDF browser memakai artefak sintetis loopback; authorization/download diuji melalui kernel HTTP Laravel/SQLite, bukan sesi browser akun produksi. Real BERT/provider/MySQL/deployment/printer/tagged-PDF/screen reader belum diuji; empat real-BERT skips. QA aggregate tetap 3 audit pass/91 not_run; F5/CSV dan audit Livewire gap existing tetap terbuka. Tidak mengubah secret/data operasional/dependency/vendor assets atau deploy/push.
 - **Berikutnya:** commit semantic dan berhenti pada IP-033; IP-034–IP-039 pending.
+
+### IP-034 — Catatan eksekusi
+
+- **Status/tanggal:** done; 15 Oktober 2026, Asia/Jakarta. Branch frontend-refactor/admin-export, HEAD awal 00b2a54; tree/index awal bersih.
+- **Rujukan:** P16/AC-P16, G03, FA-01/07/09, QA-EXPORT-04–07; action riwayat/hasil, routes, exporter/sanitizer/model dan test actual.
+- **Perubahan/keputusan:** copy/link/catatan seluruh riwayat sudah benar dari IP-016/021, sehingga UI/controller/exporter/sanitizer dipertahankan. Tests menambah empty exact bytes, unverified, scope filter/page/user_id tidak mengubah export, cuplikan multibyte 200/tanggal/CRLF, formula metadata termasuk Unicode control. Existing cases diperkuat pending/completed tanpa result/zero/placeholder, attachment dan kelengkapan urutan 205 ID/eager loading per chunk. Tidak mengubah header/skala/BOM/CRLF/sanitization atau menambah filtered export.
+- **Evidence:** [CSV-IP-034.md](../reports/CSV-IP-034.md); snapshot tracked source dengan PHP 8.4/SQLite in-memory/vendor exact-lock read-only. Browser memakai kernel/session/CSRF native, akun/SQLite sintetis loopback dan tanpa layanan pengguna.
+- **Validasi:** 14 cases baru; suites terkait 66 passed/546 assertions; suite penuh 777 cases/5205 assertions: 773 passed/4 real-BERT skips, tanpa failure/warning. 69 Node/build/Pint 2/Blade/diff lulus. Firefox 6 samples pada 360/768/1280 tanpa overflow, target 44 px; empat keyboard downloads aktual. Riwayat filter halaman 2, hasil tunggal dan filter kosong menghasilkan 107 record/13740 bytes identik; akun kosong 115 bytes/header-only. Python parse/BOM/CRLF/11 columns/IDs/score/placeholder/formula lulus; foreign tidak ada. Guest/unverified direct endpoint ditolak, final console/network bersih.
+- **Batas:** driver awal/router fixture/redirect intended/fast navigation diperbaiki, bukan perubahan aplikasi. No-JS/screen reader/zoom/Excel/LibreOffice/MySQL/deployment/inference nyata belum diuji pada sesi ini; warning internal Firefox terpisah. Aggregate QA tetap 3 audit pass/91 not_run; gate F5 menyeluruh/audit Livewire gap existing belum ditutup. Tidak mengubah source produk, secret/data operasional/dependency/vendor/deploy/push.
+- **Berikutnya:** commit semantic dan berhenti pada IP-034; IP-035–IP-039 pending.
 
 ### Format catatan berikutnya
 
