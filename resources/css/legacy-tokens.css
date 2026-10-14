@@ -1,4 +1,4 @@
-/* Temporary aliases for public views only. Inventory: docs/refactor/BASE-IP-005.md.
+/* Temporary aliases for public views only. Inventory: refactor/reports/BASE-IP-005.md.
  * Remove with their last consumer; new styles use --ds-* directly. */
 [data-legacy-tokens] {
     --font-display: var(--ds-font-ui);

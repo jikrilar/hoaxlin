@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\Submissions\Tables;
 
+use App\Enums\SubmissionStatus;
+use App\Filament\Support\ReadOnlyPresentation;
+use App\Models\Submission;
+use App\View\Presenters\DetectionPresentation;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -14,20 +18,22 @@ class SubmissionsTable
         return $table
             ->columns([
                 TextColumn::make('id')->label('ID')->sortable(),
-                TextColumn::make('user.name')->label('Pengguna')->placeholder('Tamu')->searchable(),
-                TextColumn::make('input_type')->label('Jenis')->badge()->sortable(),
-                TextColumn::make('content')->label('Konten')->limit(60)->searchable(['raw_input', 'extracted_text', 'source_url']),
-                TextColumn::make('status')->label('Status')->badge()->sortable(),
-                TextColumn::make('detectionResult.label')->label('Hasil')->badge()->placeholder('Belum ada'),
-                TextColumn::make('created_at')->label('Dikirim')->dateTime()->sortable(),
+                TextColumn::make('user.name')->label('Pengguna')->placeholder('Tamu')->searchable()->wrap(),
+                TextColumn::make('input_type')->label('Jenis input')->formatStateUsing(fn (?string $state): string => DetectionPresentation::inputType($state))->sortable()->wrap(),
+                TextColumn::make('content')->label('Cuplikan input')->limit(60)->searchable(['raw_input', 'extracted_text', 'source_url'])->placeholder('Teks belum tersedia')->wrap(),
+                TextColumn::make('status')->label('Status submission')->formatStateUsing(ReadOnlyPresentation::status(...))->sortable(),
+                TextColumn::make('detectionResult.label')->label('Hasil classifier')->state(fn (Submission $record): string => ReadOnlyPresentation::submissionResult($record))->wrap(),
+                TextColumn::make('created_at')->label('Dikirim')->dateTime('d/m/Y H:i')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('input_type')->label('Jenis')->options(['text' => 'Teks', 'image' => 'Gambar', 'video' => 'Video', 'url' => 'URL']),
-                SelectFilter::make('status')->options(['pending' => 'Menunggu', 'processing' => 'Diproses', 'completed' => 'Selesai', 'failed' => 'Gagal']),
+                SelectFilter::make('input_type')->label('Jenis input')->options(['text' => 'Teks', 'image' => 'Gambar', 'video' => 'Video unggahan', 'url' => 'Tautan artikel']),
+                SelectFilter::make('status')->label('Status submission')->options(SubmissionStatus::options()),
             ])
             ->recordActions([
-                ViewAction::make(),
+                ViewAction::make()->label('Lihat detail'),
             ])
-            ->toolbarActions([]);
+            ->toolbarActions([])
+            ->emptyStateHeading('Tidak ada submission yang ditampilkan')
+            ->emptyStateDescription('Ubah pencarian atau filter untuk melihat catatan input lainnya.');
     }
 }

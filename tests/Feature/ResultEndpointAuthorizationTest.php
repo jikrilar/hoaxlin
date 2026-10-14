@@ -163,7 +163,10 @@ class ResultEndpointAuthorizationTest extends TestCase
             SubmissionAccess::sessionKey($second) => $token,
         ])->get(route('hasil', $second))->assertNotFound();
 
+        $this->get(route('hasil.pdf', $second))->assertNotFound();
+
         $this->actingAs($admin)->get(route('hasil', $first))->assertNotFound();
+        $this->actingAs($admin)->get(route('hasil.pdf', $first))->assertNotFound();
     }
 
     public function test_status_denial_does_not_disclose_result_or_failure_fields(): void
@@ -189,7 +192,7 @@ class ResultEndpointAuthorizationTest extends TestCase
     public function test_pdf_requires_completed_submission_and_final_detection_result(): void
     {
         $user = User::factory()->create();
-        foreach (['processing', 'failed'] as $status) {
+        foreach (['pending', 'processing', 'failed'] as $status) {
             $submission = Submission::factory()->create([
                 'user_id' => $user->id,
                 'status' => $status,

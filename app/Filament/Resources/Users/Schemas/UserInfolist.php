@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
-use Filament\Schemas\Components\Text;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class UserInfolist
@@ -11,11 +12,17 @@ class UserInfolist
     {
         return $schema
             ->components([
-                Text::make('name')->label('Nama'),
-                Text::make('email')->label('Email'),
-                Text::make('is_admin')->label('Administrator')->formatStateUsing(fn (bool $state): string => $state ? 'Ya' : 'Tidak'),
-                Text::make('email_verified_at')->label('Email diverifikasi')->dateTime(),
-                Text::make('created_at')->label('Terdaftar')->dateTime(),
+                Section::make('Identitas akun')->schema([
+                    TextEntry::make('name')->label('Nama'),
+                    TextEntry::make('email')->label('Email'),
+                ])->columns(2)->columnSpanFull(),
+                Section::make('Akses dan verifikasi')
+                    ->description('Peran administrator dan verifikasi email adalah dua status yang berbeda.')
+                    ->schema([
+                        TextEntry::make('is_admin')->label('Peran')->formatStateUsing(fn (bool $state): string => $state ? 'Administrator' : 'Pengguna'),
+                        TextEntry::make('email_verified_at')->label('Email diverifikasi')->dateTime('d/m/Y H:i')->placeholder('Belum terverifikasi'),
+                        TextEntry::make('created_at')->label('Terdaftar')->dateTime('d/m/Y H:i'),
+                    ])->columns(2)->columnSpanFull(),
             ]);
     }
 }

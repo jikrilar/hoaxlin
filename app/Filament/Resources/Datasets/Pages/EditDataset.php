@@ -11,11 +11,16 @@ class EditDataset extends EditRecord
 {
     protected static string $resource = DatasetResource::class;
 
+    protected ?string $subheading = DatasetResource::CURATION_NOTICE;
+
     protected function getHeaderActions(): array
     {
         return [
             ViewAction::make(),
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->modalHeading('Hapus data kurasi ini?')
+                ->modalDescription('Data akan dihapus dari katalog. Tindakan ini tidak dapat dibatalkan dan tidak melatih ulang atau mengganti model BERT aktif.')
+                ->modalSubmitActionLabel('Hapus data kurasi'),
         ];
     }
 }

@@ -2,48 +2,73 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Widgets\Concerns\RequiresAdminPanel;
 use App\Models\DetectionResult;
 use App\Models\Submission;
+use App\View\Presenters\DetectionPresentation;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
+use PDOException;
 
 class StatsOverview extends BaseWidget
 {
+    use RequiresAdminPanel;
+
+    protected static ?int $sort = 10;
+
+    protected static bool $isLazy = false;
+
+    protected ?string $pollingInterval = '30s';
+
+    protected string $view = 'filament.admin.widgets.operations';
+
+    private bool $operationsAvailable = true;
+
     protected function getStats(): array
     {
-        $total = Submission::count();
-        $today = Submission::whereDate('created_at', today())->count();
-        $pending = Submission::whereIn('status', ['pending', 'processing'])->count();
-        $failed = Submission::where('status', 'failed')->count();
-        $failedJobs = DB::table('failed_jobs')->count();
+        $today = today(config('app.timezone'));
 
-        $labels = DetectionResult::select('label', DB::raw('count(*) as c'))
-            ->groupBy('label')
-            ->pluck('c', 'label')
-            ->all();
-        $valid = $labels['valid'] ?? 0;
-        $hoax = $labels['hoax'] ?? 0;
-        $meragukan = $labels['meragukan'] ?? 0;
+        try {
+            return [
+                Stat::make('Seluruh submission', number_format(Submission::count(), 0, ',', '.'))->description('Semua status, seluruh riwayat'),
+                Stat::make('Dikirim hari ini', number_format(Submission::whereDate('created_at', $today)->count(), 0, ',', '.'))
+                    ->description($today->format('d/m/Y').' · '.config('app.timezone')),
+                Stat::make('Menunggu atau diproses', number_format(Submission::whereIn('status', ['pending', 'processing'])->count(), 0, ',', '.'))
+                    ->description('Status pending dan processing, seluruh riwayat'),
+                Stat::make('Submission gagal', number_format(Submission::where('status', 'failed')->count(), 0, ',', '.'))->description('Status failed, seluruh riwayat'),
+                Stat::make('Entri failed jobs', number_format(DB::table('failed_jobs')->count(), 0, ',', '.'))
+                    ->description('Entri antrean gagal; bukan jumlah submission unik'),
+            ];
+        } catch (PDOException $exception) {
+            report($exception);
+            $this->operationsAvailable = false;
 
-        // 7-day sparkline for submissions
-        $spark = collect(range(6, 0))->map(
-            fn ($d) => Submission::whereDate('created_at', today()->subDays($d))->count()
-        )->all();
+            return [];
+        }
+    }
+
+    protected function getViewData(): array
+    {
+        try {
+            $stats = $this->getCachedStats();
+            $available = $this->operationsAvailable;
+            $counts = $available ? DetectionResult::select('label', DB::raw('count(*) as c'))->groupBy('label')->pluck('c', 'label')->all() : [];
+        } catch (PDOException $exception) {
+            report($exception);
+            $available = false;
+            $stats = [];
+            $counts = [];
+        }
 
         return [
-            Stat::make('Total Submission', number_format($total))
-                ->description($today.' hari ini')
-                ->descriptionIcon('heroicon-m-arrow-trending-up')
-                ->chart($spark)
-                ->color('primary'),
-            Stat::make('Valid / Hoax / Meragukan', "{$valid} / {$hoax} / {$meragukan}")
-                ->description('Distribusi label')
-                ->color($hoax > $valid ? 'danger' : 'success'),
-            Stat::make('Pending / Gagal', "{$pending} / {$failed}")
-                ->description($failedJobs.' failed jobs')
-                ->descriptionIcon($failed > 0 ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-check-circle')
-                ->color($failed > 0 ? 'danger' : 'success'),
+            'stats' => $stats,
+            'available' => $available,
+            'labels' => collect(['valid', 'hoax', 'meragukan'])->map(fn (string $label): array => [
+                'code' => $label, 'label' => DetectionPresentation::label($label)['text'],
+                'count' => $available ? (int) ($counts[$label] ?? 0) : null,
+            ])->all(),
+            'pollingInterval' => $this->getPollingInterval(),
         ];
     }
 }

@@ -10,6 +10,8 @@ class ListDatasets extends ListRecords
 {
     protected static string $resource = DatasetResource::class;
 
+    protected ?string $subheading = DatasetResource::CURATION_NOTICE;
+
     protected function getHeaderActions(): array
     {
         return [

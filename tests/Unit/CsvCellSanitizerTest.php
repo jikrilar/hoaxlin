@@ -27,6 +27,7 @@ class CsvCellSanitizerTest extends TestCase
         yield 'carriage return' => ["\r=1+1"];
         yield 'line feed' => ["\n=1+1"];
         yield 'whitespace and control characters' => [" \t\r\n@SUM(1,1)"];
+        yield 'unicode whitespace and control characters' => ["\u{00A0}\u{200B}=1"];
     }
 
     #[DataProvider('safeValues')]

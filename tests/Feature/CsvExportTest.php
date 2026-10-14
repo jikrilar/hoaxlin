@@ -9,6 +9,7 @@ use App\Services\Export\SubmissionCsvExporter;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\TestCase;
 
@@ -27,6 +28,7 @@ class CsvExportTest extends TestCase
             "\t=cmd|' /C calc'!A0",
             "\r=1+1",
             "\n=1+1",
+            " \t\r\n@SUM(1,1)",
         ];
 
         $submissions = collect($values)->mapWithKeys(function (string $value) use ($user): array {
@@ -100,16 +102,126 @@ class CsvExportTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
+    public function test_unverified_user_cannot_export_even_with_owned_submissions(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $this->submissionWithResult($user, 'completed', 'valid');
+
+        $this->actingAs($user)->get(route('riwayat.csv'))
+            ->assertRedirect(route('verification.notice'));
+    }
+
+    public function test_empty_export_is_exactly_a_bom_and_the_existing_header_with_crlf(): void
+    {
+        $user = User::factory()->create();
+        Submission::factory()->create(['raw_input' => 'Data akun lain tidak boleh muncul.']);
+
+        $content = $this->download($user);
+
+        $this->assertSame("\xEF\xBB\xBFID,Tipe,Status,Label,Confidence,Model,\"Bahasa Sumber\",\"Provider Terjemahan\",\"Model Terjemahan\",Dibuat,Teks/URL\r\n", $content);
+        $this->assertCount(1, $this->parseCsv($content));
+    }
+
+    public function test_filter_and_page_context_does_not_change_the_download_scope_or_action_links(): void
+    {
+        $user = User::factory()->create();
+        $matching = $this->submissionWithResult($user, 'completed', 'valid');
+        $matching->update(['raw_input' => 'Informasi cocok untuk pencarian']);
+        $excluded = Submission::factory()->for($user)->create(['status' => 'pending', 'input_type' => 'image']);
+        $foreign = Submission::factory()->create();
+        $filters = ['search' => 'Informasi cocok', 'label' => 'valid', 'input_type' => 'text', 'status' => 'completed', 'sort' => 'oldest'];
+
+        $history = $this->actingAs($user)->get(route('riwayat', $filters))
+            ->assertOk()->assertViewHas('submissions', fn ($items): bool => $items->total() === 1);
+        $result = $this->get(route('hasil', $matching))->assertOk();
+        foreach ([$history, $result] as $response) {
+            $response->assertSee('Unduh seluruh riwayat CSV')
+                ->assertSee('href="'.route('riwayat.csv').'"', false)
+                ->assertSee('CSV berisi seluruh riwayat akun Anda, bukan hanya');
+            $this->assertSame(1, substr_count($response->getContent(), 'href="'.route('riwayat.csv').'"'));
+        }
+
+        $response = $this->get(route('riwayat.csv', $filters + ['page' => 2, 'user_id' => $foreign->user_id]))
+            ->assertOk()->assertHeader('content-type', 'text/csv; charset=UTF-8');
+        $rows = $this->rowsById($response->streamedContent());
+        $this->assertSame([$excluded->id, $matching->id], array_keys($rows));
+        $this->assertArrayNotHasKey($foreign->id, $rows);
+    }
+
+    public function test_csv_preserves_200_character_multibyte_excerpts_input_precedence_and_timestamp_format(): void
+    {
+        $user = User::factory()->create();
+        $text = str_repeat('é', 200).'TEXTE_EXCLU';
+        $url = 'https://example.test/'.str_repeat('a', 210);
+        $source = Submission::factory()->for($user)->create([
+            'raw_input' => $text, 'source_url' => 'https://example.test/secondary',
+            'created_at' => '2026-10-15 09:34:56',
+        ]);
+        $link = Submission::factory()->for($user)->create(['input_type' => 'url', 'raw_input' => null, 'source_url' => $url]);
+        $media = Submission::factory()->for($user)->create([
+            'input_type' => 'image', 'raw_input' => null, 'source_url' => null,
+            'media_path' => 'submissions/private-image.jpg', 'extracted_text' => 'OCR tidak menggantikan field sumber CSV.',
+        ]);
+        $content = $this->download($user);
+        $rows = $this->rowsById($content);
+
+        $this->assertSame(str_repeat('é', 200), $rows[$source->id][10]);
+        $this->assertSame(200, mb_strlen($rows[$source->id][10]));
+        $this->assertSame(mb_substr($url, 0, 200), $rows[$link->id][10]);
+        $this->assertSame('2026-10-15 09:34', $rows[$source->id][9]);
+        $this->assertSame('', $rows[$media->id][10]);
+        $this->assertStringNotContainsString('private-image.jpg', $content);
+        $this->assertStringNotContainsString('TEXTE_EXCLU', $content);
+        $this->assertStringEndsWith("\r\n", $content);
+        $this->assertStringNotContainsString("\n", str_replace("\r\n", '', $content));
+        $this->assertStringNotContainsString("\r", str_replace("\r\n", '', $content));
+        foreach ($this->parseCsv($content) as $row) {
+            $this->assertCount(11, $row);
+        }
+    }
+
+    #[DataProvider('formulaMetadata')]
+    public function test_csv_sanitizes_free_text_metadata_as_well_as_input(string $value): void
+    {
+        $user = User::factory()->create();
+        $submission = $this->submissionWithResult($user, 'completed', 'valid');
+        $submission->update(['source_language' => $value, 'translation_provider' => $value, 'translation_model' => $value]);
+        $submission->detectionResult->update(['model_version' => $value]);
+        $rows = $this->rowsById($this->download($user));
+
+        foreach ([5, 6, 7, 8] as $column) {
+            $this->assertSame("'{$value}", $rows[$submission->id][$column]);
+        }
+        $this->assertSame('0.8123', $rows[$submission->id][4]);
+    }
+
+    public static function formulaMetadata(): iterable
+    {
+        yield 'equals' => ['=1+1'];
+        yield 'plus' => ['+1'];
+        yield 'minus' => ['-1'];
+        yield 'at' => ['@SUM(1,1)'];
+        yield 'tab' => ["\t=1"];
+        yield 'CR' => ["\r=1"];
+        yield 'LF' => ["\n=1"];
+        yield 'mixed whitespace' => [" \t\r\n@SUM(1,1)"];
+        yield 'unicode whitespace and control' => ["\u{00A0}\u{200B}=1"];
+    }
+
     public function test_only_completed_submissions_export_detection_result_as_final(): void
     {
         $user = User::factory()->create();
+        $pending = $this->submissionWithResult($user, 'pending', 'valid');
         $processing = $this->submissionWithResult($user, 'processing', 'hoax');
         $failed = $this->submissionWithResult($user, 'failed', 'valid');
         $completed = $this->submissionWithResult($user, 'completed', 'meragukan');
+        $withoutResult = Submission::factory()->for($user)->create(['status' => 'completed']);
+        $zeroScore = $this->submissionWithResult($user, 'completed', 'valid');
+        $zeroScore->detectionResult->update(['confidence_score' => 0]);
 
         $rows = $this->rowsById($this->download($user));
 
-        foreach ([$processing, $failed] as $partial) {
+        foreach ([$pending, $processing, $failed, $withoutResult] as $partial) {
             $this->assertSame('-', $rows[$partial->id][3]);
             $this->assertSame('-', $rows[$partial->id][4]);
             $this->assertSame('-', $rows[$partial->id][5]);
@@ -118,6 +230,11 @@ class CsvExportTest extends TestCase
         $this->assertSame('meragukan', $rows[$completed->id][3]);
         $this->assertSame('0.8123', $rows[$completed->id][4]);
         $this->assertSame('indobert-export-test', $rows[$completed->id][5]);
+        $this->assertSame('-', $rows[$withoutResult->id][6]);
+        $this->assertSame('-', $rows[$withoutResult->id][7]);
+        $this->assertSame('-', $rows[$withoutResult->id][8]);
+        $this->assertSame('valid', $rows[$zeroScore->id][3]);
+        $this->assertSame('0.0000', $rows[$zeroScore->id][4]);
     }
 
     public function test_csv_includes_translation_provenance_without_internal_accounting(): void
@@ -163,7 +280,7 @@ class CsvExportTest extends TestCase
         $user = User::factory()->create();
         $count = (SubmissionCsvExporter::CHUNK_SIZE * 2) + 5;
 
-        Submission::factory()->count($count)->create([
+        $submissions = Submission::factory()->count($count)->create([
             'user_id' => $user->id,
             'status' => 'completed',
         ])->each(function (Submission $submission): void {
@@ -188,6 +305,7 @@ class CsvExportTest extends TestCase
         $rows = $this->parseCsv($this->download($user));
 
         $this->assertCount($count + 1, $rows);
+        $this->assertSame($submissions->pluck('id')->reverse()->values()->all(), array_map(fn (array $row): int => (int) $row[0], array_slice($rows, 1)));
         $this->assertSame(3, $submissionQueries, 'Submission export must read records in bounded chunks.');
         $this->assertSame(3, $resultQueries, 'Detection results must be eager-loaded once per chunk, not once per row.');
     }
@@ -213,7 +331,8 @@ class CsvExportTest extends TestCase
         $response = $this->actingAs($user)->get(route('riwayat.csv'));
 
         $response->assertOk()
-            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8')
+            ->assertDownload('hoaxlin-riwayat-'.now()->format('Ymd').'.csv');
 
         $baseResponse = $response->baseResponse;
         $this->assertInstanceOf(StreamedResponse::class, $baseResponse);

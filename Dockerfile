@@ -100,6 +100,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 
 COPY vite.config.js ./
 COPY resources/ ./resources/
+COPY app/Filament/ ./app/Filament/
 COPY --from=composer-production /var/www/html/vendor/ ./vendor/
 COPY --from=composer-production /var/www/html/storage/ ./storage/
 RUN npm run build
