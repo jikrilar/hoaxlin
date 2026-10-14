@@ -498,6 +498,8 @@ IP-030 memigrasikan [Datasets native](../reports/DATASETS-IP-030.md): Section/fo
 
 IP-031 memigrasikan [tiga resource baca/detail](../reports/READ-ONLY-IP-031.md) dengan native TextEntry/Section/table/ViewAction. ReadOnlyPresentation memusatkan enum status/tahap, guard final dan label dari presenter publik, confidence_score tanpa accessor null-to-zero, explanation states serta boolean penilaian. Record classifier nonfinal tetap dapat diinspeksi dan ditandai parsial; query/filter/order tidak disempitkan ke completed. URL/media tetap teks dan relation links hanya resource admin. Scoped PAGE_START noscript notice menjelaskan kontrol daftar yang memerlukan JS. Resource getPages/read-only permissions dan file/form legacy tetap, tanpa reprocess/mutasi/domain/schema atau runtime publik baru.
 
+IP-032 memigrasikan [monitoring native](../reports/MONITORING-IP-032.md): kedua resource mempertahankan table/filter/default latest/getPages, menambah infolist Section/TextEntry dan satu ViewEntry shared untuk metadata. MonitoringPresentation memakai proyeksi positif typed metadata writer, field changes per target serta masking free text/unknown payload; original log/event tidak ditulis ulang. Shared Blade pre escaped mempertahankan indent/newline/wrap, tanpa raw JSON model serialization/JS baru. State metadata_summary tidak bind raw metadata. Stage/outcome dibaca raw original untuk mapping enum, tanpa mengubah casts. PAGE_START notice scoped diperluas ke dua list; inherited permissions/observer gap tidak diubah dan immutability tidak dijanjikan.
+
 | Area | Pola | Batas mutasi baseline |
 | --- | --- | --- |
 | Login/dashboard | Native panel + widget existing | Tidak menambah role picker atau metrik buatan |
