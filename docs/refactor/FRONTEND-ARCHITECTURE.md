@@ -472,6 +472,8 @@ Error profil harus memiliki konteks form yang benar; jangan menyebut penghapusan
 
 Statistik memiliki alternatif tabel yang dapat dibaca sebelum chart berhasil. `byTopic` baseline sebenarnya distribusi label, bukan kategori topik; total bukan otomatis completed-only atau prevalensi hoaks di masyarakat.
 
+IP-023 menerapkan [Cara kerja/Tentang](INFORMATION-IP-023.md): information.css menyediakan reading width 768px/70ch, editorial H1, section/divider dan list/dl semantic tanpa kartu/logo/KPI atau inline handlers. Kedua Route::view memakai shell existing dan ui/link ke form/home/info; tidak membutuhkan module JS baru. Cara kerja memakai SubmissionFormOptions existing untuk media limits dan DetectionPresentation untuk istilah label; copy tetap mengikuti jobs/contract aktual. Guest/login/verified, local retrieval/classifier/explanation/provider boundaries disebut jelas. btn-primary/result-badge/hero-badge legacy dibuang setelah seluruh consumer pindah; glass/gradient/warning yang masih dipakai Privasi/Statistik tetap. Tidak ada perubahan backend/routes/config/dependency; kernel tests dan browser fixtures termasuk native zoom 200% memberi subhasil IP-023, bukan penutupan QA menyeluruh.
+
 ## 14. Arsitektur admin Filament
 
 Gunakan provider `app/Providers/Filament/AdminPanelProvider.php` dan resource/schema/table/widget existing. Auth, middleware, policies, discovery, registered pages, dan `User::canAccessPanel` tidak diganti oleh theme.

@@ -128,10 +128,16 @@ class GuestSubmissionAccessTest extends TestCase
     {
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('id="tab-teks"', false)
+            ->assertSee('id="form-teks"', false)
+            ->assertSee('name="input_type" value="text"', false)
+            ->assertDontSee('id="tab-teks"', false)
             ->assertDontSee('id="tab-gambar"', false)
             ->assertDontSee('id="tab-video"', false)
-            ->assertDontSee('id="tab-url"', false);
+            ->assertDontSee('id="tab-url"', false)
+            ->assertDontSee('name="input_type" value="image"', false)
+            ->assertDontSee('name="input_type" value="video"', false)
+            ->assertDontSee('name="input_type" value="video_url"', false)
+            ->assertDontSee('name="input_type" value="url"', false);
 
         $this->actingAs(User::factory()->create())
             ->get(route('home'))

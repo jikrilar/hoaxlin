@@ -18,6 +18,24 @@ class ModelStatisticsClaimsTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_information_pages_do_not_turn_runtime_or_corpus_metrics_into_marketing_claims(): void
+    {
+        $runtime = Mockery::mock(BertRuntimeMetadata::class);
+        $runtime->shouldNotReceive('fetch');
+        $this->app->instance(BertRuntimeMetadata::class, $runtime);
+        Http::preventStrayRequests();
+
+        foreach (['cara-kerja', 'tentang'] as $route) {
+            $this->get(route($route))->assertOk()
+                ->assertDontSee('95%+')->assertDontSee('100% akurat')->assertDontSee('15s')
+                ->assertDontSee('Evaluasi model aktif')->assertDontSee('Jenis Input Didukung')
+                ->assertDontSee('akurasi universal')->assertDontSee('Notifikasi Hasil')
+                ->assertSee('prediksi model, bukan verifikasi kebenaran yang definitif');
+        }
+
+        Http::assertNothingSent();
+    }
+
     public function test_runtime_metadata_is_the_active_model_source(): void
     {
         Http::fake([

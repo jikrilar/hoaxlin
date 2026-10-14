@@ -357,6 +357,8 @@ IP-022 menambah [subhasil detail riwayat](HISTORY-DETAIL-IP-022.md) untuk QA-HIS
 | **QA-INFO-04 — Populasi/batas statistik** | Uji no data, bulan nol, boundary akhir/awal bulan, 12 bulan dan relasi result pada non-completed fixture; bandingkan query. | Range bulan half-open memakai app.timezone. total bukan completed-only; byTopic adalah distribusi label, bukan topik atau prevalensi/akurasi. Agregat tidak membocorkan user/input. | AC-P14; IP-025; G04 |
 | **QA-INFO-05 — Chart dan alternatif** | Blokir chart script, matikan JS, uji dataset kosong/panjang dan keyboard membaca tabel alternatif. | Data/periode tetap terbaca sebagai tabel/teks; chart tidak menjadi satu-satunya informasi. Tidak ada unhandled error; angka unavailable tidak dibuat 0 bila memang tidak diketahui. | AC-P14; IP-025 |
 
+IP-023 menambah [subhasil Cara kerja/Tentang](INFORMATION-IP-023.md) untuk QA-INFO-01/02: copy ditinjau terhadap jobs/README/PRD/request/media/access actual; media limits dari options existing dan labels dari presenter hasil. Dua suite terkait 24 tests/252 assertions pass; suite PHP penuh 607 passed, 25 existing DOM parser warnings dan 4 real-BERT skips, tanpa failures. Browser normal/no-JS/reduced 42 samples/189 checks dan native zoom 200% kedua halaman lulus. Page console/network errors kosong; Firefox process timeout JS existing tetap dicatat. Identitas pengembang conflicting tidak ditebak; screen reader/BFCache/provider/MySQL/E2E belum diuji. QA aggregate tetap 3 audit pass/91 not_run, F4 belum ditutup. Privasi/Statistik tetap IP-024/IP-025.
+
 ### 6.11 Panel Filament native
 
 **Prasyarat:** Admin/non-admin test, policy/constraints existing, setiap resource registered dan fixture panjang/unavailable.

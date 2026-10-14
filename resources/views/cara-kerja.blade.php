@@ -1,187 +1,102 @@
 @extends('layouts.app')
 
-@section('title', 'Cara Kerja — hoaxlin.id')
-@section('description', 'Pelajari bagaimana sistem AI BERT kami mendeteksi berita hoax dari berbagai jenis input.')
+@section('title', 'Cara kerja Hoaxlin — hoaxlin.id')
+@section('description', 'Kenali alur input, prediksi IndoBERT, dan referensi terkait dari basis pengetahuan lokal. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.')
 
 @section('content')
+@php
+    $inputOptions = \App\Support\SubmissionFormOptions::from(app(\App\Services\Media\TranscriptionMediaContract::class));
+@endphp
+<article class="container-app hl-reading-page" aria-labelledby="how-title">
+    <header class="hl-reading-intro">
+        <h1 id="how-title" class="hl-heading-editorial">Cara kerja Hoaxlin</h1>
+        <p>Informasi yang kamu kirim diolah menjadi teks, dianalisis oleh IndoBERT, lalu dilengkapi referensi terkait dan penjelasan bila tersedia.</p>
+        <p class="hl-reading-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
+    </header>
 
-<!-- Hero -->
-<section style="padding:9rem 0 5rem; text-align:center; position:relative; " aria-label="Header halaman cara kerja">
-
-    <div class="container-app" style="position:relative; z-index:1;">
-        <div class="hero-badge" style="display:inline-flex; margin-bottom:1.25rem; justify-content:center;">
-            <span class="hero-badge-dot" aria-hidden="true"></span>
-            Teknologi & Metodologi
-        </div>
-        <h1 class="hl-heading-editorial" style="margin-bottom:1rem;">
-            Cara Kerja <span class="gradient-text">hoaxlin.id</span>
-        </h1>
-        <p style="color:var(--color-text-secondary); max-width:560px; margin:0 auto; font-size:1.0625rem; line-height:1.7;">
-            Dari input berita hingga hasil deteksi — pelajari setiap langkah dalam pipeline sistem pendeteksi hoax berbasis BERT kami.
-        </p>
-    </div>
-</section>
-
-<!-- Pipeline Overview -->
-<section style="padding:3rem 0 5rem;" aria-label="Pipeline sistem">
-    <div class="container-app" style="max-width:900px;">
-
-        <!-- Step 1: Input -->
-        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10)); margin-bottom:1.5rem; display:grid; grid-template-columns:80px 1fr; gap:2rem; align-items:start;" role="article">
-            <div style="width:5rem; height:5rem; background:var(--ds-bg-selected); border:1px solid var(--ds-border-control); border-radius:1.25rem; display:flex; align-items:center; justify-content:center;" aria-hidden="true">
-                <span style="font-size:2rem;">📥</span>
+    <section class="hl-reading-section" aria-labelledby="input-title">
+        <h2 id="input-title">Pilih input yang sesuai</h2>
+        <p>Tamu hanya dapat mengirim teks. Setelah masuk ke akun, kamu juga dapat menggunakan tautan artikel, gambar, video unggahan, dan tautan video.</p>
+        <dl class="hl-reading-definitions">
+            <div>
+                <dt>Teks</dt>
+                <dd>50–50.000 karakter. Kirim isi informasi yang ingin diperiksa, dengan konteks yang cukup untuk dibaca.</dd>
             </div>
             <div>
-                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-                    <span style="color:var(--ds-link); font-family:var(--font-display); font-weight:var(--ds-font-weight-semibold); font-size:0.875rem; text-transform:uppercase; letter-spacing:0.08em;" aria-label="Langkah 1">LANGKAH 01</span>
-                </div>
-                <h2 style="font-size:1.375rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">Penerimaan Input</h2>
-                <p style="color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.75; margin-bottom:1.25rem;">
-                    Sistem mendukung empat format. Guest hanya dapat mengirim teks; URL, gambar, video, dan direct media URL tersedia setelah login.
-                </p>
-                <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:0.75rem;">
-                    @foreach([
-                        ['icon'=>'🔤', 'name'=>'Teks Langsung', 'desc'=>'Input paling cepat. Langsung ke tokenisasi.'],
-                        ['icon'=>'🖼️', 'name'=>'Gambar / OCR', 'desc'=>'Ekstraksi teks via OpenAI Vision API.'],
-                        ['icon'=>'🎬', 'name'=>'Video / Transkripsi', 'desc'=>'Upload atau direct media URL; halaman platform tidak didukung.'],
-                        ['icon'=>'🔗', 'name'=>'Tautan URL', 'desc'=>'Artikel di-scraping, konten diekstrak.'],
-                    ] as $inp)
-                    <div style="padding:0.875rem; background:var(--ds-bg-surface); border:1px solid var(--color-border); border-radius:0.75rem;">
-                        <div style="font-size:1.25rem; margin-bottom:0.375rem;" aria-hidden="true">{{ $inp['icon'] }}</div>
-                        <div style="font-size:0.875rem; font-weight:600; color:var(--color-text-primary); margin-bottom:0.25rem;">{{ $inp['name'] }}</div>
-                        <div style="font-size:0.8125rem; color:var(--color-text-muted);">{{ $inp['desc'] }}</div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-
-        <!-- Arrow -->
-        <div style="text-align:center; margin:0.25rem 0; color:var(--ds-link); font-size:1.5rem;" aria-hidden="true">↓</div>
-
-        <!-- Step 2: Preprocessing -->
-        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10)); margin-bottom:1.5rem; display:grid; grid-template-columns:80px 1fr; gap:2rem; align-items:start;" role="article">
-            <div style="width:5rem; height:5rem; background:var(--ds-bg-selected); border:1px solid var(--ds-info-fg); border-radius:1.25rem; display:flex; align-items:center; justify-content:center;" aria-hidden="true">
-                <span style="font-size:2rem;">🔬</span>
+                <dt>Tautan artikel</dt>
+                <dd>URL HTTP atau HTTPS menuju artikel yang dapat diakses. Sistem mengambil dan mengekstrak isi halaman; tidak semua halaman dapat dibaca.</dd>
             </div>
             <div>
-                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-                    <span style="color:var(--ds-info-fg); font-family:var(--font-display); font-weight:var(--ds-font-weight-semibold); font-size:0.875rem; text-transform:uppercase; letter-spacing:0.08em;" aria-label="Langkah 2">LANGKAH 02</span>
-                </div>
-                <h2 style="font-size:1.375rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">Pra-pemrosesan Teks</h2>
-                <p style="color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.75; margin-bottom:1.25rem;">
-                    Setelah teks diekstrak, bahasa dideteksi. Teks Indonesia diteruskan; teks Inggris diterjemahkan ke Indonesia sebelum masuk ke IndoBERT.
-                </p>
-                <div style="display:flex; flex-direction:column; gap:0.625rem;">
-                    @foreach([
-                        'Penghapusan tag HTML, URL, dan karakter non-standar',
-                        'Deteksi bahasa sumber pada hasil ekstraksi atau transkripsi',
-                        'Terjemahan Inggris ke Indonesia sebelum klasifikasi',
-                        'Tokenisasi menggunakan WordPiece tokenizer BERT',
-                        'Pemotongan teks bila melebihi panjang maksimum (512 token)',
-                    ] as $step)
-                    <div style="display:flex; gap:0.75rem; align-items:flex-start;">
-                        <div style="width:1.25rem; height:1.25rem; background:var(--ds-info-bg); border:1px solid var(--ds-info-fg); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;" aria-hidden="true">
-                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--ds-info-fg)" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <span style="color:var(--color-text-secondary); font-size:0.9375rem;">{{ $step }}</span>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-
-        <div style="text-align:center; margin:0.25rem 0; color:var(--ds-link); font-size:1.5rem;" aria-hidden="true">↓</div>
-
-        <!-- Step 3: BERT Classification -->
-        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10)); margin-bottom:1.5rem; display:grid; grid-template-columns:80px 1fr; gap:2rem; align-items:start; border-color:var(--ds-info-fg);" role="article">
-            <div style="width:5rem; height:5rem; background:var(--ds-bg-selected); border:1px solid var(--ds-info-fg); border-radius:1.25rem; display:flex; align-items:center; justify-content:center;" aria-hidden="true">
-                <span style="font-size:2rem;">🧠</span>
+                <dt>Gambar</dt>
+                <dd>{{ strtoupper(implode(', ', $inputOptions['image']['extensions'])) }}; maksimal {{ $inputOptions['image']['maxSizeLabel'] }} dan {{ $inputOptions['image']['maxWidth'] }} × {{ $inputOptions['image']['maxHeight'] }} piksel. Teks dibaca melalui OCR.</dd>
             </div>
             <div>
-                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-                    <span style="color:var(--ds-info-fg); font-family:var(--font-display); font-weight:var(--ds-font-weight-semibold); font-size:0.875rem; text-transform:uppercase; letter-spacing:0.08em;" aria-label="Langkah 3 inti">LANGKAH 03 — INTI</span>
-                </div>
-                <h2 style="font-size:1.375rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">Klasifikasi BERT</h2>
-                <p style="color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.75; margin-bottom:1.25rem;">
-                    Ini adalah inti dari sistem. Model <strong style="color:var(--color-text-primary);">IndoBERT</strong> yang telah di-fine-tune pada dataset hoax Indonesia menganalisis teks secara mendalam dan mengklasifikasikannya.
-                </p>
-
-                <!-- BERT Features -->
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap:1rem; margin-bottom:1.25rem;">
-                    @foreach([
-                        ['title'=>'Bidireksional', 'desc'=>'Membaca konteks dari kiri-kanan DAN kanan-kiri secara bersamaan.', 'color'=>'var(--ds-info-fg)'],
-                        ['title'=>'Pretrained', 'desc'=>'Sudah memahami bahasa Indonesia dari corpus besar sebelum fine-tuning.', 'color'=>'var(--ds-info-fg)'],
-                        ['title'=>'Fine-tuned', 'desc'=>'Dilatih ulang pada dataset berita hoax Indonesia berlabel.', 'color'=>'var(--ds-link)'],
-                        ['title'=>'Transformer', 'desc'=>'Mekanisme attention 12 layer untuk menangkap relasi antar kata.', 'color'=>'var(--ds-info-fg)'],
-                    ] as $feat)
-                    <div style="padding:1rem; background:var(--ds-info-bg); border:1px solid var(--ds-info-fg); border-radius:0.75rem;">
-                        <div style="color:{{ $feat['color'] }}; font-weight:600; font-size:0.875rem; margin-bottom:0.375rem;">{{ $feat['title'] }}</div>
-                        <div style="color:var(--color-text-muted); font-size:0.8125rem; line-height:1.5;">{{ $feat['desc'] }}</div>
-                    </div>
-                    @endforeach
-                </div>
-
-                <!-- Output Classes -->
-                <div style="padding:1.25rem; background:var(--ds-bg-surface); border:1px solid var(--color-border); border-radius:0.875rem;">
-                    <p style="color:var(--color-text-muted); font-size:0.8125rem; margin-bottom:0.875rem; text-transform:uppercase; letter-spacing:0.06em;">Label Output</p>
-                    <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-                        <div class="result-badge valid">✅ Valid</div>
-                        <div class="result-badge hoax">🚨 Hoax</div>
-                        <div class="result-badge meragukan">⚠️ Meragukan</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div style="text-align:center; margin:0.25rem 0; color:var(--ds-link); font-size:1.5rem;" aria-hidden="true">↓</div>
-
-        <!-- Step 4: Result -->
-        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-10)); display:grid; grid-template-columns:80px 1fr; gap:2rem; align-items:start;" role="article">
-            <div style="width:5rem; height:5rem; background:var(--ds-bg-selected); border:1px solid var(--ds-success-fg); border-radius:1.25rem; display:flex; align-items:center; justify-content:center;" aria-hidden="true">
-                <span style="font-size:2rem;">📊</span>
+                <dt>Video unggahan</dt>
+                <dd>{{ strtoupper(implode(', ', $inputOptions['video']['extensions'])) }}; maksimal {{ $inputOptions['video']['maxSizeLabel'] }} dan {{ $inputOptions['video']['maxDurationSeconds'] }} detik. Ucapan pada audio ditranskripsikan menjadi teks.</dd>
             </div>
             <div>
-                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-                    <span style="color:var(--ds-success-fg); font-family:var(--font-display); font-weight:var(--ds-font-weight-semibold); font-size:0.875rem; text-transform:uppercase; letter-spacing:0.08em;" aria-label="Langkah 4">LANGKAH 04</span>
-                </div>
-                <h2 style="font-size:1.375rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">Hasil & Penjelasan</h2>
-                <p style="color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.75; margin-bottom:1.25rem;">
-                    Output BERT (label + confidence score) adalah hasil inti. OpenAI dapat menyusun penjelasan naratif; jika layanan penjelasan tidak tersedia, hasil BERT tetap final dan status tersebut ditampilkan secara jujur.
-                </p>
-                <div style="display:flex; flex-direction:column; gap:0.625rem;">
-                    @foreach([
-                        ['icon'=>'🏷️', 'text'=>'Label klasifikasi: Valid, Hoax, atau Meragukan'],
-                        ['icon'=>'📈', 'text'=>'Confidence score — seberapa yakin model terhadap prediksinya'],
-                        ['icon'=>'🤖', 'text'=>'Narasi penjelasan bila tersedia; tidak dibuat-buat saat layanan unavailable'],
-                        ['icon'=>'💾', 'text'=>'Riwayat tersimpan untuk pengguna yang sudah login'],
-                    ] as $out)
-                    <div style="display:flex; gap:0.75rem; align-items:center; padding:0.625rem 0.875rem; background:var(--ds-success-bg); border:1px solid var(--ds-success-fg); border-radius:0.625rem;">
-                        <span aria-hidden="true">{{ $out['icon'] }}</span>
-                        <span style="color:var(--color-text-secondary); font-size:0.9375rem;">{{ $out['text'] }}</span>
-                    </div>
-                    @endforeach
-                </div>
+                <dt>Tautan video</dt>
+                <dd>URL HTTP atau HTTPS langsung ke file audio/video {{ strtoupper(implode(', ', $inputOptions['videoUrl']['extensions'])) }} yang didukung, dengan batas ukuran dan durasi transkripsi yang sama. Halaman YouTube, TikTok, Instagram, Facebook, atau halaman pemutar tidak didukung.</dd>
             </div>
+        </dl>
+        <p class="hl-reading-note">Format dan isi file tetap divalidasi saat dikirim. Batas serta pilihan input juga tersedia pada form pemeriksaan.</p>
+    </section>
+
+    <section class="hl-reading-section" aria-labelledby="pipeline-title">
+        <h2 id="pipeline-title">Dari input hingga hasil</h2>
+        <p>Proses mengikuti jenis input. Tidak semua input memerlukan ekstraksi media atau terjemahan.</p>
+        <ol class="hl-reading-steps">
+            <li>
+                <h3>Ekstraksi teks</h3>
+                <p>Teks dirapikan, isi artikel diekstrak, gambar dibaca melalui OCR, atau audio pada media ditranskripsikan. Kualitas gambar, suara, dan konteks input memengaruhi teks yang dapat dianalisis.</p>
+            </li>
+            <li>
+                <h3>Terjemahan bila diperlukan</h3>
+                <p>Bahasa teks diperiksa. Teks Indonesia langsung digunakan; teks Inggris diterjemahkan ke Indonesia sebelum klasifikasi. Input asli, teks hasil ekstraksi, dan terjemahan bila ada dapat ditinjau pada detail hasil.</p>
+            </li>
+            <li>
+                <h3>Klasifikasi IndoBERT</h3>
+                <p>IndoBERT menganalisis pola bahasa untuk menghasilkan label prediksi dan skor keyakinan model. Model dilatih dengan kelas valid dan hoax; label meragukan adalah abstention saat skor keyakinan di bawah ambang runtime, bukan kelas training ketiga.</p>
+            </li>
+            <li>
+                <h3>Retrieval referensi terkait</h3>
+                <p>RAG mencari teks yang relevan dalam basis pengetahuan lokal. Pencarian ini tidak mencakup seluruh web dan tidak mengubah label atau skor keyakinan classifier. Referensi terkait tidak otomatis mendukung prediksi model.</p>
+            </li>
+            <li>
+                <h3>Penjelasan bila tersedia</h3>
+                <p>OpenAI menyusun penjelasan berdasarkan prediksi, cuplikan input, dan referensi yang tersedia. Penjelasan bukan classifier kedua. Jika layanan penjelasan tidak tersedia, statusnya ditampilkan secara jujur dan hasil klasifikasi yang sudah selesai tetap dapat dibaca.</p>
+            </li>
+        </ol>
+        <p class="hl-reading-note">Hasil final ditampilkan setelah pemrosesan selesai. Jika ekstraksi, terjemahan yang diperlukan, atau klasifikasi gagal, halaman hasil menampilkan kegagalan dan langkah pemulihan yang tersedia.</p>
+    </section>
+
+    <section class="hl-reading-section" aria-labelledby="meaning-title">
+        <h2 id="meaning-title">Membaca hasil dengan hati-hati</h2>
+        <dl class="hl-reading-definitions">
+            @foreach([
+                'valid' => 'Model memprediksi pola teks sebagai valid. Prediksi ini bukan bukti bahwa seluruh isi informasi benar.',
+                'hoax' => 'Model memprediksi pola teks sebagai hoaks. Prediksi ini tetap perlu diperiksa terhadap sumber dan konteks aslinya.',
+                'meragukan' => 'Ini bukan bukti bahwa informasi benar atau palsu. Model menahan keputusan karena skor keyakinannya tidak memenuhi ambang runtime; ini bukan klaim bahwa semua sumber telah diperiksa.',
+            ] as $label => $meaning)
+                <div>
+                    <dt>{{ \App\View\Presenters\DetectionPresentation::label($label)['text'] }}</dt>
+                    <dd>{{ $meaning }}</dd>
+                </div>
+            @endforeach
+        </dl>
+        <h3>Skor keyakinan model</h3>
+        <p>Confidence menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita, akurasi produk, atau kredibilitas sumber. Skor kemiripan retrieval mengukur relevansi referensi terhadap teks, bukan confidence classifier.</p>
+        <h3>Referensi dan penjelasan yang belum tersedia</h3>
+        <p>Jika tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini, halaman hasil menyatakan keterbatasan tersebut. Ini tidak berarti tidak ada bukti di seluruh Internet. Penjelasan dapat sedang disiapkan atau tidak tersedia; sistem tidak membuat referensi atau narasi pengganti yang seolah nyata.</p>
+    </section>
+
+    <section class="hl-reading-section" aria-labelledby="review-title">
+        <h2 id="review-title">Tinjau sumber secara mandiri</h2>
+        <p>Model dapat keliru, termasuk pada informasi baru atau teks yang konteksnya tidak lengkap. Periksa sumber asli, tanggal, dan konteks kutipan, lalu bandingkan dengan sumber terpercaya. Jangan mengambil keputusan hanya dari label atau skor model.</p>
+        <div class="hl-reading-actions">
+            <x-ui.link :href="route('home').'#cek-berita'" variant="primary">Periksa informasi</x-ui.link>
+            <x-ui.link :href="route('tentang')" variant="secondary">Tentang Hoaxlin</x-ui.link>
         </div>
-
-    </div>
-</section>
-
-<!-- CTA -->
-<section style="padding:4rem 0 6rem; text-align:center;" aria-label="Call to action">
-    <div class="container-app" style="max-width:600px;">
-        <h2 style="font-size:2rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:1rem;">
-            Siap <span class="gradient-text">Mencoba</span>?
-        </h2>
-        <p style="color:var(--color-text-secondary); margin-bottom:2rem; font-size:1.0625rem;">
-            Coba analisis berita sekarang — gratis, tanpa perlu daftar!
-        </p>
-        <a href="{{ url('/') }}#cek-berita" class="btn-primary" style="font-size:1rem; padding:0.875rem 2.5rem;">
-            <span>Mulai Sekarang</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-    </div>
-</section>
-
+    </section>
+</article>
 @endsection

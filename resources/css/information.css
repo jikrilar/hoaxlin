@@ -1,0 +1,88 @@
+/* Shared reading layout for public information pages. */
+@layer components {
+    .hl-reading-page {
+        max-inline-size: var(--ds-container-reading);
+        padding-block: var(--ds-space-8) var(--ds-space-16);
+    }
+
+    .hl-header[data-navigation-ready] + main .hl-reading-page {
+        padding-block-start: calc(var(--ds-space-16) + var(--ds-space-8));
+    }
+
+    .hl-reading-page p, .hl-reading-page dd {
+        max-inline-size: 70ch;
+    }
+
+    .hl-reading-intro h1 {
+        font-size: var(--ds-type-editorial-heading-size);
+        line-height: var(--ds-type-editorial-heading-leading);
+    }
+
+    .hl-reading-intro > p, .hl-reading-section > p {
+        margin-block-start: var(--ds-space-4);
+    }
+
+    .hl-reading-note {
+        color: var(--ds-text-muted);
+        font-size: var(--ds-type-body-sm-size);
+        line-height: var(--ds-type-body-sm-leading);
+    }
+
+    .hl-reading-section {
+        margin-block-start: var(--ds-space-8);
+        padding-block-start: var(--ds-space-6);
+        border-block-start: var(--ds-border-width) solid var(--ds-border-subtle);
+    }
+
+    .hl-reading-section h2 {
+        font-size: var(--ds-type-section-title-size);
+    }
+
+    .hl-reading-section h3 {
+        margin-block: var(--ds-space-6) var(--ds-space-2);
+        font-size: var(--ds-type-item-title-size);
+    }
+
+    .hl-reading-definitions {
+        margin-block-start: var(--ds-space-5);
+    }
+
+    .hl-reading-definitions > div + div {
+        margin-block-start: var(--ds-space-5);
+    }
+
+    .hl-reading-definitions dt {
+        color: var(--ds-text-primary);
+        font-weight: var(--ds-font-weight-semibold);
+    }
+
+    .hl-reading-definitions dd {
+        margin-block-start: var(--ds-space-2);
+    }
+
+    .hl-reading-steps {
+        list-style: decimal;
+        padding-inline-start: var(--ds-space-6);
+        margin-block-start: var(--ds-space-5);
+    }
+
+    .hl-reading-steps > li {
+        padding-inline-start: var(--ds-space-2);
+    }
+
+    .hl-reading-steps > li::marker {
+        color: var(--ds-text-muted);
+        font-weight: var(--ds-font-weight-medium);
+    }
+
+    .hl-reading-steps h3 {
+        margin-block-start: var(--ds-space-5);
+    }
+
+    .hl-reading-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--ds-space-3);
+        margin-block-start: var(--ds-space-5);
+    }
+}
