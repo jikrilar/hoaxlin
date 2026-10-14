@@ -120,11 +120,11 @@ Pertahankan nama top-level view dan controller agar route/view lookup existing t
 | `resources/css/pages/` | Opsional | Style khusus halaman yang tidak cocok sebagai utility/komponen |
 | `resources/css/filament/admin/theme.css` | Baru melalui generator | Theme panel admin, token bridge dan override terbatas |
 | `resources/js/app.js` | Existing, dirapikan | Entry publik dan registrasi lifecycle |
-| `resources/js/bootstrap.js` | Existing | Bootstrap Axios existing; hapus hanya setelah audit pemakai |
+| `resources/js/bootstrap.js` | Tersedia IP-007; audit IP-035 | Registrasi lifecycle dan lazy page modules lokal, tanpa Axios/global baru |
 | `resources/js/core/lifecycle.js` | Baru | Mount, cleanup, guard init, navigasi |
 | `resources/js/components/navigation.js` | Baru | Disclosure navigasi/akun |
 | `resources/js/components/form-submit.js` | Baru | Loading dan perlindungan double submit pada form native |
-| `resources/js/components/password.js` | Tersedia IP-007/IP-010 | Toggle password aksesibel, hints dan secret cleanup |
+| `resources/js/components/password.js` | Tersedia IP-007/IP-010; cleanup IP-035 | Toggle aksesibel, reset dan secret cleanup; hints tanpa pemakai dihapus |
 | `resources/js/components/dialog.js` | Baru bila dipakai | Dialog penghapusan; focus/Escape/focus return |
 | `resources/js/pages/submission-form.js` | Tersedia IP-011 | Batas/counter/recovery teks, submit status, cleanup draft/CAPTCHA |
 | `resources/js/pages/submission-media.js` | Tersedia IP-012 | Selector progressive, URL/file validation advisory, preview dan cleanup |
@@ -261,7 +261,7 @@ Tailwind menggunakan `@theme inline` ketika theme variables merujuk CSS variable
 
 `app.css` tetap entry publik. Import token/bridge/base/components dilakukan dari entry tersebut; jaga urutan import yang sah dan layer `base`, `components`, `utilities`. Hindari unlayered overrides tanpa alasan karena dapat mengalahkan utility.
 
-Pertahankan `@source` yang diperlukan untuk Blade, JS, serta pagination Laravel. Baseline juga memindai compiled views dan pola Vue; audit dahulu sebelum cleanup. Pattern scanner bukan bukti framework Vue dipakai.
+IP-035 membatasi scanner publik dengan `source(none)` dan explicit `@source` Blade/JS serta pagination Laravel. Compiled views dan pola Vue dihapus setelah audit: semua class publik berasal dari source Blade/JS, dan tidak ada file Vue. Build tidak lagi memindai dokumen atau cache lama secara otomatis. Scanner/theme admin tetap terpisah pada source PHP Filament dan custom views.
 
 Nama class komponen dapat memakai prefix `hl-`, misalnya `hl-field`, `hl-alert`, dan `hl-prediction`. JS mengikat `data-*`, bukan class visual. Utility untuk layout sederhana tetap wajar; jangan mengganti semua utility dengan CSS custom.
 
@@ -281,6 +281,8 @@ Jangan membangun class seperti `bg-${status}-500`. Pakai mapping string class le
 | Alias token lama | Bridge sementara dengan daftar pemakai, lalu dihapus |
 
 Lebar progress dari angka backend boleh berupa style dinamis tervalidasi; warna/type/layout tidak perlu ditulis inline. Rentang angka dijaga 0–100 pada presentasi tanpa mengganti status domain.
+
+IP-035 menyelesaikan [cleanup pemakai lama](../reports/CLEANUP-IP-035.md): legacy token/component CSS beserta atribut layout dihapus setelah consumer dimigrasi. `container-app` tetap shared layout API dengan deklarasi yang sama, dipindahkan ke components.css. Recovery/display helper CSS tanpa pemakai dan password strength/match hints dibuang; toggle/reset/secret cleanup tetap. Helper scope.objectURL yang hanya dipanggil test dihapus; upload preview tetap memakai scope.own/revoke dengan release saat ganti/hapus/unmount, dan test real blob mempertahankan assertions. Axios tanpa consumer dihapus bersama 26 transitive packages; package records lain, concurrently untuk Composer dev, Chart.js lazy serta font berlisensi tetap. Polling backend, character counter fungsional, Livewire hooks, progress width tervalidasi dan stack extension layout dipertahankan dengan pemakai/kontrak jelas.
 
 ## 9. Arsitektur JavaScript publik
 

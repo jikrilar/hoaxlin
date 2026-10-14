@@ -1,10 +1,8 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source(none);
 @import './design-tokens.css';
 @import './fonts.css';
 @import './theme.css';
-@import './legacy-tokens.css';
 @import './base.css';
-@import './legacy-components.css';
 @import './components.css';
 @import './submission-progress.css';
 @import './result.css';
@@ -14,7 +12,5 @@
 @import './statistics.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 @source "../**/*.blade.php";
 @source "../**/*.js";
-@source "../**/*.vue";
