@@ -86,6 +86,10 @@
         display: none;
     }
 
+    .fi-panel-admin .fi-resource-users:has([data-users-runtime-required]) .fi-sc-form {
+        display: none;
+    }
+
     @media (prefers-reduced-motion: reduce) {
         .fi-panel-admin *, .fi-panel-admin *::before, .fi-panel-admin *::after {
             animation-duration: 0.01ms !important;

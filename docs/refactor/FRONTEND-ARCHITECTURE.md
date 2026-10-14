@@ -492,6 +492,9 @@ IP-027 menerapkan [theme/login native](ADMIN-THEME-IP-027.md) lewat generator Fi
 
 IP-028 menerapkan [dashboard operasional](DASHBOARD-IP-028.md): provider mempertahankan tiga widget aplikasi dengan sort operations/trend/model dan mengeluarkan widget account/vendor; user menu native tetap. View scoped memakai section/dl/tables/details; ChartWidget diinclude agar loader/palette/checksum/poll/destroy native tidak difork. Data server eager, visible polling 30/60/60s, cache per render, dua query grouped tren dengan populasi existing. Trait canView/mount memakai guard/canAccessPanel yang sama dan hydration authorization native, tanpa syarat verified baru. Scope/periode/nonfinal/evaluation provenance/top3 dijelaskan; SQL/runtime unavailable bukan zero/model historis. Public JS/reset/dependency/routes/pipeline tidak berubah.
 
+IP-029 memigrasikan [Users native](USERS-IP-029.md): schema Section/TextEntry/form native, table status tekstual dan preview tanpa perubahan query, parent actions/delete/cascade tetap. Password kosong saat fill dan setelah save, blank tidak didehydrasi, hashed cast model tetap; model ValidationException is_admin dipetakan ke form path untuk native field error. PAGE_START hook scoped pada CreateUser/EditUser memberikan noscript notice dan menyembunyikan JS-dependent form. Native bulk action tunggal tampil langsung dengan confirmation/count, tanpa fork dropdown/vendor. Observer hanya mencatat path admin*; native Livewire update path yang berbeda tetap audit gap existing dan tidak diubah di sini.
+
+
 
 | Area | Pola | Batas mutasi baseline |
 | --- | --- | --- |

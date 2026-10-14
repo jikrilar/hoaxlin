@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\Users\Pages\CreateUser;
+use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Widgets\ModelVersionWidget;
 use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\SubmissionTrendChart;
@@ -35,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('hoaxlin.id')
             ->login()
             ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE, fn () => view('filament.admin.auth.runtime-notice'))
+            ->renderHook(PanelsRenderHook::PAGE_START, fn () => view('filament.admin.users.runtime-notice'), scopes: [CreateUser::class, EditUser::class])
             ->colors([
                 // Filament needs concrete colors to calculate component contrast.
                 // Keep these bridges aligned with design-tokens.css; generating a
