@@ -490,6 +490,9 @@ Target font Inter dan primary evergreen. Palette Filament dapat menghasilkan sha
 
 IP-027 menerapkan [theme/login native](ADMIN-THEME-IP-027.md) lewat generator Filament 5.7.3 actual; viteTheme/darkMode(false)/LocalFontProvider serta palette konkret untuk contrast map. Theme mengimport fondasi/scanner resmi, tokens dan pure Inter face shared, tanpa reset/shell/JS publik. Provider auth/middleware/discovery/widgets tetap. Noscript hook menjelaskan kebutuhan JS dan menyembunyikan form wire:submit yang tidak punya fallback submit. Docker frontend menyalin app/Filament untuk scanner. Kernel/native browser/session/modal/zoom/contrast lulus untuk A00 dan representative admin; infolist user baseline 500 dicatat bagi IP-029. Ini bukan penutupan seluruh gate F5.
 
+IP-028 menerapkan [dashboard operasional](DASHBOARD-IP-028.md): provider mempertahankan tiga widget aplikasi dengan sort operations/trend/model dan mengeluarkan widget account/vendor; user menu native tetap. View scoped memakai section/dl/tables/details; ChartWidget diinclude agar loader/palette/checksum/poll/destroy native tidak difork. Data server eager, visible polling 30/60/60s, cache per render, dua query grouped tren dengan populasi existing. Trait canView/mount memakai guard/canAccessPanel yang sama dan hydration authorization native, tanpa syarat verified baru. Scope/periode/nonfinal/evaluation provenance/top3 dijelaskan; SQL/runtime unavailable bukan zero/model historis. Public JS/reset/dependency/routes/pipeline tidak berubah.
+
+
 | Area | Pola | Batas mutasi baseline |
 | --- | --- | --- |
 | Login/dashboard | Native panel + widget existing | Tidak menambah role picker atau metrik buatan |

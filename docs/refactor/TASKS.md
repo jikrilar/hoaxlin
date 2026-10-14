@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 14 Oktober 2026 |
-| Status | IP-001–IP-027 selesai; 27 dari 39 task selesai, IP-028–IP-039 pending |
+| Status | IP-001–IP-028 selesai; 28 dari 39 task selesai, IP-029–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-027 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-028 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -103,7 +103,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-025](#ip-025) | F4 | Migrasikan statistik dan alternatif tabel | done |
 | [IP-026](#ip-026) | F4 | Buat error/fallback HTML sesuai scope | done |
 | [IP-027](#ip-027) | F5 | Buat theme Filament dan login admin light-only | done |
-| [IP-028](#ip-028) | F5 | Rapikan dashboard dan widgets existing | pending |
+| [IP-028](#ip-028) | F5 | Rapikan dashboard dan widgets existing | done |
 | [IP-029](#ip-029) | F5 | Migrasikan resource Users | pending |
 | [IP-030](#ip-030) | F5 | Migrasikan resource Datasets | pending |
 | [IP-031](#ip-031) | F5 | Migrasikan resources baca/detail | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-027 selesai, IP-028–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-028 selesai, IP-029–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -625,10 +625,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-027 selesai, IP-
 - **Arsitektur:** FA-03, FA-06.
 - **Source/target:** `app/Filament/Widgets/`, `app/Providers/Filament/AdminPanelProvider.php`.
 
-- [ ] Review AccountWidget, FilamentInfoWidget, StatsOverview, SubmissionTrendChart dan ModelVersionWidget; atur hierarchy sesuai tugas administrasi.
-- [ ] Nilai/periode/scope/model berasal dari widget/service; unavailable jujur tanpa angka contoh/SLA buatan.
-- [ ] Widget vendor tidak perlu mendominasi; perubahan daftar/order dilakukan eksplisit pada provider.
-- [ ] Verifikasi chart/text/long labels/light theme/density dan akses admin tanpa public data leakage.
+- [x] Review AccountWidget, FilamentInfoWidget, StatsOverview, SubmissionTrendChart dan ModelVersionWidget; atur hierarchy sesuai tugas administrasi.
+- [x] Nilai/periode/scope/model berasal dari widget/service; unavailable jujur tanpa angka contoh/SLA buatan.
+- [x] Widget vendor tidak perlu mendominasi; perubahan daftar/order dilakukan eksplisit pada provider.
+- [x] Verifikasi chart/text/long labels/light theme/density dan akses admin tanpa public data leakage.
 
 **Validasi:** Widget/source review; A01 data/error/chart states.
 
@@ -1212,6 +1212,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Validasi:** build host/Docker frontend/Pint/Blade/diff lulus; 8 feature cases baru, suites terkait 34 passed/298 assertions, bersama docs 57 passed/640 assertions. Suite penuh 680 cases/4157 assertions: 651 passed + 25 existing DOM warnings + 4 BERT skips, tanpa failures. 69 Node tests pass. Browser 22 samples/64 checks, login zoom 200%, kontras primary 6.85:1 dan border 3.79:1, modal Escape/focus return/no deletion lulus.
 - **Batas:** user detail baseline 500 akibat Text::label incompatible ditemukan/dicatat untuk IP-029; pola infolist lainnya perlu IP-030/031, tidak diubah di sini. Final browser console bersih, satu expected detail 500; early lazy-navigation errors hilang setelah driver menunggu hydration. Hover paint alternatif/headless limitation, screen reader/forced colors/BFCache/all resources/MySQL/deployment/inference nyata belum diuji. QA aggregate tetap 3 audit pass/91 not_run; F5 belum ditutup.
 - **Berikutnya:** commit semantic dan berhenti pada IP-027; IP-028–IP-039 pending.
+
+### IP-028 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/admin-export, HEAD awal 5a776ca; tree/index awal bersih.
+- **Rujukan:** A01/AC-A01/FA-03/06, QA-ADMIN-02/10; Filament 5.7.3/Livewire 4.3.3 actual, widget/service/adapter/test existing dan design system.
+- **Perubahan:** provider mengeluarkan AccountWidget/FilamentInfoWidget, tiga widget sort operations→trend→model. Native sections/dl/tables/disclosures dan angka UI normal; all-time/status/date/timezone/nonfinal scope, failed jobs bukan unique submission, top3 kelompok bukan total versi. Model runtime/eval provenance dari adapter existing, historis bukan model aktif. Dua query tren menggantikan 60 dengan populasi/rentang DATE/whereHas tetap; eager SSR/per-render cache dan visible polling presentasi 30/60/60s.
+- **Kontrak:** guard canAccessPanel existing saat mount/hydration tanpa verified requirement; no private record/trace/token rendering. SQL failure n/a berbeda dari zero; native ChartWidget include/loader/poll/checksum/lifecycle, duration0/native table/no-JS/failure fallback/keyboard/open preserved. Backend/pipeline/routes/User/schema/dependency/vendor/public CSS/JS unchanged.
+- **Evidence:** [DASHBOARD-IP-028.md](DASHBOARD-IP-028.md); snapshot /tmp/hoaxlin-ip028-73jvzntk, exact-lock vendor, PHP 8.4/SQLite dan browser kernel/session/Livewire aktual dengan HTTP/runtime fixtures, bukan layanan/model produksi.
+- **Validasi:** 10 feature cases baru; suites terkait 31 passed/296 assertions. Suite PHP penuh 690 cases/4235 assertions: 661 passed + 25 existing DOM warnings + 4 BERT skips, tanpa failures. 69 Node/build host/Docker frontend/Pint 6 files/Blade/diff pass. Firefox 37 samples/138 checks pada normal/no-JS/reduced/chunk failure, actual chart vs table/escaping/SQL error/mobile/font/text resize/keyboard/Livewire refresh pass; native zoom200% viewport380 scroll374 tanpa overflow.
+- **Batas:** blocked chart satu intended503/import error dengan table fallback; ordinary console/network bersih. User detail baseline500 tetap IP-029. Warning timeout/internal Firefox process dicatat terpisah dari laporan final. Screen reader/forced colors/BFCache/MySQL/provider/BERT/deployment dan resource lain belum diuji. QA aggregate tetap 3 audit pass/91 not_run; F5 menyeluruh belum ditutup. Tidak ada migration/data/env/prune/delete/deploy/push changes.
+- **Berikutnya:** commit semantic dan berhenti pada IP-028; IP-029–IP-039 pending.
 
 ### Format catatan berikutnya
 
