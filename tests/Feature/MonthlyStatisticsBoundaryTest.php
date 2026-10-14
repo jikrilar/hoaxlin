@@ -105,6 +105,40 @@ class MonthlyStatisticsBoundaryTest extends TestCase
         );
     }
 
+    public function test_month_end_does_not_skip_february_or_duplicate_months(): void
+    {
+        $this->freezeAt('2026-03-31 12:00:00');
+        $this->submissionAt('2026-02-01 00:00:00', 'valid');
+        $this->submissionAt('2026-02-28 23:59:59', 'hoax');
+        $this->submissionAt('2026-03-01 00:00:00', 'valid');
+
+        $response = $this->get(route('statistik'))->assertOk();
+        $trend = $response->viewData('trend');
+        $this->assertSame([
+            '2025-04', '2025-05', '2025-06', '2025-07', '2025-08', '2025-09',
+            '2025-10', '2025-11', '2025-12', '2026-01', '2026-02', '2026-03',
+        ], $trend->pluck('month')->all());
+        $this->assertSame(2, $this->month($trend, 'Feb 2026')['total']);
+        $this->assertSame(1, $this->month($trend, 'Mar 2026')['total']);
+        $period = $response->viewData('period');
+        $this->assertSame('2025-04-01 00:00:00', $period['start']->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-04-01 00:00:00', $period['end_exclusive']->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-03-31T12:00:00+07:00', $period['generated_at']->toIso8601String());
+        $this->assertSame('Asia/Jakarta', $period['timezone']);
+    }
+
+    public function test_leap_day_keeps_twelve_distinct_months_and_counts_february(): void
+    {
+        $this->freezeAt('2028-02-29 12:00:00');
+        $this->submissionAt('2028-02-29 00:00:00', 'hoax');
+        $trend = $this->trend();
+        $this->assertCount(12, $trend->pluck('month')->unique());
+        $this->assertSame('2027-03', $trend->first()['month']);
+        $this->assertSame('2028-02', $trend->last()['month']);
+        $this->assertSame('Februari 2028', $trend->last()['display_label']);
+        $this->assertSame(1, $trend->last()['total']);
+    }
+
     private function freezeAt(string $timestamp): void
     {
         Carbon::setTestNow(Carbon::createFromFormat('Y-m-d H:i:s', $timestamp, config('app.timezone')));

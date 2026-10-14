@@ -476,6 +476,8 @@ IP-023 menerapkan [Cara kerja/Tentang](INFORMATION-IP-023.md): information.css m
 
 IP-024 menerapkan [Privasi](PRIVACY-IP-024.md) pada reading layout IP-023, tanpa stylesheet/module baru. Route::view tetap publik; ui/link auth-aware hanya mengarahkan guest ke login atau akun ke profil. Media cutoff ditampilkan dari max(1, data_retention.media_hours), tanpa perubahan command/scheduler/policy; date revisi time literal. Copy berasal dari service/models/config actual dan membedakan data server/provider/session/cache/retention/deletion, tanpa menampilkan capability/secrets atau mengarang kontak. Legacy btn-ghost/warning-box/divider dibuang setelah consumer terakhir dimigrasi; statistik masih memakai API legacy yang tersisa. Source-to-copy/kernel/browser/native zoom memberi subhasil P13/FA-09; actual deployment/hydration/QA menyeluruh tetap terpisah.
 
+IP-025 menerapkan [Statistik/tabel alternatif](STATISTICS-IP-025.md): statistics.css scoped, server HTML tables tersedia sebelum canvas, periode/timezone/populasi all-status vs all-time label join dijelaskan tanpa metric kualitas/data privat. Controller hanya menambah metadata presentasi dan mengoreksi overflow month-end yang diumumkan/ditest: startOfMonth sebelum subMonths, predikat/count/join tetap. Page module existing mengimport statistics-chart.js dinamis (Chart.js 4.5.1 exact-lock, line subset), validate data, handled import/constructor failure, scope-owned destroy/late guard dan no animation. Canvas hidden saat SSR/no-JS/failure; tabel tidak disentuh enhancement. Dependency baru terbatas chart + color; Chart global/CDN listener dihapus. Last glass/gradient consumers dimigrasi. Kernel tests, actual dependency browser/503 failure/Livewire navigate dan resource gating memberi subhasil P14/FA-04/FA-10, bukan penutupan QA menyeluruh.
+
 ## 14. Arsitektur admin Filament
 
 Gunakan provider `app/Providers/Filament/AdminPanelProvider.php` dan resource/schema/table/widget existing. Auth, middleware, policies, discovery, registered pages, dan `User::canAccessPanel` tidak diganti oleh theme.
@@ -517,7 +519,7 @@ Inter weight 400/500/600, Newsreader 400/500 sesuai design system. Pilih satu st
 
 Jika self-hosting, gunakan asset/font path yang benar-benar dibuat dan dapat di-resolve build. File WOFF2 browser tidak otomatis dapat dipakai DomPDF. Jangan menyatakan font sudah diterapkan dari computed fallback saja.
 
-Chart.js CDN existing bukan dependency terkunci. Jika chart dipertahankan, task statistik harus memilih versi/strategi loading secara eksplisit; bundling Vite dengan dependency terkunci dapat dipilih saat task itu dikerjakan. Tidak menambahkan import paket yang belum terpasang ke contoh kode siap-build.
+Pada baseline, Chart.js CDN belum terkunci. IP-025 menggantinya dengan Chart.js 4.5.1 exact-lock dan chunk Vite khusus statistik yang hanya meregistrasi kebutuhan line chart. Library diimport dinamis setelah payload valid tersedia; native tables tetap terbaca ketika import gagal atau JS tidak aktif. Tidak menambahkan import paket yang belum terpasang atau memuat dependency chart di seluruh halaman.
 
 ## 16. PDF dan CSV
 

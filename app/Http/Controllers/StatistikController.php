@@ -13,13 +13,17 @@ class StatistikController extends Controller
     public function index(): View
     {
         $timezone = config('app.timezone');
+        $generatedAt = now($timezone)->toImmutable();
+        $monthStart = $generatedAt->startOfMonth();
 
-        $trend = collect(range(11, 0))->map(function ($m) use ($timezone) {
-            $date = now($timezone)->toImmutable()->subMonths($m)->startOfMonth();
+        $trend = collect(range(11, 0))->map(function ($m) use ($monthStart) {
+            $date = $monthStart->subMonths($m);
             $next = $date->addMonth();
 
             return [
                 'label' => $date->format('M Y'),
+                'month' => $date->format('Y-m'),
+                'display_label' => $date->locale('id')->translatedFormat('F Y'),
                 'total' => $this->submissionsInMonth($date, $next)->count(),
                 'hoax' => $this->submissionsInMonth($date, $next)
                     ->whereHas('detectionResult', fn ($q) => $q->where('label', 'hoax'))
@@ -37,7 +41,14 @@ class StatistikController extends Controller
             ->pluck('c', 'label')
             ->all();
 
-        return view('statistik', compact('trend', 'byTopic'));
+        $period = [
+            'start' => $monthStart->subMonths(11),
+            'end_exclusive' => $monthStart->addMonth(),
+            'generated_at' => $generatedAt,
+            'timezone' => $timezone,
+        ];
+
+        return view('statistik', compact('trend', 'byTopic', 'period'));
     }
 
     /**

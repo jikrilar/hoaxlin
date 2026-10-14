@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 14 Oktober 2026 |
-| Status | IP-001–IP-024 selesai; 24 dari 39 task selesai, IP-025–IP-039 pending |
+| Status | IP-001–IP-025 selesai; 25 dari 39 task selesai, IP-026–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-024 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-025 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -100,7 +100,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-022](#ip-022) | F4 | Verifikasi detail riwayat memakai hasil bersama | done |
 | [IP-023](#ip-023) | F4 | Migrasikan Cara kerja dan Tentang | done |
 | [IP-024](#ip-024) | F4 | Rapikan halaman privasi berdasarkan praktik aktual | done |
-| [IP-025](#ip-025) | F4 | Migrasikan statistik dan alternatif tabel | pending |
+| [IP-025](#ip-025) | F4 | Migrasikan statistik dan alternatif tabel | done |
 | [IP-026](#ip-026) | F4 | Buat error/fallback HTML sesuai scope | pending |
 | [IP-027](#ip-027) | F5 | Buat theme Filament dan login admin light-only | pending |
 | [IP-028](#ip-028) | F5 | Rapikan dashboard dan widgets existing | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-024 selesai, IP-025–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-025 selesai, IP-026–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -569,10 +569,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-024 selesai, IP-
 - **Arsitektur:** FA-01, FA-04, FA-10.
 - **Source/target:** `resources/views/statistik.blade.php`, `resources/js/pages/statistics.js` (bila chart dipertahankan), `package.json`, `package-lock.json` (hanya jika strategi chart memerlukan).
 
-- [ ] Tampilkan tren/periode dan distribusi label dengan penjelasan populasi/timezone/query existing.
-- [ ] Sebut byTopic sebagai distribusi label; total/aggregate tidak diklaim completed-only, accuracy atau prevalensi masyarakat.
-- [ ] Render alternatif tabel sebelum chart; chart tidak menjadi syarat akses data dan dibersihkan saat unmount.
-- [ ] Jika chart dipertahankan, pilih versi/loading yang jelas dan terbatas halaman statistik; jangan import paket yang belum dipasang atau upgrade dependency lain.
+- [x] Tampilkan tren/periode dan distribusi label dengan penjelasan populasi/timezone/query existing.
+- [x] Sebut byTopic sebagai distribusi label; total/aggregate tidak diklaim completed-only, accuracy atau prevalensi masyarakat.
+- [x] Render alternatif tabel sebelum chart; chart tidak menjadi syarat akses data dan dibersihkan saat unmount.
+- [x] Jika chart dipertahankan, pilih versi/loading yang jelas dan terbatas halaman statistik; jangan import paket yang belum dipasang atau upgrade dependency lain.
 
 **Validasi:** MonthlyStatisticsBoundaryTest, ModelStatisticsClaimsTest; chart failure QA.
 
@@ -1179,6 +1179,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Validasi:** PHP 8.4 Docker/exact-lock vendor/SQLite in-memory: lima suites terkait 55 passed / 547 assertions; suite PHP penuh 645 cases / 3791 assertions, 616 passed + 25 existing parser warnings + 4 real-BERT skips, tanpa failures. Build/66 Node/Pint/diff pass. Browser normal/no-JS/reduced 42 samples/229 checks serta native zoom 200% pass; mobile/long text/font/keyboard/native account/CTA/provider link/storage diperiksa.
 - **Batas:** Source review bukan audit deployment; env/provider/disk/session/mail/scheduler/backup aktual tidak diperiksa. Browser rendered kernel fixtures bukan session/hydration E2E; screen reader/BFCache/MySQL/real providers belum diuji. Firefox process normal timeout JS existing dicatat, page console/network errors kosong. QA aggregate tetap 3 audit pass/91 not_run; F4 belum ditutup. Tidak ada operational prune/delete/migration/data/env/deploy/push changes; kontak resmi tidak diarang.
 - **Berikutnya:** buat commit semantic dan berhenti pada IP-024; IP-025–IP-039 pending.
+
+### IP-025 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/examination-progress-results, HEAD awal 5594392; tree/index awal bersih.
+- **Rujukan:** AC-P14/G04/FA-01/FA-04/FA-10/QA-INFO-04/05; P14/statistics query, design tokens/components dan lifecycle IP-007.
+- **Perubahan:** heading/sections, periode/timezone/generated time, native tren/distribusi tables/captions/scopes dan scroll lokal/focus; data tersedia sebelum chart. Total semua status dan label all-time/nonfinal dijelaskan, bukan topik/prevalensi/akurasi. Shared label/disclaimer/abstention/empty cases; tidak ada data privat. Legacy glass/gradient consumer terakhir dihapus. Chart.js 4.5.1 exact-lock + color dependency, page-only dynamic tree-shaken chunk, hidden fallback/validated data/dash/point/no animation, async failure/late import/destroy ownership.
+- **Koreksi eksplisit:** kode subMonths sebelum startOfMonth menggandakan/melewati bulan pada tanggal 31. Diumumkan sebelum edit; diubah ke month-start immutable sebelum subMonths, dengan metadata bulan ISO/Indonesia dan period. Populasi total/label/join/predikat half-open tetap, rentang month-end dikoreksi dan diuji; tidak silent query change.
+- **Evidence:** [STATISTICS-IP-025.md](STATISTICS-IP-025.md); lima feature cases baru dan dua chart lifecycle cases diadaptasi + tiga cases tambahan. Shared lifecycle/navigation/routes/config/auth/schema/pipeline/Composer/admin/PDF unchanged; package existing tidak diupgrade.
+- **Validasi:** PHP 8.4 Docker/SQLite: suites statistik 19 passed / 142 assertions; suite penuh 650 cases / 3846 assertions, 621 passed + 25 existing parser warnings + 4 real-BERT skips, tanpa failures. Build/69 Node/Pint tiga PHP files/diff pass. Browser normal/no-JS/reduced/503 chunk 54 samples/191 checks; native zoom 200%, 3 resource checks (home/how/statistics 0/0/1 chart request), actual Chart.js vs table data dan Livewire destroy/fresh instance lulus.
+- **Batas:** Browser rendered kernel/SQLite fixtures + SDK/library actual bukan deployment/session/inference E2E; screen reader/BFCache/MySQL/real providers belum diuji. Failure mode mencatat enam intended 503/MIME console errors tanpa unhandled rejection; modes lain page errors kosong. Firefox process normal/reduced/blocked cleanup timeout existing dicatat. QA aggregate tetap 3 audit pass/91 not_run, F4 belum ditutup. Tidak ada operational data/env/migration/training/deploy/push changes.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-025; IP-026–IP-039 pending.
 
 ### Format catatan berikutnya
 
