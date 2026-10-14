@@ -543,6 +543,8 @@ CSV tetap di `SubmissionCsvExporter`. Pertahankan header, skala confidence, plac
 
 Output PDF diperiksa terpisah dari browser/build. Mengubah web CSS tidak membuktikan PDF ikut berubah atau tetap terbaca.
 
+IP-033 menerapkan [PDF mandiri aktual](../reports/PDF-IP-033.md): CSS print A4/margin 18 mm, DejaVu Sans/Serif bawaan DomPDF dan block/table dengan wrapping/page breaks. DetectionPresentation::label/confidence/inputType/sourceUrl dipakai untuk makna bersama tanpa shell/components web. Nilai versi tidak diberi prefiks tambahan, timestamp diformat pada app timezone, field provenance nullable tidak menyimpulkan tidak ada terjemahan. Cuplikan 1600 karakter diberi penanda, explanation mengikuti enum/status dan tetap full saat ready. Source URL safe ditulis plain text; media_path/JSON diagnostik tidak dicetak. Controller tetap dua record tanpa evidence/query baru; SubmissionAccess/completed/result guard tetap. Font embedded, PDF multi-page serta endpoint HTTP diperiksa terpisah dari viewer Firefox/build.
+
 ## 17. Batas keamanan frontend
 
 - Authorization tetap pada middleware/controller/service dan refresh Livewire. Tombol tersembunyi bukan pengganti pemeriksaan akses.

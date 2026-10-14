@@ -41,10 +41,12 @@ class TranslationProvenanceExportTest extends TestCase
         $this->assertStringNotContainsString('123', $html);
         $this->assertStringNotContainsString('0.012345', $html);
 
-        $this->actingAs($submission->user)
+        $response = $this->actingAs($submission->user)
             ->get(route('hasil.pdf', $submission))
             ->assertOk()
-            ->assertHeader('content-type', 'application/pdf');
+            ->assertHeader('content-type', 'application/pdf')
+            ->assertDownload('hoaxlin-'.$submission->id.'-'.now()->format('Ymd').'.pdf');
+        $this->assertStringStartsWith('%PDF-', $response->getContent());
     }
 
     public function test_untranslated_pdf_does_not_claim_provider_or_model(): void
@@ -57,7 +59,8 @@ class TranslationProvenanceExportTest extends TestCase
 
         $this->assertStringContainsString('Bahasa Sumber', $html);
         $this->assertStringContainsString('>id<', $html);
-        $this->assertStringContainsString('Tidak diterjemahkan', $html);
+        $this->assertStringContainsString('<th>Provider Terjemahan</th><td>Tidak tersedia</td>', $html);
+        $this->assertStringContainsString('<th>Model Terjemahan</th><td>Tidak tersedia</td>', $html);
         $this->assertStringNotContainsString('openai', $html);
         $this->assertStringNotContainsString('gpt-4o-mini', $html);
     }

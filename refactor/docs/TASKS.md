@@ -3,8 +3,8 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 14 Oktober 2026 |
-| Status | IP-001–IP-032 selesai; 32 dari 39 task selesai, IP-033–IP-039 pending |
+| Tanggal | 15 Oktober 2026 |
+| Status | IP-001–IP-033 selesai; 33 dari 39 task selesai, IP-034–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
@@ -108,7 +108,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-030](#ip-030) | F5 | Migrasikan resource Datasets | done |
 | [IP-031](#ip-031) | F5 | Migrasikan resources baca/detail | done |
 | [IP-032](#ip-032) | F5 | Migrasikan monitoring events dan admin logs | done |
-| [IP-033](#ip-033) | F5 | Migrasikan dan render PDF hasil | pending |
+| [IP-033](#ip-033) | F5 | Migrasikan dan render PDF hasil | done |
 | [IP-034](#ip-034) | F5 | Verifikasi tindakan dan kontrak ekspor CSV | pending |
 | [IP-035](#ip-035) | F6 | Cleanup setelah seluruh pemakai dimigrasi | pending |
 | [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-032 selesai, IP-033–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-033 selesai, IP-034–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -715,10 +715,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-032 selesai, IP-
 - **Arsitektur:** FA-02, FA-07.
 - **Source/target:** `resources/views/hasil-pdf.blade.php`, `app/View/Presenters/DetectionPresentation.php` (opsional).
 
-- [ ] Migrasikan PDF mandiri A4 portrait dengan CSS/font DomPDF yang didukung; tanpa layout web/Vite/JS/WOFF2 browser.
-- [ ] Selaraskan label/disclaimer/confidence/model/time/provenance dengan web; jangan tampilkan path storage internal atau versi double-v.
-- [ ] Jika input/extraction dicuplik, beri penanda; evidence yang belum disuplai tidak dibuat sebagai referensi palsu.
-- [ ] Render PDF aktual untuk seluruh label, explanation unavailable, teks/URL panjang dan karakter Indonesia; verifikasi page break serta access/final guards.
+- [x] Migrasikan PDF mandiri A4 portrait dengan CSS/font DomPDF yang didukung; tanpa layout web/Vite/JS/WOFF2 browser.
+- [x] Selaraskan label/disclaimer/confidence/model/time/provenance dengan web; jangan tampilkan path storage internal atau versi double-v.
+- [x] Jika input/extraction dicuplik, beri penanda; evidence yang belum disuplai tidak dibuat sebagai referensi palsu.
+- [x] Render PDF aktual untuk seluruh label, explanation unavailable, teks/URL panjang dan karakter Indonesia; verifikasi page break serta access/final guards.
 
 **Validasi:** Render PDF aktual + ResultEndpointAuthorizationTest/FinalResultStateTest.
 
@@ -1267,6 +1267,16 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Validasi:** 12 cases baru; suites terkait 86 passed / 947 assertions. Suite penuh 749 cases / 4953 assertions: 720 passed, 25 existing DOM warnings, 4 BERT skips, tanpa failure. Regresi copy notice 30 passed / 414 assertions. 69 Node/build host/Docker frontend/Pint9/Blade/diff lulus. Browser 81 samples / 173 checks normal/no-JS/reduced, 17 native interactions dan 8 page native zoom200% tanpa overflow. Whole HTML tidak memuat secret marker, refresh/filter/pagination/keyboard relation/detail lulus, metadata original tetap di DB. Final console/network bersih dan screenshot ditinjau.
 - **Batas:** driver zoom awal menyelesaikan assertions lalu exit143; client verification ulang exit0. Warning internal Firefox/startup dicatat terpisah. Screen reader/forced colors/BFCache/MySQL/deployment/inference nyata belum diuji. Audit observer path gap existing tetap, log tidak dijanjikan immutable/lengkap. Proyeksi field baru memerlukan review bila writer berubah. QA aggregate tetap 3 audit pass / 91 not_run; F5 menyeluruh belum ditutup. Tidak ada operational migration/data/env/deploy/push changes.
 - **Berikutnya:** commit semantic dan berhenti pada IP-032; IP-033–IP-039 pending.
+
+### IP-033 — Catatan eksekusi
+
+- **Status/tanggal:** done; 15 Oktober 2026, Asia/Jakarta. Branch frontend-refactor/admin-export, HEAD awal 2125644; tree/index awal bersih.
+- **Rujukan:** P15/AC-P15, G05, FA-02/07, DESIGN-SYSTEM bagian print/PDF dan QA-EXPORT-01/02/03; template/controller/presenter/model serta test actual.
+- **Perubahan:** PDF mandiri A4 portrait/margin 18 mm, white/evergreen/semantic tones, DejaVu Sans/Serif tertanam dan layout block/table DomPDF. Label/confidence memakai DetectionPresentation existing; abstention/disclaimer utuh, null berbeda dari nol, versi tersimpan tanpa tambahan v. Waktu memakai timezone aplikasi; provenance nullable jujur, source URL aman plain text, media path internal tidak dirender. Cuplikan input/ekstraksi/terjemahan 1600 karakter ditandai; explanation ready/pending/unavailable/unknown mengikuti web, narrative panjang dapat melanjutkan halaman.
+- **Kontrak:** controller/SubmissionAccess/final guard/model/schema tetap; evidence tidak ditambahkan tanpa contract eksplisit. PDF ringkasan tidak lagi mencetak raw_scores JSON/stage/inferensi diagnostik; record backend tidak berubah. Test provenance diperkuat attachment/filename/PDF bytes, access test menambah pending serta direct PDF guest cross-capability/admin tanpa capability.
+- **Evidence/validasi:** [PDF-IP-033.md](../reports/PDF-IP-033.md). Empat belas cases baru; suites terkait 63 passed/428 assertions sebelum penguatan tambahan access, suite penuh final 763 cases/5051 assertions: 759 passed/4 real-BERT skips, tanpa failure/warning. Sembilan PDF aktual/18 halaman; A4/font embedded/bounds/no overlap/teks Unicode dan URL/akhir explanation lengkap. Firefox PDF viewer 9 samples 360/768/1280, halaman terakhir, keyboard dan zoom 200%; build host/Docker awal, 69 Node, Pint 3, Blade cache/clear dan diff pass.
+- **Batas:** PDF browser memakai artefak sintetis loopback; authorization/download diuji melalui kernel HTTP Laravel/SQLite, bukan sesi browser akun produksi. Real BERT/provider/MySQL/deployment/printer/tagged-PDF/screen reader belum diuji; empat real-BERT skips. QA aggregate tetap 3 audit pass/91 not_run; F5/CSV dan audit Livewire gap existing tetap terbuka. Tidak mengubah secret/data operasional/dependency/vendor assets atau deploy/push.
+- **Berikutnya:** commit semantic dan berhenti pada IP-033; IP-034–IP-039 pending.
 
 ### Format catatan berikutnya
 
