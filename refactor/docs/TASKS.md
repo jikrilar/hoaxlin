@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 14 Oktober 2026 |
-| Status | IP-001–IP-030 selesai; 30 dari 39 task selesai, IP-031–IP-039 pending |
+| Status | IP-001–IP-031 selesai; 31 dari 39 task selesai, IP-032–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-030 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-031 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -106,7 +106,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-028](#ip-028) | F5 | Rapikan dashboard dan widgets existing | done |
 | [IP-029](#ip-029) | F5 | Migrasikan resource Users | done |
 | [IP-030](#ip-030) | F5 | Migrasikan resource Datasets | done |
-| [IP-031](#ip-031) | F5 | Migrasikan resources baca/detail | pending |
+| [IP-031](#ip-031) | F5 | Migrasikan resources baca/detail | done |
 | [IP-032](#ip-032) | F5 | Migrasikan monitoring events dan admin logs | pending |
 | [IP-033](#ip-033) | F5 | Migrasikan dan render PDF hasil | pending |
 | [IP-034](#ip-034) | F5 | Verifikasi tindakan dan kontrak ekspor CSV | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-030 selesai, IP-031–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-031 selesai, IP-032–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -679,10 +679,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-030 selesai, IP-
 - **Arsitektur:** FA-03, FA-06, FA-09.
 - **Source/target:** `app/Filament/Resources/Submissions/`, `app/Filament/Resources/DetectionResults/`, `app/Filament/Resources/Feedback/`.
 
-- [ ] Migrasikan list/view dengan field, filters, relation dan long content yang diberikan schema existing.
-- [ ] Bedakan submission nonfinal dari result classifier parsial; confidence adalah skor classifier dan is_correct adalah feedback pengguna.
-- [ ] Pertahankan getPages serta canCreate/Edit/Delete/read-only rules; file legacy Create/Edit tidak diaktifkan.
-- [ ] Jangan menambah video_url filter tanpa contract, reprocess/retry, edit classifier result atau voting truth; uji table/detail/access/escaping.
+- [x] Migrasikan list/view dengan field, filters, relation dan long content yang diberikan schema existing.
+- [x] Bedakan submission nonfinal dari result classifier parsial; confidence adalah skor classifier dan is_correct adalah feedback pengguna.
+- [x] Pertahankan getPages serta canCreate/Edit/Delete/read-only rules; file legacy Create/Edit tidak diaktifkan.
+- [x] Jangan menambah video_url filter tanpa contract, reprocess/retry, edit classifier result atau voting truth; uji table/detail/access/escaping.
 
 **Validasi:** Resource getPages/actions review; list/detail/access QA.
 
@@ -1245,6 +1245,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Validasi:** 16 cases baru; suites terkait 68 passed/785 assertions. Suite penuh 719 cases/4539 assertions: 690 passed +25 existing DOM warnings +4 BERT skips, tanpa failure; suites terkait diulang setelah whitespace detail. 69 Node/build host/Docker frontend/Pint11/Blade/diff pass. Browser54 samples/135 checks normal/no-JS/reduced +13 native interactions create/edit/verifier/confirmation/keyboard selected count2/Escape/focus; final console/network bersih. Enam page native zoom200% viewport380/scroll374/controls36 tanpa overflow; screenshot ditinjau.
 - **Batas:** model CRUD admin-path tercatat; fixture native Livewire updates tidak tercatat (admin_logs0), audit gap observer existing tetap terbuka. Log proses Firefox compositor/Remote Settings/Nimbus dibedakan dari page final. Screen reader/forced colors/BFCache/MySQL/deployment/inference nyata belum diuji; confirmed delete native pada PHP/SQLite. QA aggregate tetap3 audit pass/91 not_run; F5 belum ditutup. Tidak ada operational migration/data/env/delete/deploy/push changes.
 - **Berikutnya:** commit semantic dan berhenti pada IP-030; IP-031–IP-039 pending.
+
+### IP-031 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Branch frontend-refactor/admin-export, HEAD awal fcc15ad; tree/index awal bersih.
+- **Rujukan:** A04/A05/A06, AC-A04/05/06; G02/G06; FA-03/06/09 dan QA-ADMIN-05/06/07/10 serta QA-RESULT-03/06. Filament 5.7.3/Livewire 4.3.3 actual, resource/schema/model/panel access dan presenter publik IP-015 existing.
+- **Perubahan:** enam list/detail native dengan TextEntry kompatibel, section status/input/provenance/classifier/explanation/metadata/feedback; konten panjang full-width/escaped/paragraf, preview wrap, empty state, labels/dates. Status/tahap enum existing, guard final bersama, relation links admin yang tepat. Feedback boolean menjadi penilaian pengguna. Scoped noscript notice hanya tiga list menjelaskan kebutuhan JS untuk search/filter/pagination.
+- **Kontrak:** getPages index/view dan canCreate/Edit/Delete/DeleteAny false tidak diubah; file/form Create/Edit legacy tetap tidak aktif. Search/filter/order/populasi tetap, input filter masih text/image/video/url tanpa video_url baru. Record nonfinal ditandai parsial, confidence_score classifier mempertahankan dua desimal/nol tanpa null-to-zero; model accessor/schema tetap. Explanation ready/pending/unavailable dipertahankan; versi/provenance tidak dikarang. URL sumber/media path tetap teks, capability/credential/raw provider response tidak ditambahkan ke view.
+- **Evidence:** [READ-ONLY-IP-031.md](../reports/READ-ONLY-IP-031.md); snapshot /tmp/hoaxlin-ip031-n7ezr3a8 dengan vendor exact-lock/PHP8.4/SQLite in-memory. Browser kernel/session/Livewire aktual dan SQLite sintetis loopback, provider HTTP fake; tanpa data/layanan pengguna.
+- **Validasi:** 18 cases baru; suites terkait akhir 83 passed / 859 assertions. Suite penuh final 737 cases / 4801 assertions: 708 passed, 25 existing DOM warnings, 4 BERT skips, tanpa failure. 69 Node, build host/Docker frontend, Pint 15 files, Blade cache/clear dan diff lulus. Browser 108 samples / 231 checks normal/no-JS/reduced, 18 native interactions (relations/filter/search/pagination/focus/detail), 12 halaman native zoom 200% tanpa overflow; final console/network bersih dan screenshot ditinjau.
+- **Batas:** screen reader/forced colors/BFCache/MySQL/deployment/inference nyata belum diperiksa; compositor/Nimbus Firefox internal dan penyesuaian fixture/driver dicatat terpisah. Audit observer gap endpoint Livewire IP-029/030 tetap di luar task baca saja. QA aggregate tetap 3 audit pass / 91 not_run; F5 menyeluruh belum ditutup. Tidak ada perubahan model/policy/schema/backend/queue/KB/secret/operational data/deploy/push.
+- **Berikutnya:** commit semantic dan berhenti pada IP-031; IP-032–IP-039 pending.
 
 ### Format catatan berikutnya
 

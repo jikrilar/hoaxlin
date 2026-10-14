@@ -496,6 +496,8 @@ IP-029 memigrasikan [Users native](../reports/USERS-IP-029.md): schema Section/T
 
 IP-030 memigrasikan [Datasets native](../reports/DATASETS-IP-030.md): Section/form teks full-width dan metadata, TextEntry escaped/full paragraphs, table preview/label tekstual dengan query existing. Label options/copy kurasi dipusatkan pada resource; required min10/source max255/nullable admin relationship/AdminUser tetap. Single/bulk actions hanya mengubah presentasi confirmation/count, executor native tetap. View notice no-JS resource dibagi Users/Datasets, PAGE_START scoped pada empat create/edit pages dan CSS pada kedua resource; tidak memuat runtime/reset publik. Audit admin-path guard existing tetap dan gap endpoint Livewire didokumentasikan.
 
+IP-031 memigrasikan [tiga resource baca/detail](../reports/READ-ONLY-IP-031.md) dengan native TextEntry/Section/table/ViewAction. ReadOnlyPresentation memusatkan enum status/tahap, guard final dan label dari presenter publik, confidence_score tanpa accessor null-to-zero, explanation states serta boolean penilaian. Record classifier nonfinal tetap dapat diinspeksi dan ditandai parsial; query/filter/order tidak disempitkan ke completed. URL/media tetap teks dan relation links hanya resource admin. Scoped PAGE_START noscript notice menjelaskan kontrol daftar yang memerlukan JS. Resource getPages/read-only permissions dan file/form legacy tetap, tanpa reprocess/mutasi/domain/schema atau runtime publik baru.
+
 | Area | Pola | Batas mutasi baseline |
 | --- | --- | --- |
 | Login/dashboard | Native panel + widget existing | Tidak menambah role picker atau metrik buatan |
