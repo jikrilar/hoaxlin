@@ -8,4 +8,6 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateDataset extends CreateRecord
 {
     protected static string $resource = DatasetResource::class;
+
+    protected ?string $subheading = DatasetResource::CURATION_NOTICE;
 }

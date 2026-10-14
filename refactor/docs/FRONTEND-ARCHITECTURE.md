@@ -494,7 +494,7 @@ IP-028 menerapkan [dashboard operasional](../reports/DASHBOARD-IP-028.md): provi
 
 IP-029 memigrasikan [Users native](../reports/USERS-IP-029.md): schema Section/TextEntry/form native, table status tekstual dan preview tanpa perubahan query, parent actions/delete/cascade tetap. Password kosong saat fill dan setelah save, blank tidak didehydrasi, hashed cast model tetap; model ValidationException is_admin dipetakan ke form path untuk native field error. PAGE_START hook scoped pada CreateUser/EditUser memberikan noscript notice dan menyembunyikan JS-dependent form. Native bulk action tunggal tampil langsung dengan confirmation/count, tanpa fork dropdown/vendor. Observer hanya mencatat path admin*; native Livewire update path yang berbeda tetap audit gap existing dan tidak diubah di sini.
 
-
+IP-030 memigrasikan [Datasets native](../reports/DATASETS-IP-030.md): Section/form teks full-width dan metadata, TextEntry escaped/full paragraphs, table preview/label tekstual dengan query existing. Label options/copy kurasi dipusatkan pada resource; required min10/source max255/nullable admin relationship/AdminUser tetap. Single/bulk actions hanya mengubah presentasi confirmation/count, executor native tetap. View notice no-JS resource dibagi Users/Datasets, PAGE_START scoped pada empat create/edit pages dan CSS pada kedua resource; tidak memuat runtime/reset publik. Audit admin-path guard existing tetap dan gap endpoint Livewire didokumentasikan.
 
 | Area | Pola | Batas mutasi baseline |
 | --- | --- | --- |

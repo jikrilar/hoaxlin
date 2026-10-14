@@ -18,6 +18,8 @@ use Filament\Tables\Table;
 
 class DatasetResource extends Resource
 {
+    public const CURATION_NOTICE = 'Referensi kurasi production. Perubahan di sini tidak melatih ulang atau mengganti model BERT aktif.';
+
     protected static ?string $model = Dataset::class;
 
     protected static ?string $navigationLabel = 'Katalog Dataset';
@@ -27,6 +29,16 @@ class DatasetResource extends Resource
     protected static ?string $pluralModelLabel = 'katalog dataset';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    public static function labelOptions(): array
+    {
+        return ['valid' => 'Valid', 'hoax' => 'Hoaks', 'meragukan' => 'Meragukan'];
+    }
+
+    public static function labelText(string $state): string
+    {
+        return static::labelOptions()[$state] ?? $state;
+    }
 
     public static function form(Schema $schema): Schema
     {

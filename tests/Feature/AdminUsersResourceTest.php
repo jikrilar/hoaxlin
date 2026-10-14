@@ -40,9 +40,9 @@ class AdminUsersResourceTest extends TestCase
         $this->admin();
         $response = $this->get($url)->assertOk()->assertDontSee($record->password)->assertDontSee($record->remember_token);
         if (in_array($page, ['create', 'edit'], true)) {
-            $response->assertSee('data-users-runtime-required');
+            $response->assertSee('data-admin-form-runtime-required');
         } else {
-            $response->assertDontSee('data-users-runtime-required');
+            $response->assertDontSee('data-admin-form-runtime-required');
         }
         Http::assertNothingSent();
     }

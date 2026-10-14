@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\Datasets\Pages\CreateDataset;
+use App\Filament\Resources\Datasets\Pages\EditDataset;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Widgets\ModelVersionWidget;
@@ -37,7 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('hoaxlin.id')
             ->login()
             ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE, fn () => view('filament.admin.auth.runtime-notice'))
-            ->renderHook(PanelsRenderHook::PAGE_START, fn () => view('filament.admin.users.runtime-notice'), scopes: [CreateUser::class, EditUser::class])
+            ->renderHook(PanelsRenderHook::PAGE_START, fn () => view('filament.admin.resources.runtime-notice'), scopes: [CreateUser::class, EditUser::class, CreateDataset::class, EditDataset::class])
             ->colors([
                 // Filament needs concrete colors to calculate component contrast.
                 // Keep these bridges aligned with design-tokens.css; generating a

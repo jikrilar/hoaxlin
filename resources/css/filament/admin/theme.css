@@ -86,7 +86,7 @@
         display: none;
     }
 
-    .fi-panel-admin .fi-resource-users:has([data-users-runtime-required]) .fi-sc-form {
+    .fi-panel-admin :is(.fi-resource-users, .fi-resource-datasets):has([data-admin-form-runtime-required]) .fi-sc-form {
         display: none;
     }
 
