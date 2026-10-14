@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code', '404')
+@section('title', 'Halaman atau hasil tidak ditemukan')
+@section('message', 'Halaman atau hasil yang dituju tidak dapat dibuka melalui akses ini.')
+@section('recovery', 'Periksa kembali alamatnya atau buka beranda. Hasil tamu memerlukan sesi yang digunakan saat mengirim informasi; ID hasil saja bukan izin berbagi publik.')

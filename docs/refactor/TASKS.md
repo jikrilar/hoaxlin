@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 14 Oktober 2026 |
-| Status | IP-001–IP-025 selesai; 25 dari 39 task selesai, IP-026–IP-039 pending |
+| Status | IP-001–IP-026 selesai; 26 dari 39 task selesai, IP-027–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-025 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-026 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -101,7 +101,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-023](#ip-023) | F4 | Migrasikan Cara kerja dan Tentang | done |
 | [IP-024](#ip-024) | F4 | Rapikan halaman privasi berdasarkan praktik aktual | done |
 | [IP-025](#ip-025) | F4 | Migrasikan statistik dan alternatif tabel | done |
-| [IP-026](#ip-026) | F4 | Buat error/fallback HTML sesuai scope | pending |
+| [IP-026](#ip-026) | F4 | Buat error/fallback HTML sesuai scope | done |
 | [IP-027](#ip-027) | F5 | Buat theme Filament dan login admin light-only | pending |
 | [IP-028](#ip-028) | F5 | Rapikan dashboard dan widgets existing | pending |
 | [IP-029](#ip-029) | F5 | Migrasikan resource Users | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-025 selesai, IP-026–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-026 selesai, IP-027–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -587,10 +587,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-025 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04, FA-09.
 - **Source/target:** `resources/views/errors/`, `resources/views/partials/head.blade.php`, `resources/views/components/ui/`.
 
-- [ ] Buat themed error HTML minimal untuk kode relevan tanpa user/submission/AI dependency yang rapuh.
-- [ ] Sediakan pesan aman dan recovery nyata untuk 403/404/419/429/500/503; invalid guest capability tetap 404.
-- [ ] Validation redirect/422 tetap menuntun ke field; Accept JSON/status endpoint tetap contract JSON dan HTTP code existing.
-- [ ] Periksa no secret/stack trace, navigation/keyboard, serta network polling error yang tidak berarti domain failed.
+- [x] Buat themed error HTML minimal untuk kode relevan tanpa user/submission/AI dependency yang rapuh.
+- [x] Sediakan pesan aman dan recovery nyata untuk 403/404/419/429/500/503; invalid guest capability tetap 404.
+- [x] Validation redirect/422 tetap menuntun ke field; Accept JSON/status endpoint tetap contract JSON dan HTTP code existing.
+- [x] Periksa no secret/stack trace, navigation/keyboard, serta network polling error yang tidak berarti domain failed.
 
 **Validasi:** ResultEndpointAuthorizationTest, PublicPipelineErrorTest; HTML/JSON.
 
@@ -1190,6 +1190,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Validasi:** PHP 8.4 Docker/SQLite: suites statistik 19 passed / 142 assertions; suite penuh 650 cases / 3846 assertions, 621 passed + 25 existing parser warnings + 4 real-BERT skips, tanpa failures. Build/69 Node/Pint tiga PHP files/diff pass. Browser normal/no-JS/reduced/503 chunk 54 samples/191 checks; native zoom 200%, 3 resource checks (home/how/statistics 0/0/1 chart request), actual Chart.js vs table data dan Livewire destroy/fresh instance lulus.
 - **Batas:** Browser rendered kernel/SQLite fixtures + SDK/library actual bukan deployment/session/inference E2E; screen reader/BFCache/MySQL/real providers belum diuji. Failure mode mencatat enam intended 503/MIME console errors tanpa unhandled rejection; modes lain page errors kosong. Firefox process normal/reduced/blocked cleanup timeout existing dicatat. QA aggregate tetap 3 audit pass/91 not_run, F4 belum ditutup. Tidak ada operational data/env/migration/training/deploy/push changes.
 - **Berikutnya:** buat commit semantic dan berhenti pada IP-025; IP-026–IP-039 pending.
+
+### IP-026 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/examination-progress-results, HEAD awal 711b432; tree/index awal bersih.
+- **Rujukan:** E01/AC-E01/FA-01/02/04/09; QA-ERROR-01–03 dan QA-PROGRESS-08, kontrak exception Laravel actual serta akses/polling existing.
+- **Perubahan:** 403/404/419/429/500/503 bertema dengan shell minimal, CSS-only entry/token/font shared, static safe copy dan native GET recovery. View tidak memakai auth/session/submission/AI/Livewire/JS. Missing manifest menampilkan HTML native yang tetap terbaca. Retry-After integer positif saja; tanpa trace, replay POST, countdown atau input secret.
+- **Kontrak:** handler/JSON/status/header/validation/CSRF/throttle/authorization/pipeline/polling unchanged. Invalid guest capability tetap 404; processing tidak menjadi failed saat transport 503. Debug off acceptance; debug policy tidak diubah. Framework bootstrap/session factory tetap prasyarat runtime.
+- **Evidence:** [ERROR-PAGES-IP-026.md](ERROR-PAGES-IP-026.md), 22 feature cases baru; snapshot /tmp/hoaxlin-ip026-20exs_8x dengan Docker PHP 8.4/SQLite in-memory dan dev vendor exact-lock read-only.
+- **Validasi:** build/Pint/Blade/diff lulus; empat suites terkait 49 passed/349 assertions; suite penuh 672 cases/4042 assertions, 643 passed + 25 existing DOM warnings + 4 real-BERT skips, tanpa failures. 69 Node tests lulus. Browser normal/no-JS/reduced 42 samples/115 checks, keenam kode/native zoom 200%/keyboard recovery/konten panjang/manifest fallback lulus.
+- **Batas:** rendered kernel browser fixtures bukan deployment/session E2E; screen reader/forced colors/BFCache/MySQL/providers belum diuji. Page console errors kosong; 31 cached fixture favicon 404 dicatat, assets aplikasi lulus. Process timeout JS existing saat meninggalkan recovery serta internal Firefox errors dicatat. QA aggregate tetap 3 audit pass/91 not_run; F4 belum ditutup.
+- **Berikutnya:** commit semantic dan berhenti pada IP-026; IP-027–IP-039 pending.
 
 ### Format catatan berikutnya
 

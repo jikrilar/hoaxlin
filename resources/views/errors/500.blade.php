@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code', '500')
+@section('title', 'Layanan mengalami kendala')
+@section('message', 'Permintaan ini belum dapat ditampilkan karena kendala layanan.')
+@section('recovery', 'Coba buka kembali halaman yang dituju beberapa saat lagi, atau kembali ke beranda. Jangan mengirim ulang form secara otomatis.')

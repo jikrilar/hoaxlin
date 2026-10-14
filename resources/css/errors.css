@@ -1,0 +1,18 @@
+/* Independent, CSS-only error shell: no public navigation or JS runtime required. */
+@import 'tailwindcss' source(none);
+@import './design-tokens.css';
+@import './fonts.css';
+@import './theme.css';
+@import './base.css';
+@import './components.css';
+
+@layer components {
+    .hl-error-shell { min-block-size: 100vh; }
+    .hl-error-header { max-inline-size: var(--ds-container-shell); margin-inline: auto; padding: var(--ds-space-4); border-block-end: var(--ds-border-width) solid var(--ds-border-subtle); }
+    .hl-error-header .hl-wordmark { padding-inline: 0; font-size: var(--ds-type-section-title-size); font-weight: var(--ds-font-weight-semibold); }
+    .hl-error-main { max-inline-size: var(--ds-container-reading); margin-inline: auto; padding: var(--ds-space-12) var(--ds-space-4) var(--ds-space-16); }
+    .hl-error-code { font-size: var(--ds-type-body-sm-size); color: var(--ds-text-muted); margin-block-end: var(--ds-space-3); }
+    .hl-error-message { margin-block-start: var(--ds-space-4); }
+    .hl-error-hint { margin-block-start: var(--ds-space-4); color: var(--ds-text-muted); }
+    .hl-error-actions { display: flex; flex-wrap: wrap; gap: var(--ds-space-3); margin-block-start: var(--ds-space-6); }
+}

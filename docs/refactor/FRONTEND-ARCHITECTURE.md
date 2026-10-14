@@ -546,6 +546,8 @@ Output PDF diperiksa terpisah dari browser/build. Mengubah web CSS tidak membukt
 - Tidak ada input/password/token di localStorage, sessionStorage, URL search, atau service worker cache baru.
 - Endpoint status tetap mengembalikan kontrak JSON ketika diminta; error layout HTML tidak dipaksakan pada JSON consumer.
 
+IP-026 menerapkan [error shell minimal](ERROR-PAGES-IP-026.md) untuk 403/404/419/429/500/503. Entry errors.css memakai tokens/font/base/components tanpa JS atau public/auth shell; Vite manifest failure memberikan native HTML yang terbaca. Safe static copy/native relative GET recovery tidak membaca akun/session/submission atau exception message. Retry-After integer positif tervalidasi; header/code/JSON/validation/guest capability dan polling domain tetap milik handler/middleware existing. Framework bootstrap/view/redirector session factory tetap prasyarat; debug policy tidak diubah. Kernel/middleware/browser tests membuktikan subhasil E01 tanpa menutup QA deployment menyeluruh.
+
 Perubahan kebijakan keamanan/infrastruktur merupakan task tersendiri. Dokumen ini tidak memasang CSP, mengubah storage policy, atau mengubah autentikasi.
 
 ## 18. Aksesibilitas dan performa
