@@ -154,13 +154,13 @@ class SubmissionTest extends TestCase
         $page = $this->get(route('home'))->assertOk()
             ->assertSee('id="submission-errors" role="alert"', false)
             ->assertSee('Platform video tidak didukung. Gunakan URL langsung ke file audio/video.')
-            ->assertSee('id="tab-video" class="input-tab active" role="tab" aria-selected="true"', false)
-            ->assertSee('id="panel-video" class="tab-content active"', false)
-            ->assertSee('id="video-input-type" value="video_url"', false)
+            ->assertSee('data-active-input="video" data-active-video="url"', false)
+            ->assertSee('id="panel-video" class="hl-input-panel"', false)
+            ->assertSee('name="input_type" value="video_url"', false)
             ->assertSee('value="'.$sourceUrl.'"', false)
             ->assertDontSee('validation.');
 
-        $this->assertMatchesRegularExpression('/id="video-tab-url"[^>]*aria-pressed="true"/', $page->getContent());
+        $page->assertSee('id="video-tab-url"', false)->assertSee('data-video-mode="url"', false);
 
         $this->from(route('home'))->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video_url',
@@ -178,9 +178,9 @@ class SubmissionTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $page = $this->get(route('home'))->assertOk()
-            ->assertSee('id="video-url-platform-error" role="alert" hidden', false);
+            ->assertSee('id="video-url-input-client-error" class="hl-field__error" data-url-error role="alert" hidden', false);
 
-        $this->assertMatchesRegularExpression('/const blockedVideoHosts = [^\r\n]*custom\.example[^\r\n]*;/', $page->getContent());
+        $page->assertSee('data-direct-url-options=', false)->assertSee('custom.example');
     }
 
     public function test_guest_cannot_submit_article_url(): void
@@ -278,13 +278,13 @@ class SubmissionTest extends TestCase
                 ->assertSee('value="'.$sourceUrl.'"', false);
 
             if ($inputType === 'url') {
-                $page->assertSee('id="tab-url" class="input-tab active" role="tab" aria-selected="true"', false)
-                    ->assertSee('id="panel-url" class="tab-content active"', false);
+                $page->assertSee('data-active-input="url"', false)
+                    ->assertSee('id="panel-url" class="hl-input-panel"', false);
             } else {
-                $page->assertSee('id="tab-video" class="input-tab active" role="tab" aria-selected="true"', false)
-                    ->assertSee('id="panel-video" class="tab-content active"', false)
-                    ->assertSee('id="video-input-type" value="video_url"', false);
-                $this->assertMatchesRegularExpression('/id="video-tab-url"[^>]*aria-pressed="true"/', $page->getContent());
+                $page->assertSee('data-active-input="video" data-active-video="url"', false)
+                    ->assertSee('id="panel-video" class="hl-input-panel"', false)
+                    ->assertSee('name="input_type" value="video_url"', false);
+                $page->assertSee('id="video-tab-url"', false)->assertSee('data-video-mode="url"', false);
             }
         }
 
@@ -316,10 +316,10 @@ class SubmissionTest extends TestCase
                 ->assertSee('Jawaban CAPTCHA salah.');
 
             if ($inputType === 'image') {
-                $page->assertSee('id="tab-gambar" class="input-tab active"', false);
+                $page->assertSee('data-active-input="gambar"', false);
             } else {
-                $page->assertSee('id="tab-video" class="input-tab active"', false)
-                    ->assertSee('id="video-input-type" value="video"', false);
+                $page->assertSee('data-active-input="video" data-active-video="upload"', false)
+                    ->assertSee('name="input_type" value="video"', false);
             }
         }
 

@@ -39,7 +39,7 @@ class FinalResultStateTest extends TestCase
             ->get(route('hasil', $submission))
             ->assertOk()
             ->assertSee('wire:poll.2s.visible', false)
-            ->assertDontSee('class="result-badge', false);
+            ->assertDontSee('data-result-label', false);
     }
 
     public function test_partial_result_while_explaining_keeps_polling_and_is_not_rendered_as_final(): void
@@ -63,7 +63,7 @@ class FinalResultStateTest extends TestCase
             ->assertOk()
             ->assertSee('Sedang Menganalisis')
             ->assertSee('wire:poll.2s.visible', false)
-            ->assertDontSee('class="result-badge', false)
+            ->assertDontSee('data-result-label', false)
             ->assertDontSee('Berdasarkan analisis mendalam');
 
         $this->actingAs($user)
@@ -89,7 +89,7 @@ class FinalResultStateTest extends TestCase
         $this->actingAs($user)
             ->get(route('hasil', $submission))
             ->assertOk()
-            ->assertSee('Hasil Deteksi')
+            ->assertSee('Hasil analisis')
             ->assertSee('Penjelasan final dari pipeline.')
             ->assertDontSee('wire:poll.2s.visible', false)
             ->assertDontSee('let interval = setInterval', false);
@@ -115,7 +115,7 @@ class FinalResultStateTest extends TestCase
             ->get(route('hasil', $submission))
             ->assertOk()
             ->assertSee('Pemrosesan Gagal')
-            ->assertDontSee('class="result-badge', false)
+            ->assertDontSee('data-result-label', false)
             ->assertDontSee('wire:poll.2s.visible', false)
             ->assertDontSee('let interval = setInterval', false);
     }
@@ -128,8 +128,8 @@ class FinalResultStateTest extends TestCase
         $this->actingAs($user)
             ->get(route('hasil', $submission))
             ->assertOk()
-            ->assertSee('Hasil Deteksi')
-            ->assertSee('Penjelasan Belum Tersedia')
+            ->assertSee('Hasil analisis')
+            ->assertSee('Status tercatat: Sedang disusun')
             ->assertSee('Penjelasan AI belum tersedia untuk hasil ini.')
             ->assertDontSee('Berdasarkan analisis mendalam');
     }

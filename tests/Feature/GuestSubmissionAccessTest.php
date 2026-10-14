@@ -25,7 +25,7 @@ class GuestSubmissionAccessTest extends TestCase
         $this->get(route('hasil', $submission))
             ->assertOk()
             ->assertSee('wire:poll.2s.visible', false)
-            ->assertDontSee('class="result-badge', false);
+            ->assertDontSee('data-result-label', false);
         $this->getJson(route('hasil.status', $submission))
             ->assertOk()
             ->assertJson([
@@ -88,6 +88,25 @@ class GuestSubmissionAccessTest extends TestCase
         ])->get(route('hasil', $ownedSubmission))->assertForbidden();
     }
 
+    public function test_login_with_guest_capability_does_not_grant_feedback_ownership(): void
+    {
+        [$submission, $token] = $this->guestSubmission();
+        $submission->update(['status' => 'completed']);
+        $this->createResult($submission);
+        $user = User::factory()->create();
+
+        $this->withSession([SubmissionAccess::sessionKey($submission) => $token]);
+        $this->get(route('hasil', $submission))->assertOk()
+            ->assertSee(route('hasil.pdf', $submission), false)
+            ->assertDontSee('id="feedback-form"', false);
+        $this->actingAs($user)->get(route('hasil', $submission))->assertOk()
+            ->assertSee('Umpan balik hanya tersedia untuk hasil yang dikirim melalui akun Anda.')
+            ->assertDontSee('id="feedback-form"', false);
+        $this->post(route('feedback'), ['submission_id' => $submission->id, 'is_correct' => '1'])
+            ->assertNotFound();
+        $this->assertDatabaseEmpty('feedback');
+    }
+
     public function test_authenticated_submission_ownership_still_applies(): void
     {
         $owner = User::factory()->create();
@@ -109,10 +128,16 @@ class GuestSubmissionAccessTest extends TestCase
     {
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('id="tab-teks"', false)
+            ->assertSee('id="form-teks"', false)
+            ->assertSee('name="input_type" value="text"', false)
+            ->assertDontSee('id="tab-teks"', false)
             ->assertDontSee('id="tab-gambar"', false)
             ->assertDontSee('id="tab-video"', false)
-            ->assertDontSee('id="tab-url"', false);
+            ->assertDontSee('id="tab-url"', false)
+            ->assertDontSee('name="input_type" value="image"', false)
+            ->assertDontSee('name="input_type" value="video"', false)
+            ->assertDontSee('name="input_type" value="video_url"', false)
+            ->assertDontSee('name="input_type" value="url"', false);
 
         $this->actingAs(User::factory()->create())
             ->get(route('home'))

@@ -40,11 +40,12 @@ class ResultEvidencePresentationTest extends TestCase
         $response = $this->actingAs($user)->get(route('hasil', $submission));
 
         $response->assertOk()
-            ->assertSee('Status Verifikasi')
+            ->assertSee('Prediksi model: Valid')
             ->assertSee('Skor Keyakinan Model')
             ->assertSee('63%')
             ->assertDontSee('99%')
-            ->assertSee('Bukti/Rujukan Terkait')
+            ->assertDontSee('role="progressbar"', false)
+            ->assertSee('Referensi terkait')
             ->assertSee($first->title)
             ->assertSee($first->source)
             ->assertSee($first->source_url)
@@ -103,7 +104,7 @@ class ResultEvidencePresentationTest extends TestCase
         $response->assertOk()
             ->assertSee($displayLabel)
             ->assertSee('Ini bukan bukti bahwa informasi benar atau palsu.');
-        $this->assertStringContainsString('role="status" aria-label="'.$displayLabel.'"', $response->getContent());
+        $this->assertStringContainsString('data-result-label data-tone="warning"', $response->getContent());
 
         $this->assertSame('meragukan', $result->fresh()->label);
         $this->assertSame('0.8500', $result->fresh()->confidence_score);

@@ -2,74 +2,7 @@
 
 @layer components {
 
-    /* ─── Glass Card ─── */
-
-    .glass-card {
-        background: var(--ds-bg-surface);
-        border: 1px solid var(--ds-border-subtle);
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-        min-width: 0;
-        border-radius: var(--ds-radius-lg);
-    }
-
-    .glass-card:hover {
-        border-color: var(--ds-border-control);
-    }
-
-    .glass-card-solid {
-        background: var(--ds-bg-surface);
-        border: 1px solid var(--ds-border-subtle);
-        border-radius: var(--ds-radius-lg);
-    }
-    /* ─── Gradient Text ─── */
-
-    .gradient-text {
-        color: var(--ds-action-primary);
-    }
     /* ─── Buttons ─── */
-
-    .btn-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.75rem;
-        background: var(--ds-action-primary);
-        color: var(--ds-text-inverse);
-        font-weight: var(--ds-font-weight-semibold);
-        font-size: 0.9375rem;
-        border-radius: var(--ds-radius-md);
-        border: none;
-        cursor: pointer;
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-        position: relative;
-        overflow: hidden;
-        text-decoration: none;
-    }
-
-    .btn-primary:hover {
-        background: var(--ds-action-hover);
-    }
-
-    .btn-primary:active {
-        background: var(--ds-action-active);
-    }
-
-    .btn-primary:disabled {
-        opacity: 1;
-        cursor: not-allowed;
-        background: var(--ds-bg-disabled);
-        color: var(--ds-text-disabled);
-    }
-
-    .btn-primary span {
-        position: relative;
-        z-index: 1;
-    }
-
-    .btn-primary svg {
-        position: relative;
-        z-index: 1;
-    }
 
     .btn-secondary {
         display: inline-flex;
@@ -92,71 +25,8 @@
         border-color: var(--ds-border-control);
     }
 
-    .btn-ghost {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background: transparent;
-        color: var(--ds-text-body);
-        font-weight: 500;
-        font-size: 0.875rem;
-        border-radius: var(--ds-radius-md);
-        border: 1px solid transparent;
-        cursor: pointer;
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-        text-decoration: none;
-    }
-
-    .btn-ghost:hover {
-        background: var(--ds-bg-surface);
-        color: var(--ds-text-primary);
-        border-color: var(--ds-border-subtle);
-    }
     /* ─── Input Tab Switcher ─── */
 
-    .input-tabs {
-        display: flex;
-        background: var(--ds-bg-surface);
-        border-radius: var(--ds-radius-md);
-        padding: 0.25rem;
-        gap: 0.25rem;
-        border: 1px solid var(--ds-border-subtle);
-        overflow-x: auto;
-        scrollbar-width: none;
-    }
-
-    .input-tabs::-webkit-scrollbar {
-        display: none;
-    }
-
-    .input-tab {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.625rem 1.25rem;
-        border-radius: var(--ds-radius-md);
-        background: transparent;
-        border: none;
-        color: var(--ds-text-muted);
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    .input-tab:hover {
-        color: var(--ds-text-body);
-        background: var(--ds-bg-selected);
-    }
-
-    .input-tab.active {
-        background: var(--ds-bg-selected);
-        color: var(--ds-link);
-        border: 1px solid var(--ds-border-control);
-    }
     /* ─── Form Elements ─── */
 
     .form-textarea, .form-input {
@@ -181,188 +51,6 @@
     }
     /* ─── Upload Drop Zone ─── */
 
-    .upload-zone {
-        border: 2px dashed var(--ds-border-control);
-        border-radius: var(--ds-radius-md);
-        padding: 3rem 2rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        cursor: pointer;
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-        background: var(--ds-bg-surface);
-        text-align: center;
-        position: relative;
-    }
-
-    .upload-zone:hover, .upload-zone.dragover {
-        border-color: var(--ds-border-control);
-        background: var(--ds-bg-selected);
-    }
-
-    .upload-zone-icon {
-        width: 4rem;
-        height: 4rem;
-        background: var(--ds-bg-selected);
-        border-radius: var(--ds-radius-md);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--ds-link);
-        font-size: 1.75rem;
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-    }
-
-    .upload-zone-title {
-        color: var(--ds-text-primary);
-        font-weight: var(--ds-font-weight-semibold);
-        font-size: 1.0625rem;
-    }
-
-    .upload-zone-subtitle {
-        color: var(--ds-text-muted);
-        font-size: 0.875rem;
-    }
-
-    .upload-zone input[type="file"] {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-    }
-    /* ─── Result Badge ─── */
-
-    .result-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1.25rem;
-        border-radius: var(--ds-radius-md);
-        font-weight: var(--ds-font-weight-semibold);
-        font-size: 0.9375rem;
-        letter-spacing: 0.02em;
-        text-transform: uppercase;
-    }
-
-    .result-badge.valid {
-        background: var(--ds-prediction-valid-bg);
-        color: var(--ds-prediction-valid-fg);
-        border: var(--ds-border-width) solid currentColor;
-    }
-
-    .result-badge.hoax {
-        background: var(--ds-prediction-hoax-bg);
-        color: var(--ds-prediction-hoax-fg);
-        border: var(--ds-border-width) solid currentColor;
-    }
-
-    .result-badge.meragukan {
-        background: var(--ds-prediction-meragukan-bg);
-        color: var(--ds-prediction-meragukan-fg);
-        border: var(--ds-border-width) solid currentColor;
-    }
-    /* ─── Confidence Meter ─── */
-
-    .confidence-bar-track {
-        height: 8px;
-        background: var(--ds-bg-surface);
-        border-radius: var(--ds-radius-md);
-        overflow: hidden;
-    }
-
-    .confidence-bar-fill {
-        height: 100%;
-        border-radius: var(--ds-radius-md);
-        transition: width var(--ds-duration-progress) var(--ds-ease);
-        position: relative;
-    }
-
-    .confidence-bar-fill.valid {
-        background: var(--ds-prediction-valid-fg);
-    }
-
-    .confidence-bar-fill.hoax {
-        background: var(--ds-prediction-hoax-fg);
-    }
-
-    .confidence-bar-fill.meragukan {
-        background: var(--ds-prediction-meragukan-fg);
-    }
-    /* Evidence references */
-
-    .evidence-section {
-        margin: 1.75rem 0;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--ds-border-subtle);
-    }
-
-    .evidence-list {
-        display: grid;
-        gap: 0.75rem;
-        margin: 1rem 0 0;
-        padding-inline-start: 1.5rem;
-    }
-
-    .evidence-list li::marker {
-        color: var(--ds-link);
-        font-weight: var(--ds-font-weight-semibold);
-    }
-
-    .evidence-reference {
-        min-width: 0;
-        padding: 0.75rem 0.25rem 1rem;
-        border-bottom: 1px solid var(--ds-border-subtle);
-    }
-
-    .evidence-reference h3 {
-        margin: 0 0 0.5rem;
-        color: var(--ds-text-primary);
-        font-size: 0.9375rem;
-        font-weight: var(--ds-font-weight-semibold);
-        overflow-wrap: anywhere;
-    }
-
-    .evidence-reference__metadata {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem 1rem;
-        margin: 0;
-        color: var(--ds-text-muted);
-        font-size: 0.8125rem;
-        line-height: 1.6;
-    }
-
-    .evidence-reference__url, .evidence-reference__snippet {
-        margin: 0.6rem 0 0;
-        color: var(--ds-text-body);
-        font-size: 0.8125rem;
-        line-height: 1.65;
-    }
-
-    .evidence-reference__url, .evidence-reference__url a {
-        overflow-wrap: anywhere;
-        word-break: break-word;
-    }
-
-    .evidence-reference__url a {
-        color: var(--ds-link);
-        text-decoration: underline;
-        text-underline-offset: 0.15em;
-    }
-
-    .evidence-reference__url a:focus-visible {
-        outline-offset: 2px;
-        border-radius: var(--ds-radius-md);
-    }
-
-    .evidence-reference__snippet {
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-    }
     /* ─── Alert / Notice ─── */
 
     .info-box {
@@ -377,40 +65,6 @@
         line-height: 1.5;
     }
 
-    .warning-box {
-        display: flex;
-        gap: 0.75rem;
-        padding: 1rem 1.25rem;
-        background: var(--ds-warning-bg);
-        border: 1px solid var(--ds-border-control);
-        border-radius: var(--ds-radius-md);
-        color: var(--ds-warning-fg);
-        font-size: 0.875rem;
-        line-height: 1.5;
-    }
-    /* ─── Hero Section ─── */
-
-    .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.375rem 1rem;
-        background: var(--ds-bg-selected);
-        border: 1px solid var(--ds-border-control);
-        border-radius: var(--ds-radius-md);
-        color: var(--ds-link);
-        font-size: 0.8125rem;
-        font-weight: var(--ds-font-weight-semibold);
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-    }
-
-    .hero-badge-dot {
-        width: 6px;
-        height: 6px;
-        background: var(--ds-link);
-        border-radius: 50%;
-    }
     /* ─── Stats ─── */
 
     .stat-card {
@@ -465,24 +119,6 @@
         font-size: 1.375rem;
         margin-bottom: 1.25rem;
     }
-    /* ─── History Table ─── */
-
-    .history-row {
-        border-bottom: 1px solid var(--ds-border-subtle);
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-        display: grid;
-        grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)) minmax(0, 100px);
-        gap: var(--ds-space-4);
-        align-items: center;
-    }
-
-    .history-row:hover {
-        background: var(--ds-bg-selected);
-    }
-
-    .history-row:last-child {
-        border-bottom: none;
-    }
     /* ─── Loading Spinner ─── */
 
     .spinner {
@@ -500,52 +136,6 @@
             transform: rotate(360deg);
         }
     }
-    /* ─── Progress Steps ─── */
-
-    .progress-step {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem 1rem;
-        border-radius: var(--ds-radius-md);
-        transition: background-color var(--ds-duration-fast) var(--ds-ease), border-color var(--ds-duration-fast) var(--ds-ease), color var(--ds-duration-fast) var(--ds-ease);
-    }
-
-    .progress-step.done {
-        color: var(--ds-success-fg);
-    }
-
-    .progress-step.active {
-        color: var(--ds-link);
-    }
-
-    .progress-step.pending {
-        color: var(--ds-text-muted);
-    }
-
-    .step-icon {
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.875rem;
-        flex-shrink: 0;
-    }
-
-    .step-icon.done {
-        background: var(--ds-bg-selected);
-    }
-
-    .step-icon.active {
-        background: var(--ds-bg-selected);
-    }
-
-    .step-icon.pending {
-        background: var(--ds-bg-selected);
-    }
-
     /* ─── Auth Forms ─── */
 
     .auth-input {
@@ -582,15 +172,6 @@
         margin-top: 0.375rem;
     }
     /* Decorative orb/reveal class consumers are removed from views in this task. */
-    /* ─── Tab Content ─── */
-
-    .tab-content {
-        display: none;
-    }
-
-    .tab-content.active {
-        display: block;
-    }
     /* ─── Responsive Utils ─── */
 
     .container-app {
@@ -602,57 +183,11 @@
 
     @media (max-width: 768px) {
 
-        .input-tab {
-            padding: 0.5rem 0.875rem;
-            font-size: 0.8125rem;
-        }
 
         .stat-value {
             font-size: 1.75rem;
         }
     }
 
-    /* ─── Misc ─── */
 
-    .divider {
-        height: 1px;
-        background: var(--ds-border-subtle);
-    }
-
-    /* ─── Mobile History Cards ─── */
-
-    /* ─── Profile Page ─── */
-    /* Integration states while these legacy class names still have consumers. */
-
-    .container-app :is(.history-row, .history-header) > * {
-        min-width: 0;
-    }
-
-    .upload-zone:focus-within {
-        outline: var(--ds-focus-width) solid var(--ds-focus);
-        outline-offset: var(--ds-focus-offset);
-    }
-
-    @media (max-width: 48rem) {
-
-        .history-row {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: var(--ds-space-2);
-        }
-    }
-    .history-header {
-        display: grid;
-        grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)) minmax(0, 100px);
-        gap: var(--ds-space-4);
-        align-items: center;
-    }
-
-    @media (max-width: 48rem) {
-
-        .history-header {
-            display: none;
-        }
-    }
 }

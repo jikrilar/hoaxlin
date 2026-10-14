@@ -3,15 +3,15 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 13 Oktober 2026 |
-| Status | IP-001–IP-010 selesai; 10 dari 39 task selesai, IP-011–IP-039 pending |
+| Tanggal | 14 Oktober 2026 |
+| Status | IP-001–IP-026 selesai; 26 dari 39 task selesai, IP-027–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-010 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-026 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -86,22 +86,22 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-008](#ip-008) | F2 | Ekstrak fondasi head/runtime dan shell publik | done |
 | [IP-009](#ip-009) | F2 | Migrasikan navigasi, footer, dan flash | done |
 | [IP-010](#ip-010) | F2 | Buat shell auth dan pola form enhancement | done |
-| [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | pending |
-| [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | pending |
-| [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | pending |
-| [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | pending |
-| [IP-015](#ip-015) | F3 | Migrasikan hasil final, evidence, dan provenance | pending |
-| [IP-016](#ip-016) | F3 | Migrasikan actions dan feedback hasil | pending |
-| [IP-017](#ip-017) | F4 | Migrasikan login dan registrasi | pending |
-| [IP-018](#ip-018) | F4 | Migrasikan lupa/reset password | pending |
-| [IP-019](#ip-019) | F4 | Migrasikan verifikasi email | pending |
-| [IP-020](#ip-020) | F4 | Migrasikan profil dan konfirmasi hapus akun | pending |
-| [IP-021](#ip-021) | F4 | Migrasikan riwayat, filter, dan pagination | pending |
-| [IP-022](#ip-022) | F4 | Verifikasi detail riwayat memakai hasil bersama | pending |
-| [IP-023](#ip-023) | F4 | Migrasikan Cara kerja dan Tentang | pending |
-| [IP-024](#ip-024) | F4 | Rapikan halaman privasi berdasarkan praktik aktual | pending |
-| [IP-025](#ip-025) | F4 | Migrasikan statistik dan alternatif tabel | pending |
-| [IP-026](#ip-026) | F4 | Buat error/fallback HTML sesuai scope | pending |
+| [IP-011](#ip-011) | F3 | Migrasikan hierarchy beranda dan form teks | done |
+| [IP-012](#ip-012) | F3 | Migrasikan URL, gambar, video, dan URL media | done |
+| [IP-013](#ip-013) | F3 | Migrasikan view progress Livewire | done |
+| [IP-014](#ip-014) | F3 | Perbaiki kepemilikan fallback dan terminal transition | done |
+| [IP-015](#ip-015) | F3 | Migrasikan hasil final, evidence, dan provenance | done |
+| [IP-016](#ip-016) | F3 | Migrasikan actions dan feedback hasil | done |
+| [IP-017](#ip-017) | F4 | Migrasikan login dan registrasi | done |
+| [IP-018](#ip-018) | F4 | Migrasikan lupa/reset password | done |
+| [IP-019](#ip-019) | F4 | Migrasikan verifikasi email | done |
+| [IP-020](#ip-020) | F4 | Migrasikan profil dan konfirmasi hapus akun | done |
+| [IP-021](#ip-021) | F4 | Migrasikan riwayat, filter, dan pagination | done |
+| [IP-022](#ip-022) | F4 | Verifikasi detail riwayat memakai hasil bersama | done |
+| [IP-023](#ip-023) | F4 | Migrasikan Cara kerja dan Tentang | done |
+| [IP-024](#ip-024) | F4 | Rapikan halaman privasi berdasarkan praktik aktual | done |
+| [IP-025](#ip-025) | F4 | Migrasikan statistik dan alternatif tabel | done |
+| [IP-026](#ip-026) | F4 | Buat error/fallback HTML sesuai scope | done |
 | [IP-027](#ip-027) | F5 | Buat theme Filament dan login admin light-only | pending |
 | [IP-028](#ip-028) | F5 | Rapikan dashboard dan widgets existing | pending |
 | [IP-029](#ip-029) | F5 | Migrasikan resource Users | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-005–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-026 selesai, IP-027–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -315,10 +315,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04.
 - **Source/target:** `resources/views/welcome.blade.php`, `resources/views/partials/submission/`, `resources/js/pages/submission-form.js`.
 
-- [ ] Tempatkan pengantar singkat dan form sebagai fokus awal; statistik/cara kerja menjadi konteks sekunder.
-- [ ] Migrasikan POST deteksi untuk guest teks: raw_input, input_type=text, CSRF, captcha_answer dan honeypot website tetap.
-- [ ] Jaga batas 50–50.000 karakter, error summary/inline, old input aman, dan focus recovery.
-- [ ] Tampilkan loading mengirim dan cegah double submit; hapus timer yang berpura-pura menandai tahap analisis sebelum respons backend.
+- [x] Tempatkan pengantar singkat dan form sebagai fokus awal; statistik/cara kerja menjadi konteks sekunder.
+- [x] Migrasikan POST deteksi untuk guest teks: raw_input, input_type=text, CSRF, captcha_answer dan honeypot website tetap.
+- [x] Jaga batas 50–50.000 karakter, error summary/inline, old input aman, dan focus recovery.
+- [x] Tampilkan loading mengirim dan cegah double submit; hapus timer yang berpura-pura menandai tahap analisis sebelum respons backend.
 
 **Validasi:** SubmissionTest, AtomicCaptchaQuotaTest; browser.
 
@@ -333,10 +333,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04, FA-09.
 - **Source/target:** `resources/views/welcome.blade.php`, `resources/views/partials/submission/`, `resources/js/pages/submission-form.js`, `app/Http/Controllers/HomeController.php` (view data bila diperlukan).
 
-- [ ] Sediakan empat kategori presentasi dan dua pilihan Video dengan lima nilai domain tetap: text/image/video/video_url/url.
-- [ ] Ambil limit/format/durasi/blocked hosts dari request/service/config; tambah structured view data bila perlu, tanpa mengubah policy/validator.
-- [ ] Jaga media_file/source_url/multipart/required state dan input inactive; no-JS path dapat ditemukan dan guest tetap hanya teks.
-- [ ] Preview filename/URL memakai textContent/escaping; revoke object URL; invalid file/URL/host memiliki recovery dan file harus dipilih ulang.
+- [x] Sediakan empat kategori presentasi dan dua pilihan Video dengan lima nilai domain tetap: text/image/video/video_url/url.
+- [x] Ambil limit/format/durasi/blocked hosts dari request/service/config; tambah structured view data bila perlu, tanpa mengubah policy/validator.
+- [x] Jaga media_file/source_url/multipart/required state dan input inactive; no-JS path dapat ditemukan dan guest tetap hanya teks.
+- [x] Preview filename/URL memakai textContent/escaping; revoke object URL; invalid file/URL/host memiliki recovery dan file harus dipilih ulang.
 
 **Validasi:** VideoMediaContractTest, ExternalUrlSecurityTest, SubmissionTest.
 
@@ -351,10 +351,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-02, FA-05.
 - **Source/target:** `resources/views/livewire/submission-progress.blade.php`, `app/Livewire/SubmissionProgress.php` (bila perlu presentasi).
 
-- [ ] Migrasikan typography/status/progress tanpa mengubah enum stage atau persen backend.
-- [ ] Pertahankan SubmissionAccess pada setiap refresh; result parsial tidak ditampilkan sebagai final.
-- [ ] Jaga wire:poll.2s.visible hanya untuk nonterminal; failed tidak disajikan sebagai sukses 100%.
-- [ ] Sediakan live-region perubahan bermakna dan refresh manual; hilangkan dekorasi/countdown dan baca status unknown/unavailable secara jujur.
+- [x] Migrasikan typography/status/progress tanpa mengubah enum stage atau persen backend.
+- [x] Pertahankan SubmissionAccess pada setiap refresh; result parsial tidak ditampilkan sebagai final.
+- [x] Jaga wire:poll.2s.visible hanya untuk nonterminal; failed tidak disajikan sebagai sukses 100%.
+- [x] Sediakan live-region perubahan bermakna dan refresh manual; hilangkan dekorasi/countdown dan baca status unknown/unavailable secara jujur.
 
 **Validasi:** SubmissionProgressTest, FinalResultStateTest, PublicPipelineErrorTest.
 
@@ -369,10 +369,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-04, FA-05.
 - **Source/target:** `resources/js/progress/fallback.js`, `resources/js/pages/result.js`, `resources/views/hasil.blade.php`.
 
-- [ ] Deteksi init Livewire sesuai runtime terpasang; marker wire:id saja bukan bukti hydration. Fallback aktif hanya bila belum ada pemilik Livewire.
-- [ ] Gunakan timeout berurutan, satu in-flight request, session same-origin, URL hasil.status dari server dan cleanup AbortController/timer.
-- [ ] Pause/resume saat hidden/visible/unmount; tangani network error, non-JSON, access/session error dan 429 tanpa mengubah status domain.
-- [ ] Hentikan loop sebelum handoff/terminal; reload bila diperlukan sekali per root/submission. Uji navigasi antarhasil, back/forward, request lambat dan bootstrap failure.
+- [x] Deteksi init Livewire sesuai runtime terpasang; marker wire:id saja bukan bukti hydration. Fallback aktif hanya bila belum ada pemilik Livewire.
+- [x] Gunakan timeout berurutan, satu in-flight request, session same-origin, URL hasil.status dari server dan cleanup AbortController/timer.
+- [x] Pause/resume saat hidden/visible/unmount; tangani network error, non-JSON, access/session error dan 429 tanpa mengubah status domain.
+- [x] Hentikan loop sebelum handoff/terminal; reload bila diperlukan sekali per root/submission. Uji navigasi antarhasil, back/forward, request lambat dan bootstrap failure.
 
 **Validasi:** Network/lifecycle QA; progress/access tests.
 
@@ -387,10 +387,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-02, FA-04, FA-09.
 - **Source/target:** `resources/views/hasil.blade.php`, `resources/views/components/results/`, `resources/views/partials/result/`, `app/View/Presenters/DetectionPresentation.php` (opsional).
 
-- [ ] Komposisikan progress/failed/completed tanpa result/final berdasarkan data server; hasil final hanya saat completed dan result sah.
-- [ ] Terapkan label/tone/disclaimer yang sama: valid neutral, hoax danger, meragukan warning dengan copy abstention; unknown/null tidak menjadi hasil buatan.
-- [ ] Tampilkan confidence classifier sebagai metadata, explanation states, evidence nyata berurutan rank/document_id, dan link/kutipan aman.
-- [ ] Tambahkan disclosure input/provenance dari data tersedia; presenter opsional hanya mapping tanpa query, threshold, inference atau authorization baru.
+- [x] Komposisikan progress/failed/completed tanpa result/final berdasarkan data server; hasil final hanya saat completed dan result sah.
+- [x] Terapkan label/tone/disclaimer yang sama: valid neutral, hoax danger, meragukan warning dengan copy abstention; unknown/null tidak menjadi hasil buatan.
+- [x] Tampilkan confidence classifier sebagai metadata, explanation states, evidence nyata berurutan rank/document_id, dan link/kutipan aman.
+- [x] Tambahkan disclosure input/provenance dari data tersedia; presenter opsional hanya mapping tanpa query, threshold, inference atau authorization baru.
 
 **Validasi:** ResultEvidencePresentationTest, FinalResultStateTest, GroundedExplanationTest, ExplanationDegradationTest.
 
@@ -405,10 +405,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-09.
 - **Source/target:** `resources/views/hasil.blade.php`, `resources/views/partials/result/`, `resources/js/components/form-submit.js`.
 
-- [ ] Sediakan next-check/history/PDF/CSV actions sesuai akses dan state final; CSV diberi label seluruh riwayat.
-- [ ] Render feedback hanya untuk verified account owner; guest capability atau admin access hasil tidak otomatis memberi ownership feedback.
-- [ ] Pertahankan POST feedback, submission_id, boolean is_correct dan comment max 1000; gunakan radio/native selection bila cocok.
-- [ ] Tampilkan sent/duplicate/error state, bukan edit/resubmit baru; feedback berarti penilaian pengguna, bukan voting fakta.
+- [x] Sediakan next-check/history/PDF/CSV actions sesuai akses dan state final; CSV diberi label seluruh riwayat.
+- [x] Render feedback hanya untuk verified account owner; guest capability atau admin access hasil tidak otomatis memberi ownership feedback.
+- [x] Pertahankan POST feedback, submission_id, boolean is_correct dan comment max 1000; gunakan radio/native selection bila cocok.
+- [x] Tampilkan sent/duplicate/error state, bukan edit/resubmit baru; feedback berarti penilaian pengguna, bukan voting fakta.
 
 **Validasi:** FeedbackTest, GuestSubmissionAccessTest, ResultEndpointAuthorizationTest.
 
@@ -425,10 +425,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-09.
 - **Source/target:** `resources/views/auth/login.blade.php`, `resources/views/auth/register.blade.php`.
 
-- [ ] Migrasikan login/register ke shell auth dengan label/hint/error, autocomplete dan loading native.
-- [ ] Jaga remember boolean, credential/throttle feedback, session/intended redirect dan email recovery; password tidak masuk old input.
-- [ ] Pertahankan name/email/password confirmation/terms/unique validation serta Registered event/redirect verification contract.
-- [ ] Gunakan link privasi/register/login/forgot nyata; jangan mengarang password policy atau URL syarat penggunaan yang belum tersedia.
+- [x] Migrasikan login/register ke shell auth dengan label/hint/error, autocomplete dan loading native.
+- [x] Jaga remember boolean, credential/throttle feedback, session/intended redirect dan email recovery; password tidak masuk old input.
+- [x] Pertahankan name/email/password confirmation/terms/unique validation serta Registered event/redirect verification contract.
+- [x] Gunakan link privasi/register/login/forgot nyata; jangan mengarang password policy atau URL syarat penggunaan yang belum tersedia.
 
 **Validasi:** AuthenticationTest; keyboard/mobile/error submit.
 
@@ -443,10 +443,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-09.
 - **Source/target:** `resources/views/auth/forgot-password.blade.php`, `resources/views/auth/reset-password.blade.php`.
 
-- [ ] Migrasikan request reset dengan field email, CSRF/throttle dan status broker; inbox/spam hint tidak menjanjikan delivery.
-- [ ] Jaga token hidden, email dan confirmed password pada POST password.store; GET form tidak dianggap bukti token valid.
-- [ ] Tampilkan invalid/expired broker recovery dan redirect login setelah success; tidak membuat auto-login baru.
-- [ ] Verifikasi old email aman, password/confirmation tidak dipulihkan, native submit dan mobile/keyboard.
+- [x] Migrasikan request reset dengan field email, CSRF/throttle dan status broker; inbox/spam hint tidak menjanjikan delivery.
+- [x] Jaga token hidden, email dan confirmed password pada POST password.store; GET form tidak dianggap bukti token valid.
+- [x] Tampilkan invalid/expired broker recovery dan redirect login setelah success; tidak membuat auto-login baru.
+- [x] Verifikasi old email aman, password/confirmation tidak dipulihkan, native submit dan mobile/keyboard.
 
 **Validasi:** AuthenticationTest, MailConfigurationTest; broker scenarios.
 
@@ -461,10 +461,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-09.
 - **Source/target:** `resources/views/auth/verify-email.blade.php`.
 
-- [ ] Jelaskan kebutuhan verifikasi dan email akun yang di-escape; sediakan resend, profil/ubah email dan logout.
-- [ ] Pertahankan resend POST + CSRF/throttle, verification-link-sent dan verified redirect.
-- [ ] Link verifikasi tetap signed + auth + throttle; expired/invalid link mengikuti respons server.
-- [ ] Jangan menambah timer inbox, auto resend atau jaminan SMTP; uji verified/unverified dan keyboard/mobile.
+- [x] Jelaskan kebutuhan verifikasi dan email akun yang di-escape; sediakan resend, profil/ubah email dan logout.
+- [x] Pertahankan resend POST + CSRF/throttle, verification-link-sent dan verified redirect.
+- [x] Link verifikasi tetap signed + auth + throttle; expired/invalid link mengikuti respons server.
+- [x] Jangan menambah timer inbox, auto resend atau jaminan SMTP; uji verified/unverified dan keyboard/mobile.
 
 **Validasi:** AuthenticationTest, MailConfigurationTest; verified/unverified.
 
@@ -479,10 +479,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04, FA-09.
 - **Source/target:** `resources/views/profile.blade.php`, `resources/js/components/dialog.js`, `resources/js/components/password-toggle.js`, `resources/js/components/form-submit.js`.
 
-- [ ] Pisahkan section identitas/password/penghapusan dengan form PATCH, PUT, DELETE dan method spoofing/CSRF yang benar.
-- [ ] Jaga fields name/email, current_password/password confirmation, dan password konfirmasi delete; error dekat tindakan yang tepat.
-- [ ] Tampilkan status verified/unverified dan state email change/reverification; tidak menambah notification preference.
-- [ ] Dialog delete memiliki akibat sesuai service, focus/Escape/return focus, password validation dan fallback native; uji pada data test.
+- [x] Pisahkan section identitas/password/penghapusan dengan form PATCH, PUT, DELETE dan method spoofing/CSRF yang benar.
+- [x] Jaga fields name/email, current_password/password confirmation, dan password konfirmasi delete; error dekat tindakan yang tepat.
+- [x] Tampilkan status verified/unverified dan state email change/reverification; tidak menambah notification preference.
+- [x] Dialog delete memiliki akibat sesuai service, focus/Escape/return focus, password validation dan fallback native; uji pada data test.
 
 **Validasi:** ProfileTest; keyboard, validation, deletion di test data.
 
@@ -497,10 +497,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04.
 - **Source/target:** `resources/views/riwayat.blade.php`, `resources/views/components/ui/`.
 
-- [ ] Migrasikan heading/toolbar, summary, tabel/list, empty state dan pagination tanpa filter client-side.
-- [ ] Pertahankan GET search/label/input_type/status/sort existing, query string dan pagination 15; filter change kembali ke page awal.
-- [ ] Jelaskan summary seluruh riwayat dan CSV seluruh riwayat; jangan menambah opsi video_url atau menganggap Video mencakup domain itu.
-- [ ] Label/confidence nonfinal memakai unavailable, bukan valid/0%; mobile tabel scroll lokal atau list semantik.
+- [x] Migrasikan heading/toolbar, summary, tabel/list, empty state dan pagination tanpa filter client-side.
+- [x] Pertahankan GET search/label/input_type/status/sort existing, query string dan pagination 15; filter change kembali ke page awal.
+- [x] Jelaskan summary seluruh riwayat dan CSV seluruh riwayat; jangan menambah opsi video_url atau menganggap Video mencakup domain itu.
+- [x] Label/confidence nonfinal memakai unavailable, bukan valid/0%; mobile tabel scroll lokal atau list semantik.
 
 **Validasi:** SubmissionHistoryTest; filter/pagination/mobile.
 
@@ -515,10 +515,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-05.
 - **Source/target:** `resources/views/hasil.blade.php`, `resources/views/partials/result/`.
 
-- [ ] Verifikasi riwayat.show tetap memakai view hasil bersama dan back link Kembali ke riwayat.
-- [ ] Jaga forUser sebagai boundary query detail; tidak mengubahnya menjadi akses admin lintas pemilik.
-- [ ] Periksa missing/other-owned record dan direct refresh tanpa bocoran input/status.
-- [ ] Pastikan PDF/status/media dan feedback menggunakan akses masing-masing; tidak membuat mapping/evidence template kedua.
+- [x] Verifikasi riwayat.show tetap memakai view hasil bersama dan back link Kembali ke riwayat.
+- [x] Jaga forUser sebagai boundary query detail; tidak mengubahnya menjadi akses admin lintas pemilik.
+- [x] Periksa missing/other-owned record dan direct refresh tanpa bocoran input/status.
+- [x] Pastikan PDF/status/media dan feedback menggunakan akses masing-masing; tidak membuat mapping/evidence template kedua.
 
 **Validasi:** SubmissionHistoryTest, ResultEndpointAuthorizationTest.
 
@@ -533,10 +533,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02.
 - **Source/target:** `resources/views/cara-kerja.blade.php`, `resources/views/tentang.blade.php`.
 
-- [ ] Migrasikan reading layout/heading/sections dan link pemeriksaan yang nyata.
-- [ ] Jelaskan input, ekstraksi/terjemahan, IndoBERT, retrieval lokal, explanation, confidence dan abstention sesuai pipeline.
-- [ ] Gunakan identitas/kontak/data aktual; hilangkan klaim crawler seluruh web, universal accuracy, fitur rencana, partner/testimoni buatan.
-- [ ] Periksa Bahasa Indonesia, long text, mobile, keyboard dan konsistensi copy dengan halaman hasil.
+- [x] Migrasikan reading layout/heading/sections dan link pemeriksaan yang nyata.
+- [x] Jelaskan input, ekstraksi/terjemahan, IndoBERT, retrieval lokal, explanation, confidence dan abstention sesuai pipeline.
+- [x] Gunakan identitas/kontak/data aktual; hilangkan klaim crawler seluruh web, universal accuracy, fitur rencana, partner/testimoni buatan.
+- [x] Periksa Bahasa Indonesia, long text, mobile, keyboard dan konsistensi copy dengan halaman hasil.
 
 **Validasi:** DocumentationWorkflowContractTest, ModelStatisticsClaimsTest; copy review.
 
@@ -551,10 +551,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-09.
 - **Source/target:** `resources/views/kebijakan-privasi.blade.php`.
 
-- [ ] Susun data akun/input, pemrosesan/integrasi, storage/access, retention, deletion dan kontak sesuai praktik source aktual.
-- [ ] Periksa config/service terkait sebagai evidence; retensi media tidak disamakan dengan retensi semua submission/akun.
-- [ ] Jangan menambah jaminan backup/provider deletion, compliance atau local-only processing tanpa dasar.
-- [ ] Jaga tanggal kebijakan sesuai revisi nyata; verifikasi readability/link/mobile/long text dan catat perbedaan copy yang ditemukan.
+- [x] Susun data akun/input, pemrosesan/integrasi, storage/access, retention, deletion dan kontak sesuai praktik source aktual.
+- [x] Periksa config/service terkait sebagai evidence; retensi media tidak disamakan dengan retensi semua submission/akun.
+- [x] Jangan menambah jaminan backup/provider deletion, compliance atau local-only processing tanpa dasar.
+- [x] Jaga tanggal kebijakan sesuai revisi nyata; verifikasi readability/link/mobile/long text dan catat perbedaan copy yang ditemukan.
 
 **Validasi:** Source-to-copy review; mobile/long text.
 
@@ -569,10 +569,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-04, FA-10.
 - **Source/target:** `resources/views/statistik.blade.php`, `resources/js/pages/statistics.js` (bila chart dipertahankan), `package.json`, `package-lock.json` (hanya jika strategi chart memerlukan).
 
-- [ ] Tampilkan tren/periode dan distribusi label dengan penjelasan populasi/timezone/query existing.
-- [ ] Sebut byTopic sebagai distribusi label; total/aggregate tidak diklaim completed-only, accuracy atau prevalensi masyarakat.
-- [ ] Render alternatif tabel sebelum chart; chart tidak menjadi syarat akses data dan dibersihkan saat unmount.
-- [ ] Jika chart dipertahankan, pilih versi/loading yang jelas dan terbatas halaman statistik; jangan import paket yang belum dipasang atau upgrade dependency lain.
+- [x] Tampilkan tren/periode dan distribusi label dengan penjelasan populasi/timezone/query existing.
+- [x] Sebut byTopic sebagai distribusi label; total/aggregate tidak diklaim completed-only, accuracy atau prevalensi masyarakat.
+- [x] Render alternatif tabel sebelum chart; chart tidak menjadi syarat akses data dan dibersihkan saat unmount.
+- [x] Jika chart dipertahankan, pilih versi/loading yang jelas dan terbatas halaman statistik; jangan import paket yang belum dipasang atau upgrade dependency lain.
 
 **Validasi:** MonthlyStatisticsBoundaryTest, ModelStatisticsClaimsTest; chart failure QA.
 
@@ -587,10 +587,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-004 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-04, FA-09.
 - **Source/target:** `resources/views/errors/`, `resources/views/partials/head.blade.php`, `resources/views/components/ui/`.
 
-- [ ] Buat themed error HTML minimal untuk kode relevan tanpa user/submission/AI dependency yang rapuh.
-- [ ] Sediakan pesan aman dan recovery nyata untuk 403/404/419/429/500/503; invalid guest capability tetap 404.
-- [ ] Validation redirect/422 tetap menuntun ke field; Accept JSON/status endpoint tetap contract JSON dan HTTP code existing.
-- [ ] Periksa no secret/stack trace, navigation/keyboard, serta network polling error yang tidak berarti domain failed.
+- [x] Buat themed error HTML minimal untuk kode relevan tanpa user/submission/AI dependency yang rapuh.
+- [x] Sediakan pesan aman dan recovery nyata untuk 403/404/419/429/500/503; invalid guest capability tetap 404.
+- [x] Validation redirect/422 tetap menuntun ke field; Accept JSON/status endpoint tetap contract JSON dan HTTP code existing.
+- [x] Periksa no secret/stack trace, navigation/keyboard, serta network polling error yang tidak berarti domain failed.
 
 **Validasi:** ResultEndpointAuthorizationTest, PublicPipelineErrorTest; HTML/JSON.
 
@@ -1027,6 +1027,180 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Batas:** artisan auth/profile/mail tests exit 255 karena vendor/autoload.php repo tidak tersedia. Renderer/unit memakai vendor lock sementara IP-005, PHP host 8.5 bukan runtime aplikasi yang didukung. Native receiver menguji serialization/redirect browser, bukan controller/middleware/session/DB/mail/throttle/broker/signed verify. Autofill disimulasikan sebelum mount; tidak memakai password manager akun nyata. QA aggregate tetap 3 pass/91 not_run; IP-017–IP-020 tetap diperlukan untuk alur halaman/backend lengkap. Tidak ada POST aplikasi, migration/seed/deploy atau perubahan environment/data.
 - **Perlindungan:** 254 fingerprints backend/routes/config/database/lock/font/vendor/admin/PDF/AGENTS cocok baseline; route/auth/domain/pipeline/dependency tidak diubah.
 - **Berikutnya:** berhenti pada IP-010 dan buat commit semantic; IP-011–IP-039 tetap pending.
+
+### IP-011 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; AC-P01 teks; FA-01/FA-02/FA-04.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal db985dc, tree/index bersih; instruksi root berlaku.
+- **Perubahan:** welcome menjadi pengantar singkat → form → catatan → bantuan/link → native model disclosure. Hero/KPI/marketing/model architecture sebelum/sekitar form dihapus; statistik controller tetap berkonteks. Partials text/errors/input-types/legacy-media, registry submission-form dan scoped adapter media menggantikan inline globals. CSS semantic halaman dan textarea nyaman; dead progress-step/step-icon dihapus.
+- **Contract:** guest hanya form teks native POST deteksi/CSRF/input_type=text/raw_input/CAPTCHA/website; textarea required/minlength 50/maxlength 50000. Label/hint/error terhubung, old string escaped/non-string kosong, CAPTCHA/honeypot/file tidak direpopulasi. Summary autofocus/field links dan module focus recovery. Domain/routes/multipart/old URL/required media existing tetap; media layout/limits/duration/no-JS lengkap tetap IP-012. AtomicCaptchaQuotaTest hanya mengganti assertion single guest tab dengan input_type=text; assertions backend lain utuh.
+- **Perilaku:** form tetap terlihat dan draft tidak dihapus saat mengirim; shared native double-submit guard dan polite request status menggantikan overlay serta timer tahap BERT/penjelasan palsu. Canceled/invalid submit tidak loading. Cleanup memulihkan tombol/status/validitas, mengosongkan CAPTCHA dan mencerminkan safe textarea draft melalui DOM defaultValue agar Livewire outerHTML snapshot memulihkannya; tidak ada browser storage/AJAX. Adapter legacy media memiliki listener/object URL cleanup dan filename text aman.
+- **Validasi:** build 13 modules, 50 standalone PHP tests/335 assertions, 30 JS tests, Pint dua PHP tests, diff check pass. 32 skenario render, 38 compiled PHP syntax dan 26 native baseline form comparisons pass; 254 protected fingerprints cocok. Firefox: 256 cross-page smoke samples dan 64 final homepage-state samples; normal/reduced 19 native form checks masing-masing, no-JS 10; 21 actual locked Livewire checks, tujuh navigate lalu Back/Forward pass. Boundary user-typed 49/50, maxlength 50000, JS 50001, Enter satu POST/303 ke receiver loopback, summary/field focus, persistence, no fake stages, BFCache persisted=true dan textarea draft recovery diperiksa. Screenshot mobile ditinjau; console final tanpa error.
+- **Evidence:** [TEXT-FORM-IP-011.md](TEXT-FORM-IP-011.md), SubmissionFormPresentationTest, frontend submission tests dan artefak /tmp/hoaxlin-ip011-bq9t6pyl.
+- **Batas:** SubmissionTest/AtomicCaptchaQuotaTest dan suite artisan exit 255 sebelum bootstrap karena vendor/autoload.php repo tidak ada; vendor lock sementara IP-005/PHP host 8.5 bukan runtime aplikasi yang didukung. Tidak menjalankan controller/DB/CAPTCHA reservation/quota/throttle HTTP/queue/AI/ownership/admin/PDF atau hydration/polling. Native receiver hanya fixture serialization/redirect; text resize bukan native zoom/screen reader. QA aggregate tetap 3 pass/91 not_run.
+- **Perlindungan:** backend/routes/config/database/lock/font/vendor/admin/PDF/AGENTS tidak berubah; tidak ada perubahan environment/data, POST aplikasi, migration/seed atau deployment.
+- **Berikutnya:** berhenti pada IP-011 dan buat commit semantic; IP-012–IP-039 tetap pending.
+
+### IP-012 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; pelaksana Codex; AC-P01 semua input/G01 data presentasi; FA-01/FA-02/FA-04/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 55f94b0; tree/index bersih, instruksi root berlaku.
+- **Perubahan:** HomeController/SubmissionFormOptions menyajikan rules/config existing tanpa policy/query baru; upload-field primitive, partials media/url/upload/security, dan submission-media module mengganti adapter/partial legacy IP-011. Legacy input-tabs/upload-zone/tab-content tanpa consumer dihapus. Assertions markup feature Submission/VideoMedia disesuaikan dengan native links/state/options, seluruh assertions keamanan backend tetap.
+- **Contract:** empat kategori Teks/Tautan artikel/Gambar/Video dan dua pilihan Video; lima native POST domains text/url/image/video/video_url, payload field terpisah, dua multipart, CSRF/CAPTCHA/honeypot tetap. Guest hanya teks; no-JS semua form akun visible/active dan dapat dinavigasi via fragment link. Dengan JS, tabs keyboard/ARIA, hidden panels dan disabled inactive fieldsets; error summary/inline, escaped old URL/non-string kosong, file dipilih ulang. G01 options mencakup ukuran/dimensi/MIME/format gambar, upload/remote formats, durasi/ukuran video, batas URL dan blocked hosts.
+- **Perilaku:** advisory URL/file/metadatum validation memberi koreksi/ganti/hapus; backend MIME/signature/SSRF/policy tetap otoritatif. URL preview hostname text tanpa network request, filename textContent, object URL revoke saat ganti/hapus/navigation. Unsupported browser preview tetap membolehkan validasi server. Cleanup memulihkan loading/native fallback, mengosongkan file/CAPTCHA, menjaga chosen category/subtype dan safe URL/text draft tanpa browser storage/AJAX/global baru.
+- **Validasi:** npm build 13 modules, 53 standalone PHP tests/380 assertions, 34 JS tests, Pint lima PHP files dan diff check pass. 36 render scenarios/43 compiled syntax; 28 native baseline contracts di luar pemisahan media cocok. Firefox: 288 cross-page samples, media normal/reduced 34 checks masing-masing/no-JS 19, dan 18 Livewire checks pass. Kelima domains dikirim satu native POST/303 ke receiver loopback, upload bytes multipart dan field isolation tercatat; keyboard, old subtype, file/URL error recovery, image width >8000, video duration >300, size >24MiB, source revoke dan Back/Forward diperiksa. Screenshot mobile/no-JS ditinjau; console final tanpa error.
+- **Evidence:** [MEDIA-FORM-IP-012.md](MEDIA-FORM-IP-012.md), SubmissionFormPresentationTest, frontend media tests dan artefak /tmp/hoaxlin-ip012-plpw5hsc.
+- **Batas:** artisan VideoMediaContractTest/ExternalUrlSecurityTest/SubmissionTest serta suite penuh exit 255 karena vendor/autoload.php repo tidak tersedia. Vendor lock sementara IP-005/PHP 8.5 bukan runtime aplikasi didukung; tidak menjalankan controller/DB/middleware/CAPTCHA reservation/quota/SSRF HTTP/queue/AI/admin/PDF/hydration. Receiver tidak membuktikan pipeline aplikasi; text resize bukan native zoom/screen reader. QA aggregate tetap 3 pass/91 not_run.
+- **Perlindungan:** 253 existing fingerprints backend/routes/config/database/lock/font/vendor/admin/PDF/AGENTS cocok; hanya HomeController view data dan Support presentation helper ditambahkan. Validator/service policy/domain/schema/access tetap; tidak ada POST aplikasi, migration/seed, dependency/environment/data/deployment change.
+- **Berikutnya:** berhenti pada IP-012 dan buat commit semantic; IP-013–IP-039 tetap pending.
+
+### IP-013 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P02/AC-P04 progress; FA-02/FA-05 view.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 7a58e77; tree/index awal bersih.
+- **Perubahan:** progress Blade/CSS semantic, heading/status/stage/meter, satu live region tanpa persen, native refresh kontekstual dan tindakan form baru saat failed. Emoji/skala hardcoded/inline layout/animasi dihapus; no-JS tanpa meta refresh. Parent fallback hanya menyesuaikan marker persen dan aria-valuetext.
+- **Contract:** enum/persen/status dan authorization tiap refresh tetap; pending/processing null 5/30, unknown jujur, processing done bukan final. Failed tidak memiliki meter/persen sukses meski backend done/100; completed tanpa result unavailable. Polling attribute hanya nonterminal; result parsial tidak final.
+- **Validasi:** build, 80 standalone PHP tests/656 assertions (27/276 progress), 34 Node tests, Pint dua test files dan diff check pass. 57 renders/456 Firefox samples pada normal/no-JS/reduced; manual GET lewat Enter 60→75 dan final guards di ketiga profile pass. Mobile screenshots ditinjau; final console tanpa error.
+- **Evidence:** [PROGRESS-IP-013.md](PROGRESS-IP-013.md), unit/feature regressions dan /tmp/hoaxlin-ip013-9ogzjcgb. 257 protected fingerprints cocok; app/routes/config/database/locks/admin/PDF tetap.
+- **Batas:** artisan tiga feature suites exit 255 karena autoload repo hilang; feature regressions belum dieksekusi. Unit menggunakan vendor lock sementara dan refresh double tanpa SQL; browser tanpa component snapshot/hydration. HTTP aplikasi/DB/network polling/session middleware/AI/admin/PDF/screen reader/native zoom belum diverifikasi. QA tetap 3 audit pass/91 not_run.
+- **Berikutnya:** berhenti dan buat commit semantic untuk IP-013; kepemilikan fallback dan terminal reload existing tetap IP-014. IP-014–IP-039 pending.
+
+### IP-014 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P02/AC-P04 lifecycle; FA-04/FA-05.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal cc29c16; tree/index awal bersih.
+- **Perubahan:** result coordinator, fallback scheduler dan Livewire adapter; data-page/root/status URL/stages dari server. Inline interval/reload global dihapus. Native ownership lewat registered find/$el/hooks; fallback abort sebelum handoff. Satu GET in-flight, timeout body, pause/resume, same-origin session, response ID/schema guard, bounded retry/Retry-After dan notice transport aman.
+- **Contract:** stage/persen/access/status backend dan final guard tetap. Terminal cleanup mendahului reload per root/ID; A/B independen, SSR terminal tidak reload dan failed tidak diisi 100%. Native in-flight tetap dimiliki SDK; module menghapus hook dan memblokir action berikutnya bila hidden/error. Per-message disposer SDK 4.3.3 yang rusak dihindari tanpa patch/upgrade vendor.
+- **Validasi:** build, 61 Node tests (27 progress), 80 standalone PHP tests/657 assertions, Pint/syntax/diff pass. 57 renders/456 layout samples; 12 native runtime dan 13 fallback network checks pass. Native A/B/Back/terminal, bootstrap inert/asset failure, handoff abort, slow max-one-flight, hidden/visible/removal/access/non-JSON/429 recovery terbukti lewat SDK asli dan receiver loopback.
+- **Evidence:** [POLLING-IP-014.md](POLLING-IP-014.md), progress.test.mjs, SubmissionProgressPresentationTest dan /tmp/hoaxlin-ip014-87avom0p; 257 protected fingerprints cocok.
+- **Batas:** artisan tiga feature suites exit 255 karena autoload repo hilang. Browser memakai checksum/transport fixture; bukan controller/DB/session/checksum HTTP aplikasi atau AI/admin/PDF. Invalid JSON native yang sengaja diinjeksi menghasilkan parser log SDK yang diharapkan, tanpa modal unsafe; run akhir tanpa error cleanup/import tak diharapkan. QA aggregate tetap 3 audit pass/91 not_run; F3 belum ditutup.
+- **Berikutnya:** commit semantic dan berhenti pada IP-014; IP-015–IP-039 pending.
+
+### IP-015 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P02/AC-P04 final result; FA-02/FA-04/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 2028c82; tree/index awal bersih.
+- **Perubahan:** presenter mapping murni, components/results dan partials/result, CSS result semantic. Final hanya completed/result dengan submission ID cocok; label neutral/danger/warning, disclaimer dan abstention utuh; unknown/null jujur dan score nol tetap nyata. Explanation ready/pending/unavailable/unknown, evidence rank/document_id/link/escaping, serta full input/extraction/translation dan metadata tersimpan dalam disclosure native.
+- **Contract:** classifier confidence bukan factual truth/retrieval similarity; tidak ada meter/animasi confidence atau provenance buatan. Private media tetap endpoint existing tanpa storage path/janji retensi. Timestamp memakai timezone record. Progress/JS IP-014 tetap; actions/feedback diekstrak verbatim, migrasinya tetap IP-016.
+- **Validasi:** build 16 modules, seluruh unit terisolasi 141 tests/816 assertions (result 38/129), 61 Node tests, Pint lima PHP files, 50 compiled syntax dan diff check pass. 67 renders/536 browser samples dan 51 result checks, disclosure native normal/no-JS/reduced, teks >40.000 karakter, safe source, partial guard dan provenance pass. Regresi native 12/fallback 13 checks pass. Screenshot menemukan tautan kembali tertutup fixed header; CSS scoped diperbaiki dan layout diulang.
+- **Evidence:** [RESULT-IP-015.md](RESULT-IP-015.md), DetectionPresentationTest dan /tmp/hoaxlin-ip015-67qogt3y. 225 protected existing fingerprints cocok; seluruh source JS unchanged, legacy actions verbatim.
+- **Batas:** empat suite feature task exit 255 karena autoload repo hilang; tiga feature files hanya menyesuaikan assertion markup. Unit/vendor lock sementara/PHP 8.5 dan browser checksum/transport fixture bukan HTTP aplikasi/DB/provider/AI/admin/export. Native JSON fault mencatat parser error SDK yang diharapkan; result/layout biasa tanpa error. Screen reader/native zoom belum diuji; QA tetap 3 audit pass/91 not_run, F3 belum ditutup.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-015; IP-016–IP-039 pending.
+
+### IP-016 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P02/AC-P04 actions/feedback dan actions P15/P16; FA-01/FA-02/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 4604180; tree/index awal bersih.
+- **Perubahan:** actions/feedback semantic menggantikan actions-legacy; next check/PDF final dan verified personal history/CSV dengan copy seluruh riwayat. Feedback hanya final milik akun verified; unverified owner mendapat link verifikasi, guest capability/admin access bukan ownership. Native radio required 1/0, CSRF/POST/submission_id/comment max 1000 tetap; old choice/comment aman per submission, readonly sent dan duplicate/error persisten. Inline handler/styles/hidden comment dan print nonfinal dihapus; helper form-submit existing dipakai tanpa JS baru.
+- **Validasi:** build 16 modules, 170 unit terisolasi/982 assertions (result 67/295), sembilan validator boolean/comment existing tanpa SQL, 61 Node tests, Pint empat test files, 51 compiled syntax/diff pass. 86 renders/688 browser samples, 93 feedback checks normal/no-JS/reduced dan 17 no-JS result regression pass; Space/ArrowDown/Tab/Enter, native POST/303, 0/1/comment/CSRF, 1000 typing limit, error/duplicate/recovery/double submit diperiksa. 12 native progress regression pass; screenshot mobile ditinjau.
+- **Evidence:** [ACTIONS-IP-016.md](ACTIONS-IP-016.md), DetectionPresentationTest dan /tmp/hoaxlin-ip016-3yxbjtxs. 226 protected fingerprints dan seluruh source JS unchanged.
+- **Batas:** tiga feature suites exit 255 karena autoload repo hilang; assertions baru belum dieksekusi. PHP 8.5/vendor sementara dan receiver/checksum fixture bukan HTTP controller/CSRF/middleware/DB/access/export/provider aplikasi. Validator field tidak mencakup exists/ownership. Native JSON fault mencatat parser error SDK yang diharapkan; layout/feedback tanpa console error. Back no-store fresh reload memulihkan kontrol, bukan draft; old-input recovery terpisah. Screen reader/native zoom belum diuji; QA tetap 3 audit pass/91 not_run, F3 belum ditutup.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-016; IP-017–IP-039 pending.
+
+### IP-017 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P05/AC-P06; FA-01/FA-02/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 0339875; tree/index awal bersih.
+- **Perubahan:** login/register semantic memakai shell/fields/toggles/buttons/links IP-010; copy Masuk/Buat akun dan kebutuhan verifikasi nyata. Remember value=1 sesuai boolean backend, tanpa klaim 30 hari; terms accepted/value=1, name/email max 255 dan native validation. Old name/email string escaped, checkbox recovery aman dan password kosong. Error partial menerima field targets untuk fokus/link, pesan credential/throttle/unique/terms/confirmation tetap server. Inline style/decorative divider, strength meter heuristik dan data-password-hints registrasi dihapus.
+- **Contract:** POST/CSRF/autocomplete/confirmation/terms/Password::defaults/unique/Registered/verification dan session/intended/limiter tetap; seluruh backend/JS unchanged. Forgot/reset/verify/profile tidak dimigrasi; summary generic shared shell tetap tersedia.
+- **Validasi:** build 16 modules; 193 unit terisolasi/1049 assertions (AuthShell 28/183), sepuluh actual field-rule cases tanpa unique SQL/auth; 61 Node tests; Pint dua PHP files, 52 compiled syntax/diff pass. 95 renders/760 browser samples dan 129 account checks; account normal/no-JS/reduced native keyboard/POST/303/remember on-off/terms/toggle/loading/Back/error-focus-recovery/double-submit diperiksa. Screenshot mobile ditinjau; console tanpa error.
+- **Evidence:** [LOGIN-REGISTER-IP-017.md](LOGIN-REGISTER-IP-017.md), AuthShellTest, AuthenticationTest dan /tmp/hoaxlin-ip017-6t815gco. 226 protected fingerprints cocok; seluruh JS unchanged.
+- **Batas:** AuthenticationTest exit 255 karena autoload repo tidak tersedia; empat regression tests baru belum dieksekusi. PHP 8.5/vendor sementara dan receiver loopback bukan autentikasi/session/intended/limiter/unique/Registered/mail/guards HTTP aplikasi. Back no-store load baru; password-manager nyata/screen reader/native zoom belum diuji. QA tetap 3 audit pass/91 not_run, F4 belum ditutup; tidak ada perubahan environment/data/deployment.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-017; IP-018–IP-039 pending.
+
+### IP-018 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P07/AC-P08; FA-01/FA-02/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal e5170b5; tree/index awal bersih.
+- **Perubahan:** forgot/reset memakai primitives/shell/error targets IP-010/017; old/query email string escaped, password/confirmation kosong, route token hidden dan old token diabaikan. Native POST/CSRF/required/autocomplete, inbox/spam hint tanpa janji delivery, broker status/error persisten dan recovery password.request/login. GET tidak menyatakan token valid; success tetap login/status tanpa auto-login. Inline styles/divider/ikon submit dan novalidate forgot dihapus; JS/CSS/backend tetap.
+- **Validasi:** build 16 modules; 214 unit terisolasi/1147 assertions (AuthShell 49/281), termasuk controller actual/validation adapter/broker fake untuk enam status, GET no broker dan empat invalid field cases; 61 Node tests, Pint dua PHP files, 52 compiled syntax/diff pass. 110 renders/880 layout samples dan 122 recovery checks normal/no-JS/reduced; native POST/303 email/token/password/confirmation/CSRF, keyboard, error focus/recovery, toggle/loading/Back/cancellation/double-submit diperiksa; screenshot mobile ditinjau.
+- **Evidence:** [PASSWORD-RESET-IP-018.md](PASSWORD-RESET-IP-018.md), AuthShellTest/AuthenticationTest dan /tmp/hoaxlin-ip018-sn6q0en3. 226 protected fingerprints dan seluruh JS/CSS unchanged.
+- **Batas:** AuthenticationTest/MailConfigurationTest exit 255 karena autoload repo hilang; feature invalid/expired-token tests baru belum dieksekusi. PHP 8.5/vendor sementara, request adapter dan broker/receiver fake bukan DB token expiry/User save/event/remember/CSRF/throttle/mail HTTP. Native normal run awal exit 143/warning timeout direstart dan diulang; run akhir tanpa console error. Back no-store bukan BFCache; password manager/screen reader/native zoom belum diuji. QA tetap 3 audit pass/91 not_run; F4 belum ditutup, tidak ada environment/data/deployment change.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-018; IP-019–IP-039 pending.
+
+### IP-019 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P09; FA-01/FA-02/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal e8cfc20; tree/index awal bersih.
+- **Perubahan:** verifikasi memakai shell/button/link/CSS existing, email escaped dan wrapping, instruksi akses/inbox/spam/expired tanpa klaim email terkirim awal. Native resend/logout POST + CSRF, Ubah email route profile, single verification-link-sent shared status; inline styles dihapus. Tidak ada timer/auto resend/SMTP guarantee. Auth/signed/throttle/verified intended-home dan controller existing dipertahankan.
+- **Validasi:** build pass 16 modules; seluruh unit 228 tests/1226 assertions, AuthShellTest 63/360 termasuk 14 cases baru; Node 61 pass; Pint dua tests/52 compiled syntax/diff pass. Controller actual dengan notification/fulfillment doubles, authorize ID/hash dan UrlGenerator valid/tampered/expired actual. 115 Blade renders; 11 targeted auth states/88 browser layout samples; 65 action checks normal/no-JS/reduced, keyboard/mobile/200% text/POST/CSRF/status/profile/logout/independent loading/Back/cancellation/double-submit pass, zero final console errors.
+- **Evidence:** [EMAIL-VERIFICATION-IP-019.md](EMAIL-VERIFICATION-IP-019.md), AuthShellTest/AuthenticationTest dan /tmp/hoaxlin-ip019-f4gm2xq5. 250 fingerprints protected source serta seluruh CSS/JS cocok.
+- **Batas:** AuthenticationTest/MailConfigurationTest exit 255 karena autoload repo hilang; feature tests baru belum berjalan. Unit tanpa kernel/DB/mail, fulfillment double tanpa persistence/Verified event; browser receiver 429 bukan limiter Laravel. Real auth/CSRF/throttle/session logout/DB/event/SMTP/profile reverify belum diverifikasi. Ekspektasi footer harness awal salah dikoreksi; final ulang lulus. PHP 8.5/vendor sementara, Back no-store bukan BFCache, native zoom/screen reader belum diuji. QA tetap 3 audit pass/91 not_run dan F4 belum ditutup; tidak ada environment/data/deployment change.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-019; IP-020–IP-039 pending.
+
+### IP-020 — Catatan eksekusi
+
+- **Status:** done; 13 Oktober 2026, Asia/Jakarta; AC-P10; FA-01/FA-02/FA-04/FA-09.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal b551cd8; tree/index awal bersih.
+- **Perubahan:** tiga section/form PATCH/PUT/DELETE native ber-CSRF; identity escaped/string/max255, password current/new/confirmation kosong/autocomplete; named request bags profile/passwordUpdate/accountDeletion agar error hanya dekat tindakannya. Verified links/copy reverify sesuai controller existing. Delete memakai satu panel/form details native yang dipindah ke dialog saat JS, Batal/error focus, Tab/Escape/return focus/reset/scroll/cleanup/remount; copy terbatas akun/riwayat/media sesuai service. Hapus inline styles/handlers/glass/emoji/strength meter; CSS tokens/profile/header clearance. Rules/authorization/controllers/service/routes/schema unchanged.
+- **Validasi:** build pass 16 modules; seluruh unit 244/1338, AuthShellTest 79/472 termasuk 16 profile cases; FormRequest/validator/current password actual dengan fake unique presence. Node 66 pass termasuk 5 dialog tests; Pint lima PHP files/53 compiled syntax/diff pass. 128 renders, 20 targeted states/160 layout samples; browser 126 action checks normal46/no-JS34/reduced46 lulus untuk native serialization/context/validation/loading/Back/dialog/no-JS/cleanup, tanpa console error pada report lengkap.
+- **Evidence:** [PROFILE-IP-020.md](PROFILE-IP-020.md), AuthShellTest/ProfileTest/dialog.test.mjs serta /tmp/hoaxlin-ip020-ab6zb5m9. Fingerprint protected source berubah hanya pada tiga errorBag properties dan presentation/helper yang disengaja.
+- **Batas:** ProfileTest exit 255 karena autoload repo hilang; real DB unique/User saves/delete/service/media/cascade/notification/HTTP auth-CSRF/session-logout belum diuji. Receiver redirect/reverify bukan controller execution. PHP 8.5/vendor sementara; process-log Firefox timeout warnings dan retry fresh normal exit143 dicatat, normal report lengkap tetap dari source final sama. BFCache/native zoom/screen reader belum diuji. QA tetap 3 audit pass/91 not_run; F4 belum ditutup; tidak ada data/environment/deploy change.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-020; IP-021–IP-039 pending.
+
+### IP-021 — Catatan eksekusi
+
+- **Status:** done; 14 Oktober 2026, Asia/Jakarta; AC-P03/action AC-P16; G02/G03; FA-01/FA-02/FA-04.
+- **Checkout:** frontend-refactor/examination-progress-results, HEAD awal 94f9b9a; tree/index awal bersih.
+- **Perubahan:** heading/toolbar/whole-history summary, lima GET filter fields sekaligus mempertahankan label/reset page, shared aware select dan native query pagination; semantic list/dl/time/mobile/empty/recovery. Presenter final guard/label/confidence IP-015 dipakai, preview/errors escaped dan nonfinal/null unavailable. Video hanya unggahan, CSV entire-history tanpa filter. Inline/gradient/glass/emoji/pseudo rows dihapus, unused history CSS dibuang. HistoryRequest menjaga nonscalar search untuk string validation tanpa cast warning; query/controller/rules/guards/15 pagination/export/JS unchanged.
+- **Validasi:** build pass 16 modules; seluruh unit 275/1474, HistoryPresentationTest 31/136; Request actual trims/100-limit/default-sort/invalid enums+array, paginator query/edges dan final/mismatch/empty/escaping cases. Node 66/Pint 3 PHP files/55 compiled syntax/diff pass. 139 Blade renders, 18 states/144 layout samples; normal/no-JS/reduced masing-masing 29 browser checks (87) untuk keyboard/filter GET/page reset/prev-next/CSV href/error/native empty/long, zero report console errors.
+- **Evidence:** [HISTORY-IP-021.md](HISTORY-IP-021.md), HistoryPresentationTest/SubmissionHistoryTest serta /tmp/hoaxlin-ip021-2qkpfjxb. Protected source berubah hanya HistoryRequest normalization; seluruh JS unchanged.
+- **Resume 14 Oktober:** source tetap; artefak /tmp/vendor sementara sesi 13 tidak tersedia lagi. Build, Node 66, syntax source PHP dan diff check diulang; PHPUnit/Pint/compiled Blade/browser tidak diulang. Test Laravel tetap blocked autoload.
+- **Batas:** SubmissionHistoryTest/CsvExportTest exit 255 karena autoload repo hilang; feature cases baru belum dieksekusi. Unit/browser tanpa HTTP kernel/SQL owner-filter-sort-summary/CSV delivery. Receiver fixed response hanya serializer/navigation; no detail acceptance IP-022 atau export acceptance IP-034. PHP 8.5/vendor sementara; process-log Firefox cleanup timeout warning dicatat, native zoom/screen reader/BFCache belum diuji. QA tetap 3 audit pass/91 not_run; F4 belum ditutup, no data/env/deploy changes.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-021; IP-022–IP-039 pending.
+
+### IP-022 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/examination-progress-results, HEAD awal 81f41b9; tree/index awal bersih.
+- **Rujukan:** AC-P04/P02 pada PAGE-SPECIFICATIONS; FA-01/FA-02/FA-05 pada FRONTEND-ARCHITECTURE; QA-HISTORY-04/QA-ACCESS-04 pada QA-ACCEPTANCE serta hasil bersama IP-013–IP-016.
+- **Perubahan:** hasil.blade.php memakai primitive ui/link dan route context untuk “Kembali ke riwayat”/“Kembali ke beranda”. Tidak menduplikasi view, mapping atau evidence. RiwayatController::show/forUser, SubmissionAccess, routes, progress, PDF/media/feedback dan seluruh CSS/JS/backend unchanged.
+- **Evidence:** [HISTORY-DETAIL-IP-022.md](HISTORY-DETAIL-IP-022.md); lima unit state cases dan sembilan feature cases baru, termasuk refresh/back, stale/missing result, escaping/failure sanitization, evidence rank/document_id, feedback pemilik, missing/foreign/admin 404 dan verified guards.
+- **Validasi:** Docker PHP 8.4.11, exact-lock temporary vendor, SQLite in-memory dan kernel Laravel aktual: SubmissionHistoryTest/ResultEndpointAuthorizationTest 30 tests / 292 assertions pass. Seluruh Unit: 280 cases / 1518 assertions, 255 passed + 25 warnings HTML5 DOM parser pada tests lama. Build, 66 Node tests, Pint tiga file dan diff check pass. Browser fixture Firefox normal/no-JS/reduced: 98 layout samples / 295 checks pass; 14 detail states dan native kembali/refresh/history list.
+- **Batas:** Browser transport/model fixtures bukan E2E hydration/SQL; SQL dan guards diuji terpisah melalui kernel tests. CSRF bypass testing, MySQL, real storage/mail/AI, screen reader/native zoom/BFCache dan visual PDF belum diuji. BiDi mencatat nol page console errors, tetapi process log normal/reduced masih memuat Script terminated by timeout pada JS existing; QA aggregate tetap 3 audit pass/91 not_run, F4 belum ditutup. Tidak ada perubahan env/dependency/operational data/deploy/push.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-022; IP-023–IP-039 pending.
+
+### IP-023 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/examination-progress-results, HEAD awal c2c98ee; tree/index awal bersih.
+- **Rujukan:** AC-P11/AC-P12, FA-01/FA-02, QA-INFO-01/02; Overview/Design system/Page specifications/Architecture/Plan/QA, README/PRD serta jobs/input/access actual.
+- **Perubahan:** Cara kerja/Tentang memakai reading layout 768px/70ch, editorial H1, named sections/ol/dl, semantic divider dan primitive links. Copy menjelaskan input/guest/login/verified, extraction/translation/IndoBERT/local retrieval/explanation, confidence/abstention/evidence unavailable serta provider/access boundaries. Format/limit gambar/video dari options policy existing; labels dari DetectionPresentation; SEO disclaimer konsisten. Kartu/KPI/emoji/inline handlers dibuang; btn-primary/result-badge/hero-badge tanpa consumer dihapus, legacy lain yang masih dipakai dipertahankan.
+- **Identitas:** nama pengembang Tentang bertentangan dengan footer/head; panel yang tidak dapat dipastikan dihapus, tanpa mengarang pengganti/kontak. Footer/head tetap; profil pembuat dapat ditambahkan setelah identitas dipastikan.
+- **Evidence:** [INFORMATION-IP-023.md](INFORMATION-IP-023.md); sepuluh feature cases baru dan dua assertion obsolete dari IP-011/IP-017 diselaraskan dengan markup/copy aktual sambil menjaga akses tamu/no notifications. Backend/routes/config/locks/JS/admin/PDF tetap.
+- **Validasi:** Docker PHP 8.4.11, exact-lock isolated vendor dan SQLite in-memory: dua suite terkait 24 passed / 252 assertions; suite PHP penuh 636 cases / 3639 assertions, 607 passed + 25 parser warnings lama + 4 real-BERT skipped, tanpa failures. Build/66 Node/Pint tiga file/diff pass. Browser normal/no-JS/reduced 42 samples/189 checks pass; native zoom 200% kedua halaman tanpa overflow, mobile/font/long text/keyboard/native CTA/skip/links lulus.
+- **Batas:** browser memakai rendered kernel fixtures/loopback transport; bukan session/hydration E2E. Process Firefox normal/reduced timeout JS existing tetap dicatat meski page console/network errors kosong. Screen reader/BFCache, real BERT/provider/MySQL/deployment belum diuji. QA aggregate tetap 3 audit pass/91 not_run, F4 belum ditutup; tidak ada data/env/dependency/deploy/push changes.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-023; IP-024–IP-039 pending.
+
+### IP-024 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/examination-progress-results, HEAD awal c781d6f; tree/index awal bersih.
+- **Rujukan:** AC-P13/FA-01/FA-02/FA-09/QA-INFO-03; reading layout IP-023, models/input/extractors/translator/explainer/access/profile/delete/retention/session/cache/usage/log config dan service actual.
+- **Perubahan:** Privasi memakai reading layout/section/dl/primitive links. Copy membedakan akun/input/hasil/operasional, IP/session, server/provider processing, owner/admin/personal history/guest access, media cutoff konfigurasi vs scheduler/deletion, cache/log/history serta batas account deletion. Revision time literal 14 Oktober 2026; retention max(1, config media_hours) sama dengan command existing. Janji maksimal 24 jam/log anonymity/form kontak/pengumuman material dihapus; provider link ke data controls API yang diverifikasi. Legacy btn-ghost/warning-box/divider tanpa consumer dibuang.
+- **Evidence:** [PRIVACY-IP-024.md](PRIVACY-IP-024.md), source-to-copy matrix dan sembilan feature cases tambahan untuk public variants/current limit/deadline/date/provider/access/deletion. Backend/routes/config/schema/authorization/JS/font/dependency/admin/PDF tetap.
+- **Validasi:** PHP 8.4 Docker/exact-lock vendor/SQLite in-memory: lima suites terkait 55 passed / 547 assertions; suite PHP penuh 645 cases / 3791 assertions, 616 passed + 25 existing parser warnings + 4 real-BERT skips, tanpa failures. Build/66 Node/Pint/diff pass. Browser normal/no-JS/reduced 42 samples/229 checks serta native zoom 200% pass; mobile/long text/font/keyboard/native account/CTA/provider link/storage diperiksa.
+- **Batas:** Source review bukan audit deployment; env/provider/disk/session/mail/scheduler/backup aktual tidak diperiksa. Browser rendered kernel fixtures bukan session/hydration E2E; screen reader/BFCache/MySQL/real providers belum diuji. Firefox process normal timeout JS existing dicatat, page console/network errors kosong. QA aggregate tetap 3 audit pass/91 not_run; F4 belum ditutup. Tidak ada operational prune/delete/migration/data/env/deploy/push changes; kontak resmi tidak diarang.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-024; IP-025–IP-039 pending.
+
+### IP-025 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/examination-progress-results, HEAD awal 5594392; tree/index awal bersih.
+- **Rujukan:** AC-P14/G04/FA-01/FA-04/FA-10/QA-INFO-04/05; P14/statistics query, design tokens/components dan lifecycle IP-007.
+- **Perubahan:** heading/sections, periode/timezone/generated time, native tren/distribusi tables/captions/scopes dan scroll lokal/focus; data tersedia sebelum chart. Total semua status dan label all-time/nonfinal dijelaskan, bukan topik/prevalensi/akurasi. Shared label/disclaimer/abstention/empty cases; tidak ada data privat. Legacy glass/gradient consumer terakhir dihapus. Chart.js 4.5.1 exact-lock + color dependency, page-only dynamic tree-shaken chunk, hidden fallback/validated data/dash/point/no animation, async failure/late import/destroy ownership.
+- **Koreksi eksplisit:** kode subMonths sebelum startOfMonth menggandakan/melewati bulan pada tanggal 31. Diumumkan sebelum edit; diubah ke month-start immutable sebelum subMonths, dengan metadata bulan ISO/Indonesia dan period. Populasi total/label/join/predikat half-open tetap, rentang month-end dikoreksi dan diuji; tidak silent query change.
+- **Evidence:** [STATISTICS-IP-025.md](STATISTICS-IP-025.md); lima feature cases baru dan dua chart lifecycle cases diadaptasi + tiga cases tambahan. Shared lifecycle/navigation/routes/config/auth/schema/pipeline/Composer/admin/PDF unchanged; package existing tidak diupgrade.
+- **Validasi:** PHP 8.4 Docker/SQLite: suites statistik 19 passed / 142 assertions; suite penuh 650 cases / 3846 assertions, 621 passed + 25 existing parser warnings + 4 real-BERT skips, tanpa failures. Build/69 Node/Pint tiga PHP files/diff pass. Browser normal/no-JS/reduced/503 chunk 54 samples/191 checks; native zoom 200%, 3 resource checks (home/how/statistics 0/0/1 chart request), actual Chart.js vs table data dan Livewire destroy/fresh instance lulus.
+- **Batas:** Browser rendered kernel/SQLite fixtures + SDK/library actual bukan deployment/session/inference E2E; screen reader/BFCache/MySQL/real providers belum diuji. Failure mode mencatat enam intended 503/MIME console errors tanpa unhandled rejection; modes lain page errors kosong. Firefox process normal/reduced/blocked cleanup timeout existing dicatat. QA aggregate tetap 3 audit pass/91 not_run, F4 belum ditutup. Tidak ada operational data/env/migration/training/deploy/push changes.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-025; IP-026–IP-039 pending.
+
+### IP-026 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/examination-progress-results, HEAD awal 711b432; tree/index awal bersih.
+- **Rujukan:** E01/AC-E01/FA-01/02/04/09; QA-ERROR-01–03 dan QA-PROGRESS-08, kontrak exception Laravel actual serta akses/polling existing.
+- **Perubahan:** 403/404/419/429/500/503 bertema dengan shell minimal, CSS-only entry/token/font shared, static safe copy dan native GET recovery. View tidak memakai auth/session/submission/AI/Livewire/JS. Missing manifest menampilkan HTML native yang tetap terbaca. Retry-After integer positif saja; tanpa trace, replay POST, countdown atau input secret.
+- **Kontrak:** handler/JSON/status/header/validation/CSRF/throttle/authorization/pipeline/polling unchanged. Invalid guest capability tetap 404; processing tidak menjadi failed saat transport 503. Debug off acceptance; debug policy tidak diubah. Framework bootstrap/session factory tetap prasyarat runtime.
+- **Evidence:** [ERROR-PAGES-IP-026.md](ERROR-PAGES-IP-026.md), 22 feature cases baru; snapshot /tmp/hoaxlin-ip026-20exs_8x dengan Docker PHP 8.4/SQLite in-memory dan dev vendor exact-lock read-only.
+- **Validasi:** build/Pint/Blade/diff lulus; empat suites terkait 49 passed/349 assertions; suite penuh 672 cases/4042 assertions, 643 passed + 25 existing DOM warnings + 4 real-BERT skips, tanpa failures. 69 Node tests lulus. Browser normal/no-JS/reduced 42 samples/115 checks, keenam kode/native zoom 200%/keyboard recovery/konten panjang/manifest fallback lulus.
+- **Batas:** rendered kernel browser fixtures bukan deployment/session E2E; screen reader/forced colors/BFCache/MySQL/providers belum diuji. Page console errors kosong; 31 cached fixture favicon 404 dicatat, assets aplikasi lulus. Process timeout JS existing saat meninggalkan recovery serta internal Firefox errors dicatat. QA aggregate tetap 3 audit pass/91 not_run; F4 belum ditutup.
+- **Berikutnya:** commit semantic dan berhenti pada IP-026; IP-027–IP-039 pending.
 
 ### Format catatan berikutnya
 

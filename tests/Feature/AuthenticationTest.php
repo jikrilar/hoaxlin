@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
@@ -78,6 +79,66 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_native_remember_value_preserves_intended_redirect_and_regenerates_session(): void
+    {
+        $user = User::factory()->create(['password' => 'password']);
+        $this->get(route('login'))->assertOk()
+            ->assertSee('name="remember" value="1"', false)
+            ->assertDontSee('30 hari');
+        $this->withSession(['url.intended' => route('riwayat')]);
+        $previousSessionId = session()->getId();
+
+        $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password', 'remember' => '1'])
+            ->assertRedirect(route('riwayat'));
+        $this->assertAuthenticatedAs($user);
+        $this->assertNotSame($previousSessionId, session()->getId());
+    }
+
+    public function test_invalid_credentials_restore_email_and_remember_without_restoring_password(): void
+    {
+        $this->from(route('login'))->post(route('login.store'), [
+            'email' => 'invalid-credentials@example.test', 'password' => 'secret-marker', 'remember' => '1',
+        ])->assertSessionHasErrors('email')->assertSessionMissing('_old_input.password');
+
+        $this->get(route('login'))->assertOk()
+            ->assertSee('Email atau kata sandi yang kamu masukkan salah.')
+            ->assertSee('invalid-credentials@example.test')
+            ->assertSee('id="auth-errors"', false)
+            ->assertDontSee('secret-marker');
+        $this->assertGuest();
+    }
+
+    public function test_login_rate_limit_feedback_remains_a_server_message(): void
+    {
+        $credentials = ['email' => 'rate-limited@example.test', 'password' => 'wrong-password'];
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->post(route('login.store'), $credentials)->assertSessionHasErrors('email');
+        }
+        $this->post(route('login.store'), $credentials)->assertSessionHasErrors('email');
+        $this->get(route('login'))->assertOk()
+            ->assertSee('Terlalu banyak percobaan masuk. Coba lagi dalam')
+            ->assertSee('href="#email"', false);
+        $this->assertGuest();
+    }
+
+    public function test_registration_preserves_terms_confirmation_and_error_recovery(): void
+    {
+        $this->from(route('register'))->post(route('register.store'), [
+            'name' => 'Nama <script id="attack">literal</script>',
+            'email' => 'registration-recovery@example.test',
+            'password' => 'secret-marker', 'password_confirmation' => 'different',
+        ])->assertSessionHasErrors(['password', 'terms'])
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.password_confirmation');
+        $this->get(route('register'))->assertOk()
+            ->assertSee('registration-recovery@example.test')
+            ->assertSee('href="#terms"', false)
+            ->assertSee('Nama &lt;script id=&quot;attack&quot;&gt;literal&lt;/script&gt;', false)
+            ->assertDontSee('<script id="attack">', false)
+            ->assertDontSee('secret-marker');
+        $this->assertDatabaseEmpty('users');
+    }
+
     public function test_user_can_verify_email_using_signed_url(): void
     {
         Event::fake([Verified::class]);
@@ -123,12 +184,47 @@ class AuthenticationTest extends TestCase
                 'email' => $user->email,
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
-            ])->assertRedirect(route('login'));
+            ])->assertRedirect(route('login'))->assertSessionHas('status', __(Password::PASSWORD_RESET));
+            $this->assertGuest();
 
             return true;
         });
 
         $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
+    }
+
+    public function test_invalid_reset_token_get_is_a_form_and_post_has_recovery_without_mutating_password(): void
+    {
+        $user = User::factory()->create(['password' => 'original-password']);
+        $resetUrl = route('password.reset', ['token' => 'invalid-token', 'email' => $user->email]);
+        $this->get($resetUrl)->assertOk()->assertSee('name="token" value="invalid-token"', false);
+
+        $this->from($resetUrl)->post(route('password.store'), [
+            'email' => $user->email, 'token' => 'invalid-token', 'password' => 'new-password', 'password_confirmation' => 'new-password',
+        ])->assertSessionHasErrors('email')
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.password_confirmation');
+        $this->get($resetUrl)->assertOk()
+            ->assertSee(__(Password::INVALID_TOKEN))
+            ->assertSee('Minta tautan reset baru')
+            ->assertSee(route('password.request'), false);
+        $this->assertTrue(Hash::check('original-password', $user->fresh()->password));
+        $this->assertGuest();
+    }
+
+    public function test_expired_reset_token_cannot_change_password_or_log_in_the_user(): void
+    {
+        $user = User::factory()->create(['password' => 'original-password']);
+        $token = Password::createToken($user);
+        $brokerName = config('auth.defaults.passwords');
+        $expiry = (int) config('auth.passwords.'.$brokerName.'.expire');
+        $this->travelTo(now()->addMinutes($expiry + 1), function () use ($user, $token): void {
+            $this->post(route('password.store'), [
+                'email' => $user->email, 'token' => $token, 'password' => 'new-password', 'password_confirmation' => 'new-password',
+            ])->assertSessionHasErrors('email');
+            $this->assertTrue(Hash::check('original-password', $user->fresh()->password));
+            $this->assertGuest();
+        });
     }
 
     public function test_unverified_user_can_resend_verification_email(): void
@@ -138,12 +234,68 @@ class AuthenticationTest extends TestCase
 
         $this->actingAs($user)->get(route('verification.notice'))->assertOk()
             ->assertSee('folder spam')
-            ->assertSee('Kirim Ulang Email Verifikasi');
+            ->assertSee('Kirim ulang tautan')
+            ->assertSee($user->email)
+            ->assertSee(route('profile'), false)
+            ->assertSee('action="'.route('logout').'"', false)
+            ->assertDontSee('Tautan verifikasi baru telah dikirim.');
+        Notification::assertNothingSent();
 
-        $this->actingAs($user)->post(route('verification.send'))
+        $this->from(route('verification.notice'))->post(route('verification.send'))
+            ->assertRedirect(route('verification.notice'))
             ->assertSessionHas('status', 'verification-link-sent');
-
         Notification::assertSentTo($user, VerifyEmail::class);
+        $this->get(route('verification.notice'))->assertOk()
+            ->assertSee('Tautan verifikasi baru telah dikirim.');
+        Notification::assertSentToTimes($user, VerifyEmail::class, 1);
+        $this->assertNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_verified_notice_redirects_home_or_to_the_intended_destination_without_notification(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('verification.notice'))->assertRedirect(route('home'));
+        $this->withSession(['url.intended' => route('riwayat')])->get(route('verification.notice'))
+            ->assertRedirect(route('riwayat'))->assertSessionMissing('url.intended');
+        Notification::assertNothingSent();
+    }
+
+    public function test_verification_notice_and_resend_require_authentication(): void
+    {
+        Notification::fake();
+        $this->get(route('verification.notice'))->assertRedirect(route('login'));
+        $this->post(route('verification.send'))->assertRedirect(route('login'));
+        Notification::assertNothingSent();
+    }
+
+    public function test_resend_rate_limit_stops_the_seventh_notification(): void
+    {
+        Notification::fake();
+        $user = User::factory()->unverified()->create();
+        $this->actingAs($user);
+        for ($attempt = 0; $attempt < 6; $attempt++) {
+            $this->from(route('verification.notice'))->post(route('verification.send'))
+                ->assertRedirect(route('verification.notice'))
+                ->assertSessionHas('status', 'verification-link-sent');
+        }
+        $this->post(route('verification.send'))->assertStatus(429)->assertHeader('Retry-After');
+        Notification::assertSentToTimes($user, VerifyEmail::class, 6);
+        $this->assertNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_signed_link_for_a_different_account_or_email_cannot_verify_current_user(): void
+    {
+        Event::fake([Verified::class]);
+        $user = User::factory()->unverified()->create();
+        $other = User::factory()->unverified()->create();
+        $this->actingAs($user);
+        foreach ([['id' => $other->id, 'hash' => sha1($other->email)], ['id' => $user->id, 'hash' => sha1('old@example.test')]] as $parameters) {
+            $this->get(URL::temporarySignedRoute('verification.verify', now()->addMinutes(60), $parameters))->assertForbidden();
+        }
+        $this->assertNull($user->fresh()->email_verified_at);
+        $this->assertNull($other->fresh()->email_verified_at);
+        Event::assertNotDispatched(Verified::class);
     }
 
     public function test_verified_user_does_not_receive_another_verification_email(): void

@@ -1,0 +1,24 @@
+@layer components {
+    .hl-statistics-page { padding-block: var(--ds-space-8) var(--ds-space-16); }
+    .hl-header[data-navigation-ready] + main .hl-statistics-page { padding-block-start: calc(var(--ds-space-16) + var(--ds-space-8)); }
+    .hl-statistics-intro > p { max-inline-size: 70ch; margin-block-start: var(--ds-space-3); }
+    .hl-statistics-note { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); line-height: var(--ds-type-body-sm-leading); }
+    .hl-statistics-section { margin-block-start: var(--ds-space-8); padding-block-start: var(--ds-space-6); border-block-start: var(--ds-border-width) solid var(--ds-border-subtle); }
+    .hl-statistics-section > p { margin-block-start: var(--ds-space-4); max-inline-size: 80ch; }
+    .hl-statistics-context { display: flex; flex-wrap: wrap; gap: var(--ds-space-4) var(--ds-space-8); margin-block: var(--ds-space-4); }
+    .hl-statistics-context dt { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .hl-statistics-context dd { margin-block-start: var(--ds-space-1); }
+    .hl-statistics-table-scroll { overflow-x: auto; margin-block-start: var(--ds-space-4); border-radius: var(--ds-radius-sm); }
+    .hl-statistics-table { inline-size: 100%; border-collapse: collapse; margin-block-start: var(--ds-space-4); text-align: start; }
+    .hl-statistics-table--trend { min-inline-size: 36rem; margin-block-start: 0; }
+    .hl-statistics-table caption { text-align: start; font-weight: var(--ds-font-weight-medium); padding-block-end: var(--ds-space-3); }
+    .hl-statistics-table th, .hl-statistics-table td { padding: var(--ds-space-3); border-block-end: var(--ds-border-width) solid var(--ds-border-subtle); vertical-align: top; }
+    .hl-statistics-table thead { background: var(--ds-bg-subtle); color: var(--ds-text-primary); }
+    .hl-statistics-table th { font-weight: var(--ds-font-weight-medium); }
+    .hl-statistics-table th:not(:first-child), .hl-statistics-table td { text-align: end; font-variant-numeric: tabular-nums; }
+    .hl-statistics-table--trend th[scope="row"] { white-space: nowrap; }
+    .hl-statistics-chart { margin-block-start: var(--ds-space-6); }
+    .hl-statistics-chart figcaption { font-size: var(--ds-type-body-sm-size); margin-block-end: var(--ds-space-3); }
+    .hl-statistics-chart__canvas { position: relative; block-size: 20rem; min-inline-size: 0; }
+    .hl-statistics-actions { display: flex; flex-wrap: wrap; gap: var(--ds-space-3); margin-block-start: var(--ds-space-5); }
+}

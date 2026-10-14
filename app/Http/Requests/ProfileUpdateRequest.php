@@ -8,6 +8,8 @@ use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
+    protected $errorBag = 'profile';
+
     public function authorize(): bool
     {
         return true;

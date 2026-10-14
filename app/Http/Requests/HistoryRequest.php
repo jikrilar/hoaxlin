@@ -25,8 +25,9 @@ class HistoryRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $search = $this->input('search');
         $this->merge([
-            'search' => $this->filled('search') ? trim((string) $this->input('search')) : null,
+            'search' => $this->filled('search') ? (is_scalar($search) ? trim((string) $search) : $search) : null,
             'sort' => $this->input('sort', 'newest'),
         ]);
     }

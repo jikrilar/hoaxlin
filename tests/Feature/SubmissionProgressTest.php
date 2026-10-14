@@ -138,4 +138,43 @@ class SubmissionProgressTest extends TestCase
             ->assertSee('Gagal')
             ->assertSee('Pemrosesan Gagal');
     }
+
+    public function test_livewire_refresh_rejects_access_when_the_owner_changes(): void
+    {
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $submission = Submission::create([
+            'user_id' => $owner->id,
+            'input_type' => 'text',
+            'raw_input' => str_repeat('Pemeriksaan akses. ', 10),
+            'status' => 'processing',
+            'processing_stage' => ProcessingStage::Classifying->value,
+        ]);
+
+        $this->actingAs($owner);
+        $component = Livewire::test(SubmissionProgress::class, ['submission' => $submission]);
+        $this->actingAs($other);
+        $component->call('refreshProgress')->assertStatus(403);
+    }
+
+    public function test_failed_done_stage_keeps_backend_percentage_without_a_success_meter(): void
+    {
+        $owner = User::factory()->create();
+        $submission = Submission::create([
+            'user_id' => $owner->id,
+            'input_type' => 'text',
+            'raw_input' => str_repeat('Pemrosesan gagal. ', 10),
+            'status' => 'failed',
+            'processing_stage' => ProcessingStage::Done->value,
+        ]);
+
+        $this->actingAs($owner);
+        Livewire::test(SubmissionProgress::class, ['submission' => $submission])
+            ->assertSet('progress', 100)
+            ->assertSee('Pemrosesan Gagal')
+            ->assertSee('Hasil final belum tersedia')
+            ->assertDontSee('role="progressbar"', false)
+            ->assertDontSee('wire:poll.2s.visible', false)
+            ->assertDontSee('100%');
+    }
 }

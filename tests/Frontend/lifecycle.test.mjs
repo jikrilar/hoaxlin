@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { createLifecycle, installLifecycle } from '../../resources/js/core/lifecycle.js';
 import { createScope, defineModule, lockScroll } from '../../resources/js/core/scope.js';
-import { mount as mountStatistics } from '../../resources/js/pages/statistics.js';
+import { createStatisticsModule } from '../../resources/js/pages/statistics.js';
 import { mount as mountForms } from '../../resources/js/components/form-submit.js';
 
 const settle = () => new Promise(resolve => setImmediate(resolve));
@@ -251,25 +251,36 @@ test('overlapping scroll locks restore the original overflow once', () => {
     assert.equal(body.style.overflow, 'auto');
 });
 
-test('chart instance is destroyed once on cleanup and can remount', () => {
+function statisticsFixture() {
     const charts = [];
-    const canvas = { isConnected: true, dataset: { trend: JSON.stringify([{ label: 'Jan', total: 3, hoax: 1 }]) } };
+    const canvas = { isConnected: true, dataset: { statisticsTrend: JSON.stringify([{ label: 'Januari 2026', total: 3, hoax: 1, valid: 1 }]) } };
+    const panel = { hidden: true };
     const root = {
-        querySelector: selector => selector.includes('data-trend') ? canvas : null,
-        ownerDocument: { documentElement: {}, defaultView: {
-            getComputedStyle: () => ({ getPropertyValue: () => 'fixture-token' }),
-            Chart: class {
-                constructor(_canvas, config) { this.config = config; this.destroyed = 0; charts.push(this); }
-                destroy() { this.destroyed++; }
-            },
-        } },
+        querySelector: selector => selector === '[data-statistics-trend]' ? canvas : panel,
+        ownerDocument: { documentElement: {}, defaultView: { getComputedStyle: () => ({ getPropertyValue: () => 'fixture-token' }) } },
     };
+    const Chart = class {
+        constructor(_canvas, config) { this.config = config; this.destroyed = 0; charts.push(this); }
+        destroy() { this.destroyed++; }
+    };
+    return { root, canvas, panel, charts, Chart };
+}
+
+test('chart instance is destroyed once on cleanup and can remount', async () => {
+    const { root, panel, charts, Chart } = statisticsFixture();
+    const mountStatistics = createStatisticsModule(async () => ({ default: Chart }));
     const dispose = mountStatistics(root);
     assert.equal(mountStatistics(root), dispose);
-    assert.deepEqual(charts[0].config.data.datasets[0].data, [3]);
+    await settle();
+    assert.deepEqual(charts[0].config.data.datasets.map(series => series.data), [[3], [1], [1]]);
+    assert.equal(charts[0].config.options.animation, false);
+    assert.equal(panel.hidden, false);
     dispose(); dispose();
     assert.equal(charts[0].destroyed, 1);
-    mountStatistics(root)();
+    assert.equal(panel.hidden, true);
+    const current = mountStatistics(root);
+    await settle();
+    current();
     assert.equal(charts.length, 2);
     assert.equal(charts[1].destroyed, 1);
 });
@@ -309,31 +320,67 @@ test('late validation cancellation keeps the native form usable', async () => {
     cleanup();
 });
 
-test('late chart library load mounts only the current live instance', () => {
-    const script = new EventTarget();
-    const canvas = { isConnected: true, dataset: { trend: '[]' } };
-    const charts = [];
-    const view = { getComputedStyle: () => ({ getPropertyValue: () => 'fixture-token' }) };
-    const root = { querySelector: selector => selector.includes('data-trend') ? canvas : script, ownerDocument: { defaultView: view, documentElement: {} } };
-    const Chart = class { constructor() { this.destroyed = false; charts.push(this); } destroy() { this.destroyed = true; } };
-    const loaded = mountStatistics(root);
-    assert.equal(charts.length, 0);
-    view.Chart = Chart;
-    script.dispatchEvent(new Event('load'));
-    assert.equal(charts.length, 1);
-    loaded();
-    assert.equal(charts[0].destroyed, true);
-    delete view.Chart;
+test('late chart library load mounts only the current live instance', async () => {
+    const { root, canvas, panel, charts, Chart } = statisticsFixture();
+    const imports = [];
+    const mountStatistics = createStatisticsModule(() => { const item = deferred(); imports.push(item); return item.promise; });
     const stale = mountStatistics(root);
+    await settle();
     stale();
-    view.Chart = Chart;
-    script.dispatchEvent(new Event('load'));
-    assert.equal(charts.length, 1);
     const current = mountStatistics(root);
-    script.dispatchEvent(new Event('load'));
-    assert.equal(charts.length, 2);
+    await settle();
+    imports[0].resolve({ default: Chart });
+    await settle();
+    assert.equal(charts.length, 0);
+    assert.equal(panel.hidden, true);
+    imports[1].resolve({ default: Chart });
+    await settle();
+    assert.equal(charts.length, 1);
     current();
-    assert.equal(charts[1].destroyed, true);
+    assert.equal(charts[0].destroyed, 1);
+    const detached = mountStatistics(root);
+    await settle();
+    canvas.isConnected = false;
+    imports[2].resolve({ default: Chart });
+    await settle();
+    assert.equal(charts.length, 1);
+    detached();
+});
+
+test('a failed chart import or constructor leaves the graphic hidden without an unhandled rejection', async () => {
+    const { root, panel } = statisticsFixture();
+    const rejected = createStatisticsModule(async () => { throw new Error('fixture chunk unavailable'); })(root);
+    await settle();
+    assert.equal(panel.hidden, true);
+    rejected();
+    let destroyed = 0;
+    const Broken = class { constructor() { throw new Error('fixture canvas unavailable'); } static getChart() { return { destroy() { destroyed++; } }; } };
+    const broken = createStatisticsModule(async () => ({ default: Broken }))(root);
+    await settle();
+    assert.equal(panel.hidden, true);
+    assert.equal(destroyed, 1);
+    broken();
+});
+
+test('empty and malformed chart payloads never load a library or reveal a fake chart', async () => {
+    for (const payload of ['invalid-json', '[]', '{}', JSON.stringify([{ label: 'Januari', total: 1, hoax: 2, valid: 0 }]), JSON.stringify([{ label: 'Januari', total: 0, hoax: 0, valid: 0 }]), JSON.stringify([{ label: 'Januari', total: 1, hoax: 0, valid: null }])]) {
+        const { root, canvas, panel } = statisticsFixture();
+        canvas.dataset.statisticsTrend = payload;
+        let imports = 0;
+        const cleanup = createStatisticsModule(async () => { imports++; })(root);
+        await settle();
+        assert.equal(imports, 0);
+        assert.equal(panel.hidden, true);
+        cleanup();
+    }
+});
+
+test('cleanup before the deferred import starts never requests the chart chunk', async () => {
+    const { root } = statisticsFixture();
+    let imports = 0;
+    createStatisticsModule(async () => { imports++; })(root)();
+    await settle();
+    assert.equal(imports, 0);
 });
 
 test('double submit is blocked; cleanup restores original nodes and attributes', async () => {

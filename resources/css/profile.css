@@ -1,0 +1,27 @@
+@layer components {
+    .hl-profile-page { max-inline-size: 48rem; padding-block: var(--ds-space-10) var(--ds-space-16); }
+    .hl-header[data-navigation-ready] + main .hl-profile-page { padding-block-start: calc(var(--ds-space-16) + var(--ds-space-8)); }
+    .hl-profile-intro { margin-block-end: var(--ds-space-8); }
+    .hl-profile-intro h1 { font-size: var(--ds-type-page-title-size); font-weight: var(--ds-font-weight-semibold); }
+    .hl-profile-intro p, .hl-profile-section > p { margin-block-start: var(--ds-space-2); color: var(--ds-text-muted); }
+    .hl-profile-status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-3); margin-block-start: var(--ds-space-4); }
+    .hl-profile-section { padding-block: var(--ds-space-8); border-block-start: var(--ds-border-width) solid var(--ds-border-subtle); }
+    .hl-profile-section h2 { font-size: var(--ds-type-section-title-size); font-weight: var(--ds-font-weight-semibold); }
+    .hl-profile-section form { margin-block-start: var(--ds-space-6); }
+    .hl-profile-errors { margin-block-start: var(--ds-space-4); }
+    .hl-profile-errors ul { list-style: disc; padding-inline-start: var(--ds-space-5); }
+    .hl-profile-errors a { color: inherit; }
+    .hl-profile-delete { border-color: var(--ds-danger-fg); }
+    .hl-profile-delete > h2 { color: var(--ds-danger-fg); }
+    .hl-profile-delete > button, .hl-profile-delete > details { margin-block-start: var(--ds-space-6); }
+    .hl-profile-delete summary { list-style: none; cursor: pointer; }
+    .hl-profile-delete summary::-webkit-details-marker { display: none; }
+    .hl-profile-delete details[open] > summary { margin-block-end: var(--ds-space-6); }
+    .hl-profile-confirmation { padding: var(--ds-space-6); border: var(--ds-border-width) solid var(--ds-danger-fg); border-radius: var(--ds-radius-md); background: var(--ds-bg-surface); }
+    .hl-profile-confirmation h3 { font-size: var(--ds-type-section-title-size); font-weight: var(--ds-font-weight-semibold); }
+    .hl-profile-confirmation > p { margin-block-start: var(--ds-space-2); color: var(--ds-text-muted); }
+    .hl-profile-confirmation form { margin-block-start: var(--ds-space-6); }
+    .hl-profile-dialog { inline-size: min(28rem, calc(100% - var(--ds-space-8))); }
+    .hl-profile-dialog .hl-profile-confirmation { border: 0; }
+    .hl-profile-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: var(--ds-space-3); }
+}

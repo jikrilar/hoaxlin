@@ -119,9 +119,9 @@ class VideoMediaContractTest extends TestCase
 
         $this->actingAs(User::factory()->create())->get(route('home'))
             ->assertOk()
-            ->assertSee('data-video-max-bytes="2097152"', false)
-            ->assertSee('id="video-size-error" role="alert" hidden', false)
-            ->assertSee('Ukuran video melebihi batas 2 MiB. Pilih file yang lebih kecil.');
+            ->assertSee('&quot;maxBytes&quot;:2097152', false)
+            ->assertSee('id="video-file-input-client-error" data-file-error role="alert" hidden', false)
+            ->assertSee('maksimal 2 MiB');
     }
 
     #[DataProvider('unsupportedUploads')]

@@ -126,7 +126,8 @@ Pertahankan nama top-level view dan controller agar route/view lookup existing t
 | `resources/js/components/form-submit.js` | Baru | Loading dan perlindungan double submit pada form native |
 | `resources/js/components/password.js` | Tersedia IP-007/IP-010 | Toggle password aksesibel, hints dan secret cleanup |
 | `resources/js/components/dialog.js` | Baru bila dipakai | Dialog penghapusan; focus/Escape/focus return |
-| `resources/js/pages/submission-form.js` | Baru | Selector input, preview, validasi ringan, cleanup |
+| `resources/js/pages/submission-form.js` | Tersedia IP-011 | Batas/counter/recovery teks, submit status, cleanup draft/CAPTCHA |
+| `resources/js/pages/submission-media.js` | Tersedia IP-012 | Selector progressive, URL/file validation advisory, preview dan cleanup |
 | `resources/js/pages/result.js` | Baru bila diperlukan | Enhancement halaman hasil dan koordinasi lifecycle |
 | `resources/js/pages/statistics.js` | Baru bila chart dipertahankan | Chart enhancement khusus statistik |
 | `resources/js/progress/fallback.js` | Baru | Polling fallback, in-flight guard, stop/resume, terminal transition |
@@ -147,7 +148,7 @@ Module yang tidak melakukan apa-apa setelah markup native disederhanakan tidak p
 | `resources/views/components/ui/` | Baru | Button, link, alert, field, empty state, disclosure |
 | `resources/views/components/forms/` | Baru bila reusable | Password field, upload field, CAPTCHA presentation |
 | `resources/views/components/results/` | Baru | Prediction label, confidence metadata, evidence item, provenance |
-| `resources/views/partials/submission/` | Baru | Bagian khusus form beranda |
+| `resources/views/partials/submission/` | Tersedia IP-011 | text/errors/input-types/media/url/upload/security; lima native forms |
 | `resources/views/partials/result/` | Baru | Komposisi hasil yang dipakai `hasil.blade.php` |
 | `resources/views/livewire/submission-progress.blade.php` | Existing | View progress, menggunakan token/komponen yang cocok |
 | `resources/views/auth/*.blade.php` | Existing | Form auth; migrasi ke shell auth |
@@ -313,7 +314,33 @@ Cleanup juga mencakup timer, request in-flight, object URL, chart, dialog, dan s
 
 DOM yang dimorph Livewire tetap dimiliki Livewire. JS publik tidak mengganti innerHTML komponen progress atau menulis field snapshot/wire attributes. Native interaction pada bagian itu sebaiknya berada di view/component Livewire atau handler yang tahan replacement DOM.
 
-Implementasi fondasi tersedia pada [IP-007](LIFECYCLE-IP-007.md): `bootstrap.js` memakai registry ES modules dan `installLifecycle`; `core/lifecycle.js` mengelola body aktif, guard import dan hooks; `core/scope.js` menyediakan `defineModule`, `createScope` dan `lockScroll`. Module shared navigation/form-submit/password/dialog mempunyai consumer nyata; `pages/statistics.js` dipilih melalui data-page dan menjaga late library load serta destroy chart. window.Hoaxlin/window.axios telah diaudit tanpa consumer dan dihapus. Handler khusus welcome/hasil/progress belum dimigrasi; table di atas tetap target bagi task halaman berikutnya, bukan bukti seluruh resource legacy telah dimiliki lifecycle.
+Implementasi fondasi tersedia pada [IP-007](LIFECYCLE-IP-007.md): `bootstrap.js` memakai registry ES modules dan `installLifecycle`; `core/lifecycle.js` mengelola body aktif, guard import dan hooks; `core/scope.js` menyediakan `defineModule`, `createScope` dan `lockScroll`. Module shared navigation/form-submit/password/dialog mempunyai consumer nyata; `pages/statistics.js` dipilih melalui data-page dan menjaga late library load serta destroy chart. window.Hoaxlin/window.axios telah diaudit tanpa consumer dan dihapus. Handler beranda kini dimiliki module IP-011 yang dijelaskan di bawah; coordinator progress/result kini dimiliki lifecycle IP-014; presentasi hasil final/provenance tersedia pada IP-015 di bawah; actions/feedback tersedia pada IP-016 di bawah, dan table di atas tetap target bagi task halaman berikutnya, bukan bukti seluruh resource legacy telah dimiliki lifecycle.
+
+IP-011 menerapkan [form teks beranda](TEXT-FORM-IP-011.md). Registry memilih submission-form hanya untuk body dengan data-page=submission. Partial text memakai native POST/CSRF, input_type=text, raw_input 50–50.000, website dan CAPTCHA; error summary/field dan old input escaped. Guest langsung memakai teks tanpa single-tab control. Pengantar/form mendahului bantuan/model disclosure; statistik dari controller tetap berkonteks. Tidak ada overlay/timer tahap analisis sebelum respons; form-submit memberi guard/label mengirim, page module memberi polite request status setelah event tidak dibatalkan.
+
+Counter/validasi teks menghitung code points setelah trim; native minlength/maxlength tetap tersedia tanpa JS. Error summary autofocus dan link field bekerja native; module menjaga focus setelah body swap. Cleanup memulihkan validitas/status, mengosongkan CAPTCHA, dan mencerminkan hanya draft textarea lewat defaultValue (DOM text setter) sebelum Livewire menyimpan outerHTML. Tidak ada localStorage/sessionStorage atau nilai CAPTCHA/file/password dalam cached attribute. Adapter media mempertahankan forms/domain/batas existing, memindahkan handlers ke scope, menulis filename sebagai text dan melepaskan object URL. Adapter/partial legacy media digantikan pada IP-012 yang dijelaskan di bawah; hasil/progress tetap IP-013–IP-016.
+
+IP-012 menerapkan [URL/gambar/video](MEDIA-FORM-IP-012.md). HomeController memberi submissionOptions dari App\Support\SubmissionFormOptions: aturan image/url diambil dari StoreSubmissionRequest, opsi video upload/remote/ukuran/durasi dari TranscriptionMediaContract dan blocked hosts dari config. Tidak ada query/policy baru. Upload-field berada di ui/field, file input native tetap visible, accept/error/hint/options terhubung dan nilai file tidak dipulihkan.
+
+Empat kategori Teks/Tautan artikel/Gambar/Video memakai fragment links native, dengan dua fragment links untuk video upload/direct URL. Lima forms masing-masing memiliki domain konstan, CAPTCHA/honeypot/CSRF dan hanya payload terkait; dua uploads multipart. Tanpa JS semua form akun terlihat/aktif, guest hanya teks. Mount upgrade links ke tabs dengan arrows/Home/End/Space/Enter; panel lain hidden dan fieldset disabled, cleanup memulihkan fallback. Chosen category/subtype dan safe URL draft dipertahankan dalam DOM snapshot, CAPTCHA/file dikosongkan.
+
+submission-media.js melakukan validasi advisory HTTP/HTTPS/maxlength, direct host/extension, file size/format/MIME dan metadata dimensions/duration bila browser dapat membacanya. Server tetap memvalidasi content/signature/SSRF dan seluruh policy. Preview URL hanya hostname text, tanpa request remote; filename textContent, local image/video blob URLs dicabut saat ganti/hapus/cleanup. Tidak ada AJAX/provider/global baru. Legacy input-tabs/upload-zone/tab-content serta adapter IP-011 tanpa consumer dihapus.
+
+IP-015 menerapkan [hasil final/evidence/provenance](RESULT-IP-015.md) melalui presenter mapping tanpa query dan komponen/partial Blade. Final membutuhkan completed dan result milik submission yang sama; label/tone/abstention/disclaimer konsisten, confidence statis dari classifier dan null jujur. Narrative hanya untuk explanation ready dengan teks; evidence rank/document_id, escaped dan URL HTTP/HTTPS tanpa credentials/control/backslash. Native disclosure menampilkan seluruh input/extraction/translation serta metadata/timestamp tersimpan; media tetap route privat existing. Confidence animation dihapus; actions/feedback existing diekstrak verbatim untuk migrasi IP-016. Tidak mengubah authorization/pipeline/JS progress.
+
+IP-016 menerapkan [actions/feedback](ACTIONS-IP-016.md) sebagai partial Blade dengan guard viewer verified/owner/final. PDF tersedia hanya final yang dapat diakses; history/CSV hanya verified dengan scope seluruh riwayat akun. Feedback memakai native radio required 1/0 dan textarea opsional 1000, old input escaped per submission, sent readonly dan duplicate/error persisten. Guest/admin access tidak menjadi ownership; unverified owner diarahkan ke verifikasi. Inline selectFeedback dan legacy actions dihapus. Form-submit existing menangani loading/double-submit/cleanup; radio native tidak membutuhkan module baru. Route/controller/middleware/authorization/export dan seluruh JS tetap sama.
+
+IP-017 menerapkan [login/register](LOGIN-REGISTER-IP-017.md) pada shell IP-010: native fields/autocomplete/required/terms, remember value=1 sesuai boolean validator, name/email old input string escaped dan password kosong. Ringkasan error menerima target field dari kedua view untuk autofocus/link; auth views lain memakai fallback generic. Strength meter/data-password-hints registrasi dihapus dari view, policy/confirmation tetap server. Password/form-submit existing tetap menangani toggle/loading/cleanup tanpa perubahan JS/backend. Intended/session/Registered/verifikasi/unique/limiter dipertahankan, belum menjadi klaim E2E dari receiver fixture.
+
+IP-018 menerapkan [forgot/reset password](PASSWORD-RESET-IP-018.md) dengan native fields/button/link/shell dan field error targets existing. Old/query email hanya string escaped, token dari route tetap hidden, password/confirmation tidak dipulihkan. GET tidak mengklaim token valid; error menyediakan request-reset/login recovery dan status tetap dari broker. Form-submit/password existing menangani loading/toggle/cleanup tanpa perubahan JS/CSS. Unit controller actual memakai request validation adapter dan broker fake; real DB expiry/User update/event/SMTP/middleware belum diverifikasi. Verifikasi/profil tetap task berikutnya.
+
+IP-019 menerapkan [verifikasi email](EMAIL-VERIFICATION-IP-019.md) dengan shell/button/link dan semantic CSS existing, email akun escaped/wrapping serta instruksi inbox/spam/expired. Tidak mengklaim pengiriman pada initial view; verification-link-sent hanya dari shared flash status. Resend/logout native POST + CSRF memakai independent form-submit loading; profile tetap GET. Auth/signed/throttle:6,1/ID-hash/verified intended-home dan success controller unchanged. Tidak ada module/countdown/auto resend baru. Controller doubles, authorize/URL signing actual serta browser receiver diuji; HTTP limiter/middleware/DB/Verified/mail belum diverifikasi. Migrasi profil tetap IP-020.
+
+IP-020 menerapkan [profil dan konfirmasi hapus](PROFILE-IP-020.md): section/divider/profile.css, native PATCH/PUT/DELETE ber-CSRF, field/password helpers existing dan named FormRequest bags profile/passwordUpdate/accountDeletion. Identitas string escaped, password tidak dipulihkan, verified/reverify mengikuti controller. Dialog mengambil satu panel/form dari details fallback, mengungkap trigger/Batal dan menjaga fokus/Escape/Tab/scroll/reset/return focus; cleanup mengembalikan fallback dan queued close tidak mengganggu reopen. Tanpa JS/API modal, details tetap native. Tidak mengubah rules/service/authorization/session contract atau menambah preferences. FormRequest/validator dan browser diuji terisolasi; DB/session/deletion/notification HTTP serta Firefox process warnings masih gap QA.
+
+IP-021 menerapkan [riwayat/filter/pagination](HISTORY-IP-021.md): lima fields GET dalam satu form/reset page, shared forms/select awareness dan ui/pagination native dengan prev/next query/disabled spans. Semantic ul/li/dl/time mengganti pseudo-table; history.css memakai tokens/mobile dan obsolete history selectors dibuang. DetectionPresentation final guard/label/confidence dipakai per row; summary stats tersimpan dan CSV tetap seluruh history. Error/old input escaped, native empty/reset/first-page recovery. HistoryRequest mempertahankan nonscalar search untuk validator string tanpa cast warning; controller/rules/authorization/query/export dan JS tetap. HTTP/SQL scope/sort/pagination/export serta warning cleanup Firefox belum ditutup.
+
+IP-022 memverifikasi [detail riwayat dengan hasil bersama](HISTORY-DETAIL-IP-022.md): riwayat.show tetap memakai hasil/P02 dan primitive link mengenali route context; refresh history memakai riwayat.show, status/media/PDF tetap endpoint hasil canonical. RiwayatController::show tetap forUser tanpa admin bypass, feedback tetap verified owner, evidence tersimpan tetap rank/document_id. Tidak ada view/mapping/evidence/JS kedua atau perubahan controller/access/routes. Kernel Laravel aktual dengan SQLite in-memory pada Docker PHP 8.4 memverifikasi batas tersebut dan suite history existing; browser fixture memverifikasi keyboard/back/refresh/mobile/no-JS. Ini subhasil IP-022, bukan penutupan QA E2E atau export acceptance.
 
 ### 9.3 Transport dan error
 
@@ -333,6 +360,8 @@ Persen mengikuti backend/enum dan fallback existing; jangan menghitung durasi at
 
 Endpoint `hasil.status` tetap digunakan dengan kredensial session. Field yang dipakai adalah state/progress/stage serta boolean completed/failed dari respons existing; kontrak tidak diganti oleh frontend.
 
+IP-013 menerapkan [view progress](PROGRESS-IP-013.md) dengan CSS semantic, satu live region status/tahap dan data-progress-percent terpisah untuk fallback existing. Null/unknown tahap tidak diberi label palsu; failed tidak merender meter dan completed belum menjamin result tersedia. Native GET refresh mempertahankan konteks hasil/riwayat, no-JS tanpa meta refresh; wire:poll.2s.visible tetap hanya nonterminal. Component refresh/enum/access/backend tidak diubah. Kepemilikan fallback/transisi terminal kemudian diselesaikan pada IP-014 di bawah; render fixture IP-013 bukan bukti hydration/network polling aplikasi.
+
 ### 10.2 Pemilik tunggal
 
 | Kondisi | Pemilik | Ketentuan |
@@ -344,6 +373,8 @@ Endpoint `hasil.status` tetap digunakan dengan kredensial session. Field yang di
 | Access/session tidak lagi sah | Tidak ada polling berulang | Beri recovery sesuai respons, tidak bypass akses |
 
 `wire:id` pada HTML bukan satu-satunya indikator. Implementasi harus mengamati init runtime yang benar pada versi terpasang. Jika fallback sudah aktif dan Livewire kemudian mengambil alih, hentikan fallback terlebih dahulu; jangan memakai keduanya untuk mengatasi satu network error.
+
+IP-014 menerapkan [coordinator/adapter/scheduler](POLLING-IP-014.md): registry memilih pages/result, wrapper memberi status URL/ID/stages, Livewire.find/$el dan hooks init/morph membuktikan owner. Fallback serial dua detik dengan timeout body 10 detik/AbortController dihentikan sebelum handoff; hidden/offline pause dan visible/online resume. Error transport tidak mengubah domain; access/session berhenti, retry maksimal tiga kegagalan dan 429 menghormati Retry-After. Terminal dispose mendahului reload dengan WeakMap per root/ID; SSR terminal tidak reload. Native in-flight tetap dimiliki SDK, action/request hooks modul dibersihkan; per-message cleanup 4.3.3 yang rusak dihindari. Browser memakai SDK asli/snapshot fixture, bukan checksum/DB/session HTTP aplikasi.
 
 ### 10.3 Scheduler fallback target
 
@@ -441,6 +472,12 @@ Error profil harus memiliki konteks form yang benar; jangan menyebut penghapusan
 
 Statistik memiliki alternatif tabel yang dapat dibaca sebelum chart berhasil. `byTopic` baseline sebenarnya distribusi label, bukan kategori topik; total bukan otomatis completed-only atau prevalensi hoaks di masyarakat.
 
+IP-023 menerapkan [Cara kerja/Tentang](INFORMATION-IP-023.md): information.css menyediakan reading width 768px/70ch, editorial H1, section/divider dan list/dl semantic tanpa kartu/logo/KPI atau inline handlers. Kedua Route::view memakai shell existing dan ui/link ke form/home/info; tidak membutuhkan module JS baru. Cara kerja memakai SubmissionFormOptions existing untuk media limits dan DetectionPresentation untuk istilah label; copy tetap mengikuti jobs/contract aktual. Guest/login/verified, local retrieval/classifier/explanation/provider boundaries disebut jelas. btn-primary/result-badge/hero-badge legacy dibuang setelah seluruh consumer pindah; glass/gradient/warning yang masih dipakai Privasi/Statistik tetap. Tidak ada perubahan backend/routes/config/dependency; kernel tests dan browser fixtures termasuk native zoom 200% memberi subhasil IP-023, bukan penutupan QA menyeluruh.
+
+IP-024 menerapkan [Privasi](PRIVACY-IP-024.md) pada reading layout IP-023, tanpa stylesheet/module baru. Route::view tetap publik; ui/link auth-aware hanya mengarahkan guest ke login atau akun ke profil. Media cutoff ditampilkan dari max(1, data_retention.media_hours), tanpa perubahan command/scheduler/policy; date revisi time literal. Copy berasal dari service/models/config actual dan membedakan data server/provider/session/cache/retention/deletion, tanpa menampilkan capability/secrets atau mengarang kontak. Legacy btn-ghost/warning-box/divider dibuang setelah consumer terakhir dimigrasi; statistik masih memakai API legacy yang tersisa. Source-to-copy/kernel/browser/native zoom memberi subhasil P13/FA-09; actual deployment/hydration/QA menyeluruh tetap terpisah.
+
+IP-025 menerapkan [Statistik/tabel alternatif](STATISTICS-IP-025.md): statistics.css scoped, server HTML tables tersedia sebelum canvas, periode/timezone/populasi all-status vs all-time label join dijelaskan tanpa metric kualitas/data privat. Controller hanya menambah metadata presentasi dan mengoreksi overflow month-end yang diumumkan/ditest: startOfMonth sebelum subMonths, predikat/count/join tetap. Page module existing mengimport statistics-chart.js dinamis (Chart.js 4.5.1 exact-lock, line subset), validate data, handled import/constructor failure, scope-owned destroy/late guard dan no animation. Canvas hidden saat SSR/no-JS/failure; tabel tidak disentuh enhancement. Dependency baru terbatas chart + color; Chart global/CDN listener dihapus. Last glass/gradient consumers dimigrasi. Kernel tests, actual dependency browser/503 failure/Livewire navigate dan resource gating memberi subhasil P14/FA-04/FA-10, bukan penutupan QA menyeluruh.
+
 ## 14. Arsitektur admin Filament
 
 Gunakan provider `app/Providers/Filament/AdminPanelProvider.php` dan resource/schema/table/widget existing. Auth, middleware, policies, discovery, registered pages, dan `User::canAccessPanel` tidak diganti oleh theme.
@@ -482,7 +519,7 @@ Inter weight 400/500/600, Newsreader 400/500 sesuai design system. Pilih satu st
 
 Jika self-hosting, gunakan asset/font path yang benar-benar dibuat dan dapat di-resolve build. File WOFF2 browser tidak otomatis dapat dipakai DomPDF. Jangan menyatakan font sudah diterapkan dari computed fallback saja.
 
-Chart.js CDN existing bukan dependency terkunci. Jika chart dipertahankan, task statistik harus memilih versi/strategi loading secara eksplisit; bundling Vite dengan dependency terkunci dapat dipilih saat task itu dikerjakan. Tidak menambahkan import paket yang belum terpasang ke contoh kode siap-build.
+Pada baseline, Chart.js CDN belum terkunci. IP-025 menggantinya dengan Chart.js 4.5.1 exact-lock dan chunk Vite khusus statistik yang hanya meregistrasi kebutuhan line chart. Library diimport dinamis setelah payload valid tersedia; native tables tetap terbaca ketika import gagal atau JS tidak aktif. Tidak menambahkan import paket yang belum terpasang atau memuat dependency chart di seluruh halaman.
 
 ## 16. PDF dan CSV
 
@@ -508,6 +545,8 @@ Output PDF diperiksa terpisah dari browser/build. Mengubah web CSS tidak membukt
 - Tidak ada API key/provider secret, raw exception, capability, password, atau isi submission di console/log analytics client.
 - Tidak ada input/password/token di localStorage, sessionStorage, URL search, atau service worker cache baru.
 - Endpoint status tetap mengembalikan kontrak JSON ketika diminta; error layout HTML tidak dipaksakan pada JSON consumer.
+
+IP-026 menerapkan [error shell minimal](ERROR-PAGES-IP-026.md) untuk 403/404/419/429/500/503. Entry errors.css memakai tokens/font/base/components tanpa JS atau public/auth shell; Vite manifest failure memberikan native HTML yang terbaca. Safe static copy/native relative GET recovery tidak membaca akun/session/submission atau exception message. Retry-After integer positif tervalidasi; header/code/JSON/validation/guest capability dan polling domain tetap milik handler/middleware existing. Framework bootstrap/view/redirector session factory tetap prasyarat; debug policy tidak diubah. Kernel/middleware/browser tests membuktikan subhasil E01 tanpa menutup QA deployment menyeluruh.
 
 Perubahan kebijakan keamanan/infrastruktur merupakan task tersendiri. Dokumen ini tidak memasang CSP, mengubah storage policy, atau mengubah autentikasi.
 

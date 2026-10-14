@@ -7,8 +7,16 @@ const modules = [
     { load: () => import('./components/form-submit') },
     { load: () => import('./components/dialog') },
     {
+        matches: root => Boolean(root.querySelector('[data-page="submission"]')),
+        load: () => import('./pages/submission-form'),
+    },
+    {
         matches: root => Boolean(root.querySelector('[data-page="statistics"]')),
         load: () => import('./pages/statistics'),
+    },
+    {
+        matches: root => Boolean(root.querySelector('[data-page="result"]')),
+        load: () => import('./pages/result'),
     },
 ];
 

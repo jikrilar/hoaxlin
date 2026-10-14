@@ -120,7 +120,7 @@ Logout menggunakan form POST `logout` dengan CSRF. Navigation aktif menggunakan 
 | Video unggahan | `video` | `media_file` | MP4/MPEG/WebM pada config baseline; MIME/extension/durasi divalidasi server |
 | URL langsung audio/video | `video_url` | `source_url` | Format remote dari config; HTTP/HTTPS; max 2048 karakter; bukan URL halaman platform |
 
-Limit media dinamis berasal dari config/service, bukan angka yang ditulis manual. Default video saat snapshot: 24 MiB dan 300 detik; tampilkan nilai runtime. `HomeController` saat ini menyediakan ukuran video tetapi belum duration/formats sebagai structured view data; lihat G01.
+Limit media dinamis berasal dari config/service, bukan angka yang ditulis manual. Default video saat snapshot: 24 MiB dan 300 detik; tampilkan nilai runtime. `HomeController` kini menyediakan submissionOptions dari request/service pada IP-012, termasuk format upload/remote, ukuran/dimensi gambar, ukuran/durasi video, batas URL dan blocked hosts; G01 ditutup untuk data presentasi.
 
 Selector memiliki empat kategori presentasi: Teks, Tautan artikel, Gambar, Video. Panel Video memiliki pilihan unggahan/URL langsung, mempertahankan dua nilai domain. Guest memakai teks; akses jenis lain dijelaskan dengan link Masuk.
 
@@ -600,7 +600,7 @@ Jika network polling gagal, error lokal tidak berarti backend submission gagal. 
 
 | ID | Temuan | Keputusan untuk refactor |
 | --- | --- | --- |
-| G01 | HomeController memberi ukuran video, belum seluruh limit/format/durasi sebagai view data terstruktur | Boleh menambah data presentasi dari service/config; tidak menulis angka atau policy baru |
+| G01 | Ditutup IP-012: HomeController menyediakan submissionOptions melalui SubmissionFormOptions dari StoreSubmissionRequest/TranscriptionMediaContract/config | Policy/validator tidak berubah; lihat [MEDIA-FORM-IP-012.md](MEDIA-FORM-IP-012.md) |
 | G02 | HistoryRequest dan filter admin submission tidak mencakup video_url | Jangan tampilkan filter yang tidak didukung; perlu task terpisah jika ingin menambah/menyatukan filter |
 | G03 | CSV exporter tidak menggunakan filter history | Copy “seluruh riwayat”; filtered export merupakan perubahan kontrak tersendiri |
 | G04 | Statistik byTopic adalah distribusi label, bukan topik; query aggregate tidak secara eksplisit completed-only | Ubah penjelasan UI; jika ingin mengubah populasi, kerjakan query/test secara eksplisit |

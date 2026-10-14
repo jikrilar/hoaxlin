@@ -1,91 +1,78 @@
-<div
-    wire:key="submission-progress-{{ $submission->id }}"
-    role="region"
-    aria-label="Progress pemrosesan"
->
-    <div
-        @if(! $isCompleted && ! $isFailed)
-            wire:poll.2s.visible="refreshProgress"
-        @endif
-    >
-    {{-- Progress Bar --}}
-    <div style="width:4rem; height:4rem; margin:0 auto 1.25rem; border-radius:1rem; background:var(--ds-bg-selected); display:flex; align-items:center; justify-content:center; font-size:1.75rem;" aria-hidden="true">
+@php
+    $stage = \App\Enums\ProcessingStage::tryFrom($submission->processing_stage ?? '');
+    $knownStatus = in_array($status, ['pending', 'processing', 'completed', 'failed'], true);
+    $displayProgress = max(0, min(100, $progress));
+    $refreshUrl = request()->routeIs('riwayat.show')
+        ? route('riwayat.show', $submission->id)
+        : route('hasil', $submission->id);
+@endphp
+
+<section class="hl-submission-progress" wire:key="submission-progress-{{ $submission->id }}"
+    data-progress-state="{{ $knownStatus ? $status : 'unknown' }}"
+    aria-labelledby="progress-title-{{ $submission->id }}"
+    @if(! $isCompleted && ! $isFailed) wire:poll.2s.visible="refreshProgress" @endif>
+    <h1 id="progress-title-{{ $submission->id }}">
         @if($isFailed)
-            ❌
+            Pemrosesan Gagal
         @elseif($isCompleted)
-            ✅
+            Analisis Selesai
+        @elseif($status === 'pending')
+            Menunggu pemrosesan
+        @elseif($status === 'processing')
+            Sedang Menganalisis
         @else
-            ⏳
+            Status pemrosesan belum tersedia
         @endif
-    </div>
-
-    <p style="color:var(--color-primary-light); font-size:0.8125rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.75rem;">
-        Status: <span data-stage-label>{{ $isFailed ? 'Gagal' : ($isCompleted ? 'Selesai' : $stageLabel) }}</span>
-    </p>
-
-    <h1 style="font-size:1.5rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">
-        {{ $isFailed ? 'Pemrosesan Gagal' : ($isCompleted ? 'Analisis Selesai' : 'Sedang Menganalisis') }}
     </h1>
 
-    <p style="color:var(--color-text-muted); line-height:1.7; max-width:560px; margin:0 auto 1.5rem;">
+    <p class="hl-submission-progress__status" role="status" aria-live="polite" aria-atomic="true">
+        Status: <span data-progress-status>{{ $isFailed ? 'Gagal' : ($isCompleted ? 'Selesai' : ($status === 'pending' ? 'Menunggu' : ($status === 'processing' ? 'Diproses' : 'Belum tersedia'))) }}</span>.
+        {{ $isFailed ? 'Tahap terakhir tercatat:' : 'Tahap:' }}
+        <span data-stage-label>{{ $stage ? $stageLabel : ($isCompleted ? 'Selesai' : 'Belum tersedia') }}</span>.
+    </p>
+
+    <p class="hl-submission-progress__description">
         @if($isFailed)
-            Terjadi kendala saat memproses input. Silakan coba kirim ulang atau hubungi administrator jika masalah berlanjut.
+            Pemrosesan terhenti. Hasil final belum tersedia. Kembali ke form untuk mengirim pemeriksaan baru.
         @elseif($isCompleted)
-            Analisis telah selesai. Hasil deteksi akan ditampilkan di bawah.
+            Pemrosesan telah selesai. Buka halaman hasil untuk melihat hasil yang tersedia.
+        @elseif(! $knownStatus)
+            Status terbaru belum dapat dijelaskan. Muat ulang halaman untuk memeriksa pembaruan.
         @else
-            Input kamu sedang diproses oleh sistem AI. Tahapan saat ini: <strong style="color:var(--color-text-secondary);" data-stage-label>{{ $stageLabel }}</strong> — halaman ini akan diperbarui otomatis.
+            Input sedang menunggu atau menjalani analisis. Hasil final tersedia setelah status pemrosesan selesai.
         @endif
     </p>
 
-    {{-- Accessible Progress Bar --}}
-    <div style="max-width:480px; margin:0 auto 1rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-            <span style="color:var(--color-text-muted); font-size:0.75rem; font-weight:500;">Progress</span>
-            <span style="color:var(--color-primary-light); font-size:0.8125rem; font-weight:var(--ds-font-weight-semibold);" aria-live="polite">{{ $progress }}%</span>
-        </div>
-        <div
-            role="progressbar"
-            aria-valuenow="{{ $progress }}"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-label="Progress pemrosesan {{ $progress }} persen, tahap {{ $stageLabel }}"
-           style="width:100%; height:0.75rem; background:var(--ds-bg-selected); border-radius:9999px; overflow:hidden; border:1px solid var(--ds-border-control);"
-        >
-            <div
-               style="height:100%; width:{{ $progress }}%; background:{{ $isFailed ? 'var(--ds-danger-fg)' : ($isCompleted ? 'var(--ds-success-fg)' : 'var(--ds-action-primary)') }}; border-radius:9999px; transition:width var(--ds-duration-progress) var(--ds-ease); will-change:width;"
-            ></div>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-top:0.5rem; gap:0.25rem;">
-            @php
-                $stages = [
-                    ['label' => 'Antrean', 'pct' => 0],
-                    ['label' => 'Ekstraksi', 'pct' => 25],
-                    ['label' => 'Klasifikasi', 'pct' => 60],
-                    ['label' => 'Penjelasan', 'pct' => 85],
-                    ['label' => 'Selesai', 'pct' => 100],
-                ];
-            @endphp
-            @foreach($stages as $s)
-                <span style="font-size:0.625rem; font-weight:500; color:{{ $progress >= $s['pct'] ? 'var(--color-primary-light)' : 'var(--color-text-muted)' }}; text-align:center; flex:1;">
-                    {{ $s['label'] }}
+    @if(! $isFailed && $knownStatus)
+        <div class="hl-submission-progress__meter">
+            <div class="hl-submission-progress__metadata">
+                <span>Indikator tahap</span>
+                <span data-progress-percent>{{ $displayProgress }}%</span>
+            </div>
+            <div class="hl-submission-progress__track" role="progressbar"
+                aria-valuenow="{{ $displayProgress }}" aria-valuemin="0" aria-valuemax="100"
+                aria-label="Indikator tahap pemrosesan"
+                aria-valuetext="{{ $displayProgress }} persen; {{ $stage ? $stageLabel : 'tahap belum tersedia' }}; status {{ $status }}"
+                aria-describedby="progress-hint-{{ $submission->id }}">
+                <div class="hl-submission-progress__fill" style="width: {{ $displayProgress }}%"></div>
+            </div>
+            <p class="hl-submission-progress__hint" id="progress-hint-{{ $submission->id }}">
+                Persentase mengikuti tahap atau status yang tercatat, bukan perkiraan waktu tersisa.
+                <span data-progress-stage-unavailable @if($stage || $isCompleted) hidden @endif>Rincian tahap belum tersedia.</span>
+                <span data-progress-not-final-done @if($isCompleted || $stage !== \App\Enums\ProcessingStage::Done) hidden @endif>
+                    Tahap tercatat selesai, tetapi status pemrosesan belum selesai; hasil belum final.
                 </span>
-            @endforeach
+            </p>
         </div>
+    @endif
+
+    <div class="hl-submission-progress__actions">
+        <a href="{{ $refreshUrl }}" class="hl-button" data-variant="{{ $isCompleted ? 'primary' : 'secondary' }}" data-progress-refresh>
+            {{ $isCompleted ? 'Lihat Hasil' : 'Muat ulang status' }}
+        </a>
+        @if($isFailed)
+            <a href="{{ url('/') }}#cek-berita" class="hl-button" data-variant="primary">Periksa informasi baru</a>
+        @endif
     </div>
 
-    @if($isCompleted)
-        <p style="margin-top:1.25rem;">
-            <a href="{{ route('hasil', $submission->id) }}" class="btn-primary" style="display:inline-flex;" wire:navigate>
-                Lihat Hasil
-            </a>
-        </p>
-        <script>
-            // Auto-reload once when completed to show the full result (if still on polling view)
-            if (! window.__submissionCompletedReloaded) {
-                window.__submissionCompletedReloaded = true;
-                setTimeout(() => window.location.reload(), 800);
-            }
-        </script>
-    @endif
-    </div>
-</div>
+</section>

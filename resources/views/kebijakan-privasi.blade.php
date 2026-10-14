@@ -1,95 +1,85 @@
 @extends('layouts.app')
 
-@section('title', 'Kebijakan Privasi — hoaxlin.id')
-@section('description', 'Baca kebijakan privasi hoaxlin.id mengenai pengumpulan, penggunaan, dan perlindungan data pengguna.')
+@section('title', 'Kebijakan privasi — hoaxlin.id')
+@section('description', 'Pelajari data yang diproses Hoaxlin, layanan pendukung, akses, retensi media, dan penghapusan akun. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.')
 
 @section('content')
-<div style="padding:9rem 0 5rem; min-height:100vh;">
-    <div class="container-app" style="max-width:760px;">
+@php
+    $mediaRetentionHours = max(1, (int) config('data_retention.media_hours', 24));
+@endphp
+<article class="container-app hl-reading-page" aria-labelledby="privacy-title">
+    <header class="hl-reading-intro">
+        <h1 id="privacy-title" class="hl-heading-editorial">Kebijakan privasi</h1>
+        <p class="hl-reading-note">Terakhir diperbarui: <time datetime="2026-10-14">14 Oktober 2026</time></p>
+        <p>Kebijakan ini menjelaskan data yang diproses saat kamu memakai Hoaxlin untuk memeriksa informasi, menggunakan akun, dan memberikan feedback.</p>
+    </header>
 
-        <a href="{{ url('/') }}" class="btn-ghost" style="display:inline-flex; margin-bottom:2rem;" aria-label="Kembali ke beranda">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            Kembali
-        </a>
-
-        <div class="glass-card" style="padding:clamp(var(--ds-space-4), 4vw, var(--ds-space-12));">
-            <h1 class="hl-heading-editorial" style="margin-bottom:0.5rem;">Kebijakan Privasi</h1>
-            <p style="color:var(--color-text-muted); font-size:0.9375rem; margin-bottom:2.5rem;">Terakhir diperbarui: 18 September 2026</p>
-
-            <div style="display:flex; flex-direction:column; gap:2rem; color:var(--color-text-secondary); font-size:0.9375rem; line-height:1.8;">
-
-                <section aria-labelledby="intro-heading">
-                    <h2 id="intro-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">1. Pendahuluan</h2>
-                    <p>hoaxlin.id ("kami", "layanan") berkomitmen untuk melindungi privasi pengguna. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi Anda saat menggunakan sistem deteksi hoax berbasis BERT ini.</p>
-                </section>
-
-                <div class="divider"></div>
-
-                <section aria-labelledby="data-heading">
-                    <h2 id="data-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">2. Data yang Dikumpulkan</h2>
-                    <ul style="list-style:none; display:flex; flex-direction:column; gap:0.625rem;">
-                        @foreach([
-                            'Teks berita yang Anda kirimkan untuk dianalisis',
-                            'Gambar/video yang diunggah (disimpan sementara untuk pemrosesan)',
-                            'Tautan URL yang Anda masukkan',
-                            'Informasi akun: nama dan email (jika Anda mendaftar)',
-                            'Data log teknis: waktu akses, jenis perangkat (tanpa identitas personal)',
-                        ] as $item)
-                        <li style="display:flex; gap:0.625rem; align-items:flex-start;">
-                            <div style="width:5px; height:5px; background:var(--color-primary-light); border-radius:50%; flex-shrink:0; margin-top:0.6rem;" aria-hidden="true"></div>
-                            {{ $item }}
-                        </li>
-                        @endforeach
-                    </ul>
-                </section>
-
-                <div class="divider"></div>
-
-                <section aria-labelledby="use-heading">
-                    <h2 id="use-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">3. Penggunaan Data</h2>
-                    <p style="margin-bottom:0.75rem;">Data yang dikumpulkan digunakan untuk:</p>
-                    <ul style="list-style:none; display:flex; flex-direction:column; gap:0.625rem;">
-                        @foreach([
-                            'Menjalankan proses deteksi hoax menggunakan model BERT',
-                            'Menyimpan riwayat pengecekan untuk pengguna terdaftar',
-                            'Mendukung evaluasi layanan melalui umpan balik pengguna (opsional); data production tidak otomatis menjadi data training',
-                            'Memantau performa dan keandalan sistem',
-                        ] as $item)
-                        <li style="display:flex; gap:0.625rem; align-items:flex-start;">
-                            <div style="width:5px; height:5px; background:var(--color-primary-light); border-radius:50%; flex-shrink:0; margin-top:0.6rem;" aria-hidden="true"></div>
-                            {{ $item }}
-                        </li>
-                        @endforeach
-                    </ul>
-                </section>
-
-                <div class="divider"></div>
-
-                <section aria-labelledby="third-party-heading">
-                    <h2 id="third-party-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">4. Layanan Pihak Ketiga</h2>
-                    <p>Sistem kami menggunakan layanan OpenAI API untuk menerjemahkan berita berbahasa Inggris ke Bahasa Indonesia, OCR gambar, transkripsi video, dan penyusunan narasi penjelasan. Konten yang memerlukan fungsi tersebut mungkin diproses oleh layanan ini sesuai dengan <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary-light); text-decoration:none;">Kebijakan Privasi OpenAI</a>.</p>
-                </section>
-
-                <div class="divider"></div>
-
-                <section aria-labelledby="retention-heading">
-                    <h2 id="retention-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">5. Retensi Data</h2>
-                    <p>File media asli (gambar/video) dihapus otomatis maksimal 24 jam setelah pemrosesan mencapai status selesai atau gagal. Data teks dan hasil analisis tetap tersedia dalam riwayat selama akun aktif.</p>
-                </section>
-
-                <div class="divider"></div>
-
-                <section aria-labelledby="rights-heading">
-                    <h2 id="rights-heading" style="color:var(--color-text-primary); font-size:1.125rem; font-weight:var(--ds-font-weight-semibold); margin-bottom:0.75rem;">6. Hak Pengguna</h2>
-                    <p>Pengguna terdaftar dapat menghapus akun melalui pengaturan akun. Penghapusan ini bersifat permanen dan menghapus akun, seluruh riwayat submission, hasil deteksi, feedback, serta file media terkait. Untuk pertanyaan lebih lanjut mengenai privasi, hubungi kami melalui form di halaman Tentang.</p>
-                </section>
-
-                <div class="warning-box" role="note">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <span>Kebijakan ini dapat berubah sewaktu-waktu. Perubahan material akan diumumkan melalui website.</span>
-                </div>
+    <section class="hl-reading-section" aria-labelledby="privacy-data-title">
+        <h2 id="privacy-data-title">Data yang diproses</h2>
+        <dl class="hl-reading-definitions">
+            <div>
+                <dt>Data akun</dt>
+                <dd>Nama, alamat email, kata sandi yang disimpan sebagai hash, dan status verifikasi email untuk akses akun. Email digunakan untuk verifikasi dan pemulihan kata sandi melalui layanan email yang dikonfigurasi.</dd>
             </div>
+            <div>
+                <dt>Input pemeriksaan</dt>
+                <dd>Teks, URL artikel atau media, serta gambar/video yang kamu unggah. File dari URL media yang didukung dapat diunduh dan disimpan untuk transkripsi.</dd>
+            </div>
+            <div>
+                <dt>Hasil dan feedback</dt>
+                <dd>Teks hasil ekstraksi atau transkripsi, terjemahan bila diperlukan, prediksi, skor keyakinan model, referensi terkait, penjelasan bila tersedia, dan feedback yang kamu kirim.</dd>
+            </div>
+            <div>
+                <dt>Data operasional</dt>
+                <dd>Status dan waktu pemrosesan, versi model/provider, catatan kegagalan, penggunaan layanan, dan aktivitas administrasi. Alamat IP digunakan untuk pembatasan permintaan; informasi sesi dan perangkat dapat tersimpan sesuai konfigurasi server.</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="hl-reading-section" aria-labelledby="privacy-processing-title">
+        <h2 id="privacy-processing-title">Pemrosesan dan layanan pendukung</h2>
+        <p>Hoaxlin mengolah input menjadi teks, menerjemahkan bila diperlukan, mengirim teks analisis ke layanan IndoBERT, lalu mencari referensi melalui layanan retrieval basis pengetahuan lokal. Pencarian referensi tidak mencakup seluruh web.</p>
+        <p>OpenAI API dapat menerima gambar untuk OCR, file media untuk transkripsi, teks untuk terjemahan Inggris ke Indonesia, serta prediksi, cuplikan teks, dan referensi untuk menyusun penjelasan. Konten diproses di server dan dapat dikirim ke layanan tersebut; pemrosesan tidak berlangsung hanya di perangkatmu.</p>
+        <p>Penanganan data pada layanan eksternal mengikuti pengaturan dan ketentuan penyedia. Retensi media Hoaxlin tidak menetapkan retensi data di OpenAI. Baca <x-ui.link href="https://developers.openai.com/api/docs/guides/your-data" target="_blank">Penanganan data OpenAI API (tab baru)</x-ui.link> untuk rincian dari penyedia.</p>
+        <p>Untuk URL artikel atau media, server menghubungi situs tujuan untuk mengambil konten. Layanan email dan penyimpanan juga mengikuti konfigurasi layanan yang digunakan Hoaxlin.</p>
+        <p>Input dan feedback tidak otomatis menjadi data training model. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
+    </section>
+
+    <section class="hl-reading-section" aria-labelledby="privacy-access-title">
+        <h2 id="privacy-access-title">Penyimpanan dan akses</h2>
+        <p>Data akun, input, hasil, dan feedback disimpan dalam basis data aplikasi. File media disimpan pada penyimpanan yang digunakan aplikasi; media diakses melalui endpoint yang memeriksa izin, bukan tautan storage publik.</p>
+        <p>Hasil akun dapat diakses oleh pemilik dan admin sesuai izin aplikasi. Riwayat dan ekspor CSV dibatasi ke akun peminta, termasuk ketika peminta adalah admin. Riwayat, CSV, dan feedback memerlukan email terverifikasi. Administrator juga dapat mengelola data melalui panel administrasi.</p>
+        <p>Hasil tamu menggunakan izin akses dalam sesi pembuatnya. ID submission saja bukan izin berbagi publik. Menghapus cookie atau kehilangan sesi dapat membuat hasil tamu tidak lagi dapat dibuka, tetapi tidak menghapus data pemeriksaan dari server.</p>
+        <p>Cookie sesi mendukung login, CAPTCHA, dan akses hasil tamu. Hasil ekstraksi, klasifikasi, terjemahan, atau penjelasan juga dapat disimpan dalam cache untuk mengurangi pemrosesan berulang. Log dan catatan penggunaan mendukung pemantauan serta pembatasan layanan.</p>
+    </section>
+
+    <section class="hl-reading-section" aria-labelledby="privacy-retention-title">
+        <h2 id="privacy-retention-title">Retensi media dan data lain</h2>
+        <p>Dengan konfigurasi saat ini, file media dari pemeriksaan yang selesai atau gagal menjadi layak dihapus setelah {{ $mediaRetentionHours }} jam sejak waktu akhir pemrosesan tercatat. File pada pemeriksaan yang masih diproses tidak dibersihkan oleh aturan ini.</p>
+        <p>Pembersihan dijadwalkan berkala. Waktu penghapusan aktual bergantung pada scheduler yang berjalan dan keberhasilan penghapusan file; masa retensi bukan jaminan bahwa file pasti hilang tepat pada batas waktu tersebut.</p>
+        <p>Aturan ini menghapus file media dan referensi lokasinya, bukan teks, terjemahan, hasil, referensi terkait, atau akun. Data pemeriksaan, termasuk milik tamu, tidak otomatis dihapus oleh pembersihan media. Cache dan log memiliki masa penyimpanan terpisah sesuai konfigurasi masing-masing.</p>
+    </section>
+
+    <section class="hl-reading-section" aria-labelledby="privacy-deletion-title">
+        <h2 id="privacy-deletion-title">Pilihan akun dan penghapusan</h2>
+        <p>Setelah masuk, kamu dapat memperbarui nama/email, mengganti kata sandi, atau menghapus akun melalui profil. Penghapusan akun memerlukan kata sandi saat ini dan konfirmasi; tindakan ini menghapus akun, submission milik akun, hasil, referensi terkait, feedback terkait, catatan pemrosesan, dan file media terkait dari penyimpanan aplikasi.</p>
+        <p>Penghapusan akun tidak menjalankan pembersihan menyeluruh pada cache, log, atau cadangan. Aplikasi juga tidak mengirim permintaan penghapusan ke layanan eksternal untuk konten yang telah diproses di sana. Data tersebut tidak boleh dianggap sudah terhapus hanya karena akun dihapus.</p>
+        <div class="hl-reading-actions">
+            @auth
+                <x-ui.link :href="route('profile')" variant="secondary">Buka profil</x-ui.link>
+            @else
+                <x-ui.link :href="route('login')" variant="secondary">Masuk untuk mengelola akun</x-ui.link>
+            @endauth
         </div>
-    </div>
-</div>
+    </section>
+
+    <section class="hl-reading-section" aria-labelledby="privacy-updates-title">
+        <h2 id="privacy-updates-title">Pembaruan kebijakan</h2>
+        <p>Halaman ini mencantumkan tanggal revisi kebijakan. Tinjau kembali isinya untuk memahami praktik pemrosesan data yang dijelaskan saat menggunakan layanan.</p>
+        <div class="hl-reading-actions">
+            <x-ui.link :href="route('home').'#cek-berita'" variant="primary">Periksa informasi</x-ui.link>
+            <x-ui.link :href="route('cara-kerja')" variant="secondary">Cara kerja Hoaxlin</x-ui.link>
+        </div>
+    </section>
+</article>
 @endsection
