@@ -4,7 +4,7 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 15 Oktober 2026 |
-| Status | IP-001–IP-036 selesai; 36 dari 39 task selesai, IP-037–IP-039 pending |
+| Status | IP-001–IP-036 selesai; 36 dari 39 task selesai, IP-037 review, IP-038–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
@@ -112,11 +112,11 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-034](#ip-034) | F5 | Verifikasi tindakan dan kontrak ekspor CSV | done |
 | [IP-035](#ip-035) | F6 | Cleanup setelah seluruh pemakai dimigrasi | done |
 | [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | done |
-| [IP-037](#ip-037) | F6 | Lengkapi QA browser lintas halaman/state | pending |
+| [IP-037](#ip-037) | F6 | Lengkapi QA browser lintas halaman/state | review |
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-036 selesai, IP-037–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-036 selesai, IP-037 review karena screen reader wajib belum diuji, IP-038–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -789,10 +789,12 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-036 selesai, IP-
 - **Arsitektur:** FA-01–FA-10.
 - **Source/target:** halaman implementasi, matriks QA pada `IMPLEMENTATION-PLAN.md`, dan jurnal `TASKS.md`.
 
-- [ ] Jalankan matriks role/input/progress/final/label/explanation/evidence/history/auth/profile/admin/statistics/error/exports yang terdampak.
-- [ ] Periksa reflow 320, viewport 360/768/1280, zoom 200%, keyboard/Escape/focus return/reduced motion dan konten panjang.
-- [ ] Periksa no-JS/bootstrap failure/navigate/back-forward/hidden-visible/slow request serta console/network; fixture dan real-service evidence dibedakan.
+- [x] Jalankan matriks role/input/progress/final/label/explanation/evidence/history/auth/profile/admin/statistics/error/exports yang terdampak.
+- [x] Periksa reflow 320, viewport 360/768/1280, zoom 200%, keyboard/Escape/focus return/reduced motion dan konten panjang.
+- [x] Periksa no-JS/bootstrap failure/navigate/back-forward/hidden-visible/slow request serta console/network; fixture dan real-service evidence dibedakan.
 - [ ] Perbaiki regresi dan ulangi cek terdampak; jangan menutup task jika acceptance penting belum diperiksa.
+
+**Catatan aktual:** tiga checklist browser lulus dengan evidence fixture; exit gate belum ditutup karena QA-A11Y-03/08 memerlukan screen reader aktual yang belum tersedia. Lihat [laporan IP-037](../reports/BROWSER-IP-037.md).
 
 **Validasi:** Matriks QA browser; console/network.
 
@@ -1308,6 +1310,18 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence:** [REGRESSION-IP-036.md](../reports/REGRESSION-IP-036.md). Snapshot dan image PHP 8.4.11/SQLite in-memory/network none dengan fixture key; tanpa layanan/data pengguna. Browser IP-035 digunakan kembali karena source/output build identik, tidak diklaim sebagai run browser baru.
 - **Diagnosis/batas:** image test existing tidak membawa dua template env dan docker/php/uploads.ini: run pertama dua error packaging; percobaan mount belum lengkap dihentikan, final lulus memakai tiga fixture repository read-only. Dockerfile/perintah default tanpa fixture tidak dinyatakan telah diperbaiki. Empat BERT skips bukan E2E pass. Screen reader/forced colors/browser lain/MySQL/deployment/provider nyata, audit gap Livewire existing serta QA agregat/F6 menyeluruh tetap terbuka. Tidak perlu mengubah exact-copy/markup assertion.
 - **Berikutnya:** commit semantic dan berhenti pada IP-036; IP-037–IP-039 pending.
+
+### IP-037 — Catatan eksekusi
+
+- **Status/tanggal:** review; 15 Oktober 2026, Asia/Jakarta. Branch frontend-refactor/cleaunp-quality-assurance, HEAD awal 79be3df; tree/index awal bersih. Tidak dinyatakan done karena minimum screen reader QA §3 belum dipenuhi.
+- **Rujukan:** AC-P00–P16/AC-A00–A08/AC-E01, FA-01–FA-10, matriks minimum dan katalog QA. Lingkup satu task; IP-038–039 tidak dimulai.
+- **Perubahan:** label CAPTCHA memakai pertanyaan backend sekali, menghapus tanda tanya ganda; field/challenge/CSRF/validasi/quota/throttle tetap. Laporan, evidence JSON sanitized dan status task/plan/QA ditambahkan; tanpa dependency/test/backend/vendor changes.
+- **Browser:** Firefox 157.0.1: 276 samples normal, 92 no-JS/reduced, 33 native zoom200/reduced dan 12 forced colors. Chromium Headless 155.0.8059.79: 308 normal/no-JS samples dan 5 checks shared interactions. 68 checks interaksi tersimpan; 15 halaman DOM/semantic contrast tanpa duplicate IDs/broken aria refs, minimum pasangan 4.78:1. Lima input native POST pending, 20 label final Chromium pada empat viewport lulus.
+- **Alur:** actual Laravel/CSRF/session/SQLite/broker/signed verification/Livewire/Filament dengan akun dan data sintetis loopback. Native admin create/save/delete, profil/delete/reverify, feedback, hasil/evidence/provenance, akses endpoint, history/export bytes, no-data statistics, native/fallback single-owner/slow/hidden/terminal serta asset/bootstrap faults diuji. Inference/worker/provider tidak dijalankan.
+- **Validasi final:** build host/Blade cache-clear lulus, 16 build files identik dengan IP-036; 98 tests terkait/463 assertions, 69 Node dan suite penuh 773 passed/4 BERT skips/5205 assertions tanpa failure/warning. Tidak ada non-Blade PHP berubah; Pint tidak diperlukan. Defect copy diulang pada kelima form; tidak mengubah assertion.
+- **Evidence:** [BROWSER-IP-037.md](../reports/BROWSER-IP-037.md), [JSON terstruktur](../reports/BROWSER-IP-037.json). Renderer/download/matrix backend existing yang sourcenya tidak berubah digunakan kembali dengan batas mode tercatat. Koreksi fixture/schema/env/regex/selector/mount/rate/probe/CDP terpisah dari defect produk.
+- **Blocker konkret:** QA-A11Y-03/08 blocked: belum ada sesi screen reader aktual; Orca/speechd tidak tersedia. DOM, keyboard, forced colors dan AT-SPI typelib bukan pengganti uji ucapan/read order. QA aggregate 3 audit pass/2 blocked/89 not_run; gate F6 menyeluruh, mobile device/MySQL/deployment/provider nyata serta audit gap Livewire existing tetap terbuka.
+- **Berikutnya:** commit semantic perubahan yang sudah diverifikasi; tetap IP-037 review. Jalankan screen reader actual pada pola template/interaksi yang dipetakan, catat kombinasi OS/browser/AT dan perbaiki bila ada temuan sebelum done. Berhenti sebelum IP-038.
 
 ### Format catatan berikutnya
 
