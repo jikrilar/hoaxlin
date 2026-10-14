@@ -1,0 +1,96 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* Shared primitives/font only. Public preflight, shell and components stay out. */
+@import '../../design-tokens.css';
+@import '../../fonts/inter.css';
+
+@layer components {
+    .fi-body.fi-panel-admin {
+        --primary-600: var(--ds-action-primary);
+        background: var(--ds-bg-canvas);
+        color: var(--ds-text-body);
+        font-family: var(--ds-font-ui);
+        overflow-wrap: anywhere;
+    }
+
+    .fi-panel-admin .fi-logo {
+        color: var(--ds-action-primary);
+        font-weight: var(--ds-font-weight-semibold);
+    }
+
+    .fi-panel-admin :is(.fi-header-heading, .fi-simple-header-heading) {
+        color: var(--ds-text-primary);
+        font-weight: var(--ds-font-weight-semibold);
+    }
+
+    .fi-panel-admin .fi-simple-main {
+        border: var(--ds-border-width) solid var(--ds-border-subtle);
+        border-radius: var(--ds-radius-lg);
+        box-shadow: none;
+    }
+
+    .fi-panel-admin :is(.fi-topbar, .fi-section) {
+        box-shadow: none;
+    }
+
+    .fi-panel-admin .fi-input-wrp {
+        --tw-ring-color: var(--ds-border-control);
+        box-shadow: 0 0 0 1px var(--tw-ring-color);
+    }
+
+    .fi-panel-admin .fi-input-wrp.fi-invalid {
+        --tw-ring-color: var(--ds-danger-fg);
+    }
+
+    .fi-panel-admin :is(.fi-checkbox-input, .fi-radio-input):not(:checked):not(:indeterminate):not(:disabled):not(.fi-invalid) {
+        --tw-ring-color: var(--ds-border-control);
+    }
+
+    .fi-panel-admin .fi-input-wrp:focus-within {
+        outline: var(--ds-focus-width) solid var(--ds-focus);
+        outline-offset: var(--ds-focus-offset);
+    }
+
+    .fi-panel-admin :is(a, button, input[type='checkbox'], input[type='radio']):focus-visible {
+        outline: var(--ds-focus-width) solid var(--ds-focus);
+        outline-offset: var(--ds-focus-offset);
+    }
+
+    .fi-panel-admin .fi-simple-main :is(.fi-btn, input.fi-input) {
+        min-block-size: 2.75rem;
+    }
+
+    .fi-panel-admin .fi-simple-main input.fi-input {
+        font-size: var(--ds-type-body-size);
+    }
+
+    /* Native Filament has JS-dependent sidebar offsets; keep main content
+       readable before hydration and when the runtime cannot initialize. */
+    .fi-panel-admin .fi-main-ctn {
+        opacity: 1 !important;
+    }
+
+    .fi-panel-admin .hl-admin-runtime-notice {
+        color: var(--ds-text-muted);
+        font-size: var(--ds-type-body-sm-size);
+        line-height: var(--ds-type-body-sm-leading);
+    }
+
+    /* The native login uses wire:submit. Without its runtime, there is no
+       supported form submission; do not expose a default browser GET form. */
+    .fi-panel-admin .fi-simple-main:has([data-admin-runtime-required]) .fi-sc-form {
+        display: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .fi-panel-admin *, .fi-panel-admin *::before, .fi-panel-admin *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0s !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}

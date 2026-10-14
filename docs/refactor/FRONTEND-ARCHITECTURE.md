@@ -488,6 +488,8 @@ Theme mengimpor token bersama dari path relatif `../../design-tokens.css`, mempe
 
 Target font Inter dan primary evergreen. Palette Filament dapat menghasilkan shade berbeda; audit pemakai/kontras. Font provider dan file aktual diperiksa jika self-hosting.
 
+IP-027 menerapkan [theme/login native](ADMIN-THEME-IP-027.md) lewat generator Filament 5.7.3 actual; viteTheme/darkMode(false)/LocalFontProvider serta palette konkret untuk contrast map. Theme mengimport fondasi/scanner resmi, tokens dan pure Inter face shared, tanpa reset/shell/JS publik. Provider auth/middleware/discovery/widgets tetap. Noscript hook menjelaskan kebutuhan JS dan menyembunyikan form wire:submit yang tidak punya fallback submit. Docker frontend menyalin app/Filament untuk scanner. Kernel/native browser/session/modal/zoom/contrast lulus untuk A00 dan representative admin; infolist user baseline 500 dicatat bagi IP-029. Ini bukan penutupan seluruh gate F5.
+
 | Area | Pola | Batas mutasi baseline |
 | --- | --- | --- |
 | Login/dashboard | Native panel + widget existing | Tidak menambah role picker atau metrik buatan |

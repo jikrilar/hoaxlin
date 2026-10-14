@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 14 Oktober 2026 |
-| Status | IP-001–IP-026 selesai; 26 dari 39 task selesai, IP-027–IP-039 pending |
+| Status | IP-001–IP-027 selesai; 27 dari 39 task selesai, IP-028–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-026 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-027 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -102,7 +102,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-024](#ip-024) | F4 | Rapikan halaman privasi berdasarkan praktik aktual | done |
 | [IP-025](#ip-025) | F4 | Migrasikan statistik dan alternatif tabel | done |
 | [IP-026](#ip-026) | F4 | Buat error/fallback HTML sesuai scope | done |
-| [IP-027](#ip-027) | F5 | Buat theme Filament dan login admin light-only | pending |
+| [IP-027](#ip-027) | F5 | Buat theme Filament dan login admin light-only | done |
 | [IP-028](#ip-028) | F5 | Rapikan dashboard dan widgets existing | pending |
 | [IP-029](#ip-029) | F5 | Migrasikan resource Users | pending |
 | [IP-030](#ip-030) | F5 | Migrasikan resource Datasets | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-026 selesai, IP-027–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-027 selesai, IP-028–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -607,10 +607,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-026 selesai, IP-
 - **Arsitektur:** FA-03, FA-06, FA-10.
 - **Source/target:** `app/Providers/Filament/AdminPanelProvider.php`, `resources/css/filament/admin/theme.css`, `vite.config.js`, `package.json`, `package-lock.json` (diff generator bila ada).
 
-- [ ] Buat theme admin lewat generator versi terpasang; review semua perubahan provider/Vite/package/lockfile yang dihasilkan.
-- [ ] Import token bersama dengan path benar, scanner relevan dan fondasi Filament; jangan import reset/shell app.css publik.
-- [ ] Daftarkan viteTheme, darkMode(false), Inter dan primary evergreen; audit shade/contrast/font aktual.
-- [ ] Pertahankan middleware/auth/discovery/canAccessPanel; uji native login admin/non-admin dan mobile/keyboard; vendor/published assets tidak diedit.
+- [x] Buat theme admin lewat generator versi terpasang; review semua perubahan provider/Vite/package/lockfile yang dihasilkan.
+- [x] Import token bersama dengan path benar, scanner relevan dan fondasi Filament; jangan import reset/shell app.css publik.
+- [x] Daftarkan viteTheme, darkMode(false), Inter dan primary evergreen; audit shade/contrast/font aktual.
+- [x] Pertahankan middleware/auth/discovery/canAccessPanel; uji native login admin/non-admin dan mobile/keyboard; vendor/published assets tidak diedit.
 
 **Validasi:** Build; A00 keyboard/mobile; admin/non-admin access.
 
@@ -1201,6 +1201,17 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Validasi:** build/Pint/Blade/diff lulus; empat suites terkait 49 passed/349 assertions; suite penuh 672 cases/4042 assertions, 643 passed + 25 existing DOM warnings + 4 real-BERT skips, tanpa failures. 69 Node tests lulus. Browser normal/no-JS/reduced 42 samples/115 checks, keenam kode/native zoom 200%/keyboard recovery/konten panjang/manifest fallback lulus.
 - **Batas:** rendered kernel browser fixtures bukan deployment/session E2E; screen reader/forced colors/BFCache/MySQL/providers belum diuji. Page console errors kosong; 31 cached fixture favicon 404 dicatat, assets aplikasi lulus. Process timeout JS existing saat meninggalkan recovery serta internal Firefox errors dicatat. QA aggregate tetap 3 audit pass/91 not_run; F4 belum ditutup.
 - **Berikutnya:** commit semantic dan berhenti pada IP-026; IP-027–IP-039 pending.
+
+### IP-027 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/admin-export, HEAD awal 4be2485, tree/index bersih.
+- **Rujukan:** A00/AC-A00/FA-03/06/10; native Filament 5.7.3 actual, design system/admin architecture dan QA-ADMIN-01/10.
+- **Perubahan:** generator actual pada snapshot membuat theme/provider/Vite registration, package/lock unchanged. Fondasi/scanner Filament + shared tokens/pure Inter face; reset/shell/JS publik tidak diimport. Local font/brand/primary palette/gray/light-only, focus/control borders/login sizing/reduced motion/main visibility. Noscript notice lewat hook native; form JS-dependent tidak disubmit sebagai GET fallback. Docker frontend COPY app/Filament agar scanner tersedia.
+- **Kontrak:** login native, canAccessPanel/is_admin, middleware/CSRF/throttle/remember/discovery/widgets/actions/resources/routes tetap. Admin unverified masih diizinkan; non-admin ditolak. Tidak mengganti CRUD atau mengubah operasi/schema/pipeline.
+- **Evidence:** [ADMIN-THEME-IP-027.md](ADMIN-THEME-IP-027.md); /tmp/hoaxlin-ip027-_c8x8_iy dengan PHP 8.4/SQLite/exact-lock vendor, browser HTTP/session/Livewire aktual pada fixture loopback.
+- **Validasi:** build host/Docker frontend/Pint/Blade/diff lulus; 8 feature cases baru, suites terkait 34 passed/298 assertions, bersama docs 57 passed/640 assertions. Suite penuh 680 cases/4157 assertions: 651 passed + 25 existing DOM warnings + 4 BERT skips, tanpa failures. 69 Node tests pass. Browser 22 samples/64 checks, login zoom 200%, kontras primary 6.85:1 dan border 3.79:1, modal Escape/focus return/no deletion lulus.
+- **Batas:** user detail baseline 500 akibat Text::label incompatible ditemukan/dicatat untuk IP-029; pola infolist lainnya perlu IP-030/031, tidak diubah di sini. Final browser console bersih, satu expected detail 500; early lazy-navigation errors hilang setelah driver menunggu hydration. Hover paint alternatif/headless limitation, screen reader/forced colors/BFCache/all resources/MySQL/deployment/inference nyata belum diuji. QA aggregate tetap 3 audit pass/91 not_run; F5 belum ditutup.
+- **Berikutnya:** commit semantic dan berhenti pada IP-027; IP-028–IP-039 pending.
 
 ### Format catatan berikutnya
 
