@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 15 Oktober 2026 |
-| Status | IP-001–IP-035 selesai; 35 dari 39 task selesai, IP-036–IP-039 pending |
+| Status | IP-001–IP-036 selesai; 36 dari 39 task selesai, IP-037–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-035 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-036 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -111,12 +111,12 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-033](#ip-033) | F5 | Migrasikan dan render PDF hasil | done |
 | [IP-034](#ip-034) | F5 | Verifikasi tindakan dan kontrak ekspor CSV | done |
 | [IP-035](#ip-035) | F6 | Cleanup setelah seluruh pemakai dimigrasi | done |
-| [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | pending |
+| [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | done |
 | [IP-037](#ip-037) | F6 | Lengkapi QA browser lintas halaman/state | pending |
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-035 selesai, IP-036–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-036 selesai, IP-037–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -771,10 +771,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-035 selesai, IP-
 - **Arsitektur:** FA-01–FA-10.
 - **Source/target:** berkas yang berubah, `tests/Feature/`, `tests/Unit/`, lockfiles dan manifest hasil build.
 
-- [ ] Jalankan npm run build serta Blade cache/clear pada development/test; periksa manifest/import/class variants yang diperlukan.
-- [ ] Jalankan test terkait dan suite penuh untuk final perubahan lintas layout/alur; Pint --test pada PHP yang diubah.
-- [ ] Jika exact-copy/markup assertion berubah, update intention sambil menjaga escaping/ownership/final/provenance/evidence/score.
-- [ ] Perbaiki failure yang disebabkan refactor; catat failure lama, skip dan blocker dengan alasan, tanpa menganggap real-BERT skip sebagai E2E pass.
+- [x] Jalankan npm run build serta Blade cache/clear pada development/test; periksa manifest/import/class variants yang diperlukan.
+- [x] Jalankan test terkait dan suite penuh untuk final perubahan lintas layout/alur; Pint --test pada PHP yang diubah.
+- [x] Jika exact-copy/markup assertion berubah, update intention sambil menjaga escaping/ownership/final/provenance/evidence/score.
+- [x] Perbaiki failure yang disebabkan refactor; catat failure lama, skip dan blocker dengan alasan, tanpa menganggap real-BERT skip sebagai E2E pass.
 
 **Validasi:** npm build; view cache/clear; test; Pint bila PHP berubah.
 
@@ -1298,6 +1298,16 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Validasi:** suites terkait 197 passed/1498 assertions; suite penuh final 777 cases/5205 assertions: 773 passed/4 BERT skips, tanpa failure/warning. 69 Node, npm ci Node 22, build host/Docker frontend final, Blade cache/clear dan diff lulus. Browser 60 samples sebelum +60 sesudah pada 360/768/1280 untuk 20 halaman/state, recorded style/geometry identik dan tanpa overflow; 8 toggle/reset checks per run. Tambahan 20 no-JS/reduced samples dan native zoom 200% lulus. Console bersih; satu intentional 404 per mode, tanpa asset failure. CSS publik 65239→50400 bytes; admin 622552 bytes identik.
 - **Batas:** driver fixture/network/hidden control/no-JS evaluation/zoom oracle dikoreksi terpisah dari produk. Zoom memakai saved site zoom Firefox, bukan CSS zoom. Screen reader/forced colors/browser lain/MySQL/deployment/inference nyata belum diuji; 4 real-BERT skips. Pint tidak berlaku karena tidak mengubah PHP source. QA aggregate tetap 3 audit pass/91 not_run; gate F6 menyeluruh dan audit gap existing tetap terbuka. Tidak melakukan deploy/push.
 - **Berikutnya:** commit semantic dan berhenti pada IP-035; IP-036–IP-039 pending.
+
+### IP-036 — Catatan eksekusi
+
+- **Status/tanggal:** done; 15 Oktober 2026, Asia/Jakarta. Branch frontend-refactor/cleaunp-quality-assurance, HEAD awal 36d82b8; tree/index awal bersih. IP-035 done dan source actual diperiksa sebelum regression.
+- **Rujukan:** FA-01–FA-10, QA-ASSET-02/04, arsitektur §20 dan strategi reuse evidence F6. Lingkup build/Blade/PHP/frontend regression; tidak menjalankan matriks browser IP-037.
+- **Perubahan:** laporan regression serta sinkronisasi status task/plan/QA. Tidak ada regresi aplikasi yang memerlukan perubahan source atau assertion; 392 berkas produk/test/config/build contract pada root dan snapshot identik dengan IP-035. Kedua lockfile/backend/vendor assets tetap.
+- **Validasi:** build host dan Docker target test lulus; 15 manifest records/empat entry/import/font URL, empat button variants/empat alert tones serta pemisahan marker CSS publik/admin diperiksa. Seluruh 16 file output build host/Docker identik. Blade cache/clear, 364 tests terkait/3023 assertions, 69 Node dan Pint --test pada 80 non-Blade PHP refactor lulus. Suite penuh final 777 cases/5205 assertions: 773 passed/4 real-BERT skips, exit 0 tanpa failure/warning.
+- **Evidence:** [REGRESSION-IP-036.md](../reports/REGRESSION-IP-036.md). Snapshot dan image PHP 8.4.11/SQLite in-memory/network none dengan fixture key; tanpa layanan/data pengguna. Browser IP-035 digunakan kembali karena source/output build identik, tidak diklaim sebagai run browser baru.
+- **Diagnosis/batas:** image test existing tidak membawa dua template env dan docker/php/uploads.ini: run pertama dua error packaging; percobaan mount belum lengkap dihentikan, final lulus memakai tiga fixture repository read-only. Dockerfile/perintah default tanpa fixture tidak dinyatakan telah diperbaiki. Empat BERT skips bukan E2E pass. Screen reader/forced colors/browser lain/MySQL/deployment/provider nyata, audit gap Livewire existing serta QA agregat/F6 menyeluruh tetap terbuka. Tidak perlu mengubah exact-copy/markup assertion.
+- **Berikutnya:** commit semantic dan berhenti pada IP-036; IP-037–IP-039 pending.
 
 ### Format catatan berikutnya
 
