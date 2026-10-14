@@ -247,8 +247,8 @@ Target aksesibilitas adalah WCAG 2.2 AA. Klaim kesesuaian penuh hanya dibuat set
 | [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md) | Struktur frontend dan keputusan FA-01–FA-10 | Arsitektur target tersedia; belum diterapkan |
 | [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md) | Task berurutan, dependensi, acceptance, dan jurnal eksekusi | Tersedia; menggantikan nama rencana REFACTOR-PLAN.md; IP-001 selesai |
 | [QA-ACCEPTANCE.md](QA-ACCEPTANCE.md) | Skenario pemeriksaan dan catatan bukti validasi | Tersedia; menggantikan nama rencana QA-CHECKLIST.md; audit source dicatat terpisah dari QA runtime |
-| [AUDIT-IP-001.md](AUDIT-IP-001.md) | Checkout aktual, route, pemakai CSS/JS, kontrak, dan risiko | Audit source IP-001; bukan hasil QA aplikasi |
+| [AUDIT-IP-001.md](../reports/AUDIT-IP-001.md) | Checkout aktual, route, pemakai CSS/JS, kontrak, dan risiko | Audit source IP-001; bukan hasil QA aplikasi |
 
-Dokumen refactor dipertahankan di `docs/refactor/` sesuai working copy pengguna. `AGENTS.md`, `PRD.md`, `README.md`, dan `RUNBOOK.md` tetap di root; tautan ke sana memakai `../../`. Path source dan perintah pada paket ini relatif terhadap root repository. Keputusan penempatan dicatat pada [audit IP-001](AUDIT-IP-001.md#penempatan-dan-otoritas-dokumen); tidak dibuat salinan di root.
+Tujuh dokumen spesifikasi refactor berada di `refactor/docs/`; laporan eksekusi berada di `refactor/reports/`, sesuai working copy pengguna. `AGENTS.md`, `PRD.md`, `README.md`, dan `RUNBOOK.md` tetap di root; tautan ke sana memakai `../../`. Path source dan perintah pada paket ini relatif terhadap root repository. Keputusan penempatan dicatat pada [audit IP-001](../reports/AUDIT-IP-001.md#penempatan-dan-otoritas-dokumen); tidak dibuat salinan di root.
 
 Output akhir proyek adalah antarmuka yang konsisten dari beranda hingga admin dan ekspor, dengan fungsi existing tetap benar serta validasi yang dapat ditinjau. Status implementasi baru berubah setelah pekerjaan kode dan pemeriksaan dilakukan; pembuatan dokumen ini tidak berarti refactoring aplikasi sudah dijalankan.

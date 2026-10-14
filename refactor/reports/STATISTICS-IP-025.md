@@ -5,7 +5,7 @@
 | Status | done; 14 Oktober 2026, Asia/Jakarta |
 | Checkout | frontend-refactor/examination-progress-results; HEAD awal 5594392; tree/index awal bersih |
 | Acceptance | AC-P14; G04; FA-01/FA-04/FA-10; QA-INFO-04/05 |
-| Rujukan | [Overview](OVERVIEW.md), [design system](DESIGN-SYSTEM.md), [P14](PAGE-SPECIFICATIONS.md), [architecture](FRONTEND-ARCHITECTURE.md), [plan](IMPLEMENTATION-PLAN.md), [QA](QA-ACCEPTANCE.md) |
+| Rujukan | [Overview](../docs/OVERVIEW.md), [design system](../docs/DESIGN-SYSTEM.md), [P14](../docs/PAGE-SPECIFICATIONS.md), [architecture](../docs/FRONTEND-ARCHITECTURE.md), [plan](../docs/IMPLEMENTATION-PLAN.md), [QA](../docs/QA-ACCEPTANCE.md) |
 
 ## Perilaku akhir dan populasi
 

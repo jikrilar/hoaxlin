@@ -11,7 +11,7 @@
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Dokumen terkait | [AGENTS.md](../../AGENTS.md), [OVERVIEW.md](OVERVIEW.md) |
 
-Base publik/light/focus dan compatibility kini diterapkan pada [laporan IP-005](BASE-IP-005.md). Smoke fixture seluruh view publik tidak menutup seluruh acceptance state/interaksi aplikasi.
+Base publik/light/focus dan compatibility kini diterapkan pada [laporan IP-005](../reports/BASE-IP-005.md). Smoke fixture seluruh view publik tidak menutup seluruh acceptance state/interaksi aplikasi.
 
 ## 1. Tujuan dan otoritas desain
 
@@ -19,7 +19,7 @@ Dokumen ini menetapkan token, hierarchy, komponen, state, responsive rules, dan 
 
 Arah desain mengambil kehangatan editorial, serif–sans hierarchy, whitespace, dan kesederhanaan antarmuka Claude. Identitas Hoaxlin memakai evergreen, Newsreader, dan alur pemeriksaan informasi yang terstruktur. `DESIGN.md` referensi Claude bukan sumber token final.
 
-Fondasi IP-004 tersedia pada [design-tokens.css](../../resources/css/design-tokens.css), [bridge publik](../../resources/css/theme.css) dan [font berlisensi](../../resources/fonts/README.md), dengan [evidence dan batas transisi](FOUNDATION-IP-004.md). Status ini tidak menandai seluruh checklist design system atau halaman sebagai lulus.
+Fondasi IP-004 tersedia pada [design-tokens.css](../../resources/css/design-tokens.css), [bridge publik](../../resources/css/theme.css) dan [font berlisensi](../../resources/fonts/README.md), dengan [evidence dan batas transisi](../reports/FOUNDATION-IP-004.md). Status ini tidak menandai seluruh checklist design system atau halaman sebagai lulus.
 
 Spesifikasi ini mengatur presentasi. Jangan mengubah authorization, schema, classifier, threshold, retrieval, prompt, quota, atau state machine agar sesuai rancangan. Nilai domain serta data server tetap menjadi sumber kebenaran.
 
@@ -250,7 +250,7 @@ Focus outline harus terlihat dan tidak terpotong oleh parent overflow. Primary b
 
 ## 7. Komponen inti
 
-Tujuh API UI/form dasar kini tersedia dan dipakai pada [IP-006](COMPONENTS-IP-006.md); komponen hasil/upload/password khusus berikut masih target task turunan. Utamakan anonymous Blade components bila tidak membutuhkan logic server tambahan. Filament tetap memakai komponen native-nya.
+Tujuh API UI/form dasar kini tersedia dan dipakai pada [IP-006](../reports/COMPONENTS-IP-006.md); komponen hasil/upload/password khusus berikut masih target task turunan. Utamakan anonymous Blade components bila tidak membutuhkan logic server tambahan. Filament tetap memakai komponen native-nya.
 
 ### 7.1 Button dan link
 
@@ -734,4 +734,4 @@ Nilai visual di dokumen ini adalah keputusan desain Hoaxlin, bukan token yang di
 
 Perubahan palet utama, font, theme, atau semantik prediksi harus memperbarui dokumen ini dan dokumen terkait secara konsisten. Perbaikan aksesibilitas boleh memperjelas token/state tanpa mengubah arah brand. Jangan mengembalikan pola visual lama untuk menyelesaikan satu masalah lokal.
 
-Dokumen ini berada di `docs/refactor/` bersama `OVERVIEW.md`; `AGENTS.md` tetap di root repository. Dokumentasi ini tidak berarti kode refactoring telah diterapkan atau lolos QA.
+Dokumen ini berada di `refactor/docs/` bersama `OVERVIEW.md`; `AGENTS.md` tetap di root repository. Dokumentasi ini tidak berarti kode refactoring telah diterapkan atau lolos QA.

@@ -6,7 +6,7 @@
 | Checkout awal | `frontend-refactor/admin-export`, `4be2485`; tree/index bersih |
 | Runtime acuan | Composer lock: Filament 5.7.3, Livewire 4.3.3; bukan asumsi versi baseline 5.0 |
 | Scope | A00 / AC-A00; fondasi theme A01–A08, bukan migrasi resource/widget task berikutnya |
-| Rujukan | [Task](TASKS.md#ip-027), [A00](PAGE-SPECIFICATIONS.md), [adaptasi Filament](DESIGN-SYSTEM.md#13-adaptasi-filament-5), [FA-03/06/10](FRONTEND-ARCHITECTURE.md), [QA admin](QA-ACCEPTANCE.md#611-panel-filament-native) |
+| Rujukan | [Task](../docs/TASKS.md#ip-027), [A00](../docs/PAGE-SPECIFICATIONS.md), [adaptasi Filament](../docs/DESIGN-SYSTEM.md#13-adaptasi-filament-5), [FA-03/06/10](../docs/FRONTEND-ARCHITECTURE.md), [QA admin](../docs/QA-ACCEPTANCE.md#611-panel-filament-native) |
 
 ## Generator dan build
 

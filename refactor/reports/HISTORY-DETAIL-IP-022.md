@@ -5,7 +5,7 @@
 | Status | done; 14 Oktober 2026, Asia/Jakarta |
 | Checkout | frontend-refactor/examination-progress-results; HEAD awal 81f41b9; tree/index awal bersih |
 | Acceptance | AC-P04; hasil P02; FA-01/FA-02/FA-05 |
-| Rujukan | [Page specifications](PAGE-SPECIFICATIONS.md), [frontend architecture](FRONTEND-ARCHITECTURE.md), [QA acceptance](QA-ACCEPTANCE.md), [task card](TASKS.md#ip-022) |
+| Rujukan | [Page specifications](../docs/PAGE-SPECIFICATIONS.md), [frontend architecture](../docs/FRONTEND-ARCHITECTURE.md), [QA acceptance](../docs/QA-ACCEPTANCE.md), [task card](../docs/TASKS.md#ip-022) |
 
 ## Perilaku akhir
 

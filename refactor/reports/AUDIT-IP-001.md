@@ -39,7 +39,7 @@ Aturan yang dibawa ke implementasi berikutnya: SSR Blade/native forms, Tailwind 
 
 ## Penempatan dan otoritas dokumen
 
-Paket yang dibaca lengkap: [OVERVIEW](OVERVIEW.md), [DESIGN-SYSTEM](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS](PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE](FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN](IMPLEMENTATION-PLAN.md), [TASKS](TASKS.md), dan [QA-ACCEPTANCE](QA-ACCEPTANCE.md).
+Paket yang dibaca lengkap: [OVERVIEW](../docs/OVERVIEW.md), [DESIGN-SYSTEM](../docs/DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS](../docs/PAGE-SPECIFICATIONS.md), [FRONTEND-ARCHITECTURE](../docs/FRONTEND-ARCHITECTURE.md), [IMPLEMENTATION-PLAN](../docs/IMPLEMENTATION-PLAN.md), [TASKS](../docs/TASKS.md), dan [QA-ACCEPTANCE](../docs/QA-ACCEPTANCE.md).
 
 Penempatan di root telah ditinjau. Keputusan: pertahankan satu paket di `docs/refactor/`, sesuai folder yang diberikan pengguna. `AGENTS.md` tetap di root sebagai instruksi repo; tidak dibuat duplikat atau pengganti. Tautan dokumen root diperbaiki menjadi `../../AGENTS.md`, `../../README.md`, `../../PRD.md`, dan `../../RUNBOOK.md`. Path source dan perintah tetap relatif root repo, sedangkan tautan Markdown relatif file dokumen.
 
@@ -206,7 +206,7 @@ G01–G08 tetap relevan: limit video belum lengkap sebagai view data; video_url 
 
 ## Validasi dan batas bukti
 
-QA-ENV-01 **pass** dalam mode `source_review`: checkout/SHA/perubahan pengguna/instruksi lokal, route, lockfile, renderer/resource/actions dan scope halaman telah diperiksa. Bukti proses dan pemeriksaan akhir dokumen tercatat pada [jurnal IP-001](TASKS.md#ip-001--catatan-eksekusi).
+QA-ENV-01 **pass** dalam mode `source_review`: checkout/SHA/perubahan pengguna/instruksi lokal, route, lockfile, renderer/resource/actions dan scope halaman telah diperiksa. Bukti proses dan pemeriksaan akhir dokumen tercatat pada [jurnal IP-001](../docs/TASKS.md#ip-001--catatan-eksekusi).
 
 Pemeriksaan yang dapat diulang dari root:
 

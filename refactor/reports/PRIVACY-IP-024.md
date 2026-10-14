@@ -5,7 +5,7 @@
 | Status | done; 14 Oktober 2026, Asia/Jakarta |
 | Checkout | frontend-refactor/examination-progress-results; HEAD awal c781d6f; tree/index awal bersih |
 | Acceptance | AC-P13; FA-01/FA-02/FA-09; QA-INFO-03 |
-| Rujukan refactor | [Overview](OVERVIEW.md), [design system](DESIGN-SYSTEM.md), [P13](PAGE-SPECIFICATIONS.md), [architecture](FRONTEND-ARCHITECTURE.md), [plan](IMPLEMENTATION-PLAN.md), [QA](QA-ACCEPTANCE.md) |
+| Rujukan refactor | [Overview](../docs/OVERVIEW.md), [design system](../docs/DESIGN-SYSTEM.md), [P13](../docs/PAGE-SPECIFICATIONS.md), [architecture](../docs/FRONTEND-ARCHITECTURE.md), [plan](../docs/IMPLEMENTATION-PLAN.md), [QA](../docs/QA-ACCEPTANCE.md) |
 
 ## Perilaku akhir
 

@@ -5,7 +5,7 @@
 | Status | done; 14 Oktober 2026, Asia/Jakarta |
 | Checkout | frontend-refactor/examination-progress-results; HEAD awal c2c98ee; tree/index awal bersih |
 | Acceptance | AC-P11/AC-P12; FA-01/FA-02; QA-INFO-01/QA-INFO-02 |
-| Rujukan desain | [Overview](OVERVIEW.md), [design system](DESIGN-SYSTEM.md), [page specifications P11/P12](PAGE-SPECIFICATIONS.md), [frontend architecture](FRONTEND-ARCHITECTURE.md), [implementation plan](IMPLEMENTATION-PLAN.md), [QA acceptance](QA-ACCEPTANCE.md) |
+| Rujukan desain | [Overview](../docs/OVERVIEW.md), [design system](../docs/DESIGN-SYSTEM.md), [page specifications P11/P12](../docs/PAGE-SPECIFICATIONS.md), [frontend architecture](../docs/FRONTEND-ARCHITECTURE.md), [implementation plan](../docs/IMPLEMENTATION-PLAN.md), [QA acceptance](../docs/QA-ACCEPTANCE.md) |
 
 ## Perubahan
 

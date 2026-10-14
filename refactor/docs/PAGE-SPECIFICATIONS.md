@@ -600,7 +600,7 @@ Jika network polling gagal, error lokal tidak berarti backend submission gagal. 
 
 | ID | Temuan | Keputusan untuk refactor |
 | --- | --- | --- |
-| G01 | Ditutup IP-012: HomeController menyediakan submissionOptions melalui SubmissionFormOptions dari StoreSubmissionRequest/TranscriptionMediaContract/config | Policy/validator tidak berubah; lihat [MEDIA-FORM-IP-012.md](MEDIA-FORM-IP-012.md) |
+| G01 | Ditutup IP-012: HomeController menyediakan submissionOptions melalui SubmissionFormOptions dari StoreSubmissionRequest/TranscriptionMediaContract/config | Policy/validator tidak berubah; lihat [MEDIA-FORM-IP-012.md](../reports/MEDIA-FORM-IP-012.md) |
 | G02 | HistoryRequest dan filter admin submission tidak mencakup video_url | Jangan tampilkan filter yang tidak didukung; perlu task terpisah jika ingin menambah/menyatukan filter |
 | G03 | CSV exporter tidak menggunakan filter history | Copy “seluruh riwayat”; filtered export merupakan perubahan kontrak tersendiri |
 | G04 | Statistik byTopic adalah distribusi label, bukan topik; query aggregate tidak secara eksplisit completed-only | Ubah penjelasan UI; jika ingin mengubah populasi, kerjakan query/test secara eksplisit |
@@ -629,4 +629,4 @@ Tambahkan test hanya untuk perilaku baru atau risiko yang belum dilindungi. Asse
 
 Bukti minimum: build/Blade/test sesuai scope, browser desktop/mobile dan keyboard untuk halaman terdampak, seluruh state penting melalui fixture yang aman, console/network review, serta PDF aktual bila template berubah. Browser screenshot dapat digunakan untuk QA internal tanpa memasukkan data pribadi ke deliverable.
 
-`PAGE-SPECIFICATIONS.md` berada di `docs/refactor/` bersama dokumen refactor lain; path source tetap relatif root repo. File ini melengkapi spesifikasi halaman yang direncanakan pada overview; ia tidak mengganti product requirements atau menyatakan implementasi telah selesai.
+`PAGE-SPECIFICATIONS.md` berada di `refactor/docs/` bersama dokumen refactor lain; path source tetap relatif root repo. File ini melengkapi spesifikasi halaman yang direncanakan pada overview; ia tidak mengganti product requirements atau menyatakan implementasi telah selesai.

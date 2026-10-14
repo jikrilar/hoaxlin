@@ -6,7 +6,7 @@
 | Checkout awal | `frontend-refactor/admin-export`, `5a776ca`; tree/index bersih |
 | Runtime | Filament 5.7.3, Livewire 4.3.3 dari Composer lock; PHP 8.4.11 pada snapshot Docker |
 | Scope | A01 / AC-A01, FA-03/06; QA-ADMIN-02 dan bagian dashboard QA-ADMIN-10 |
-| Rujukan | [Task](TASKS.md#ip-028), [spesifikasi halaman](PAGE-SPECIFICATIONS.md), [design system](DESIGN-SYSTEM.md#13-adaptasi-filament-5), [arsitektur](FRONTEND-ARCHITECTURE.md#14-arsitektur-admin-filament), [QA](QA-ACCEPTANCE.md#611-panel-filament-native) |
+| Rujukan | [Task](../docs/TASKS.md#ip-028), [spesifikasi halaman](../docs/PAGE-SPECIFICATIONS.md), [design system](../docs/DESIGN-SYSTEM.md#13-adaptasi-filament-5), [arsitektur](../docs/FRONTEND-ARCHITECTURE.md#14-arsitektur-admin-filament), [QA](../docs/QA-ACCEPTANCE.md#611-panel-filament-native) |
 
 ## Hierarchy dan pemilik state
 

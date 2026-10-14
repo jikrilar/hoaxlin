@@ -9,7 +9,7 @@
 | Hasil | Peta fixture, oracle test, rencana akses terisolasi dan gap coverage tersedia |
 | Batas | Tidak menjalankan PHPUnit, fixture browser, renderer ekspor atau pipeline nyata |
 
-Inventaris mengacu pada [QA-ACCEPTANCE.md](QA-ACCEPTANCE.md#22-matriks-fixture-minimum), [spesifikasi halaman](PAGE-SPECIFICATIONS.md#3-inventaris-route-dan-hak-akses) dan source aktual. Referensi test di bawah berarti setup/assertion telah ditinjau, **bukan test lulus**. Semua run aplikasi tetap `not_run`; akses browser fixture saat ini blocked karena `vendor/autoload.php` tidak tersedia. Tidak membuat record atau seed demo pada database pengguna.
+Inventaris mengacu pada [QA-ACCEPTANCE.md](../docs/QA-ACCEPTANCE.md#22-matriks-fixture-minimum), [spesifikasi halaman](../docs/PAGE-SPECIFICATIONS.md#3-inventaris-route-dan-hak-akses) dan source aktual. Referensi test di bawah berarti setup/assertion telah ditinjau, **bukan test lulus**. Semua run aplikasi tetap `not_run`; akses browser fixture saat ini blocked karena `vendor/autoload.php` tidak tersedia. Tidak membuat record atau seed demo pada database pengguna.
 
 ## Checkout dan dependency
 
@@ -196,4 +196,4 @@ Tidak membuat factory/helper/test baru: seluruh dimensi dapat direncanakan memak
 
 QA-ENV-03 **pass sebagai review inventaris/rencana fixture**, bukan automated_test/browser_fixture pass. Catatan source, recipes dan matriks halaman tersedia; eksekusi PHP/browser/export/E2E masih `not_run` atau blocked pada run plan. F0 memiliki ketiga catatan audit/inventaris, tetapi ini tidak menutup blocker runtime IP-002 atau menyatakan UI siap.
 
-Validasi akhir membandingkan setiap rujukan `Class::test_*` dengan deklarasi source, ID halaman/kelompok QA, tautan/anchor, status task dan hash source/konfigurasi awal. Jurnal hasil berada pada [TASKS.md](TASKS.md#ip-003--catatan-eksekusi). Kode/lockfile/root AGENTS/.env/data pengguna dipertahankan. Pekerjaan berhenti setelah IP-003 dan commit dokumentasi; IP-004–IP-039 tetap pending.
+Validasi akhir membandingkan setiap rujukan `Class::test_*` dengan deklarasi source, ID halaman/kelompok QA, tautan/anchor, status task dan hash source/konfigurasi awal. Jurnal hasil berada pada [TASKS.md](../docs/TASKS.md#ip-003--catatan-eksekusi). Kode/lockfile/root AGENTS/.env/data pengguna dipertahankan. Pekerjaan berhenti setelah IP-003 dan commit dokumentasi; IP-004–IP-039 tetap pending.

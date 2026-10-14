@@ -128,6 +128,6 @@ Perintah tersebut **belum dijalankan** dalam audit ini. Restart saja tidak mener
 
 QA-ENV-02 **pass sebagai inventaris baseline**: checks yang tersedia dijalankan dan hasil/failure/unavailable dicatat. Build frontend pass; Blade/PHPUnit/smoke aplikasi blocked oleh environment, tidak berubah menjadi pass. QA aplikasi lain tetap not_run. Gate F0 masih memerlukan IP-003.
 
-Hash semua berkas tracked dan `.env` disimpan lokal pada awal sesi lalu dibandingkan pada pemeriksaan akhir. Di luar empat dokumen IP-002, source/lockfile/konfigurasi existing tetap sama. Tidak memasang runtime sistem, mengubah secret, menjalankan migration/bootstrap/seeding, menghapus data/volume, memulai worker, mengirim email, atau memanggil inference/provider API. Evidence pemeriksaan akhir dan jurnal ada pada [TASKS.md](TASKS.md#ip-002--catatan-eksekusi).
+Hash semua berkas tracked dan `.env` disimpan lokal pada awal sesi lalu dibandingkan pada pemeriksaan akhir. Di luar empat dokumen IP-002, source/lockfile/konfigurasi existing tetap sama. Tidak memasang runtime sistem, mengubah secret, menjalankan migration/bootstrap/seeding, menghapus data/volume, memulai worker, mengirim email, atau memanggil inference/provider API. Evidence pemeriksaan akhir dan jurnal ada pada [TASKS.md](../docs/TASKS.md#ip-002--catatan-eksekusi).
 
 Pekerjaan berhenti pada IP-002 sesuai scope pengguna; IP-003–IP-039 tetap pending.

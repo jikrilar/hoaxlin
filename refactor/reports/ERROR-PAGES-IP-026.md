@@ -5,7 +5,7 @@
 | Status | done; 14 Oktober 2026, Asia/Jakarta |
 | Checkout awal | `frontend-refactor/examination-progress-results`, `711b432`, tree/index bersih |
 | Scope | E01 / AC-E01; hanya IP-026 |
-| Rujukan | [Task](TASKS.md#ip-026), [spesifikasi E01](PAGE-SPECIFICATIONS.md), [FA-01/02/04/09](FRONTEND-ARCHITECTURE.md), [QA-ERROR-01–03 / QA-PROGRESS-08](QA-ACCEPTANCE.md) |
+| Rujukan | [Task](../docs/TASKS.md#ip-026), [spesifikasi E01](../docs/PAGE-SPECIFICATIONS.md), [FA-01/02/04/09](../docs/FRONTEND-ARCHITECTURE.md), [QA-ERROR-01–03 / QA-PROGRESS-08](../docs/QA-ACCEPTANCE.md) |
 
 ## Implementasi
 

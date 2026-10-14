@@ -6,7 +6,7 @@
 | Checkout awal | `frontend-refactor/admin-export`, `c566bd4`; tree/index bersih |
 | Scope | A02 / AC-A02; FA-03/06/09; QA-ADMIN-03 dan bagian Users QA-ADMIN-10 |
 | Runtime | Filament 5.7.3 / Livewire 4.3.3 exact-lock; PHP 8.4.11 / SQLite pada snapshot |
-| Rujukan | [Task](TASKS.md#ip-029), [spesifikasi halaman](PAGE-SPECIFICATIONS.md), [design system](DESIGN-SYSTEM.md#13-adaptasi-filament-5), [arsitektur](FRONTEND-ARCHITECTURE.md#14-arsitektur-admin-filament), [QA](QA-ACCEPTANCE.md#611-panel-filament-native) |
+| Rujukan | [Task](../docs/TASKS.md#ip-029), [spesifikasi halaman](../docs/PAGE-SPECIFICATIONS.md), [design system](../docs/DESIGN-SYSTEM.md#13-adaptasi-filament-5), [arsitektur](../docs/FRONTEND-ARCHITECTURE.md#14-arsitektur-admin-filament), [QA](../docs/QA-ACCEPTANCE.md#611-panel-filament-native) |
 
 ## Halaman dan hierarchy
 
