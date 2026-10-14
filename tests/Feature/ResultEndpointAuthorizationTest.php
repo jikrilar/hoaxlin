@@ -58,6 +58,7 @@ class ResultEndpointAuthorizationTest extends TestCase
         $this->actingAs($admin)->getJson(route('hasil.status', $foreign))->assertOk();
         $this->actingAs($admin)->get(route('hasil.pdf', $foreign))->assertOk();
         $this->actingAs($admin)->get(route('hasil.media', $foreign))->assertRedirect();
+        $this->actingAs($admin)->get(route('riwayat.show', $foreign))->assertNotFound();
 
         $csv = $this->actingAs($admin)->get(route('riwayat.csv'))
             ->assertOk()
@@ -68,6 +69,31 @@ class ResultEndpointAuthorizationTest extends TestCase
 
         $this->assertTrue($rows->has($owned->id));
         $this->assertFalse($rows->has($foreign->id));
+    }
+
+    public function test_unverified_owner_keeps_direct_result_endpoint_access_but_history_and_feedback_require_verification(): void
+    {
+        Storage::fake('local');
+        $owner = User::factory()->unverified()->create();
+        [$submission] = $this->registeredSubmission(media: true, user: $owner);
+        Storage::disk('local')->put($submission->media_path, 'fixture media');
+        $this->actingAs($owner)->get(route('riwayat.show', $submission))->assertRedirect(route('verification.notice'));
+        $this->get(route('hasil', $submission))->assertOk()->assertDontSee('id="feedback-form"', false);
+        $this->getJson(route('hasil.status', $submission))->assertOk();
+        $this->get(route('hasil.pdf', $submission))->assertOk();
+        $this->get(route('hasil.media', $submission))->assertRedirect();
+        $this->post(route('feedback'), ['submission_id' => $submission->id, 'is_correct' => '1'])
+            ->assertRedirect(route('verification.notice'));
+    }
+
+    public function test_foreign_history_and_feedback_do_not_gain_permission_from_the_direct_result_route(): void
+    {
+        [$submission] = $this->registeredSubmission(media: false);
+        $other = User::factory()->create();
+        $this->get(route('riwayat.show', $submission))->assertRedirect(route('login'));
+        $this->actingAs($other)->get(route('riwayat.show', $submission))->assertNotFound();
+        $this->post(route('feedback'), ['submission_id' => $submission->id, 'is_correct' => '1'])->assertNotFound();
+        $this->assertDatabaseMissing('feedback', ['submission_id' => $submission->id, 'user_id' => $other->id]);
     }
 
     public function test_verified_owner_can_export_only_own_history(): void

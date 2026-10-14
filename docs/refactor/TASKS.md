@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 14 Oktober 2026 |
-| Status | IP-001–IP-021 selesai; 21 dari 39 task selesai, IP-022–IP-039 pending |
+| Status | IP-001–IP-022 selesai; 22 dari 39 task selesai, IP-023–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-021 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-022 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -97,7 +97,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-019](#ip-019) | F4 | Migrasikan verifikasi email | done |
 | [IP-020](#ip-020) | F4 | Migrasikan profil dan konfirmasi hapus akun | done |
 | [IP-021](#ip-021) | F4 | Migrasikan riwayat, filter, dan pagination | done |
-| [IP-022](#ip-022) | F4 | Verifikasi detail riwayat memakai hasil bersama | pending |
+| [IP-022](#ip-022) | F4 | Verifikasi detail riwayat memakai hasil bersama | done |
 | [IP-023](#ip-023) | F4 | Migrasikan Cara kerja dan Tentang | pending |
 | [IP-024](#ip-024) | F4 | Rapikan halaman privasi berdasarkan praktik aktual | pending |
 | [IP-025](#ip-025) | F4 | Migrasikan statistik dan alternatif tabel | pending |
@@ -116,7 +116,7 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-021 selesai, IP-022–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-022 selesai, IP-023–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -515,10 +515,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-021 selesai, IP-
 - **Arsitektur:** FA-01, FA-02, FA-05.
 - **Source/target:** `resources/views/hasil.blade.php`, `resources/views/partials/result/`.
 
-- [ ] Verifikasi riwayat.show tetap memakai view hasil bersama dan back link Kembali ke riwayat.
-- [ ] Jaga forUser sebagai boundary query detail; tidak mengubahnya menjadi akses admin lintas pemilik.
-- [ ] Periksa missing/other-owned record dan direct refresh tanpa bocoran input/status.
-- [ ] Pastikan PDF/status/media dan feedback menggunakan akses masing-masing; tidak membuat mapping/evidence template kedua.
+- [x] Verifikasi riwayat.show tetap memakai view hasil bersama dan back link Kembali ke riwayat.
+- [x] Jaga forUser sebagai boundary query detail; tidak mengubahnya menjadi akses admin lintas pemilik.
+- [x] Periksa missing/other-owned record dan direct refresh tanpa bocoran input/status.
+- [x] Pastikan PDF/status/media dan feedback menggunakan akses masing-masing; tidak membuat mapping/evidence template kedua.
 
 **Validasi:** SubmissionHistoryTest, ResultEndpointAuthorizationTest.
 
@@ -1148,6 +1148,16 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Resume 14 Oktober:** source tetap; artefak /tmp/vendor sementara sesi 13 tidak tersedia lagi. Build, Node 66, syntax source PHP dan diff check diulang; PHPUnit/Pint/compiled Blade/browser tidak diulang. Test Laravel tetap blocked autoload.
 - **Batas:** SubmissionHistoryTest/CsvExportTest exit 255 karena autoload repo hilang; feature cases baru belum dieksekusi. Unit/browser tanpa HTTP kernel/SQL owner-filter-sort-summary/CSV delivery. Receiver fixed response hanya serializer/navigation; no detail acceptance IP-022 atau export acceptance IP-034. PHP 8.5/vendor sementara; process-log Firefox cleanup timeout warning dicatat, native zoom/screen reader/BFCache belum diuji. QA tetap 3 audit pass/91 not_run; F4 belum ditutup, no data/env/deploy changes.
 - **Berikutnya:** buat commit semantic dan berhenti pada IP-021; IP-022–IP-039 pending.
+
+### IP-022 — Catatan eksekusi
+
+- **Status/tanggal:** done; 14 Oktober 2026, Asia/Jakarta. Checkout frontend-refactor/examination-progress-results, HEAD awal 81f41b9; tree/index awal bersih.
+- **Rujukan:** AC-P04/P02 pada PAGE-SPECIFICATIONS; FA-01/FA-02/FA-05 pada FRONTEND-ARCHITECTURE; QA-HISTORY-04/QA-ACCESS-04 pada QA-ACCEPTANCE serta hasil bersama IP-013–IP-016.
+- **Perubahan:** hasil.blade.php memakai primitive ui/link dan route context untuk “Kembali ke riwayat”/“Kembali ke beranda”. Tidak menduplikasi view, mapping atau evidence. RiwayatController::show/forUser, SubmissionAccess, routes, progress, PDF/media/feedback dan seluruh CSS/JS/backend unchanged.
+- **Evidence:** [HISTORY-DETAIL-IP-022.md](HISTORY-DETAIL-IP-022.md); lima unit state cases dan sembilan feature cases baru, termasuk refresh/back, stale/missing result, escaping/failure sanitization, evidence rank/document_id, feedback pemilik, missing/foreign/admin 404 dan verified guards.
+- **Validasi:** Docker PHP 8.4.11, exact-lock temporary vendor, SQLite in-memory dan kernel Laravel aktual: SubmissionHistoryTest/ResultEndpointAuthorizationTest 30 tests / 292 assertions pass. Seluruh Unit: 280 cases / 1518 assertions, 255 passed + 25 warnings HTML5 DOM parser pada tests lama. Build, 66 Node tests, Pint tiga file dan diff check pass. Browser fixture Firefox normal/no-JS/reduced: 98 layout samples / 295 checks pass; 14 detail states dan native kembali/refresh/history list.
+- **Batas:** Browser transport/model fixtures bukan E2E hydration/SQL; SQL dan guards diuji terpisah melalui kernel tests. CSRF bypass testing, MySQL, real storage/mail/AI, screen reader/native zoom/BFCache dan visual PDF belum diuji. BiDi mencatat nol page console errors, tetapi process log normal/reduced masih memuat Script terminated by timeout pada JS existing; QA aggregate tetap 3 audit pass/91 not_run, F4 belum ditutup. Tidak ada perubahan env/dependency/operational data/deploy/push.
+- **Berikutnya:** buat commit semantic dan berhenti pada IP-022; IP-023–IP-039 pending.
 
 ### Format catatan berikutnya
 

@@ -340,6 +340,8 @@ IP-020 menerapkan [profil dan konfirmasi hapus](PROFILE-IP-020.md): section/divi
 
 IP-021 menerapkan [riwayat/filter/pagination](HISTORY-IP-021.md): lima fields GET dalam satu form/reset page, shared forms/select awareness dan ui/pagination native dengan prev/next query/disabled spans. Semantic ul/li/dl/time mengganti pseudo-table; history.css memakai tokens/mobile dan obsolete history selectors dibuang. DetectionPresentation final guard/label/confidence dipakai per row; summary stats tersimpan dan CSV tetap seluruh history. Error/old input escaped, native empty/reset/first-page recovery. HistoryRequest mempertahankan nonscalar search untuk validator string tanpa cast warning; controller/rules/authorization/query/export dan JS tetap. HTTP/SQL scope/sort/pagination/export serta warning cleanup Firefox belum ditutup.
 
+IP-022 memverifikasi [detail riwayat dengan hasil bersama](HISTORY-DETAIL-IP-022.md): riwayat.show tetap memakai hasil/P02 dan primitive link mengenali route context; refresh history memakai riwayat.show, status/media/PDF tetap endpoint hasil canonical. RiwayatController::show tetap forUser tanpa admin bypass, feedback tetap verified owner, evidence tersimpan tetap rank/document_id. Tidak ada view/mapping/evidence/JS kedua atau perubahan controller/access/routes. Kernel Laravel aktual dengan SQLite in-memory pada Docker PHP 8.4 memverifikasi batas tersebut dan suite history existing; browser fixture memverifikasi keyboard/back/refresh/mobile/no-JS. Ini subhasil IP-022, bukan penutupan QA E2E atau export acceptance.
+
 ### 9.3 Transport dan error
 
 Form utama tetap native POST/redirect; jangan mengubahnya menjadi AJAX tanpa kebutuhan yang dinyatakan. Fetch hanya untuk status existing atau enhancement yang memang tersedia.

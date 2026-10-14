@@ -10,12 +10,13 @@
     $verifiedViewer = $resultViewer?->hasVerifiedEmail() ?? false;
     $ownsResult = $resultViewer !== null && $submission->user_id !== null
         && $resultViewer->getKey() === $submission->user_id;
+    $historyContext = request()->routeIs('riwayat.show');
 @endphp
 <div data-page="result" class="hl-result-page">
     <div class="container-app hl-result-page__inner">
-        <a href="{{ request()->routeIs('riwayat.show') ? route('riwayat') : url('/') }}" class="hl-button hl-result-page__back" data-variant="tertiary">
-            {{ request()->routeIs('riwayat.show') ? 'Kembali ke Riwayat' : 'Kembali ke Beranda' }}
-        </a>
+        <x-ui.link :href="$historyContext ? route('riwayat') : route('home')" variant="tertiary" class="hl-result-page__back">
+            {{ $historyContext ? 'Kembali ke riwayat' : 'Kembali ke beranda' }}
+        </x-ui.link>
         <div class="hl-result-page__content">
             @if(! $submission->isCompleted())
                 <div id="submission-progress-wrapper" data-progress-root data-submission-id="{{ $submission->id }}"

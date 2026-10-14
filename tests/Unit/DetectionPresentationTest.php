@@ -436,6 +436,39 @@ class DetectionPresentationTest extends TestCase
         ];
     }
 
+    #[DataProvider('historyDetailStates')]
+    public function test_history_and_direct_routes_share_result_content_and_keep_their_back_refresh_and_endpoint_context(string $status, bool $hasResult): void
+    {
+        [$submission, $result] = $this->records();
+        $submission->status = $status;
+        $submission->user_id = 7;
+        $submission->media_path = 'submissions/private-image.jpg';
+        $submission->input_type = 'image';
+        $this->user = $this->viewer(7);
+        $history = $this->renderResult($submission, $hasResult ? $result : null, path: '/riwayat/101');
+        $direct = $this->renderResult($submission, $hasResult ? $result : null);
+        $this->assertSame($direct->evaluate('string(//*[contains(@class,"hl-result-page__content")][1])'), $history->evaluate('string(//*[contains(@class,"hl-result-page__content")][1])'));
+        $this->assertSame('Kembali ke riwayat', trim($history->evaluate('string(//a[contains(@class,"hl-result-page__back")])')));
+        $this->assertSame('http://localhost/riwayat', $history->evaluate('string(//a[contains(@class,"hl-result-page__back")]/@href)'));
+        $this->assertSame('Kembali ke beranda', trim($direct->evaluate('string(//a[contains(@class,"hl-result-page__back")])')));
+        $this->assertSame('http://localhost', $direct->evaluate('string(//a[contains(@class,"hl-result-page__back")]/@href)'));
+        $this->assertSame(1, $history->query('//a[@href="http://localhost/hasil/101/media"]')->length);
+        if ($status !== 'completed') {
+            $this->assertSame('http://localhost/riwayat/101', $history->evaluate('string(//*[@data-progress-refresh]/@href)'));
+            $this->assertSame('http://localhost/hasil/101', $direct->evaluate('string(//*[@data-progress-refresh]/@href)'));
+            $this->assertSame('http://localhost/hasil/101/status', $history->evaluate('string(//*[@data-progress-root]/@data-status-url)'));
+            $this->assertSame(0, $history->query('//a[contains(@href,"/pdf")] | //form[@id="feedback-form"]')->length);
+        } elseif ($hasResult) {
+            $this->assertSame(1, $history->query('//a[@href="http://localhost/hasil/101/pdf"]')->length);
+            $this->assertSame(1, $history->query('//form[@id="feedback-form" and @method="POST" and @action="http://localhost/feedback"]/input[@name="submission_id" and @value="101"]')->length);
+        }
+    }
+
+    public static function historyDetailStates(): array
+    {
+        return [['pending', true], ['processing', true], ['failed', true], ['completed', false], ['completed', true]];
+    }
+
     private function viewer(int $id, bool $verified = true, bool $admin = false): User
     {
         $user = new User;
@@ -455,12 +488,23 @@ class DetectionPresentationTest extends TestCase
         return [$submission, $result];
     }
 
-    private function renderResult(Submission $submission, ?DetectionResult $result, ?Feedback $feedback = null): DOMXPath
+    private function renderResult(Submission $submission, ?DetectionResult $result, ?Feedback $feedback = null, string $path = '/hasil/101'): DOMXPath
     {
+        $request = Request::create('http://localhost'.$path);
+        $request->setLaravelSession($this->session);
+        $request->setRouteResolver(fn () => $this->app['router']->getRoutes()->match($request));
+        $this->app->instance('request', $request);
+        $this->app['url']->setRequest($request);
         $html = $this->app['view']->make('hasil', ['submission' => $submission, 'result' => $result, 'feedback' => $feedback, 'failureReason' => $submission->isFailed() ? 'Safe public failure' : null])->render();
-        $document = new DOMDocument;
-        @$document->loadHTML('<?xml encoding="UTF-8">'.$html);
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document = new DOMDocument;
+            $document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_NONET);
 
-        return new DOMXPath($document);
+            return new DOMXPath($document);
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
     }
 }
