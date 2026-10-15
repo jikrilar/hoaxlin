@@ -171,7 +171,9 @@ test('resource scope removes listeners, cancels timers and revokes actual object
     const target = new Target();
     let calls = 0;
     scope.listen(target, 'click', () => calls++);
-    const url = scope.objectURL(new Blob(['fixture']));
+    // Upload previews use own() so replacement can release a URL before unmount.
+    const url = URL.createObjectURL(new Blob(['fixture']));
+    scope.own(() => URL.revokeObjectURL(url));
     assert.equal(await (await fetch(url)).text(), 'fixture');
     scope.timeout(() => calls++, 10);
     target.dispatchEvent(new Event('click'));

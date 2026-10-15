@@ -1,5 +1,5 @@
 /** Own module resources; abort requests and never persist form data. */
-export function createScope({ clock = globalThis, urls = URL, onError = error => console.error('Hoaxlin: cleanup gagal.', error) } = {}) {
+export function createScope({ clock = globalThis, onError = error => console.error('Hoaxlin: cleanup gagal.', error) } = {}) {
     const controller = new AbortController();
     const disposers = new Set();
     let closed = false;
@@ -25,11 +25,6 @@ export function createScope({ clock = globalThis, urls = URL, onError = error =>
         release = own(() => clock.clearTimeout(id));
         return release;
     }
-    function objectURL(blob) {
-        const value = urls.createObjectURL(blob);
-        own(() => urls.revokeObjectURL(value));
-        return value;
-    }
     function dispose() {
         if (closed) return;
         closed = true;
@@ -38,7 +33,7 @@ export function createScope({ clock = globalThis, urls = URL, onError = error =>
             try { release(); } catch (error) { onError(error); }
         }
     }
-    return { signal: controller.signal, own, listen, timeout, objectURL, dispose };
+    return { signal: controller.signal, own, listen, timeout, dispose };
 }
 
 /** Guard independent callers and dispose partial mounts when setup fails. */

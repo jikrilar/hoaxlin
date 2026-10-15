@@ -1,0 +1,1773 @@
+{
+  "task": "IP-037",
+  "date": "2026-10-15",
+  "status": "done",
+  "initial_head": "79be3df",
+  "runtime": {
+    "php": "8.4.11",
+    "image": "hoaxlin-ip036:test",
+    "mode": "browser_fixture",
+    "kernel": "Actual Laravel/session/CSRF/SQLite and native Livewire/Filament",
+    "ports_loopback_only": [
+      8907,
+      8908
+    ],
+    "data": "Synthetic only; database queue has no worker; no real inference"
+  },
+  "change": {
+    "file": "resources/views/partials/submission/security.blade.php",
+    "reason": "Backend question already ends with ?; remove duplicate view punctuation",
+    "all_five_native_input_types": [
+      "text",
+      "url",
+      "image",
+      "video",
+      "video_url"
+    ],
+    "final_chromium_labels": 20,
+    "final_chromium_viewports": [
+      320,
+      360,
+      768,
+      1280
+    ]
+  },
+  "layout": [
+    {
+      "engine": "Firefox 157.0.1",
+      "run": "audit",
+      "sample_count": 276,
+      "status": "pass",
+      "coverage": [
+        {
+          "role": "guest",
+          "mode": "normal",
+          "paths": [
+            "/",
+            "/cara-kerja",
+            "/tentang",
+            "/kebijakan-privasi",
+            "/statistik",
+            "/login",
+            "/register",
+            "/forgot-password",
+            "/reset-password/expired?email=disposable@example.test",
+            "/unknown-path",
+            "/admin/login"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 44
+        },
+        {
+          "role": "owner",
+          "mode": "normal",
+          "paths": [
+            "/",
+            "/profil",
+            "/riwayat",
+            "/riwayat?page=2&label=valid",
+            "/riwayat?search=NO_MATCH_FIXTURE",
+            "/hasil/1",
+            "/hasil/2",
+            "/hasil/3",
+            "/hasil/4",
+            "/hasil/5",
+            "/hasil/6",
+            "/hasil/7",
+            "/hasil/8",
+            "/hasil/9",
+            "/hasil/10",
+            "/hasil/11",
+            "/hasil/12",
+            "/hasil/13",
+            "/hasil/14",
+            "/hasil/15",
+            "/hasil/16",
+            "/hasil/17",
+            "/hasil/18",
+            "/hasil/19",
+            "/hasil/22",
+            "/hasil/23",
+            "/hasil/24",
+            "/hasil/25",
+            "/hasil/26",
+            "/riwayat/1",
+            "/hasil/45"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 124
+        },
+        {
+          "role": "empty",
+          "mode": "normal",
+          "paths": [
+            "/riwayat"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 4
+        },
+        {
+          "role": "unverified",
+          "mode": "normal",
+          "paths": [
+            "/",
+            "/profil",
+            "/verify-email",
+            "/riwayat",
+            "/riwayat-export/csv",
+            "/admin"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 24
+        },
+        {
+          "role": "admin",
+          "mode": "normal",
+          "paths": [
+            "/",
+            "/admin",
+            "/admin/users",
+            "/admin/users/create",
+            "/admin/users/6",
+            "/admin/users/6/edit",
+            "/admin/datasets",
+            "/admin/datasets/create",
+            "/admin/datasets/1",
+            "/admin/datasets/1/edit",
+            "/admin/submissions",
+            "/admin/submissions/1",
+            "/admin/detection-results",
+            "/admin/detection-results/1",
+            "/admin/feedback",
+            "/admin/feedback/1",
+            "/admin/submission-processing-events",
+            "/admin/submission-processing-events/1",
+            "/admin/admin-logs",
+            "/admin/admin-logs/1"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 80
+        }
+      ]
+    },
+    {
+      "engine": "Firefox 157.0.1",
+      "run": "nojs",
+      "sample_count": 92,
+      "status": "pass",
+      "coverage": [
+        {
+          "role": "guest",
+          "mode": "nojs-reduced",
+          "paths": [
+            "/",
+            "/cara-kerja",
+            "/tentang",
+            "/kebijakan-privasi",
+            "/statistik",
+            "/login",
+            "/register",
+            "/forgot-password",
+            "/reset-password/expired",
+            "/unknown-path",
+            "/admin/login"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 44
+        },
+        {
+          "role": "owner",
+          "mode": "nojs-reduced",
+          "paths": [
+            "/",
+            "/profil",
+            "/riwayat",
+            "/riwayat/1",
+            "/hasil/8",
+            "/hasil/9",
+            "/hasil/10",
+            "/hasil/1",
+            "/hasil/2",
+            "/hasil/3",
+            "/hasil/7",
+            "/hasil/6"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 48
+        }
+      ]
+    },
+    {
+      "engine": "Firefox 157.0.1",
+      "run": "zoom",
+      "sample_count": 33,
+      "status": "pass",
+      "coverage": [
+        {
+          "role": "guest",
+          "mode": "native-zoom200-reduced",
+          "paths": [
+            "/",
+            "/cara-kerja",
+            "/tentang",
+            "/kebijakan-privasi",
+            "/statistik",
+            "/login",
+            "/register",
+            "/forgot-password",
+            "/reset-password/expired",
+            "/unknown-path",
+            "/admin/login"
+          ],
+          "viewports": [
+            683
+          ],
+          "samples": 11
+        },
+        {
+          "role": "owner",
+          "mode": "native-zoom200-reduced",
+          "paths": [
+            "/profil",
+            "/riwayat",
+            "/riwayat/1",
+            "/hasil/1",
+            "/hasil/2",
+            "/hasil/3",
+            "/hasil/8",
+            "/hasil/10",
+            "/hasil/6",
+            "/hasil/26",
+            "/hasil/25"
+          ],
+          "viewports": [
+            683
+          ],
+          "samples": 11
+        },
+        {
+          "role": "admin",
+          "mode": "native-zoom200-reduced",
+          "paths": [
+            "/admin",
+            "/admin/users",
+            "/admin/users/create",
+            "/admin/datasets",
+            "/admin/datasets/create",
+            "/admin/datasets/1",
+            "/admin/submissions/1",
+            "/admin/detection-results/1",
+            "/admin/feedback/1",
+            "/admin/submission-processing-events/1",
+            "/admin/admin-logs/1"
+          ],
+          "viewports": [
+            683
+          ],
+          "samples": 11
+        }
+      ]
+    },
+    {
+      "engine": "Firefox 157.0.1",
+      "run": "forced",
+      "sample_count": 12,
+      "status": "pass",
+      "coverage": [
+        {
+          "role": "guest",
+          "mode": "forced-colors",
+          "paths": [
+            "/",
+            "/login",
+            "/register",
+            "/statistik",
+            "/unknown-path"
+          ],
+          "viewports": [
+            360
+          ],
+          "samples": 5
+        },
+        {
+          "role": "owner",
+          "mode": "forced-colors",
+          "paths": [
+            "/profil",
+            "/riwayat",
+            "/hasil/1",
+            "/hasil/8"
+          ],
+          "viewports": [
+            360
+          ],
+          "samples": 4
+        },
+        {
+          "role": "admin",
+          "mode": "forced-colors",
+          "paths": [
+            "/admin",
+            "/admin/users/create",
+            "/admin/datasets"
+          ],
+          "viewports": [
+            360
+          ],
+          "samples": 3
+        }
+      ]
+    },
+    {
+      "engine": "HeadlessChrome 155.0.8059.79",
+      "run": "chromium",
+      "sample_count": 308,
+      "status": "pass",
+      "coverage": [
+        {
+          "role": "guest",
+          "mode": "normal",
+          "paths": [
+            "/",
+            "/cara-kerja",
+            "/tentang",
+            "/kebijakan-privasi",
+            "/statistik",
+            "/login",
+            "/register",
+            "/forgot-password",
+            "/reset-password/expired?email=disposable@example.test",
+            "/unknown-path",
+            "/admin/login"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 44
+        },
+        {
+          "role": "owner",
+          "mode": "normal",
+          "paths": [
+            "/",
+            "/profil",
+            "/riwayat",
+            "/riwayat?page=2&label=valid",
+            "/riwayat?search=NO_MATCH_FIXTURE",
+            "/hasil/1",
+            "/hasil/2",
+            "/hasil/3",
+            "/hasil/4",
+            "/hasil/5",
+            "/hasil/6",
+            "/hasil/7",
+            "/hasil/8",
+            "/hasil/9",
+            "/hasil/10",
+            "/hasil/11",
+            "/hasil/12",
+            "/hasil/13",
+            "/hasil/14",
+            "/hasil/15",
+            "/hasil/16",
+            "/hasil/17",
+            "/hasil/18",
+            "/hasil/19",
+            "/hasil/22",
+            "/hasil/23",
+            "/hasil/24",
+            "/hasil/25",
+            "/hasil/26",
+            "/riwayat/1",
+            "/hasil/45"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 124
+        },
+        {
+          "role": "empty",
+          "mode": "normal",
+          "paths": [
+            "/riwayat"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 4
+        },
+        {
+          "role": "unverified",
+          "mode": "normal",
+          "paths": [
+            "/",
+            "/profil",
+            "/verify-email",
+            "/riwayat",
+            "/riwayat-export/csv",
+            "/admin"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 24
+        },
+        {
+          "role": "admin",
+          "mode": "normal",
+          "paths": [
+            "/",
+            "/admin",
+            "/admin/users",
+            "/admin/users/create",
+            "/admin/users/9",
+            "/admin/users/9/edit",
+            "/admin/datasets",
+            "/admin/datasets/create",
+            "/admin/datasets/1",
+            "/admin/datasets/1/edit",
+            "/admin/submissions",
+            "/admin/submissions/1",
+            "/admin/detection-results",
+            "/admin/detection-results/1",
+            "/admin/feedback",
+            "/admin/feedback/1",
+            "/admin/submission-processing-events",
+            "/admin/submission-processing-events/1",
+            "/admin/admin-logs",
+            "/admin/admin-logs/1"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 80
+        },
+        {
+          "role": "owner",
+          "mode": "nojs-reduced",
+          "paths": [
+            "/",
+            "/profil",
+            "/riwayat",
+            "/hasil/1",
+            "/hasil/8"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 20
+        },
+        {
+          "role": "guest",
+          "mode": "nojs-reduced",
+          "paths": [
+            "/login",
+            "/statistik",
+            "/unknown-path"
+          ],
+          "viewports": [
+            320,
+            360,
+            768,
+            1280
+          ],
+          "samples": 12
+        }
+      ]
+    }
+  ],
+  "interaction_checks": [
+    {
+      "name": "guest input boundary",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "audit"
+    },
+    {
+      "name": "result hoax",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "audit"
+    },
+    {
+      "name": "result meragukan",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "audit"
+    },
+    {
+      "name": "result no_result",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "audit"
+    },
+    {
+      "name": "partial result hidden pending",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "audit"
+    },
+    {
+      "name": "partial result hidden processing",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "audit"
+    },
+    {
+      "name": "partial result hidden failed",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "audit"
+    },
+    {
+      "name": "mobile menu Enter/Escape/focus return",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "skip link keyboard target",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "guest 49 text chars client error",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "login invalid recovery and empty secret",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "login intended route and remember",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "profile modal trap/cancel/Escape/focus return",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "profile password bag and empty secrets",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "profile delete error reopens modal",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "profile identity invalid field context",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "input selector keyboard and inactive fields",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "feedback POST/escaped readonly/duplicate unavailable",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "history filter native query and pagination",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "CSV/PDF actual bytes and full-history scope",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "back/forward restores usable form without secret",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "unverified resend and history guard",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "signed verify URL actual fulfillment",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "expired reset recovery/empty password",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "register success routes to verification",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "delete disposable account success/session logout",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions"
+    },
+    {
+      "name": "URL backend CAPTCHA error keeps tab and old URL",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions-url-forgot-final"
+    },
+    {
+      "name": "forgot-password broker status",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions-url-forgot-final"
+    },
+    {
+      "name": "guest capability created",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions-retry"
+    },
+    {
+      "name": "guest valid text native POST/capability result",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "actions-retry"
+    },
+    {
+      "name": "strict evidence rank/link/escaping and classifier zero",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "details"
+    },
+    {
+      "name": "stages match backend percentages including unknown",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "details"
+    },
+    {
+      "name": "disclosure keyboard private media/provenance wrapping",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "details"
+    },
+    {
+      "name": "owner/foreign/final/media direct endpoint guards",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "details"
+    },
+    {
+      "name": "empty statistics genuine zero data and accessible tables",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "details"
+    },
+    {
+      "name": "reset valid broker token saves password without auto login",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "details"
+    },
+    {
+      "name": "profile email change resets verification",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "details"
+    },
+    {
+      "name": "all input client invalid states and preview lifecycle",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "details-retry"
+    },
+    {
+      "name": "native user create and persisted edit",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "admin-actions"
+    },
+    {
+      "name": "native monitoring search/no mutations /admin/submissions",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "admin-actions-readonly-final"
+    },
+    {
+      "name": "native monitoring search/no mutations /admin/detection-results",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "admin-actions-readonly-final"
+    },
+    {
+      "name": "native monitoring search/no mutations /admin/feedback",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "admin-actions-readonly-final"
+    },
+    {
+      "name": "native dataset create/edit/delete cancel Escape focus and confirm",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "admin-actions-retry"
+    },
+    {
+      "name": "actual hydrated Livewire owns polling",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "bootstrap failure transfers to fallback",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "slow fallback is single flight and aborts on leave",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "hidden pauses and visible resumes one fallback loop",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "fallback HTTP 403 retains domain state",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "fallback HTTP 404 retains domain state",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "fallback HTTP 419 retains domain state",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "fallback HTTP 429 retains domain state",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "fallback HTTP 503 retains domain state",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "terminal A and B reload independently once",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "polling"
+    },
+    {
+      "name": "native monitoring filter stage",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "filters-failure"
+    },
+    {
+      "name": "native monitoring filter action",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "filters-failure"
+    },
+    {
+      "name": "chart chunk failure preserves statistical tables",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "filters-failure"
+    },
+    {
+      "name": "app bootstrap failure preserves SSR forms and content",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "filters-failure"
+    },
+    {
+      "name": "font asset failure uses visible fallback",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "font-failure"
+    },
+    {
+      "name": "all five final CAPTCHA labels retain one question and field relation",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "media-final"
+    },
+    {
+      "name": "native url POST/multipart to authorized pending",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "media-final"
+    },
+    {
+      "name": "native image POST/multipart to authorized pending",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "media-final"
+    },
+    {
+      "name": "native video POST/multipart to authorized pending",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "media-final"
+    },
+    {
+      "name": "native video_url POST/multipart to authorized pending",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "media-final"
+    },
+    {
+      "name": "Chromium mobile menu/Escape/focus",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "chromium"
+    },
+    {
+      "name": "Chromium profile dialog/cancel/focus and password toggle",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "chromium"
+    },
+    {
+      "name": "Chromium keyboard input selection and evidence",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "chromium"
+    },
+    {
+      "name": "Chromium actual Livewire hydration/poll",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "chromium"
+    },
+    {
+      "name": "Chromium no-JS form shell and reduced preference",
+      "status": "pass",
+      "mode": "browser_fixture",
+      "run": "chromium"
+    }
+  ],
+  "dom_a11y": {
+    "pages": 15,
+    "duplicate_ids": 0,
+    "broken_aria_references": 0,
+    "pairs_per_page": 8,
+    "minimum_contrast": 4.78,
+    "pairs": [
+      {
+        "fg": "text-primary",
+        "bg": "bg-canvas",
+        "ratio": 13.52
+      },
+      {
+        "fg": "text-body",
+        "bg": "bg-surface",
+        "ratio": 9.16
+      },
+      {
+        "fg": "text-muted",
+        "bg": "bg-canvas",
+        "ratio": 4.78
+      },
+      {
+        "fg": "text-inverse",
+        "bg": "action-primary",
+        "ratio": 7.73
+      },
+      {
+        "fg": "success-fg",
+        "bg": "success-bg",
+        "ratio": 6.48
+      },
+      {
+        "fg": "warning-fg",
+        "bg": "warning-bg",
+        "ratio": 6.02
+      },
+      {
+        "fg": "danger-fg",
+        "bg": "danger-bg",
+        "ratio": 5.73
+      },
+      {
+        "fg": "info-fg",
+        "bg": "info-bg",
+        "ratio": 6.34
+      }
+    ],
+    "screen_reader": "Not run; actual screen reader required"
+  },
+  "console": {
+    "audit": {
+      "page_console_errors": 0
+    },
+    "nojs": {
+      "page_console_errors": 0
+    },
+    "zoom": {
+      "page_console_errors": 0
+    },
+    "forced": {
+      "page_console_errors": 0
+    },
+    "actions": {
+      "page_console_errors": 0
+    },
+    "actions-url-forgot-final": {
+      "page_console_errors": 0
+    },
+    "actions-retry": {
+      "page_console_errors": 0
+    },
+    "media-final": {
+      "page_console_errors": 0
+    },
+    "admin-actions-readonly-final": {
+      "page_console_errors": 0
+    },
+    "chromium": {
+      "uncaught_exceptions": 0,
+      "console_api_errors": 0
+    }
+  },
+  "intentional_network_faults": [
+    "Blocked Livewire script",
+    "Status delayed 3500 ms",
+    "Injected status HTTP 403/404/419/429/503",
+    "Blocked chart chunk",
+    "Blocked app entry",
+    "Blocked Inter/Newsreader fonts"
+  ],
+  "expected_http_errors": [
+    "Unknown route 404",
+    "Owner/foreign guards 403/404",
+    "Missing media/nonfinal PDF 404",
+    "Missing guest capability 404"
+  ],
+  "validation": {
+    "npm_build": "pass with temporary exact-lock vendor symlink removed afterwards",
+    "build_files": 16,
+    "build_identical_to_initial_IP037": true,
+    "blade_cache_clear": "pass",
+    "php_related": {
+      "passed": 66,
+      "assertions": 436
+    },
+    "php_full": {
+      "total": 778,
+      "passed": 774,
+      "skipped_real_bert": 4,
+      "assertions": 5214,
+      "errors": 0,
+      "failures": 0,
+      "warnings": 0,
+      "runner": "vendor/bin/phpunit --display-warnings --display-notices --display-errors"
+    },
+    "node": {
+      "passed": 69,
+      "failed": 0
+    },
+    "pint": "pass: tests/Feature/FinalResultStateTest.php",
+    "regression_red": "New live-region regression fails on original view (1 failure / 6 assertions)"
+  },
+  "reused_evidence": [
+    "REGRESSION-IP-036.md: broad backend/security checks; new full suite also passed",
+    "CLEANUP-IP-035.md: shared before/after comparison",
+    "PDF-IP-033.md: real renderer multi-page/font; PDF source unchanged",
+    "CSV-IP-034.md: native downloads, >100 records, format/formula safety; exporter unchanged",
+    "POLLING-IP-014.md: additional handoff/non-JSON/offline/navigation client fixtures; production public links have no wire:navigate"
+  ],
+  "remaining": [],
+  "limitations": [
+    "No physical mobile device",
+    "No real BERT/RAG/OpenAI/OCR/transcription/SMTP/provider validation",
+    "No MySQL/deployment validation",
+    "Existing admin audit observer Livewire path gap unchanged",
+    "Scoped subresults do not imply all catalog case variants passed"
+  ],
+  "artifact_hashes": {
+    "a11y-admin.json": "ee00fda47b6c0d70c230cd320770ec4da68dc664b7534b10d46701cecf0a7e9b",
+    "a11y.json": "40d8a37875f86db701f650ea4d4a8d8a7c65117cf30db56364de91bb84822ef5",
+    "actions-retry.json": "9ef6426eacc44b186246c2c92f4d60415ed84a0807c1f9c71156307329950623",
+    "actions-url-forgot-final.json": "b24e914b205825b5c43051dd910336bcfe420374a055dbe4e250cc1ceb9619d5",
+    "actions.json": "831249f7c368baba13bcdaebcda2d39c057b3cd634e568cb3aa6f6dac7982e69",
+    "admin-actions-readonly-final.json": "ffb2ccf80b56c8096aba9c8dd33414c51d9b609453456bcb01acbf983da6daa6",
+    "admin-actions-retry.json": "55c5b2220a1881183d3067ee0cd2fc3a9c84a7e4c2f8d9901178ffd3d9d99f4a",
+    "admin-actions.json": "f7ad74333ccfbb5ee62544bbf52302f58d743ab03f89c3d14f8e0cc54350ccd9",
+    "audit.json": "4b718151491914fea5366a2b2e5456f3a6794cfebeddc8b206908a0d70c94df7",
+    "blade-cache-final.log": "3f9431fcd9714f6dd47803cb20777c50c99c64c06e629ef631a2219e4d826c9a",
+    "build-final.log": "186df7da5ff27bb20f15c7dbcf23726523f89a895d0bdb12ac394ebf7fbe6f56",
+    "chromium-captcha-final.json": "6117e01344b5a1f6b630bd59a926374f8f0a3b24ab87706f4ed1b1ed61c836b6",
+    "chromium.json": "bf195551b98f589cb6dfd057b990d708b1b74ca0820b457839efefe6aecef43a",
+    "details-retry.json": "261b7e03f80b7e539e52fba2cf2128e3f8a1e0275fb3437d7e46ce59715bf94c",
+    "details.json": "a50f3b79ea1bd73a8e0a4e2ab4a1933c70e0db21754ab4b8b769550bd87a7924",
+    "filters-failure.json": "6f518d412592038d7d0e11a0a9b4abd54abc59e34c98d02eb296c0d9cb0f18b1",
+    "font-failure.json": "0d61f25ccac0a9a39332154e52738cec4ebf0e39776cd0f2ea38ba3fe8172215",
+    "forced.json": "c79c770248be3f46ef42a9ed1fc1d444244a501a6d2f499141ad582814717b85",
+    "full-suite-final.log": "da7835843811ad0582da040c5afa6d7a094e295b5489a103cd9cdff1cadd9d96",
+    "media-final.json": "3b8cdfe794ef5b0915b8191bdb40a7b9d9a684f31b41c696ae5595a4d4c1fed4",
+    "node-final.log": "b21c74a5629b60a08e6607c034dcba50dee9fe0ef20988f01f120fccfd703465",
+    "nojs-admin.json": "75fbd79dcc04057c7d965eb9b54c648d7de3bc1d36a2e559084bbd4ffcbdb167",
+    "nojs.json": "b0072cefd9d0a9af5b332cf2b819e9b02c47f8667ca4447bf2ec3e5ae29674ac",
+    "polling.json": "77742fb2ca62c1e107717f8837a9a5691c26167fe9d070f6e899c2c1a38b0a2b",
+    "targeted-final.log": "0a26e21b5f72230ba31133bdcdc687225ddf90032d67899c8a24f24b67c68dec",
+    "zoom.json": "e1d862b502ecf5fe06e23041b65b890334732b9763ecc91e3547d165c11bcd89",
+    "screenreader-regression-red.log": "f4d260a995b43111d5a20488d1d07c993163a6cb6898847af935d17621a423c3",
+    "screenreader-targeted.log": "3d40ef4d7abb66d4ec14a6b8b859e273c12dcee70b81a5b77eed3be8ff4d6cd9",
+    "screenreader-full-suite.log": "d6c29dc98c516fbdee20d6972206936c8d4c549f8bb09fbfd8851e96d855b886",
+    "screenreader-phpunit-final.log": "88bd0a5070e4cd990cdeda4c7856446906cfee5b50f569a19cb34a185450299b",
+    "screenreader-node.log": "9803cd1e8ef9f7afd402955fdf271e855a32db87f6e53e61ac72f014ef4a9aee",
+    "screenreader-pint.log": "2455685e40fbae645c7ad362a1a4b7954b8d36529fa4af2744d485251436a4d2",
+    "screenreader-build.log": "5c759b587cdc9c81431e81e01453cee945b1c86b0b99e3ba19e07ffe99164b46",
+    "screenreader-build-final.log": "202a0e409887fbda83e861f2ed676412744e5d8e82ec78315131f676b767ce26",
+    "screenreader-blade.log": "3f9431fcd9714f6dd47803cb20777c50c99c64c06e629ef631a2219e4d826c9a",
+    "screenreader-final-smoke.json": "52f5dc95d3a46c369e20a87273fc2fc440d985718ebaea44c408260e5487a7e4"
+  },
+  "resume_initial_head": "1c47f82",
+  "previous_validation": {
+    "npm_build": "pass",
+    "build_files": 16,
+    "build_identical_to_IP036": true,
+    "blade_cache_clear": "pass",
+    "php_related": {
+      "passed": 98,
+      "assertions": 463
+    },
+    "php_full": {
+      "total": 777,
+      "passed": 773,
+      "skipped_real_bert": 4,
+      "assertions": 5205,
+      "errors": 0,
+      "failures": 0,
+      "warnings": 0
+    },
+    "node": {
+      "passed": 69,
+      "failed": 0
+    },
+    "pint": "Not applicable: no non-Blade PHP source changed"
+  },
+  "additional_change": {
+    "file": "resources/views/hasil.blade.php",
+    "issue": "Polling transport text became visible without an Orca announcement because the status region itself started hidden",
+    "fix": "Keep a polite atomic status container exposed from initial render; toggle only its inner message",
+    "test": "tests/Feature/FinalResultStateTest.php: exposed live-region ancestor before first error",
+    "before": {
+      "screen_reader_transport_announcements": 0
+    },
+    "after": {
+      "HTTP_403_announcements": 1,
+      "HTTP_503_announcements": 1,
+      "repeated_announcements_during_6500ms_quiet_windows": 0,
+      "domain_state": "processing"
+    }
+  },
+  "screen_reader": {
+    "mode": "browser_fixture",
+    "status": "pass",
+    "cases": [
+      "QA-A11Y-03",
+      "QA-A11Y-08"
+    ],
+    "os": "CachyOS Linux",
+    "display": "Private X11/Xvfb 1280x900; isolated DBus/accessibility registry and Openbox",
+    "browser": "Firefox 157.0.1 headed",
+    "screen_reader": "Orca 51.0 (rev 856433b61)",
+    "atspi": "2.62.1",
+    "speech_dispatcher": "0.12.1",
+    "speech_engine": "eSpeak NG 1.52.0",
+    "measurement": "Actual Orca SPEECH OUTPUT stream triggered by browser/AT-SPI events and native keyboard; speech synthesized to an ALSA null sink",
+    "automation": "Native XTest keys and trusted BiDi input; Orca structural commands; F6 establishes content-frame focus before reading redirect notices",
+    "tools_scope": "Temporary extracted packages under QA snapshot; no global package installation or repository dependency change",
+    "limits": [
+      "Automated announcement/structure evaluation; no human speech-pronunciation or usability session",
+      "Representative shared admin table/form/infolist templates checked; no per-resource screen-reader pass claimed for A07/A08",
+      "Initial browser matrix reused for unchanged CSS/JS/templates; new wrapper gets four final viewport checks"
+    ],
+    "observations": [
+      {
+        "name": "home-headings-landmarks",
+        "status": "pass",
+        "observed": [
+          "Periksa sebelum percaya.",
+          "Pemeriksaan informasi",
+          "information"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "home-field-#teks-input",
+        "status": "pass",
+        "observed": [
+          "Teks informasi",
+          "entry",
+          "Masukkan 50–50.000 karakter. Teks yang cukup membantu model membaca konteks."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "home-field-#captcha-teks",
+        "status": "pass",
+        "observed": [
+          "Keamanan: 7 + 2 = ?",
+          "spin button",
+          "Jawab pertanyaan ini untuk mengirim pemeriksaan."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "login-field-#email",
+        "status": "pass",
+        "observed": [
+          "Alamat email",
+          "entry required"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "login-field-#password",
+        "status": "pass",
+        "observed": [
+          "Kata sandi",
+          "password text required"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "login-field-#remember_me",
+        "status": "pass",
+        "observed": [
+          "Ingat saya",
+          "check box not checked"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "login-server-error",
+        "status": "pass",
+        "observed": [
+          "Memproses...",
+          "button grayed",
+          "alert",
+          "Periksa kembali formulir• Email atau kata sandi yang kamu masukkan salah."
+        ],
+        "ordered": true
+      },
+      {
+        "name": "registration-structure",
+        "status": "pass",
+        "observed": [
+          "Buat akun",
+          "heading 1"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "registration-fields",
+        "status": "pass",
+        "observed": [
+          "Nama lengkap",
+          "Gunakan alamat email dengan huruf kecil.",
+          "Gunakan kata sandi yang unik untuk akun ini.",
+          "Konfirmasi kata sandi",
+          "Saya menyetujui Kebijakan Privasi dan memahami bahwa hasil analisis merupakan prediksi model, bukan verifikasi kebenaran yang definitif.",
+          "check box not checked required"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "verification-notice-heading",
+        "status": "pass",
+        "observed": [
+          "Verifikasi email"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "result-valid",
+        "status": "pass",
+        "observed": [
+          "Penjelasan analisis",
+          "Referensi terkait",
+          "Judul a <script>window.fixtureXss=true</script> panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang",
+          "Judul b <script>window.fixtureXss=true</script> panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "history-structure",
+        "status": "pass",
+        "observed": [
+          "Ringkasan seluruh riwayat",
+          "Cari dan filter riwayat",
+          "Daftar pemeriksaan"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "history-filter-name-hint",
+        "status": "pass",
+        "observed": [
+          "Cari teks atau URL",
+          "Cari pada teks, hasil ekstraksi, atau URL. Maksimal 100 karakter."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "history-filter-select",
+        "status": "pass",
+        "observed": [
+          "Label model",
+          "combo box",
+          "Semua label"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "profile-structure",
+        "status": "pass",
+        "observed": [
+          "Identitas akun",
+          "Ubah kata sandi",
+          "Hapus akun"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "profile-dialog",
+        "status": "pass",
+        "observed": [
+          "Hapus akun secara permanen?",
+          "dialog",
+          "Tindakan ini tidak dapat dibatalkan. Masukkan kata sandi akun untuk mengonfirmasi penghapusan.",
+          "Batal",
+          "escape",
+          "Hapus akun"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "statistics-table",
+        "status": "pass",
+        "observed": [
+          "Jumlah submission per bulan dan label tersimpan",
+          "table with 13 rows 4 columns",
+          "column header",
+          "November 2025 row header Total submission column header 0",
+          "Row 2, column 2."
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-dashboard",
+        "status": "pass",
+        "observed": [
+          "Dashboard",
+          "Ringkasan operasi",
+          "Tren submission · 30 hari"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-native-table",
+        "status": "pass",
+        "observed": [
+          "table with 10 rows 7 columns",
+          "Select/deselect all items for bulk actions."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "admin-table-control",
+        "status": "pass",
+        "observed": [
+          "Nama",
+          "Email"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "account-menu-expanded-escape",
+        "status": "pass",
+        "observed": [
+          "collapsed button",
+          "expanded",
+          "escape",
+          "collapsed"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "result-reading-valid",
+        "status": "pass",
+        "observed": [
+          "Hasil analisis",
+          "Prediksi model: Valid",
+          "Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.",
+          "Skor Keyakinan Model",
+          "Skor ini menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita.",
+          "Penjelasan analisis"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "result-reading-hoax",
+        "status": "pass",
+        "observed": [
+          "Hasil analisis",
+          "Prediksi model: Hoaks",
+          "Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.",
+          "Skor Keyakinan Model",
+          "Skor ini menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita.",
+          "Penjelasan analisis"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "result-reading-meragukan",
+        "status": "pass",
+        "observed": [
+          "Hasil analisis",
+          "Informasi belum terverifikasi oleh sumber terpercaya",
+          "Ini bukan bukti bahwa informasi benar atau palsu.",
+          "Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.",
+          "Skor Keyakinan Model",
+          "Skor ini menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita.",
+          "Penjelasan analisis"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "input-provenance-disclosure",
+        "status": "pass",
+        "observed": [
+          "Input dan teks analisis",
+          "collapsed button",
+          "expanded",
+          "collapsed"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "failed-reading",
+        "status": "pass",
+        "observed": [
+          "Pemrosesan Gagal",
+          "Status: Gagal. Tahap terakhir tercatat: Klasifikasi BERT.",
+          "Pemrosesan terhenti. Hasil final belum tersedia. Kembali ke form untuk mengirim pemeriksaan"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "progress-quiet-unchanged-polls",
+        "status": "pass",
+        "observed": [],
+        "duration_ms": 6500
+      },
+      {
+        "name": "progress-stage-retrieving",
+        "status": "pass",
+        "observed": [
+          "75 percent.",
+          "Status: Diproses. Tahap: Pencarian bukti."
+        ],
+        "ordered": true
+      },
+      {
+        "name": "progress-stage-explaining",
+        "status": "pass",
+        "observed": [
+          "85 percent.",
+          "Status: Diproses. Tahap: Penyusunan penjelasan."
+        ],
+        "ordered": true
+      },
+      {
+        "name": "progress-quiet-after-stage",
+        "status": "pass",
+        "observed": [],
+        "duration_ms": 6500
+      },
+      {
+        "name": "progress-terminal-completed",
+        "status": "pass",
+        "observed": [
+          "Finished loading Hasil analisis — hoaxlin.id."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "forgot-field-hint",
+        "status": "pass",
+        "observed": [
+          "Alamat email",
+          "Gunakan alamat email yang Anda gunakan saat mendaftar."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "reset-password-hints",
+        "status": "pass",
+        "observed": [
+          "Kata sandi baru",
+          "password text required",
+          "Konfirmasi kata sandi",
+          "Masukkan kembali kata sandi yang sama."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "error-template",
+        "status": "pass",
+        "observed": [
+          "Halaman atau hasil tidak ditemukan"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "admin-login-controls",
+        "status": "pass",
+        "observed": [
+          "Email address*",
+          "entry required",
+          "Password*",
+          "password text required"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "history-empty-reading",
+        "status": "pass",
+        "observed": [
+          "Belum ada riwayat pemeriksaan",
+          "Mulai pemeriksaan pertama Anda untuk menyimpan riwayat di akun ini.",
+          "Periksa informasi"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-dataset-controls",
+        "status": "pass",
+        "observed": [
+          "Teks informasi*",
+          "Label katalog*",
+          "combo box",
+          "Meragukan"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-readonly-detail",
+        "status": "pass",
+        "observed": [
+          "Input sumber",
+          "Terjemahan dan provenance"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "explanation_pending-reading",
+        "status": "pass",
+        "observed": [
+          "Status tercatat: Sedang disusun.",
+          "Penjelasan AI belum tersedia untuk hasil ini."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "explanation_unavailable-reading",
+        "status": "pass",
+        "observed": [
+          "Status tercatat: Tidak tersedia.",
+          "Penjelasan AI tidak tersedia. Prediksi classifier tetap ditampilkan."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "evidence-heading-quote-source",
+        "status": "pass",
+        "observed": [
+          "Judul a <script>window.fixtureXss=true</script> panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang",
+          "heading 3",
+          "Sumber:",
+          "Tanggal publikasi:",
+          "block quote",
+          "https://example.test/a",
+          "link"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "input-tabs-focus-mode-arrow",
+        "status": "pass",
+        "observed": [
+          "Teks",
+          "page tab",
+          "Tautan artikel",
+          "page tab",
+          "Teks",
+          "page tab"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "flash-native-frame-focus",
+        "status": "pass",
+        "observed": [
+          "Pesan sistem",
+          "status bar",
+          "Tautan verifikasi baru telah dikirim. Periksa kotak",
+          "Tutup pesan: Informasi"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-user-form-fields",
+        "status": "pass",
+        "observed": [
+          "Nama*",
+          "Email*",
+          "Kata sandi*",
+          "password text required"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "admin-delete-dialog-default-mode",
+        "status": "pass",
+        "observed": [
+          "Hapus data kurasi ini?",
+          "dialog",
+          "Data akan dihapus dari katalog. Tindakan ini tidak dapat dibatalkan dan tidak melatih ulang atau mengganti model BERT aktif.",
+          "Cancel",
+          "Hapus data kurasi",
+          "escape",
+          "Delete"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "transport-final-403",
+        "status": "pass",
+        "observed": [
+          "Sesi atau akses tidak lagi tersedia. Muat ulang halaman untuk memeriksa akses."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "transport-final-403-quiet",
+        "status": "pass",
+        "observed": [],
+        "duration_ms": 6500
+      },
+      {
+        "name": "transport-final-503",
+        "status": "pass",
+        "observed": [
+          "Belum dapat memperbarui status. Status terakhir tetap ditampilkan. Gunakan “Muat ulang status” jika diperlukan."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "transport-final-503-quiet",
+        "status": "pass",
+        "observed": [],
+        "duration_ms": 6500
+      }
+    ],
+    "observation_count": 49,
+    "final_layout": [
+      {
+        "name": "transport-final-layout",
+        "width": 320,
+        "overflow": false,
+        "liveRegion": "status",
+        "emptyHidden": true
+      },
+      {
+        "name": "transport-final-layout",
+        "width": 360,
+        "overflow": false,
+        "liveRegion": "status",
+        "emptyHidden": true
+      },
+      {
+        "name": "transport-final-layout",
+        "width": 768,
+        "overflow": false,
+        "liveRegion": "status",
+        "emptyHidden": true
+      },
+      {
+        "name": "transport-final-layout",
+        "width": 1280,
+        "overflow": false,
+        "liveRegion": "status",
+        "emptyHidden": true
+      }
+    ],
+    "normal_final_smoke": {
+      "checks": [
+        {
+          "name": "processing",
+          "title": "Sedang Menganalisis",
+          "overflow": false,
+          "main": 1,
+          "status": "processing",
+          "transportRegion": "status"
+        },
+        {
+          "name": "pending",
+          "title": "Menunggu pemrosesan",
+          "overflow": false,
+          "main": 1,
+          "status": "pending",
+          "transportRegion": "status"
+        },
+        {
+          "name": "failed",
+          "title": "Pemrosesan Gagal",
+          "overflow": false,
+          "main": 1,
+          "status": "failed",
+          "transportRegion": "status"
+        },
+        {
+          "name": "valid",
+          "title": "Hasil analisis",
+          "overflow": false,
+          "main": 1
+        }
+      ],
+      "native_posts": 2,
+      "fallback_requests": 0,
+      "console_errors": [],
+      "server_errors": 0
+    },
+    "raw_artifact_hashes": {
+      "matrix-private.json": "d01cf45f4df4f066419673718b22490f2504d585f56620a59c6482069ef2afec",
+      "matrix-rest-private.json": "2ba0a1460e09893cce5499c05a9ffbeabbf63b714bb3dacddfe734fca49477c8",
+      "extra-private.json": "352221e8252248c23193548ff73c067d10fac73c76dd8b1ea9d40b9e6e9fc776",
+      "followup-private.json": "873b62f0dbe060ea53910e4f3986ad0b4266573043bc8a3d0b42c14ca79ec321",
+      "completion-private.json": "9a7c7ef2e9eafd4f9f8499a3a164c108898c781d592e2bc66f0933e3ce243b62",
+      "transport-final-private.json": "b56f70c1cdcc4b2db5eb39f960f173cc05e27e9249bbab3596de057ce2ec3313",
+      "focus-final-private.json": "0bc487b06b013481e738af2b28ed7dbb594f8e27e7832c32865c106e3773562a",
+      "orca-debug-private.out": "8aa3cc8d47cf12778e01f01a85f584967d0e965dcaf25acfe3b77ec46e9bb1fd",
+      "speech-dispatcher-private.log": "e7bf7bc8ac6ca885966f6c8d272608a21654d4c0deee498e568e71528aaf3518"
+    }
+  },
+  "diagnostics_resume": [
+    "Artisan test wrapper reports 25 existing DOMDocument HTML5 section warnings in SubmissionProgressPresentationTest; direct final PHPUnit run has no failure/warning and four BERT skips",
+    "Root build initially lacked vendor Filament CSS; exact-lock temporary symlink restored imports, final build passed and symlink removed",
+    "Orca setup needed canonical private accessibility bus, explicit registry and content-frame focus; setup/focus probes and wrong monitoring slug excluded from successful observations",
+    "Admin alertdialog rechecked after clearing sticky browse mode; native title, description, Cancel, confirm and Escape/focus return announced"
+  ],
+  "final_audit": {
+    "resume_tracked_initial": 661,
+    "tracked_unchanged": 654,
+    "changed_files": 7,
+    "task_statuses": {
+      "done": 37,
+      "pending": 2
+    },
+    "local_document_links_valid": 215,
+    "source_matches_tested_snapshot": true,
+    "root_vendor_temporary_link_removed": true,
+    "owned_qa_runtimes_stopped": true,
+    "qa_ports_listening": []
+  }
+}

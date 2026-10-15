@@ -26,7 +26,7 @@ class SubmissionsTable
                 TextColumn::make('created_at')->label('Dikirim')->dateTime('d/m/Y H:i')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('input_type')->label('Jenis input')->options(['text' => 'Teks', 'image' => 'Gambar', 'video' => 'Video unggahan', 'url' => 'Tautan artikel']),
+                SelectFilter::make('input_type')->label('Jenis input')->options(['text' => 'Teks', 'image' => 'Gambar', 'video' => 'Video', 'url' => 'Tautan artikel']),
                 SelectFilter::make('status')->label('Status submission')->options(SubmissionStatus::options()),
             ])
             ->recordActions([

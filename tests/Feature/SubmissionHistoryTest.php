@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Actions\Submissions\CreateSubmission;
 use App\Models\DetectionResult;
 use App\Models\EvidenceReference;
 use App\Models\Feedback;
 use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -108,14 +110,22 @@ class SubmissionHistoryTest extends TestCase
             ->assertViewHas('submissions', fn ($items): bool => $items->first()->id === $older->id);
     }
 
-    public function test_video_filter_only_matches_uploaded_video_and_video_url_stays_invalid(): void
+    public function test_video_filter_matches_uploads_and_normalized_links_but_rejects_a_separate_video_url_filter(): void
     {
+        Queue::fake();
         $user = User::factory()->create();
         $upload = Submission::factory()->for($user)->create(['input_type' => 'video']);
+        $link = app(CreateSubmission::class)->handle([
+            'input_type' => 'video_url',
+            'source_url' => 'https://example.test/video.mp4',
+        ], $user, null);
         Submission::factory()->for($user)->create(['input_type' => 'video_url']);
+        $this->assertSame('video', $link->input_type);
         $this->actingAs($user)->get(route('riwayat', ['input_type' => 'video']))
-            ->assertOk()->assertViewHas('submissions', fn ($items): bool => $items->total() === 1 && $items->first()->id === $upload->id)
-            ->assertSee('Video unggahan tidak mencakup tautan video.');
+            ->assertOk()->assertViewHas('submissions', fn ($items): bool => $items->total() === 2
+                && $items->pluck('id')->sort()->values()->all() === collect([$upload->id, $link->id])->sort()->values()->all())
+            ->assertSee('Pilih Video untuk unggahan atau tautan video yang dikirim melalui formulir pemeriksaan.')
+            ->assertDontSee('Video unggahan tidak mencakup tautan video.');
         $this->from(route('riwayat'))->get(route('riwayat', ['input_type' => 'video_url']))->assertSessionHasErrors('input_type');
     }
 

@@ -38,7 +38,7 @@ final class DetectionPresentation
     public static function inputType(?string $type): string
     {
         return match ($type) {
-            'text' => 'Teks', 'image' => 'Gambar', 'video' => 'Video unggahan',
+            'text' => 'Teks', 'image' => 'Gambar', 'video' => 'Video',
             'video_url' => 'Tautan video', 'url' => 'Tautan artikel',
             default => 'Jenis input belum tersedia',
         };

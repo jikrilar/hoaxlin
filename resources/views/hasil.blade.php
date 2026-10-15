@@ -23,7 +23,10 @@
                     data-initial-status="{{ $submission->status }}" data-status-url="{{ route('hasil.status', $submission->id) }}"
                     data-progress-stages="{{ json_encode(\App\Enums\ProcessingStage::values()) }}">
                     <livewire:submission-progress :submission="$submission" />
-                    <p class="hl-submission-progress__hint" data-progress-transport role="status" aria-live="polite" aria-atomic="true" hidden></p>
+                    {{-- Keep the live region exposed before its message is shown. --}}
+                    <div role="status" aria-live="polite" aria-atomic="true">
+                        <p class="hl-submission-progress__hint" data-progress-transport hidden></p>
+                    </div>
                     <noscript><p class="hl-submission-progress__hint">JavaScript dinonaktifkan. Gunakan “Muat ulang status” untuk melihat pembaruan.</p></noscript>
                 </div>
                 @if($submission->isFailed() && $failureReason)

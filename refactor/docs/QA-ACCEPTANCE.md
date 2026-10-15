@@ -3,8 +3,8 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 13 Oktober 2026 |
-| Status | QA-ENV-01–03 pass sebagai audit/inventaris; 91 kasus lainnya not_run |
+| Tanggal | 15 Oktober 2026 |
+| Status | QA-ENV-01–03 audit pass; QA-A11Y-03/08 screen reader pass; 89 kasus lainnya not_run dengan subhasil task terpisah |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Arah desain | Warm Editorial Intelligence; light-only |
@@ -337,7 +337,7 @@ IP-020 menambah [subhasil profil/konfirmasi](../reports/PROFILE-IP-020.md): 16 u
 | Kasus | Jalankan | Expected | Traceability |
 | --- | --- | --- | --- |
 | **QA-HISTORY-01 — Kosong dan mixed state** | Buka tanpa history, dengan history, serta query yang tidak menemukan hasil; sertakan pending/failed/partial/completed. | Empty awal berbeda dari empty filter; actions recovery nyata. Pending/failed tidak diberi final label/skor palsu; summary menjelaskan seluruh history, bukan filter aktif. | AC-P03; IP-021 |
-| **QA-HISTORY-02 — Filter dan search** | Uji search raw/extracted/source sampai 100 dan 101 karakter; label, input_type, status serta nilai tidak valid. | GET query/validation tetap; filter hanya text/image/video/url, tanpa video_url baru. Status pending/processing/completed/failed; label existing; copy Video tidak menyamakan domain yang tidak dicakup. | AC-P03; IP-021; G02 |
+| **QA-HISTORY-02 — Filter dan search** | Uji search raw/extracted/source sampai 100 dan 101 karakter; label, input_type, status serta nilai tidak valid. | GET query/validation tetap; filter hanya text/image/video/url, tanpa video_url baru. Status pending/processing/completed/failed; label existing; copy Video mengikuti normalisasi request ke kategori tersimpan; uji tautan melalui CreateSubmission selain fixture raw video_url yang terpisah. | AC-P03; IP-021; G02 |
 | **QA-HISTORY-03 — Sort/pagination** | Uji newest/oldest/confidence, halaman kedua, clear filter dan long cells pada mobile. | 15 item per halaman; query string dipertahankan; urutan mengikuti controller termasuk tie handling existing. Summary/CSV tidak diklaim mengikuti filter; tabel memakai scroll lokal bila perlu. | AC-P03, AC-P16; IP-021, IP-034; G03 |
 | **QA-HISTORY-04 — Detail history** | Buka masing-masing state dari history, gunakan back action, lalu coba ID milik user lain; bandingkan hasil direct route. | Semantik/komponen P02 dipakai konsisten tanpa data silang. Context kembali jelas; forUser tetap; progress/evidence/feedback lifecycle tidak diduplikasi untuk P04. | AC-P04; IP-022, IP-013–IP-016 |
 
@@ -448,6 +448,12 @@ IP-026 menambah [subhasil E01](../reports/ERROR-PAGES-IP-026.md) untuk QA-ERROR-
 | **QA-ASSET-03 — Lifecycle helper global** | Ulangi normal load/navigate/back-forward dan mount/cleanup pada menu, form, password, dialog, chart dan preview. | Listener/timer/object URL/import dibersihkan; tidak ada double mount/submit. Livewire owns morph DOM; data tak tepercaya tidak masuk innerHTML; JS error satu modul tidak menyembunyikan form SSR. | IP-007, IP-010, IP-012, IP-014, IP-025, IP-037; FA-04 |
 | **QA-ASSET-04 — Cleanup dan dependency** | Sesudah IP-011–IP-034 selesai, cari pemakai CSS/JS legacy, globals, aliases, fake timer/reveal/counter serta dependency baru; build dan smoke area terdampak. | Tidak ada orphan handler/style atau polling ganda tanpa alasan. Hapus hanya setelah pemakai dimigrasi; vendor Filament assets tidak diedit. Package/lockfile changes memiliki kebutuhan nyata. | IP-035, IP-036; G08; FA-08, FA-10 |
 | **QA-ASSET-05 — Data sensitif client** | Inspect storage, DOM attributes, client console dan request selama input/auth/result/admin pada fixture sintetis. | Tidak ada token capability, credential/provider key/password/raw input sensitif yang disalin ke localStorage/sessionStorage/log debug. Form DOM/data yang memang diperlukan tetap di-escape; browser tidak mengakses provider AI langsung. | IP-007, IP-012, IP-017–IP-020, IP-037; FA-09 |
+
+IP-035 menambah [subhasil cleanup](../reports/CLEANUP-IP-035.md) untuk QA-ASSET-04/G08: consumer legacy sudah dimigrasi, alias/styles/hints/helper tanpa consumer dihapus, shared container dipertahankan tanpa perubahan deklarasi, scanner publik eksplisit dan Axios/26 transitif dihapus tanpa mengubah package records lain. Polling/counter fungsional, preview resource ownership, font/token/stack API serta vendor/admin tetap. Suites terkait 197 passed; full suite final 773 passed/4 BERT skips tanpa failure/warning, 69 Node/npm ci Node 22/build host/Docker/Blade lulus. Browser 60 samples sebelum +60 sesudah pada 360/768/1280 untuk 20 halaman/state dengan recorded style/geometry identik; 8 keyboard toggle/reset per run, tambahan 20 no-JS/reduced samples serta saved native zoom 200% lulus. Console bersih, intentional 404 terpisah dan tanpa asset failure. CSS publik turun 14839 bytes, admin identik. Driver fixture/hidden control/no-JS/zoom disesuaikan tanpa perubahan produk. Screen reader/forced colors/browser lain/MySQL/deployment/inference nyata belum diuji. Aggregate QA tetap 3 audit pass/91 not_run; IP-036–039 dan gate F6 menyeluruh belum ditutup.
+
+IP-036 menambah [subhasil regression final](../reports/REGRESSION-IP-036.md) untuk QA-ASSET-02/04 dan regression FA-01–FA-10: build host/Docker, Blade cache/clear, 15 manifest records/empat entry/import/font URL serta button/alert variants lulus; seluruh 16 output build host/Docker identik. Suites terkait 364 passed/3023 assertions, suite penuh final 773 passed/4 BERT skips/5205 assertions tanpa failure/warning, 69 Node dan Pint --test pada 80 non-Blade PHP refactor lulus. Run image test awal memiliki dua error fixture packaging existing; final lulus dengan tiga file repository read-only, tanpa perubahan Dockerfile/aplikasi/test/lockfile. Browser cleanup IP-035 digunakan kembali karena source/output produk identik, tidak dihitung sebagai run browser IP-036 atau kelulusan matriks IP-037. Real inference dan batas browser/deployment/audit gap existing tetap terbuka. Aggregate QA tetap 3 audit pass/91 not_run; IP-037–039 dan gate F6 menyeluruh belum ditutup.
+
+IP-037 menambah [QA browser lintas halaman/state](../reports/BROWSER-IP-037.md) dan [evidence JSON](../reports/BROWSER-IP-037.json): Firefox normal 276/no-JS 92/native zoom200 33/forced colors 12 samples; Chromium Headless normal/no-JS 308 samples, 68 checks interaksi, 15 halaman DOM/semantic contrast tanpa duplicate ID/broken aria refs dan minimum delapan pasangan 4.78:1. Actual Laravel/session/CSRF/SQLite/Livewire/Filament serta mutasi akun/admin disposable, native lima input, akses/final/evidence/feedback/history/export/progress/faults diperiksa. Copy tanda tanya ganda CAPTCHA diperbaiki; 20 label final Chromium pada empat viewport dan lima native forms lulus. Build/Blade, 98 tests terkait, 69 Node dan suite penuh final 773 passed/4 BERT skips/5205 assertions lulus tanpa failure/warning. Reuse renderer/download/additional client fixture evidence disebut terpisah dari run baru; raw token/cookie/credential tidak masuk laporan. Kelanjutan menutup minimum screen reader melalui **Orca 51.0 / Firefox 157.0.1 headed pada Xvfb privat**, Speech Dispatcher 0.12.1/eSpeak NG 1.52.0: 49 observasi terverifikasi pada template/interaksi utama. Pengumuman gangguan polling yang semula diam diperbaiki melalui wadah live region selalu exposed; 403/503 diumumkan sekali, status domain tetap processing dan polling tanpa perubahan diam. Test regresi red/green, 66 tests terkait/436 assertions, suite final 774 passed/4 BERT skips/5214 assertions, 69 Node, Pint satu file, build/Blade, empat viewport final dan native smoke lulus. Stream ucapan aktual diperiksa secara otomatis dengan audio null sink; tidak mengklaim evaluasi pelafalan manusia atau SR setiap resource admin individual. **IP-037 done, QA-A11Y-03/08 pass**; agregat **5 pass / 89 not_run**, tanpa otomatis menutup seluruh varian kasus lain. Gate F6 serta IP-038–039 tetap terbuka.
 
 ## 7. Pemetaan acceptance dan task
 
@@ -588,16 +594,18 @@ Gate audit dapat selesai dengan inventaris blocker yang lengkap; itu tidak menut
 
 ### 9.1 Gap register G01–G08
 
-| Gap | Keputusan yang harus dapat ditinjau | Kasus terkait |
+Keputusan/status final dipelihara pada [register halaman](PAGE-SPECIFICATIONS.md#23-gap-baseline-dan-batas-implementasi); [IP-038](../reports/GAPS-IP-038.md) menghubungkan evidence serta batasnya.
+
+| Gap | Status IP-038 | Kasus terkait |
 | --- | --- | --- |
-| G01 — View data limit video | Limit/format/durasi berasal service/config; jika perlu view data tambahan, scope presentasi jelas | QA-INPUT-05, QA-INPUT-06 |
-| G02 — Filter video_url tidak ada | Pertahankan filter existing; jangan tampilkan opsi yang tidak didukung | QA-HISTORY-02, QA-ADMIN-05 |
-| G03 — CSV tanpa filter | Copy seluruh riwayat; filtered export adalah fitur/kontrak terpisah | QA-HISTORY-03, QA-EXPORT-04 |
-| G04 — byTopic/populasi | UI menyebut distribusi label dan total query existing; query change bukan koreksi visual diam-diam | QA-INFO-04, QA-INFO-05 |
-| G05 — PDF evidence contract | Align makna hasil; evidence hanya jika controller contract nyata dan perubahan eksplisit | QA-EXPORT-02, QA-EXPORT-03 |
-| G06 — File legacy inactive | Registered pages/actions/resource permissions tetap read-only | QA-ADMIN-05–QA-ADMIN-09 |
-| G07 — Service/artifact unavailable | Fixture vs real service dicatat; live checks yang blocked disebut dengan dampak | QA-ENV-02, QA-ENV-03, QA-ADMIN-02 |
-| G08 — CSS/JS legacy/bundled source | Review semua pemakai, cleanup bertahap dan rebuild image sesuai kebutuhan | QA-ASSET-02–QA-ASSET-04 |
+| G01 | resolved | QA-INPUT-05/06 |
+| G02 | retained | QA-HISTORY-02; QA-ADMIN-05 |
+| G03 | retained | QA-HISTORY-03; QA-EXPORT-04 |
+| G04 | resolved | QA-INFO-04/05 |
+| G05 | retained | QA-EXPORT-02/03 |
+| G06 | retained | QA-ADMIN-05–09 |
+| G07 | blocked | QA-ENV-02/03; QA-ADMIN-02 |
+| G08 | resolved | QA-ASSET-02–04 |
 
 Setiap gap dicatat `resolved`, `retained` atau `blocked` beserta alasan/evidence/task. `retained` berarti batas kontrak existing dijelaskan akurat; bukan waiver terhadap bug UI dalam scope. Gap tidak otomatis menjadi fitur baru.
 
@@ -714,3 +722,7 @@ Status setelah IP-002 (11 Oktober 2026): QA-ENV-02 **pass sebagai inventaris bas
 Status setelah IP-003 (13 Oktober 2026): QA-ENV-03 **pass sebagai review inventaris/rencana fixture**, berdasarkan [inventaris state](../reports/FIXTURES-IP-003.md) dan [jurnal IP-003](TASKS.md#ip-003--catatan-eksekusi). Total terkini: pass=3, not_run=91, fail=0, blocked=0, not_applicable=0. Rencana run fixture/browser/export/real service belum dijalankan; semua QA halaman/pipeline masih not_run. Catatan F0 lengkap untuk scope audit/inventaris, tetapi blocker backend/runtime dan harness browser fixture tetap terbuka.
 
 Ketika implementasi diminta, lanjutkan task pending sesuai dependency pada TASKS.md, pilih kasus yang relevan, jalankan pemeriksaan yang tersedia, lalu catat hasil aktual. Tuntaskan failure acceptance dan ulangi scope yang terdampak. Lanjutkan pekerjaan independen saat ada blocker, tetapi pertahankan batas klaim QA dan E2E sampai bukti tersedia.
+
+Status rekonsiliasi IP-038 (15 Oktober 2026): 27 page/AC dan FA-01–10 memiliki tautan source/evidence; G01–G08 berstatus 3 resolved/4 retained/1 blocked. Source G02 memperjelas kategori Video tanpa opsi filter baru; targeted/full suite, browser 42 samples/9 checks dan dua PDF diulang untuk dampak tersebut. Evidence CSV/admin/renderer lain digunakan ulang sesuai diff, tanpa mengubah laporan historis menjadi run baru. Katalog tetap **5 pass/89 not_run**; G07, backlog backend audit/retensi, IP-039 dan gate F6 menyeluruh belum ditutup. Lihat [laporan](../reports/GAPS-IP-038.md) dan [ledger 94 kasus](../reports/GAPS-IP-038.json).
+
+Status handoff IP-039 (15 Oktober 2026): [handoff final](../reports/HANDOFF-IP-039.md) dan [ledger](../reports/HANDOFF-IP-039.json) meninjau 27 page/AC, 60 butir DoD, FA-01–10, delapan gap dan seluruh ID katalog. Suite final 780 kasus/5235 assertions: 776 passed/4 real-BERT skips; 69 Node dan Blade lulus. Source produk identik dengan IP-038; bukti build/browser/SR/export dipakai kembali sesuai fingerprint, bukan run baru. **Katalog tetap 5 pass/89 not_run; penerimaan menyeluruh/gate F6 belum lulus**, meskipun seluruh 39 task done dalam lingkup implementasi/dokumentasi. Langkah penutupan varian QA, G07 serta B01/B02/B03 tercantum pada handoff; tidak ada deployment atau perluasan kontrak.

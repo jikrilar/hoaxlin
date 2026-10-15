@@ -267,7 +267,7 @@ class HistoryPresentationTest extends TestCase
 
     public static function inputKinds(): array
     {
-        return [['text', 'Teks'], ['image', 'Gambar'], ['video', 'Video unggahan'], ['video_url', 'Tautan video'], ['url', 'Tautan artikel']];
+        return [['text', 'Teks'], ['image', 'Gambar'], ['video', 'Video'], ['video_url', 'Tautan video'], ['url', 'Tautan artikel']];
     }
 
     public function test_csv_link_is_not_offered_to_an_unverified_viewer(): void

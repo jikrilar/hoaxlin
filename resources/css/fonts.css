@@ -11,17 +11,10 @@
 
 @layer components {
     /* Explicit editorial roles; functional headings/controls continue to use Inter. */
-    .hl-heading-display,
     .hl-heading-editorial {
         font-family: var(--ds-font-editorial);
         font-optical-sizing: auto;
         letter-spacing: var(--ds-tracking-editorial);
-    }
-
-    .hl-heading-display {
-        font-size: var(--ds-type-display-size);
-        font-weight: var(--ds-type-display-weight);
-        line-height: var(--ds-type-display-leading);
     }
 
     .hl-heading-editorial {

@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use App\Enums\ProcessingStage;
 use App\Models\Submission;
 use App\Models\User;
+use DOMDocument;
+use DOMElement;
+use DOMXPath;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -12,6 +15,28 @@ use Tests\TestCase;
 class FinalResultStateTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_transport_feedback_has_an_exposed_live_region_before_an_error_arrives(): void
+    {
+        [$user, $submission] = $this->ownedSubmission('processing', ProcessingStage::Classifying);
+
+        $response = $this->actingAs($user)->get(route('hasil', $submission))->assertOk();
+        $document = new DOMDocument;
+        @$document->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());
+        $xpath = new DOMXPath($document);
+        $feedback = $xpath->query('//*[@data-progress-transport]')->item(0);
+
+        $this->assertInstanceOf(DOMElement::class, $feedback);
+        $this->assertTrue($feedback->hasAttribute('hidden'));
+        $this->assertSame('', $feedback->textContent);
+
+        $region = $feedback->parentNode;
+        $this->assertInstanceOf(DOMElement::class, $region);
+        $this->assertSame('status', $region->getAttribute('role'));
+        $this->assertSame('polite', $region->getAttribute('aria-live'));
+        $this->assertSame('true', $region->getAttribute('aria-atomic'));
+        $this->assertSame(0, $xpath->query('ancestor-or-self::*[@hidden or @aria-hidden="true"]', $region)->length);
+    }
 
     #[DataProvider('inFlightStages')]
     public function test_pending_and_processing_stages_remain_non_terminal(

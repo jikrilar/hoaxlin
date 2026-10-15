@@ -3,12 +3,14 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi dokumen | 1.0 |
-| Tanggal | 11 Oktober 2026 |
-| Status | Arsitektur target refactoring; belum diimplementasikan atau diuji pada runtime |
+| Tanggal | 15 Oktober 2026 |
+| Status | Arsitektur implementasi diselaraskan IP-038; validasi dan batas runtime di TASKS.md |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Arah desain | Warm Editorial Intelligence; light-only |
 | Dokumen terkait | [AGENTS.md](../../AGENTS.md), [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md), [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md) |
+
+Status task rinci berpusat pada [TASKS.md](TASKS.md). [rekonsiliasi IP-038](../reports/GAPS-IP-038.md) menghubungkan source, page/AC, FA-01–FA-10 dan G01–G08 ke evidence. Baseline serta catatan IP terdahulu adalah riwayat pemeriksaan pada saat task tersebut dikerjakan; batas runtime terbaru mengikuti laporan IP-038, tanpa klaim seluruh refactor/QA/E2E selesai.
 
 ## 1. Tujuan dan lingkup
 
@@ -104,34 +106,36 @@ flowchart TD
 
 Hanya satu cabang progress aktif pada satu waktu. Keduanya membaca state backend yang sama. Hasil final tetap dirender melalui halaman yang diotorisasi.
 
-## 5. Struktur file target
+## 5. Struktur file implementasi
 
-Pertahankan nama top-level view dan controller agar route/view lookup existing tidak berubah. Ekstrak bagian di dalamnya secara bertahap.
+Tabel berikut mencatat path aktual pada penutupan IP-038. Nama top-level view/controller tetap untuk lookup route existing. Inventaris terstruktur dan hash source tersedia pada laporan IP-038; tabel ini bukan klaim seluruh varian QA lulus.
 
 ### 5.1 CSS dan JavaScript
 
 | Path | Status | Tanggung jawab |
 | --- | --- | --- |
-| `resources/css/app.css` | Existing, dirapikan | Entry CSS publik; import Tailwind/token/styles |
-| `resources/css/design-tokens.css` | Baru | Primitive dan semantic tokens bersama, tanpa reset/layout |
-| `resources/css/theme.css` | Baru bila bridge perlu dipisah | Mapping `@theme inline` untuk utility publik |
-| `resources/css/base.css` | Baru | Base publik, focus, typography fungsional, aksesibilitas |
-| `resources/css/components.css` | Baru | Pola reusable; pecah lagi hanya jika ukuran/pemakai membenarkan |
-| `resources/css/pages/` | Opsional | Style khusus halaman yang tidak cocok sebagai utility/komponen |
-| `resources/css/filament/admin/theme.css` | Baru melalui generator | Theme panel admin, token bridge dan override terbatas |
-| `resources/js/app.js` | Existing, dirapikan | Entry publik dan registrasi lifecycle |
-| `resources/js/bootstrap.js` | Existing | Bootstrap Axios existing; hapus hanya setelah audit pemakai |
-| `resources/js/core/lifecycle.js` | Baru | Mount, cleanup, guard init, navigasi |
-| `resources/js/components/navigation.js` | Baru | Disclosure navigasi/akun |
-| `resources/js/components/form-submit.js` | Baru | Loading dan perlindungan double submit pada form native |
-| `resources/js/components/password.js` | Tersedia IP-007/IP-010 | Toggle password aksesibel, hints dan secret cleanup |
-| `resources/js/components/dialog.js` | Baru bila dipakai | Dialog penghapusan; focus/Escape/focus return |
-| `resources/js/pages/submission-form.js` | Tersedia IP-011 | Batas/counter/recovery teks, submit status, cleanup draft/CAPTCHA |
-| `resources/js/pages/submission-media.js` | Tersedia IP-012 | Selector progressive, URL/file validation advisory, preview dan cleanup |
-| `resources/js/pages/result.js` | Baru bila diperlukan | Enhancement halaman hasil dan koordinasi lifecycle |
-| `resources/js/pages/statistics.js` | Baru bila chart dipertahankan | Chart enhancement khusus statistik |
-| `resources/js/progress/fallback.js` | Baru | Polling fallback, in-flight guard, stop/resume, terminal transition |
-| `resources/fonts/` | Opsional | Font berlisensi jika dipilih bundling/self-hosting melalui Vite |
+| `resources/css/app.css` | Tersedia | Entry publik; import eksplisit token/font/theme/base/component/page styles dan scanner Blade/JS/pagination |
+| `resources/css/design-tokens.css` | Tersedia | Primitive/semantic tokens bersama; tanpa reset/layout |
+| `resources/css/theme.css` | Tersedia | Bridge publik `@theme inline` |
+| `resources/css/base.css`, `resources/css/components.css` | Tersedia | Base publik/focus dan komponen bersama; container-app dimiliki components |
+| `resources/css/fonts.css`, `resources/css/fonts/inter.css` | Tersedia | Newsreader editorial dan Inter UI self-hosted, font-display swap |
+| `resources/css/submission-progress.css`, `resources/css/result.css` | Tersedia | Progress dan hasil scoped |
+| `resources/css/history.css`, `resources/css/profile.css` | Tersedia | Riwayat dan profil scoped |
+| `resources/css/information.css`, `resources/css/statistics.css` | Tersedia | Bacaan dan statistik scoped; tidak dibuat folder CSS pages tambahan |
+| `resources/css/errors.css` | Tersedia | Entry HTML error minimal yang mandiri |
+| `resources/css/filament/admin/theme.css` | Tersedia | Theme generator Filament, token/font bersama, tanpa reset publik |
+| `resources/js/app.js` | Tersedia | Memanggil boot dari bootstrap |
+| `resources/js/bootstrap.js` | Tersedia | Registry lazy modules dan pemasangan lifecycle sekali |
+| `resources/js/core/lifecycle.js`, `resources/js/core/scope.js` | Tersedia | Mount/cleanup/guard; defineModule/createScope/lockScroll dan scoped resources |
+| `resources/js/components/navigation.js` | Tersedia | Nonmodal disclosure akun/mobile dan flash; tanpa scroll/focus lock |
+| `resources/js/components/form-submit.js` | Tersedia | Native loading/double-submit/reset/restore |
+| `resources/js/components/password.js` | Tersedia | Toggle, reset dan secret cleanup; tanpa strength/match hints |
+| `resources/js/components/dialog.js` | Tersedia | Native dialog/fallback, focus/Escape/return/scroll cleanup |
+| `resources/js/pages/submission-form.js`, `resources/js/pages/submission-media.js` | Tersedia | Teks/counter/recovery dan selector/URL/upload/preview; media dipasang oleh submission-form |
+| `resources/js/pages/result.js` | Tersedia | Coordinator satu pemilik polling, aman saat terminal/unmount |
+| `resources/js/progress/livewire.js`, `resources/js/progress/fallback.js` | Tersedia | Adapter SDK/hydration/hooks dan scheduler serial/backoff/abort |
+| `resources/js/pages/statistics.js`, `resources/js/pages/statistics-chart.js` | Tersedia | Mount/cleanup statistik dan dynamic Chart.js line subset |
+| `resources/fonts/` | Tersedia | WOFF2 Inter/Newsreader, README provenance dan OFL; tidak dipakai DomPDF |
 
 Module yang tidak melakukan apa-apa setelah markup native disederhanakan tidak perlu dibuat. Disclosure berbasis `details/summary` dan radio feedback native dapat menghilangkan handler khusus.
 
@@ -139,23 +143,20 @@ Module yang tidak melakukan apa-apa setelah markup native disederhanakan tidak p
 
 | Path | Status | Tanggung jawab |
 | --- | --- | --- |
-| `resources/views/layouts/app.blade.php` | Existing | Shell publik |
-| `resources/views/layouts/auth.blade.php` | Tersedia IP-010 | Shell auth ringkas, memakai fondasi head/runtime bersama |
-| `resources/views/partials/head.blade.php` | Baru | Metadata, font, Vite CSS/JS, Livewire styles dan stack style |
-| `resources/views/partials/runtime.blade.php` | Baru | Livewire scripts dan stack script, sekali per dokumen |
-| `resources/views/partials/navigation.blade.php` | Baru | Navigation publik dan akun |
-| `resources/views/partials/footer.blade.php` | Baru | Footer ringkas |
-| `resources/views/components/ui/` | Baru | Button, link, alert, field, empty state, disclosure |
-| `resources/views/components/forms/` | Baru bila reusable | Password field, upload field, CAPTCHA presentation |
-| `resources/views/components/results/` | Baru | Prediction label, confidence metadata, evidence item, provenance |
-| `resources/views/partials/submission/` | Tersedia IP-011 | text/errors/input-types/media/url/upload/security; lima native forms |
-| `resources/views/partials/result/` | Baru | Komposisi hasil yang dipakai `hasil.blade.php` |
-| `resources/views/livewire/submission-progress.blade.php` | Existing | View progress, menggunakan token/komponen yang cocok |
-| `resources/views/auth/*.blade.php` | Existing | Form auth; migrasi ke shell auth |
-| `resources/views/hasil-pdf.blade.php` | Existing | Template DomPDF mandiri |
-| `resources/views/errors/` | Baru sesuai scope | Themed error HTML; kontrak JSON/status tetap |
-| `resources/views/filament/` | Opsional | Hanya custom view admin yang diperlukan |
-| `app/View/Presenters/DetectionPresentation.php` | Opsional, belum ada | Mapping presentasi lintas web/PDF/admin bila duplikasi nyata |
+| `resources/views/layouts/app.blade.php`, `resources/views/layouts/auth.blade.php` | Tersedia | Shell publik dan auth, satu main |
+| `resources/views/partials/head.blade.php`, `resources/views/partials/runtime.blade.php` | Tersedia | Metadata/Vite/Livewire/stacks bersama |
+| `resources/views/partials/navigation.blade.php`, `resources/views/partials/footer.blade.php`, `resources/views/partials/flash.blade.php` | Tersedia | Destinations server-aware dan pesan persisten |
+| `resources/views/components/ui/` | Tersedia | Button/link/field/alert/disclosure/empty state/pagination |
+| `resources/views/components/forms/` | Tersedia | Input/select/password/upload-field; CAPTCHA memakai ui/field dan partial security |
+| `resources/views/components/results/` | Tersedia | Prediction + score, explanation dan evidence item |
+| `resources/views/partials/submission/`, `resources/views/partials/result/` | Tersedia | Lima native input forms dan komposisi hasil/provenance/actions/feedback |
+| `resources/views/livewire/submission-progress.blade.php` | Tersedia | Status/tahap backend dan native refresh |
+| `resources/views/auth/`, `resources/views/partials/auth/` | Tersedia | Auth views serta error summary bersama |
+| `resources/views/errors/`, `resources/views/hasil-pdf.blade.php` | Tersedia | Error HTML dan renderer PDF mandiri |
+| `resources/views/filament/` | Tersedia | Widget, notice scoped dan metadata projection native admin |
+| `app/Support/SubmissionFormOptions.php` | Tersedia | Data limit presentasi dari request/media contract/config tanpa query/policy baru |
+| `app/View/Presenters/DetectionPresentation.php` | Tersedia | Mapping label/skor/jenis input/URL/final guard bersama web/admin/PDF |
+| `app/Filament/Support/ReadOnlyPresentation.php`, `app/Filament/Support/MonitoringPresentation.php` | Tersedia | Presentasi resource baca dan proyeksi positif metadata; tidak mengubah record |
 
 Anonymous components menggunakan namespace seperti `x-ui.button` dan `x-results.evidence-item`. Partial dipakai untuk komposisi yang khusus satu halaman. Jangan membuat dua template hasil untuk `hasil` dan `riwayat.show`; keduanya tetap memakai `hasil.blade.php`.
 
@@ -261,7 +262,7 @@ Tailwind menggunakan `@theme inline` ketika theme variables merujuk CSS variable
 
 `app.css` tetap entry publik. Import token/bridge/base/components dilakukan dari entry tersebut; jaga urutan import yang sah dan layer `base`, `components`, `utilities`. Hindari unlayered overrides tanpa alasan karena dapat mengalahkan utility.
 
-Pertahankan `@source` yang diperlukan untuk Blade, JS, serta pagination Laravel. Baseline juga memindai compiled views dan pola Vue; audit dahulu sebelum cleanup. Pattern scanner bukan bukti framework Vue dipakai.
+IP-035 membatasi scanner publik dengan `source(none)` dan explicit `@source` Blade/JS serta pagination Laravel. Compiled views dan pola Vue dihapus setelah audit: semua class publik berasal dari source Blade/JS, dan tidak ada file Vue. Build tidak lagi memindai dokumen atau cache lama secara otomatis. Scanner/theme admin tetap terpisah pada source PHP Filament dan custom views.
 
 Nama class komponen dapat memakai prefix `hl-`, misalnya `hl-field`, `hl-alert`, dan `hl-prediction`. JS mengikat `data-*`, bukan class visual. Utility untuk layout sederhana tetap wajar; jangan mengganti semua utility dengan CSS custom.
 
@@ -282,6 +283,8 @@ Jangan membangun class seperti `bg-${status}-500`. Pakai mapping string class le
 
 Lebar progress dari angka backend boleh berupa style dinamis tervalidasi; warna/type/layout tidak perlu ditulis inline. Rentang angka dijaga 0–100 pada presentasi tanpa mengganti status domain.
 
+IP-035 menyelesaikan [cleanup pemakai lama](../reports/CLEANUP-IP-035.md): legacy token/component CSS beserta atribut layout dihapus setelah consumer dimigrasi. `container-app` tetap shared layout API dengan deklarasi yang sama, dipindahkan ke components.css. Recovery/display helper CSS tanpa pemakai dan password strength/match hints dibuang; toggle/reset/secret cleanup tetap. Helper scope.objectURL yang hanya dipanggil test dihapus; upload preview tetap memakai scope.own/revoke dengan release saat ganti/hapus/unmount, dan test real blob mempertahankan assertions. Axios tanpa consumer dihapus bersama 26 transitive packages; package records lain, concurrently untuk Composer dev, Chart.js lazy serta font berlisensi tetap. Polling backend, character counter fungsional, Livewire hooks, progress width tervalidasi dan stack extension layout dipertahankan dengan pemakai/kontrak jelas.
+
 ## 9. Arsitektur JavaScript publik
 
 ### 9.1 Entry dan modul
@@ -292,17 +295,17 @@ Contoh marker target: `data-page="submission"`, `data-page="result"`, atau `data
 
 | Modul | Input | Efek | Cleanup |
 | --- | --- | --- | --- |
-| Navigation | Root navigation, button/panel ids | Toggle state dan focus | Listener, focus lock, scroll lock |
+| Navigation | Root navigation, button/panel ids | Disclosure nonmodal dan focus return | Listener/media query/state; tanpa focus/scroll lock |
 | Form submit | Root form native | Cegah double submit, loading text | Listener dan reset state saat restore |
 | Password toggle | Field + button | Toggle type/nama aksesibel | Listener |
-| Submission form | Root selector/forms, config aman | Tab, count, preview, active input | Listener, object URL, async preview |
-| Result | Root result | Disclosure/terminal coordination bila diperlukan | Listener dan guard per root |
+| Submission form + media | Root selector/forms, config aman | Count/recovery dan tab/preview native enhancement | Listener, object URL, async preview dan draft/secret cleanup |
+| Result | Root result/progress | Coordinator adapter Livewire/fallback dan transisi terminal | Listener/request/hooks/timer/guard per root; disclosure tetap native |
 | Fallback progress | Root + URL status server | Request berurutan, status render, stop | Timer, AbortController, visibility handler |
 | Statistics | Root + aggregate series | Chart enhancement | Chart instance dan listener |
 
 Setiap initializer mengembalikan fungsi cleanup, misalnya kontrak `mount(root) => cleanup`. Dynamic import juga harus memiliki guard: bila navigasi sudah mengganti root ketika import selesai, jangan mount pada halaman lama.
 
-Jangan menambah global function baru untuk `onclick`. Ekstrak handler ke module/listener; `window.Hoaxlin` lama dihapus setelah semua pemakainya dimigrasi. `window.axios` tidak otomatis dihapus bersamaan jika masih dibutuhkan.
+Handler inline/window.Hoaxlin dan Axios tanpa consumer sudah dihapus pada IP-007/IP-035. Interaksi memakai module/listener dan fetch status existing; jangan membuat global baru.
 
 ### 9.2 Lifecycle
 
@@ -314,7 +317,7 @@ Cleanup juga mencakup timer, request in-flight, object URL, chart, dialog, dan s
 
 DOM yang dimorph Livewire tetap dimiliki Livewire. JS publik tidak mengganti innerHTML komponen progress atau menulis field snapshot/wire attributes. Native interaction pada bagian itu sebaiknya berada di view/component Livewire atau handler yang tahan replacement DOM.
 
-Implementasi fondasi tersedia pada [IP-007](../reports/LIFECYCLE-IP-007.md): `bootstrap.js` memakai registry ES modules dan `installLifecycle`; `core/lifecycle.js` mengelola body aktif, guard import dan hooks; `core/scope.js` menyediakan `defineModule`, `createScope` dan `lockScroll`. Module shared navigation/form-submit/password/dialog mempunyai consumer nyata; `pages/statistics.js` dipilih melalui data-page dan menjaga late library load serta destroy chart. window.Hoaxlin/window.axios telah diaudit tanpa consumer dan dihapus. Handler beranda kini dimiliki module IP-011 yang dijelaskan di bawah; coordinator progress/result kini dimiliki lifecycle IP-014; presentasi hasil final/provenance tersedia pada IP-015 di bawah; actions/feedback tersedia pada IP-016 di bawah, dan table di atas tetap target bagi task halaman berikutnya, bukan bukti seluruh resource legacy telah dimiliki lifecycle.
+Implementasi fondasi tersedia pada [IP-007](../reports/LIFECYCLE-IP-007.md): `bootstrap.js` memakai registry ES modules dan `installLifecycle`; `core/lifecycle.js` mengelola body aktif, guard import dan hooks; `core/scope.js` menyediakan `defineModule`, `createScope` dan `lockScroll`. Module shared navigation/form-submit/password/dialog mempunyai consumer nyata; `pages/statistics.js` dipilih melalui data-page dan menjaga late library load serta destroy chart. window.Hoaxlin/window.axios telah diaudit tanpa consumer dan dihapus. Handler beranda kini dimiliki module IP-011 yang dijelaskan di bawah; coordinator progress/result kini dimiliki lifecycle IP-014; presentasi hasil final/provenance tersedia pada IP-015 di bawah; actions/feedback tersedia pada IP-016 di bawah, dan tabel path di atas kini mencatat implementasi. Catatan IP berikut merekam bukti pada waktunya; runtime lintas halaman terbaru ditelusuri melalui IP-037/IP-038.
 
 IP-011 menerapkan [form teks beranda](../reports/TEXT-FORM-IP-011.md). Registry memilih submission-form hanya untuk body dengan data-page=submission. Partial text memakai native POST/CSRF, input_type=text, raw_input 50–50.000, website dan CAPTCHA; error summary/field dan old input escaped. Guest langsung memakai teks tanpa single-tab control. Pengantar/form mendahului bantuan/model disclosure; statistik dari controller tetap berkonteks. Tidak ada overlay/timer tahap analisis sebelum respons; form-submit memberi guard/label mengirim, page module memberi polite request status setelah event tidak dibatalkan.
 
@@ -376,6 +379,8 @@ IP-013 menerapkan [view progress](../reports/PROGRESS-IP-013.md) dengan CSS sema
 
 IP-014 menerapkan [coordinator/adapter/scheduler](../reports/POLLING-IP-014.md): registry memilih pages/result, wrapper memberi status URL/ID/stages, Livewire.find/$el dan hooks init/morph membuktikan owner. Fallback serial dua detik dengan timeout body 10 detik/AbortController dihentikan sebelum handoff; hidden/offline pause dan visible/online resume. Error transport tidak mengubah domain; access/session berhenti, retry maksimal tiga kegagalan dan 429 menghormati Retry-After. Terminal dispose mendahului reload dengan WeakMap per root/ID; SSR terminal tidak reload. Native in-flight tetap dimiliki SDK, action/request hooks modul dibersihkan; per-message cleanup 4.3.3 yang rusak dihindari. Browser memakai SDK asli/snapshot fixture, bukan checksum/DB/session HTTP aplikasi.
 
+IP-037 membuktikan hydration/session/CSRF/Livewire aktual, fault/lifecycle serta ucapan Orca. Wadah status gangguan transport pada hasil tetap exposed sejak render; hanya isi pesan visual yang boleh hidden. Perubahan tahap diumumkan, polling tanpa perubahan tidak mengulang pesan. [IP-038](../reports/GAPS-IP-038.md) menjelaskan penggunaan ulang evidence berdasarkan diff; test fixture tidak menjadi inference nyata.
+
 ### 10.3 Scheduler fallback target
 
 - Gunakan siklus timeout berurutan setelah request selesai, bukan interval async yang dapat bertumpuk.
@@ -411,7 +416,7 @@ Uji lifecycle ini dengan navigasi antarhasil, kembali lewat browser, tab hidden/
 
 ## 11. Arsitektur form pemeriksaan
 
-Form tetap menuju POST `deteksi`. Nilai domain dan fields tidak berubah: `text`, `image`, `video`, `video_url`, `url`; `raw_input`, `source_url`, `media_file`.
+Form tetap menuju POST `deteksi`. Nilai request dan fields tidak berubah: `text`, `image`, `video`, `video_url`, `url`; `raw_input`, `source_url`, `media_file`. CreateSubmission memakai InputType::fromRequest untuk menormalisasi video_url menjadi video tersimpan; UI kategori tersimpan memakai label Video. Nilai mentah video_url pada record terpisah tidak menjadi filter baru (G02).
 
 Target mempertahankan pemisahan form per input agar required field/CSRF/error mudah dilacak. Kelompok Video dapat menampilkan form unggahan dan URL langsung sebagai dua pilihan native, lalu ditingkatkan dengan selector; tidak harus mengubah field domain melalui JS untuk membuat no-JS path bekerja.
 
@@ -513,13 +518,14 @@ Jangan mengedit `vendor/` atau `public/css/filament/`, `public/js/filament/`, `p
 
 ## 15. Vite, font, dan asset
 
-Dua entry publik existing dipertahankan. Theme admin ditambahkan hanya setelah file dibuat. Token/base/components adalah import dependency, bukan entry Vite terpisah.
+Empat entry aktual: app.css dan app.js untuk shell publik/auth, errors.css untuk HTML error mandiri, serta theme admin. Token/base/components/font/page CSS adalah import dependency, bukan entry tambahan.
 
-Contoh input target setelah theme tersedia:
+Input Vite aktual:
 
 ```js
 input: [
     'resources/css/app.css',
+    'resources/css/errors.css',
     'resources/js/app.js',
     'resources/css/filament/admin/theme.css',
 ]
@@ -527,7 +533,7 @@ input: [
 
 Tetap gunakan plugin Laravel dan `@tailwindcss/vite` existing serta refresh development. Layout publik memuat dua entry publik; Filament memuat theme melalui provider. Jangan memuat JS publik di admin hanya untuk memperoleh helper.
 
-Inter weight 400/500/600, Newsreader 400/500 sesuai design system. Pilih satu strategi font untuk publik, documentasikan lisensi/provider, gunakan swap dan fallback. Jangan memuat Outfit lama atau font yang sama berulang kali tanpa alasan. Newsreader dipakai editorial, bukan control/tabel admin.
+Inter weight 400/500/600, Newsreader 400/500 sesuai design system. Strategi aktual self-hosted melalui fonts.css/inter.css dan WOFF2 berlisensi OFL; provider admin LocalFontProvider memakai Inter yang sama. Gunakan swap dan fallback. Jangan memuat Outfit lama atau font yang sama berulang kali tanpa alasan. Newsreader dipakai editorial, bukan control/tabel admin.
 
 Jika self-hosting, gunakan asset/font path yang benar-benar dibuat dan dapat di-resolve build. File WOFF2 browser tidak otomatis dapat dipakai DomPDF. Jangan menyatakan font sudah diterapkan dari computed fallback saja.
 
@@ -644,7 +650,7 @@ Image normal memakai Composer no-dev; jangan menganggap test tools ada dalam con
 
 ## 21. Kriteria selesai arsitektur frontend
 
-Kriteria ini untuk implementasi berikutnya, bukan status lulus dokumen ini.
+Kriteria ini adalah acceptance implementasi, bukan status lulus otomatis dokumen ini. [Handoff IP-039](../reports/HANDOFF-IP-039.md#page-acceptance-dan-definition-of-done) memetakan seluruh 14 butir ke bukti/batas; checklist penerimaan menyeluruh tetap terbuka. Inventaris aktual mengikuti §5, FA-08 kini memiliki handoff, tanpa mengubah keputusan arsitektur lain.
 
 - [ ] View page hanya mengomposisi halaman; komponen tidak melakukan query atau inference.
 - [ ] Route/controller/request/policy dan nilai domain tetap sesuai kontrak.

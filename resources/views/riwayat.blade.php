@@ -5,7 +5,7 @@
 
 @php
     $labelOptions = ['' => 'Semua label', 'valid' => 'Valid (prediksi model)', 'hoax' => 'Hoaks (prediksi model)', 'meragukan' => 'Informasi belum terverifikasi oleh sumber terpercaya'];
-    $typeOptions = ['' => 'Semua jenis', 'text' => 'Teks', 'image' => 'Gambar', 'video' => 'Video unggahan', 'url' => 'Tautan artikel'];
+    $typeOptions = ['' => 'Semua jenis', 'text' => 'Teks', 'image' => 'Gambar', 'video' => 'Video', 'url' => 'Tautan artikel'];
     $statusOptions = ['' => 'Semua status', 'pending' => 'Menunggu', 'processing' => 'Diproses', 'completed' => 'Selesai', 'failed' => 'Gagal'];
     $sortOptions = ['newest' => 'Terbaru', 'oldest' => 'Terlama', 'confidence' => 'Skor keyakinan model tertinggi'];
     $filterValues = [];
@@ -77,7 +77,7 @@
                         @endforeach
                     </x-forms.select>
                 </x-ui.field>
-                <x-ui.field id="history-input-type" label="Jenis input" hint="Video unggahan tidak mencakup tautan video." :error="$errors->first('input_type')">
+                <x-ui.field id="history-input-type" label="Jenis input" hint="Pilih Video untuk unggahan atau tautan video yang dikirim melalui formulir pemeriksaan." :error="$errors->first('input_type')">
                     <x-forms.select name="input_type">
                         @foreach($typeOptions as $value => $label)
                             <option value="{{ $value }}" @selected($filterValues['input_type'] === $value)>{{ $label }}</option>

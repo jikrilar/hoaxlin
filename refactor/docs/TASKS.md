@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 15 Oktober 2026 |
-| Status | IP-001–IP-034 selesai; 34 dari 39 task selesai, IP-035–IP-039 pending |
+| Status | IP-001–IP-039 selesai; 39 dari 39 task selesai, acceptance menyeluruh belum selesai |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-034 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-039 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -110,13 +110,13 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-032](#ip-032) | F5 | Migrasikan monitoring events dan admin logs | done |
 | [IP-033](#ip-033) | F5 | Migrasikan dan render PDF hasil | done |
 | [IP-034](#ip-034) | F5 | Verifikasi tindakan dan kontrak ekspor CSV | done |
-| [IP-035](#ip-035) | F6 | Cleanup setelah seluruh pemakai dimigrasi | pending |
-| [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | pending |
-| [IP-037](#ip-037) | F6 | Lengkapi QA browser lintas halaman/state | pending |
-| [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
-| [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
+| [IP-035](#ip-035) | F6 | Cleanup setelah seluruh pemakai dimigrasi | done |
+| [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | done |
+| [IP-037](#ip-037) | F6 | Lengkapi QA browser lintas halaman/state | done |
+| [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | done |
+| [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | done |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-034 selesai, IP-035–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-039 selesai, termasuk minimum screen reader aktual IP-037, rekonsiliasi keputusan IP-038 dan handoff IP-039. Penerimaan menyeluruh/gate F6 belum lulus: 89 kasus QA masih not_run dan G07 real-service E2E blocked; lihat [handoff](../reports/HANDOFF-IP-039.md). Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -753,10 +753,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-034 selesai, IP-
 - **Arsitektur:** FA-03, FA-04, FA-08, FA-10.
 - **Source/target:** `resources/css/`, `resources/js/`, `resources/views/`, `package.json`, `package-lock.json` (audit pemakai dependency/font).
 
-- [ ] Pastikan seluruh task migrasi IP-011–IP-034 selesai atau review tanpa perubahan yang dibuktikan; jangan hapus pemakai legacy yang masih diperlukan.
-- [ ] Gunakan rg untuk memetakan glass/gradient/orb/reveal/counter/inline handlers/aliases/globals dan hapus setelah tidak dipakai.
-- [ ] Periksa scanner, font imports, global utilities dan page modules agar tidak ada orphan code, event, interval atau dependency.
-- [ ] Jalankan build dan review area yang berubah; jangan menghapus vendor/published assets atau kode di luar scope.
+- [x] Pastikan seluruh task migrasi IP-011–IP-034 selesai atau review tanpa perubahan yang dibuktikan; jangan hapus pemakai legacy yang masih diperlukan.
+- [x] Gunakan rg untuk memetakan glass/gradient/orb/reveal/counter/inline handlers/aliases/globals dan hapus setelah tidak dipakai.
+- [x] Periksa scanner, font imports, global utilities dan page modules agar tidak ada orphan code, event, interval atau dependency.
+- [x] Jalankan build dan review area yang berubah; jangan menghapus vendor/published assets atau kode di luar scope.
 
 **Validasi:** rg pemakai; build; smoke area terdampak.
 
@@ -771,10 +771,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-034 selesai, IP-
 - **Arsitektur:** FA-01–FA-10.
 - **Source/target:** berkas yang berubah, `tests/Feature/`, `tests/Unit/`, lockfiles dan manifest hasil build.
 
-- [ ] Jalankan npm run build serta Blade cache/clear pada development/test; periksa manifest/import/class variants yang diperlukan.
-- [ ] Jalankan test terkait dan suite penuh untuk final perubahan lintas layout/alur; Pint --test pada PHP yang diubah.
-- [ ] Jika exact-copy/markup assertion berubah, update intention sambil menjaga escaping/ownership/final/provenance/evidence/score.
-- [ ] Perbaiki failure yang disebabkan refactor; catat failure lama, skip dan blocker dengan alasan, tanpa menganggap real-BERT skip sebagai E2E pass.
+- [x] Jalankan npm run build serta Blade cache/clear pada development/test; periksa manifest/import/class variants yang diperlukan.
+- [x] Jalankan test terkait dan suite penuh untuk final perubahan lintas layout/alur; Pint --test pada PHP yang diubah.
+- [x] Jika exact-copy/markup assertion berubah, update intention sambil menjaga escaping/ownership/final/provenance/evidence/score.
+- [x] Perbaiki failure yang disebabkan refactor; catat failure lama, skip dan blocker dengan alasan, tanpa menganggap real-BERT skip sebagai E2E pass.
 
 **Validasi:** npm build; view cache/clear; test; Pint bila PHP berubah.
 
@@ -789,10 +789,12 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-034 selesai, IP-
 - **Arsitektur:** FA-01–FA-10.
 - **Source/target:** halaman implementasi, matriks QA pada `IMPLEMENTATION-PLAN.md`, dan jurnal `TASKS.md`.
 
-- [ ] Jalankan matriks role/input/progress/final/label/explanation/evidence/history/auth/profile/admin/statistics/error/exports yang terdampak.
-- [ ] Periksa reflow 320, viewport 360/768/1280, zoom 200%, keyboard/Escape/focus return/reduced motion dan konten panjang.
-- [ ] Periksa no-JS/bootstrap failure/navigate/back-forward/hidden-visible/slow request serta console/network; fixture dan real-service evidence dibedakan.
-- [ ] Perbaiki regresi dan ulangi cek terdampak; jangan menutup task jika acceptance penting belum diperiksa.
+- [x] Jalankan matriks role/input/progress/final/label/explanation/evidence/history/auth/profile/admin/statistics/error/exports yang terdampak.
+- [x] Periksa reflow 320, viewport 360/768/1280, zoom 200%, keyboard/Escape/focus return/reduced motion dan konten panjang.
+- [x] Periksa no-JS/bootstrap failure/navigate/back-forward/hidden-visible/slow request serta console/network; fixture dan real-service evidence dibedakan.
+- [x] Perbaiki regresi dan ulangi cek terdampak; jangan menutup task jika acceptance penting belum diperiksa.
+
+**Catatan aktual:** matriks browser dan minimum screen reader aktual lulus. Orca/Firefox menghasilkan 49 observasi terverifikasi; defect live region gangguan polling diperbaiki dan diulang. QA-A11Y-03/08 pass; gate F6 menyeluruh tetap bergantung IP-038–039. Lihat [laporan IP-037](../reports/BROWSER-IP-037.md).
 
 **Validasi:** Matriks QA browser; console/network.
 
@@ -807,10 +809,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-034 selesai, IP-
 - **Arsitektur:** FA-01–FA-10.
 - **Source/target:** `TASKS.md`, `IMPLEMENTATION-PLAN.md`, `FRONTEND-ARCHITECTURE.md`, `DESIGN-SYSTEM.md`, `PAGE-SPECIFICATIONS.md` (bila keputusan berubah).
 
-- [ ] Cocokkan task, page/AC, FA decisions dan evidence; pastikan setiap gap G01–G08 memiliki keputusan/status yang jelas.
-- [ ] Gabungkan evidence PDF/CSV/admin yang sudah valid; ulangi hanya jika perubahan/failure/risiko baru memerlukannya.
-- [ ] Selaraskan nama module/helper serta keputusan final pada dokumen terkait; status progres rinci tetap berpusat di TASKS.md.
-- [ ] Catat batas E2E/runtime/retained contract; perubahan fitur yang di luar scope tetap backlog terpisah.
+- [x] Cocokkan task, page/AC, FA decisions dan evidence; pastikan setiap gap G01–G08 memiliki keputusan/status yang jelas.
+- [x] Gabungkan evidence PDF/CSV/admin yang sudah valid; ulangi hanya jika perubahan/failure/risiko baru memerlukannya.
+- [x] Selaraskan nama module/helper serta keputusan final pada dokumen terkait; status progres rinci tetap berpusat di TASKS.md.
+- [x] Catat batas E2E/runtime/retained contract; perubahan fitur yang di luar scope tetap backlog terpisah.
 
 **Validasi:** Traceability, known gaps, decision/evidence review.
 
@@ -825,10 +827,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-034 selesai, IP-
 - **Arsitektur:** FA-08.
 - **Source/target:** `TASKS.md`, final diff/review notes dan dokumen yang berubah.
 
-- [ ] Review final diff, files changed dan task status; pastikan perubahan pengguna yang tidak terkait tetap terjaga.
-- [ ] Siapkan ringkasan perilaku akhir, cara menjalankan/meninjau, validasi dan risk/known limitations berbasis evidence.
-- [ ] Periksa seluruh page acceptance dan definition of done; jika ada blocker penting, nyatakan status pekerjaan belum selesai.
-- [ ] Sediakan next action yang konkret bila masih blocked; commit/PR/publish/deploy mengikuti lingkup instruksi pengguna, bukan dipicu hanya oleh checklist ini.
+- [x] Review final diff, files changed dan task status; pastikan perubahan pengguna yang tidak terkait tetap terjaga.
+- [x] Siapkan ringkasan perilaku akhir, cara menjalankan/meninjau, validasi dan risk/known limitations berbasis evidence.
+- [x] Periksa seluruh page acceptance dan definition of done; jika ada blocker penting, nyatakan status pekerjaan belum selesai.
+- [x] Sediakan next action yang konkret bila masih blocked; commit/PR/publish/deploy mengikuti lingkup instruksi pengguna, bukan dipicu hanya oleh checklist ini.
 
 **Validasi:** Final review dan definition of done.
 
@@ -1287,6 +1289,67 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Validasi:** 14 cases baru; suites terkait 66 passed/546 assertions; suite penuh 777 cases/5205 assertions: 773 passed/4 real-BERT skips, tanpa failure/warning. 69 Node/build/Pint 2/Blade/diff lulus. Firefox 6 samples pada 360/768/1280 tanpa overflow, target 44 px; empat keyboard downloads aktual. Riwayat filter halaman 2, hasil tunggal dan filter kosong menghasilkan 107 record/13740 bytes identik; akun kosong 115 bytes/header-only. Python parse/BOM/CRLF/11 columns/IDs/score/placeholder/formula lulus; foreign tidak ada. Guest/unverified direct endpoint ditolak, final console/network bersih.
 - **Batas:** driver awal/router fixture/redirect intended/fast navigation diperbaiki, bukan perubahan aplikasi. No-JS/screen reader/zoom/Excel/LibreOffice/MySQL/deployment/inference nyata belum diuji pada sesi ini; warning internal Firefox terpisah. Aggregate QA tetap 3 audit pass/91 not_run; gate F5 menyeluruh/audit Livewire gap existing belum ditutup. Tidak mengubah source produk, secret/data operasional/dependency/vendor/deploy/push.
 - **Berikutnya:** commit semantic dan berhenti pada IP-034; IP-035–IP-039 pending.
+
+### IP-035 — Catatan eksekusi
+
+- **Status/tanggal:** done; 15 Oktober 2026, Asia/Jakarta. Branch frontend-refactor/cleaunp-quality-assurance, HEAD awal c87ecf8; tree/index awal bersih. IP-011–034 done dan consumer aktual diperiksa sebelum cleanup.
+- **Rujukan:** G08, FA-03/04/08/10, QA-ASSET-04 dan smoke consumer global; build/frontend dependencies serta CSS/JS/Blade actual.
+- **Perubahan:** dua stylesheet legacy/import/atribut layout dihapus; container-app yang masih dipakai dipindahkan utuh ke components.css. Recovery/display CSS helper dan password strength/match hints tanpa consumer dibuang. Scope.objectURL tanpa consumer produksi dihapus, real blob/abort/listener/timer assertions dipertahankan melalui pola scope.own yang dipakai preview upload. Scanner publik source(none) dengan explicit Blade/JS/pagination, tanpa compiled views/Vue. Axios +26 transitif dihapus; semua package records lain dipertahankan tanpa upgrade/penambahan.
+- **Dipertahankan:** semantic theme/token API, self-hosted font/license, concurrently Composer dev, Chart.js lazy, input character counter, serial polling/deadline/scope cleanup, Livewire native ownership, progress width backend, dialog lock serta layout stacks. Tidak menyentuh backend/schema/auth/model/queue/exporter/vendor assets atau mengaktifkan resource legacy.
+- **Evidence:** [CLEANUP-IP-035.md](../reports/CLEANUP-IP-035.md). Snapshot PHP 8.4/SQLite in-memory/vendor exact-lock read-only, browser kernel/session/CSRF aktual dengan SQLite/akun sintetis loopback; tanpa layanan pengguna.
+- **Validasi:** suites terkait 197 passed/1498 assertions; suite penuh final 777 cases/5205 assertions: 773 passed/4 BERT skips, tanpa failure/warning. 69 Node, npm ci Node 22, build host/Docker frontend final, Blade cache/clear dan diff lulus. Browser 60 samples sebelum +60 sesudah pada 360/768/1280 untuk 20 halaman/state, recorded style/geometry identik dan tanpa overflow; 8 toggle/reset checks per run. Tambahan 20 no-JS/reduced samples dan native zoom 200% lulus. Console bersih; satu intentional 404 per mode, tanpa asset failure. CSS publik 65239→50400 bytes; admin 622552 bytes identik.
+- **Batas:** driver fixture/network/hidden control/no-JS evaluation/zoom oracle dikoreksi terpisah dari produk. Zoom memakai saved site zoom Firefox, bukan CSS zoom. Screen reader/forced colors/browser lain/MySQL/deployment/inference nyata belum diuji; 4 real-BERT skips. Pint tidak berlaku karena tidak mengubah PHP source. QA aggregate tetap 3 audit pass/91 not_run; gate F6 menyeluruh dan audit gap existing tetap terbuka. Tidak melakukan deploy/push.
+- **Berikutnya:** commit semantic dan berhenti pada IP-035; IP-036–IP-039 pending.
+
+### IP-036 — Catatan eksekusi
+
+- **Status/tanggal:** done; 15 Oktober 2026, Asia/Jakarta. Branch frontend-refactor/cleaunp-quality-assurance, HEAD awal 36d82b8; tree/index awal bersih. IP-035 done dan source actual diperiksa sebelum regression.
+- **Rujukan:** FA-01–FA-10, QA-ASSET-02/04, arsitektur §20 dan strategi reuse evidence F6. Lingkup build/Blade/PHP/frontend regression; tidak menjalankan matriks browser IP-037.
+- **Perubahan:** laporan regression serta sinkronisasi status task/plan/QA. Tidak ada regresi aplikasi yang memerlukan perubahan source atau assertion; 392 berkas produk/test/config/build contract pada root dan snapshot identik dengan IP-035. Kedua lockfile/backend/vendor assets tetap.
+- **Validasi:** build host dan Docker target test lulus; 15 manifest records/empat entry/import/font URL, empat button variants/empat alert tones serta pemisahan marker CSS publik/admin diperiksa. Seluruh 16 file output build host/Docker identik. Blade cache/clear, 364 tests terkait/3023 assertions, 69 Node dan Pint --test pada 80 non-Blade PHP refactor lulus. Suite penuh final 777 cases/5205 assertions: 773 passed/4 real-BERT skips, exit 0 tanpa failure/warning.
+- **Evidence:** [REGRESSION-IP-036.md](../reports/REGRESSION-IP-036.md). Snapshot dan image PHP 8.4.11/SQLite in-memory/network none dengan fixture key; tanpa layanan/data pengguna. Browser IP-035 digunakan kembali karena source/output build identik, tidak diklaim sebagai run browser baru.
+- **Diagnosis/batas:** image test existing tidak membawa dua template env dan docker/php/uploads.ini: run pertama dua error packaging; percobaan mount belum lengkap dihentikan, final lulus memakai tiga fixture repository read-only. Dockerfile/perintah default tanpa fixture tidak dinyatakan telah diperbaiki. Empat BERT skips bukan E2E pass. Screen reader/forced colors/browser lain/MySQL/deployment/provider nyata, audit gap Livewire existing serta QA agregat/F6 menyeluruh tetap terbuka. Tidak perlu mengubah exact-copy/markup assertion.
+- **Berikutnya:** commit semantic dan berhenti pada IP-036; IP-037–IP-039 pending.
+
+### IP-037 — Catatan eksekusi
+
+- **Status/tanggal:** done; 15 Oktober 2026, Asia/Jakarta. Branch frontend-refactor/cleaunp-quality-assurance, HEAD awal 79be3df. Sesi awal berakhir review pada 1c47f82; kelanjutan menutup minimum screen reader QA §3. Tree/index awal kedua sesi bersih.
+- **Rujukan:** AC-P00–P16/AC-A00–A08/AC-E01, FA-01–FA-10, matriks minimum dan katalog QA. Lingkup satu task; IP-038–039 tidak dimulai.
+- **Perubahan awal:** label CAPTCHA memakai pertanyaan backend sekali, menghapus tanda tanya ganda; field/challenge/CSRF/validasi/quota/throttle tetap. Laporan, evidence JSON sanitized dan status task/plan/QA ditambahkan; tanpa dependency/test/backend/vendor changes.
+- **Browser:** Firefox 157.0.1: 276 samples normal, 92 no-JS/reduced, 33 native zoom200/reduced dan 12 forced colors. Chromium Headless 155.0.8059.79: 308 normal/no-JS samples dan 5 checks shared interactions. 68 checks interaksi tersimpan; 15 halaman DOM/semantic contrast tanpa duplicate IDs/broken aria refs, minimum pasangan 4.78:1. Lima input native POST pending, 20 label final Chromium pada empat viewport lulus.
+- **Alur:** actual Laravel/CSRF/session/SQLite/broker/signed verification/Livewire/Filament dengan akun dan data sintetis loopback. Native admin create/save/delete, profil/delete/reverify, feedback, hasil/evidence/provenance, akses endpoint, history/export bytes, no-data statistics, native/fallback single-owner/slow/hidden/terminal serta asset/bootstrap faults diuji. Inference/worker/provider tidak dijalankan.
+- **Validasi awal:** build host/Blade cache-clear lulus, 16 build files identik dengan IP-036; 98 tests terkait/463 assertions, 69 Node dan suite penuh 773 passed/4 BERT skips/5205 assertions tanpa failure/warning. Defect copy diulang pada kelima form.
+- **Validasi kelanjutan:** test regresi baru gagal pada view lama, lalu suites terkait 66 passed/436 assertions, suite PHPUnit final 778 cases/5214 assertions: 774 passed/4 BERT skips tanpa failure/warning; 69 Node, Pint satu file, build dan Blade cache-clear lulus. Seluruh 16 output build tetap identik. Empat viewport final tanpa overflow; smoke empat state memakai dua POST Livewire, nol fallback dan nol console/server error. Artisan wrapper melaporkan 25 warning DOMDocument existing; hasil runner langsung dan diagnosis dibedakan di laporan.
+- **Evidence:** [BROWSER-IP-037.md](../reports/BROWSER-IP-037.md), [JSON terstruktur](../reports/BROWSER-IP-037.json). Renderer/download/matrix backend existing yang sourcenya tidak berubah digunakan kembali dengan batas mode tercatat. Koreksi fixture/schema/env/regex/selector/mount/rate/probe/CDP terpisah dari defect produk.
+- **Screen reader / perbaikan:** Orca 51.0, Firefox 157.0.1 headed/Xvfb privat, Speech Dispatcher 0.12.1 dan eSpeak NG 1.52.0 menghasilkan 49 observasi ucapan/struktur yang diverifikasi. Label/hint/error/loading, flash, tiga label hasil/disclaimer, explanation/evidence/disclosure, tabel, profil, native admin dan Escape/focus return terbaca. Stage berubah diumumkan sekali, dua jendela polling diam. Wadah live region transport kini tetap exposed sementara isi visual boleh hidden; fault 403/503 masing-masing diumumkan sekali, domain tetap processing dan jendela diam tidak mengulang pesan. QA-A11Y-03/08 pass; aggregate 5 pass/89 not_run tetap konservatif. Tidak mengklaim uji pelafalan manusia atau SR tiap resource individual.
+- **Batas/cleanup:** mobile fisik, MySQL/deployment/provider nyata dan audit gap Livewire existing tetap terbuka. Tool AT hanya diekstrak di snapshot; tidak ada instalasi global/dependency produk. Runtime/browser/DBus/display QA milik sesi ditutup; tidak mengubah data/env operasional.
+- **Berikutnya:** commit semantic untuk IP-037 dan berhenti sebelum IP-038; IP-038–039 serta gate F6 menyeluruh belum ditutup.
+
+### IP-038 — Catatan eksekusi
+
+- **Status:** done; lingkup rekonsiliasi, IP-039 tetap pending.
+- **Branch/commit awal:** `frontend-refactor/cleaunp-quality-assurance`, `1001d3b`; tree/index awal bersih.
+- **Files changed:** tujuh dokumen refactor, laporan [GAPS-IP-038.md](../reports/GAPS-IP-038.md)/[JSON](../reports/GAPS-IP-038.json), presenter jenis input, riwayat, opsi native admin dan empat file test.
+- **Page/AC dan FA:** 27 page/AC (P00–P16, A00–A08, E01), FA-01–FA-10 dipetakan ke source/evidence. G01/G04/G08 resolved; G02/G03/G05/G06 retained; G07 blocked untuk real-service E2E. Katalog QA tetap 5 pass/89 not_run, bukan penerimaan menyeluruh.
+- **Perilaku akhir:** label kategori tersimpan video menjadi Video. Request video_url sudah dinormalisasi oleh action existing sehingga ikut filter Video; copy unggahan-saja sebelumnya keliru. Query/filter/validasi/domain lima input, authorization, CSV raw dan pipeline tetap. Test action aktual melindungi normalisasi dan menolak filter video_url tersendiri.
+- **Keputusan dokumentasi:** inventaris module/helper/entry/font aktual diselaraskan; bukti PDF/CSV/admin yang tidak terdampak dipakai ulang berbasis hash/source. B01 audit observer native Livewire, B02 redaksi/retensi writer dan B03 verifikasi platform operasional tercatat sebagai backlog terpisah tanpa perubahan backend/data.
+- **Validasi:** regresi source lama 3 failures; final 192 tests terkait/1459 assertions lulus. Suite penuh 780 kasus/5235 assertions: 776 passed, 4 real-BERT skips. Pint 6 file PHP, 69 Node tests, build dan Blade cache/clear lulus; 16 output build identik. Firefox 42 samples/9 checks pada 320/360/768/1280, no-JS/reduced motion dan native zoom 200%; copy/filter/detail/keyboard/recovery lulus tanpa overflow/console error/server 5xx. Dua PDF A4 aktual diverifikasi teks/font/raster tanpa private path.
+- **Evidence/runtime:** snapshot source terisolasi, vendor exact-lock read-only, PHP 8.4.11/SQLite in-memory, CLI network none. Browser memakai database sintetis loopback tanpa worker/inference/API berbayar. Bukti lama tidak dihitung sebagai run baru; rincian hasil/hash/path/anchor/status ada pada ledger JSON.
+- **Skip/blocker:** empat test BERT skip berarti real-service E2E belum terverifikasi; tidak membuktikan layanan produksi mati. Batas PDF/CSV/filter/read-only/statistik dipertahankan secara eksplisit. Tidak ada deployment/push atau perubahan env/data operasional.
+- **Berikutnya:** commit semantic perubahan IP-038 lalu berhenti; IP-039 dan gate F6 menyeluruh belum dikerjakan.
+
+### IP-039 — Catatan eksekusi
+
+- **Status:** done untuk handoff; 39 done/0 pending. Penerimaan refactor menyeluruh tetap incomplete, gate F6 belum lulus.
+- **Branch/commit awal:** `frontend-refactor/cleaunp-quality-assurance`, `f56b055`; tree/index awal bersih, tidak ada perubahan pengguna yang belum di-commit.
+- **Files changed:** dokumen TASKS/IMPLEMENTATION-PLAN/OVERVIEW/FRONTEND-ARCHITECTURE/QA-ACCEPTANCE dan [HANDOFF-IP-039.md](../reports/HANDOFF-IP-039.md)/[JSON](../reports/HANDOFF-IP-039.json). Tidak mengubah source aplikasi/test/config/dependency/env/data operasional.
+- **Page/AC dan FA:** 27 page/AC dan 10 FA direview; 60 butir DoD dari lima sumber dipetakan ke 16 area. Reviewed/evidence_partial bukan status QA pass; checklist penerimaan keseluruhan tidak dicentang massal.
+- **Review akhir:** rentang baseline af173ec–f56b055 memuat 238 file; inventaris dan fingerprint source/evidence dicatat. AGENTS/trusted proxy dari commit 1278b13 dipisahkan sebagai inherited non-UI. Query/schema/jobs/services/actions/enums/models/policies/observers/config/Python/Composer/Compose/published vendor assets tetap terhadap baseline.
+- **Perilaku akhir:** handoff menyediakan ringkasan perubahan/alasan, urutan review, perintah reproduksi dari checkout baru, sumber bukti serta batas dan tindak lanjut. G01/G04/G08 resolved; G02/G03/G05/G06 retained; G07 blocked. B01/B02 audit observer/writer dan B03 platform tetap backlog terpisah.
+- **Validasi IP-039:** full PHPUnit pada source final snapshot ter-mount: 780 kasus/5235 assertions, 776 passed/4 real-BERT skips, tanpa failure/warning. Node 69 passed; Blade cache/clear lulus. Vendor exact-lock read-only, PHP 8.4.11/PHPUnit 11.5.56, SQLite in-memory, env kosong/fixture key dan network none. Setup symlink mount vendor gagal sebelum suite terbentuk; mountpoint snapshot dikoreksi tanpa mengubah autoload/source produk, lalu run final lulus.
+- **Evidence reuse:** build 16 output identik dan input source tidak berubah; browser/SR/PDF/CSV aktual menggunakan laporan IP-033–038 sesuai scope/hash. Tidak mengklaim run browser/build/Pint baru; tidak ada PHP atau halaman produk yang berubah. Fingerprint 616 file di luar refactor pada snapshot sesuai f56b055; tautan/anchor/ID/status dan diff check diperiksa pada audit JSON. Edit footer pengguna yang muncul saat finalisasi dipertahankan di luar commit dan belum termasuk hasil verifikasi snapshot.
+- **Skip/blocker:** katalog 5 pass/89 not_run; G07 layanan nyata, native audit B01, redaksi/retensi writer B02 dan platform B03 tetap terlihat. Reproduksi Docker test menyertakan tiga fixture mounts karena packaging existing; SMTP/deployment/provider/model nyata belum diverifikasi.
+- **Berikutnya:** commit semantic dokumen IP-039 lalu berhenti. Tindak lanjut QA/backend/operasional pada handoff bukan task baru yang otomatis dimulai; tidak membuat PR/push/publish/deploy.
 
 ### Format catatan berikutnya
 

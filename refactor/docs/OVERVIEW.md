@@ -6,10 +6,12 @@
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Dokumen | Overview refactoring antarmuka |
 | Versi dokumen | 1.0 |
-| Tanggal | 11 Oktober 2026 |
-| Status | Rencana refactoring; implementasi dan validasi runtime belum dilakukan dalam penyusunan dokumen ini |
+| Tanggal | 15 Oktober 2026 |
+| Status | Handoff IP-039 tersedia; progres di TASKS.md, penerimaan menyeluruh belum selesai |
 | Arah desain | Warm Editorial Intelligence |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
+
+Status task rinci berpusat pada [TASKS.md](TASKS.md). [rekonsiliasi IP-038](../reports/GAPS-IP-038.md) menghubungkan source, page/AC, FA-01–FA-10 dan G01–G08 ke evidence. Baseline serta catatan IP terdahulu adalah riwayat pemeriksaan pada saat task tersebut dikerjakan; batas runtime terbaru mengikuti laporan IP-038, tanpa klaim seluruh refactor/QA/E2E selesai.
 
 ## 1. Ringkasan proyek
 
@@ -223,6 +225,8 @@ Target aksesibilitas adalah WCAG 2.2 AA. Klaim kesesuaian penuh hanya dibuat set
 
 ### 12.2 Definition of done
 
+[Review IP-039](../reports/HANDOFF-IP-039.md#page-acceptance-dan-definition-of-done) memetakan butir di bawah ke source/evidence/batas. Checklist penerimaan menyeluruh tetap terbuka: 89 kasus QA not_run dan G07 real-service E2E blocked, meskipun seluruh 39 task implementasi/dokumentasi sudah memiliki catatan done.
+
 - [ ] Seluruh area dalam scope menggunakan arah light-only ivory–evergreen secara konsisten.
 - [ ] Newsreader dan Inter benar-benar dimuat dengan fallback yang layak.
 - [ ] Tugas utama mudah ditemukan; tidak ada dekorasi yang menghalangi form atau hasil.
@@ -242,13 +246,13 @@ Target aksesibilitas adalah WCAG 2.2 AA. Klaim kesesuaian penuh hanya dibuat set
 | --- | --- | --- |
 | `AGENTS.md` | Instruksi kerja Codex dan batas teknis | Tersedia di root repo; instruksi working copy telah ditinjau pada IP-001 |
 | `OVERVIEW.md` | Tujuan, scope, arah, tahapan, dan kriteria selesai | Dokumen ini |
-| [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md) | Token lengkap, typography, komponen, state, responsive rules | Spesifikasi tersedia; belum diterapkan |
+| [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md) | Token lengkap, typography, komponen, state, responsive rules | Token/font/komponen diterapkan; review dan batas bukti pada handoff IP-039 |
 | [PAGE-SPECIFICATIONS.md](PAGE-SPECIFICATIONS.md) | Spesifikasi halaman, alur, navigasi, microcopy, dan aksesibilitas | Spesifikasi tersedia; menggantikan nama rencana UX-SPEC.md |
-| [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md) | Struktur frontend dan keputusan FA-01–FA-10 | Arsitektur target tersedia; belum diterapkan |
-| [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md) | Task berurutan, dependensi, acceptance, dan jurnal eksekusi | Tersedia; menggantikan nama rencana REFACTOR-PLAN.md; IP-001 selesai |
-| [QA-ACCEPTANCE.md](QA-ACCEPTANCE.md) | Skenario pemeriksaan dan catatan bukti validasi | Tersedia; menggantikan nama rencana QA-CHECKLIST.md; audit source dicatat terpisah dari QA runtime |
+| [FRONTEND-ARCHITECTURE.md](FRONTEND-ARCHITECTURE.md) | Struktur frontend dan keputusan FA-01–FA-10 | Struktur aktual diselaraskan IP-038; review FA-01–FA-10 pada handoff |
+| [IMPLEMENTATION-PLAN.md](IMPLEMENTATION-PLAN.md) dan [TASKS.md](TASKS.md) | Task berurutan, dependensi, acceptance, dan jurnal eksekusi | Seluruh 39 task memiliki catatan done; penerimaan menyeluruh belum selesai |
+| [QA-ACCEPTANCE.md](QA-ACCEPTANCE.md) | Skenario pemeriksaan dan catatan bukti validasi | 94 kasus tetap 5 pass/89 not_run; subhasil task dan batas runtime dicatat terpisah |
 | [AUDIT-IP-001.md](../reports/AUDIT-IP-001.md) | Checkout aktual, route, pemakai CSS/JS, kontrak, dan risiko | Audit source IP-001; bukan hasil QA aplikasi |
 
 Tujuh dokumen spesifikasi refactor berada di `refactor/docs/`; laporan eksekusi berada di `refactor/reports/`, sesuai working copy pengguna. `AGENTS.md`, `PRD.md`, `README.md`, dan `RUNBOOK.md` tetap di root; tautan ke sana memakai `../../`. Path source dan perintah pada paket ini relatif terhadap root repository. Keputusan penempatan dicatat pada [audit IP-001](../reports/AUDIT-IP-001.md#penempatan-dan-otoritas-dokumen); tidak dibuat salinan di root.
 
-Output akhir proyek adalah antarmuka yang konsisten dari beranda hingga admin dan ekspor, dengan fungsi existing tetap benar serta validasi yang dapat ditinjau. Status implementasi baru berubah setelah pekerjaan kode dan pemeriksaan dilakukan; pembuatan dokumen ini tidak berarti refactoring aplikasi sudah dijalankan.
+Implementasi dan bukti lintas area dapat ditinjau melalui [handoff IP-039](../reports/HANDOFF-IP-039.md) dan ledger-nya. Status task implementasi/dokumentasi 39 done terpisah dari penerimaan refactor menyeluruh yang belum selesai; varian QA dan real-service E2E yang belum dibuktikan tetap dinyatakan secara eksplisit.
