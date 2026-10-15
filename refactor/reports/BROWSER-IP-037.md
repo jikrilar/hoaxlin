@@ -1,6 +1,6 @@
 # IP-037 — QA browser lintas halaman dan state
 
-Status **review**, 15 Oktober 2026 (Asia/Jakarta). Branch `frontend-refactor/cleaunp-quality-assurance`, HEAD awal `79be3df`, tree/index awal bersih. Pemeriksaan browser yang tersedia selesai; **task belum dinyatakan done** karena minimum screen reader pada [QA §3](../docs/QA-ACCEPTANCE.md#3-browser-responsive-dan-aksesibilitas), QA-A11Y-03 dan QA-A11Y-08 belum dapat dijalankan. IP-038–039 tidak dimulai.
+Status **done**, 15 Oktober 2026 (Asia/Jakarta). Branch `frontend-refactor/cleaunp-quality-assurance`, HEAD awal `79be3df`, kelanjutan dari `1c47f82`; tree/index awal kedua sesi bersih. Sesi awal berakhir review karena screen reader belum tersedia. Kelanjutan memenuhi minimum screen reader [QA §3](../docs/QA-ACCEPTANCE.md#3-browser-responsive-dan-aksesibilitas), memperbaiki pengumuman gangguan polling dan mengulang regresi. QA-A11Y-03/08 pass. IP-038–039 tidak dimulai.
 
 Rujukan: [IP-037](../docs/TASKS.md#ip-037), [matriks minimum](../docs/IMPLEMENTATION-PLAN.md#15-matriks-qa-minimum), [acceptance halaman](../docs/PAGE-SPECIFICATIONS.md), [design system](../docs/DESIGN-SYSTEM.md), FA-01–FA-10 dan [regression IP-036](REGRESSION-IP-036.md). [Evidence JSON](BROWSER-IP-037.json) menyimpan inventaris role/route/mode/viewport, 68 checks interaksi, hasil validasi, batas dan hash artefak tanpa cookie, credential, capability atau token reset/verify.
 
@@ -14,7 +14,7 @@ Kelima label final diperiksa lewat browser; Chromium mengulang 20 pemeriksaan la
 
 - Snapshot `/tmp/hoaxlin-ip037-k7ptwwx0`: tracked source, `.env` kosong, fixture key, vendor exact-lock read-only dan PHP 8.4.11. Source final mencakup perbaikan label di atas.
 - Laravel HTTP/session/CSRF, SQLite, file cache/session, broker password, signed verification, Livewire serta Filament native berjalan aktual pada loopback `127.0.0.1:8907`. Database kosong terpisah pada port 8908 menguji statistik no-data. Seluruh akun, submission, evidence, media, feedback dan mutasi adalah sintetis.
-- Firefox **157.0.1** melalui WebDriver BiDi; Chrome for Testing **HeadlessChrome 155.0.8059.79** melalui CDP. Binary Chrome dari [manifest resmi Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json) ditempatkan sementara, tanpa dependency/lockfile baru dan tanpa menonaktifkan sandbox. Keduanya headless; mobile berupa viewport emulation.
+- Firefox **157.0.1** melalui WebDriver BiDi; Chrome for Testing **HeadlessChrome 155.0.8059.79** melalui CDP. Binary Chrome dari [manifest resmi Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json) ditempatkan sementara, tanpa dependency/lockfile baru dan tanpa menonaktifkan sandbox. Run awal keduanya headless; mobile berupa viewport emulation. Kelanjutan screen reader memakai Firefox headed pada Xvfb privat.
 - Mode `browser_fixture` memakai record hasil sintetis untuk presentasi; label tersebut bukan keluaran inference nyata. Network failure/delay sengaja diinjeksi dan dibedakan dari backend/session aktual. Tidak memakai mock SDK Livewire atau mengganti authorization.
 - Tidak menyentuh database/secret/Compose operasional, deployment, mail nyata, provider, model atau published vendor assets. CLI regression memakai `--network none`.
 
@@ -57,9 +57,9 @@ Run normal Firefox, no-JS, zoom, forced colors, tindakan akun, native media dan 
 
 Penyesuaian fixture/driver dicatat terpisah dari defect produk: non-null constraints, `artisan serve --no-reload` untuk mempertahankan env terisolasi, escape regex CAPTCHA, broker success yang mengosongkan email, guest session untuk no-JS admin login, label `Ubah`/role `alertdialog`, deferred native filters dan menunggu form mount. Unknown octet-stream sengaja menyerahkan pemeriksaan gambar ke server; client rejection diuji dengan MIME text/plain. Probe warna menonaktifkan transition sebelum mengukur nilai akhir; percobaan awal menghasilkan rasio palsu 1:1 pada admin. CDP Enter menyertakan carriage-return dan target aktif. Limiter fixture sempat tercapai saat login antarrun bertumpuk; hanya cache snapshot yang dibersihkan sebelum run ulang, bukan limiter produksi yang diubah.
 
-Tidak ada regresi produk S0–S2 terkonfirmasi. Defect copy CAPTCHA diperbaiki dan pemeriksaan terdampak diulang; error driver bukan alasan mengubah kontrak atau melonggarkan assertion.
+Temuan copy CAPTCHA dan pengumuman gangguan polling telah diperbaiki dan pemeriksaan terdampak diulang. Diagnosis fixture/driver dicatat terpisah dari defect produk; kontrak backend dan assertion keamanan dipertahankan.
 
-## Validasi source final
+## Validasi sesi awal
 
 - `npm run build`, Blade `view:cache`/`view:clear`, `git diff --check` lulus. **16 output build identik** dengan IP-036; perubahan label tidak mengubah class/import/assets.
 - Suites terkait **98 passed / 463 assertions**; suite PHP penuh **777 cases / 5205 assertions: 773 passed, 4 real-BERT skips**, exit 0 tanpa failure/warning. Source final diuji lewat snapshot ter-mount; tidak mengklaim image IP-036 telah dibangun ulang dengan view baru.
@@ -68,17 +68,44 @@ Tidak ada regresi produk S0–S2 terkonfirmasi. Defect copy CAPTCHA diperbaiki d
 
 Artefak raw, screenshot, driver dan fixture berada di direktori `/tmp` di atas dan bersifat sementara; cookie/capability/token/credential raw tidak di-commit. Evidence JSON terstruktur dan ringkasan ini adalah rekaman permanen. Untuk mengulang, siapkan tracked snapshot/empty env/PHP exact-lock/SQLite terpisah, jalankan native Laravel pada loopback dengan `--no-reload`, gunakan role/state pada JSON dan jalankan tindakan pada tabel; injeksi network hanya di browser QA. Regression dapat diulang melalui PHP test runtime terisolasi yang memuat source final, atau target test dengan fixture repository lengkap seperti [IP-036](REGRESSION-IP-036.md#diagnosis-image-test-dan-reproduksi).
 
-## Pemeriksaan wajib yang belum ditutup
+## Kelanjutan: screen reader aktual
 
-| Kasus | Status / alasan / langkah berikutnya |
+Tool yang semula tidak tersedia diekstrak ke direktori sementara snapshot: **Orca 51.0 (rev 856433b61), AT-SPI2 2.62.1, Speech Dispatcher 0.12.1 dan eSpeak NG 1.52.0**. Kombinasi uji adalah CachyOS Linux + Firefox 157.0.1 **headed**, private X11/Xvfb 1280×900, Openbox, DBus dan registry aksesibilitas terpisah. Tidak menginstal paket global atau menambah dependency repository. Sintesis ucapan berjalan melalui ALSA null sink; yang dievaluasi adalah stream `SPEECH OUTPUT` Orca aktual, bukan penilaian pendengaran/pelafalan atau sesi usability manusia.
+
+Native XTest/BiDi keyboard/pointer dan perintah navigasi Orca memicu event browser/AT-SPI. [Pedoman navigasi Orca](https://gnome.pages.gitlab.gnome.org/orca/help/commands_structural_navigation.html) digunakan untuk heading, landmark, tabel, form dan kutipan. Fokus frame konten dipastikan melalui keyboard sebelum membaca respons redirect. Probe bus/registry awal, salah slug monitoring, stale focus dan percobaan sticky browse yang tidak menghasilkan pembacaan target tidak dihitung lulus.
+
+**49 observasi terverifikasi** beserta kutipan ucapan yang disanitasi tersimpan pada `screen_reader.observations` di JSON. Cakupan representatif:
+
+| Pola | Hasil ucapan/interaksi aktual |
 | --- | --- |
-| QA-A11Y-03 | **blocked** untuk pengumuman screen reader aktual: Orca dan Python speechd tidak tersedia. DOM/live region/keyboard lulus tidak membuktikan ucapan status/error/polling. Jalankan satu kombinasi OS/browser/screen reader pada form error, status progress dan notice/loading. |
-| QA-A11Y-08 | **blocked**: belum ada sesi pembaca layar aktual. Jalankan heading/landmark/read order, tabel, disclosure, dialog dan nama kontrol pada public/auth/result/history/profile/admin yang telah dipetakan. AT-SPI typelib yang tersedia bukan screen reader. |
+| Shell/form publik | H1/H2 dan landmark; label teks, batas 50–50.000, CAPTCHA serta hint; tab Teks → Tautan artikel → Teks memakai focus mode; akun expanded/collapsed dan Escape |
+| Auth/notifikasi | Email, password masked, checkbox/terms dan hint; “Memproses...”/disabled lalu alert credential salah; reset/forgot; pesan verifikasi terbaca melalui region “Pesan sistem”, status dan tombol tutup |
+| Hasil | H1 → label valid/hoaks/abstention → disclaimer → skor model → explanation; abstention membacakan “Ini bukan bukti bahwa informasi benar atau palsu.” |
+| Explanation/evidence | Pending/unavailable dibaca jujur; H3 rujukan, sumber/tanggal, blockquote, URL sumber dan link role; disclosure input collapsed/expanded/collapsed |
+| Riwayat/profil | Heading, search/hint/select dan empty state; dialog profil membacakan nama/deskripsi/Batal, Escape kembali ke penghapus |
+| Statistik/admin | Caption tabel dan relasi row/column header; dashboard; tabel native dan sort names; login, Users fields/switch, Datasets text/select; shared read-only infolist; dialog hapus native membacakan nama/deskripsi/Cancel/konfirmasi dan Escape/focus return |
+| Progress/error | Failed tanpa hasil final; stage retrieving/explaining masing-masing diumumkan sekali; meter native menyebut 75/85% hanya saat berubah; dua jendela 6500ms tanpa perubahan menghasilkan nol ucapan ulang; terminal memuat halaman hasil |
 
-Kedua blocker merupakan minimum QA, sehingga IP-037 tetap **review**, tiga checklist browser selesai dan exit gate belum ditutup. Tidak menganggap ketiadaan alat sebagai not_applicable. Catat kombinasi OS/browser/screen reader serta hasilnya; perbaiki temuan jika ada, ulangi cek terdampak, lalu ubah IP-037 menjadi done. Tidak perlu mengulang 721 samples apabila source terkait tidak berubah dan tidak ada risiko baru.
+Pemeriksaan screen reader admin memakai template bersama table/form/infolist dan dialog sebagai representatif; tidak mengklaim pass SR tiap resource individual A07/A08. Matriks browser awal tetap mencakup halaman/state tersebut. Kasus katalog lainnya tetap konservatif.
 
-Device mobile fisik, MySQL/deployment, SMTP dan BERT/RAG/OpenAI/OCR/transkripsi nyata belum diverifikasi; empat BERT skips bukan E2E pass. Audit observer native Livewire path tetap gap existing. QA agregat konservatif menjadi **3 audit pass / 2 blocked / 89 not_run**: subhasil browser tidak otomatis menutup semua varian katalog. Gate F6 menyeluruh serta IP-038–039 tetap terbuka.
+### Defect live region dan perbaikan
 
-Audit akhir source/dokumen: 655 dari 659 berkas tracked awal tetap identik; hanya tiga dokumen status dan satu partial CAPTCHA berubah, ditambah dua laporan. 215 tautan lokal pada tujuh dokumen aktif dan laporan ini valid; root vendor sementara sudah dihapus.
+Pada source awal, paragraf `data-progress-transport` sekaligus live region memakai `hidden` saat kosong. Fault 403 menghasilkan pesan visual, tetapi **nol ucapan Orca**, sedangkan perubahan stage pada sesi yang sama terbaca. Live region kini berupa wadah `role=status`, `aria-live=polite`, `aria-atomic=true` yang exposed sejak render; paragraf pesan di dalamnya tetap dapat disembunyikan saat kosong. Rendering visual dan scheduler/authorization/domain tidak berubah.
 
-Cleanup: kedua server Laravel fixture dan seluruh browser QA milik sesi ditutup; port loopback QA tidak lagi listening. Snapshot/binary/artefak sementara tetap terpisah dari repository.
+Pada source final, fault 403 membacakan “Sesi atau akses tidak lagi tersedia. Muat ulang halaman untuk memeriksa akses.” sekali; fault 503 membacakan pesan pembaruan tidak tersedia sekali. Dua jendela 6500ms berikutnya diam; status domain keduanya tetap `processing`. Empat viewport final 320/360/768/1280 tidak overflow dan wadah live region tetap exposed. Smoke normal pending/processing/failed/final lulus: dua POST Livewire, nol polling fallback paralel, nol console error dan nol server error.
+
+Test baru pada `FinalResultStateTest` memverifikasi wadah status sudah exposed sebelum error pertama meski isi pesan hidden. Test tersebut **gagal pada view lama** (1 failure/6 assertions), lalu lulus sesudah perbaikan; test existing tidak dilonggarkan.
+
+## Validasi source final kelanjutan
+
+- Build frontend, Blade cache/clear, Pint pada satu PHP test yang berubah, 69 Node tests dan `git diff --check` lulus. Seluruh **16 output build identik** dengan sesi awal/IP-036; CSS/JS/dependency/vendor assets tidak berubah.
+- Suites terkait **66 passed /436 assertions**. Runner final `vendor/bin/phpunit --display-warnings --display-notices --display-errors`: **778 cases /5214 assertions — 774 passed, 4 real-BERT skips**, tanpa failure/warning. Empat skip tetap tidak membuktikan inference nyata.
+- `artisan test` wrapper juga selesai tanpa failure, tetapi melaporkan **25 warning DOMDocument existing** pada Unit SubmissionProgressPresentationTest (parser HTML4 mengenali `section` sebagai tag invalid). Diagnosis ini dibedakan dari hasil runner PHPUnit langsung. Build root awal memerlukan import CSS vendor Filament; symlink exact-lock sementara dipasang untuk build lalu dihapus. Tidak mengubah dependency/test existing untuk menyembunyikan diagnosis.
+
+QA-A11Y-03 dan QA-A11Y-08 kini **pass**; minimum screen reader IP-037 terpenuhi dan keempat checklist task selesai. Agregat menjadi **5 pass /89 not_run**: tiga audit awal dan dua kasus screen reader; subhasil lintas task tidak otomatis menutup seluruh varian katalog. IP-038–039 dan gate F6 menyeluruh tetap terbuka.
+
+Device mobile fisik, tagged-PDF/screen reader PDF, MySQL/deployment, SMTP dan BERT/RAG/OpenAI/OCR/transkripsi nyata belum diverifikasi. Audit observer native Livewire tetap gap existing. Tidak ada perubahan pada batas operasional tersebut.
+
+Reproduksi SR: jalankan fixture Laravel/session terpisah, gunakan satu Firefox headed dengan Orca dan speech backend aktif pada bus/display yang sama, navigasikan pola pada tabel menggunakan keyboard dan rekam ucapan pembaca layar. Biarkan progress tetap selama ≥6500ms, ubah stage backend fixture, lalu injeksikan respons status 403/503; periksa pengumuman sekali, quiet window dan domain yang tetap. Hash artefak/runner tercatat pada JSON. Data raw, cookie, token dan credential tetap hanya pada snapshot sementara.
+
+Cleanup kelanjutan: server Laravel fixture, Firefox/Orca/Speech Dispatcher, registry/DBus dan display virtual milik QA telah dihentikan; port QA tidak lagi listening. Tool dan raw artefak sementara tetap di luar repository. Root vendor sementara telah dihapus. Kelanjutan mengubah tujuh berkas tracked (lima dokumen/evidence, satu view hasil dan satu test); 654 dari 661 berkas tracked awal kelanjutan tetap identik.

@@ -1,7 +1,7 @@
 {
   "task": "IP-037",
   "date": "2026-10-15",
-  "status": "review",
+  "status": "done",
   "initial_head": "79be3df",
   "runtime": {
     "php": "8.4.11",
@@ -1038,28 +1038,30 @@
     "Missing guest capability 404"
   ],
   "validation": {
-    "npm_build": "pass",
+    "npm_build": "pass with temporary exact-lock vendor symlink removed afterwards",
     "build_files": 16,
-    "build_identical_to_IP036": true,
+    "build_identical_to_initial_IP037": true,
     "blade_cache_clear": "pass",
     "php_related": {
-      "passed": 98,
-      "assertions": 463
+      "passed": 66,
+      "assertions": 436
     },
     "php_full": {
-      "total": 777,
-      "passed": 773,
+      "total": 778,
+      "passed": 774,
       "skipped_real_bert": 4,
-      "assertions": 5205,
+      "assertions": 5214,
       "errors": 0,
       "failures": 0,
-      "warnings": 0
+      "warnings": 0,
+      "runner": "vendor/bin/phpunit --display-warnings --display-notices --display-errors"
     },
     "node": {
       "passed": 69,
       "failed": 0
     },
-    "pint": "Not applicable: no non-Blade PHP source changed"
+    "pint": "pass: tests/Feature/FinalResultStateTest.php",
+    "regression_red": "New live-region regression fails on original view (1 failure / 6 assertions)"
   },
   "reused_evidence": [
     "REGRESSION-IP-036.md: broad backend/security checks; new full suite also passed",
@@ -1068,20 +1070,7 @@
     "CSV-IP-034.md: native downloads, >100 records, format/formula safety; exporter unchanged",
     "POLLING-IP-014.md: additional handoff/non-JSON/offline/navigation client fixtures; production public links have no wire:navigate"
   ],
-  "remaining": [
-    {
-      "case": "QA-A11Y-03",
-      "status": "blocked",
-      "required": "Actual screen-reader live-region announcements",
-      "reason": "Orca/speechd unavailable; no assistive-technology session"
-    },
-    {
-      "case": "QA-A11Y-08",
-      "status": "blocked",
-      "required": "Actual screen reader per main template/interaction",
-      "reason": "DOM/AT-SPI availability, keyboard and forced colors do not substitute screen-reader output"
-    }
-  ],
+  "remaining": [],
   "limitations": [
     "No physical mobile device",
     "No real BERT/RAG/OpenAI/OCR/transcription/SMTP/provider validation",
@@ -1115,6 +1104,670 @@
     "nojs.json": "b0072cefd9d0a9af5b332cf2b819e9b02c47f8667ca4447bf2ec3e5ae29674ac",
     "polling.json": "77742fb2ca62c1e107717f8837a9a5691c26167fe9d070f6e899c2c1a38b0a2b",
     "targeted-final.log": "0a26e21b5f72230ba31133bdcdc687225ddf90032d67899c8a24f24b67c68dec",
-    "zoom.json": "e1d862b502ecf5fe06e23041b65b890334732b9763ecc91e3547d165c11bcd89"
+    "zoom.json": "e1d862b502ecf5fe06e23041b65b890334732b9763ecc91e3547d165c11bcd89",
+    "screenreader-regression-red.log": "f4d260a995b43111d5a20488d1d07c993163a6cb6898847af935d17621a423c3",
+    "screenreader-targeted.log": "3d40ef4d7abb66d4ec14a6b8b859e273c12dcee70b81a5b77eed3be8ff4d6cd9",
+    "screenreader-full-suite.log": "d6c29dc98c516fbdee20d6972206936c8d4c549f8bb09fbfd8851e96d855b886",
+    "screenreader-phpunit-final.log": "88bd0a5070e4cd990cdeda4c7856446906cfee5b50f569a19cb34a185450299b",
+    "screenreader-node.log": "9803cd1e8ef9f7afd402955fdf271e855a32db87f6e53e61ac72f014ef4a9aee",
+    "screenreader-pint.log": "2455685e40fbae645c7ad362a1a4b7954b8d36529fa4af2744d485251436a4d2",
+    "screenreader-build.log": "5c759b587cdc9c81431e81e01453cee945b1c86b0b99e3ba19e07ffe99164b46",
+    "screenreader-build-final.log": "202a0e409887fbda83e861f2ed676412744e5d8e82ec78315131f676b767ce26",
+    "screenreader-blade.log": "3f9431fcd9714f6dd47803cb20777c50c99c64c06e629ef631a2219e4d826c9a",
+    "screenreader-final-smoke.json": "52f5dc95d3a46c369e20a87273fc2fc440d985718ebaea44c408260e5487a7e4"
+  },
+  "resume_initial_head": "1c47f82",
+  "previous_validation": {
+    "npm_build": "pass",
+    "build_files": 16,
+    "build_identical_to_IP036": true,
+    "blade_cache_clear": "pass",
+    "php_related": {
+      "passed": 98,
+      "assertions": 463
+    },
+    "php_full": {
+      "total": 777,
+      "passed": 773,
+      "skipped_real_bert": 4,
+      "assertions": 5205,
+      "errors": 0,
+      "failures": 0,
+      "warnings": 0
+    },
+    "node": {
+      "passed": 69,
+      "failed": 0
+    },
+    "pint": "Not applicable: no non-Blade PHP source changed"
+  },
+  "additional_change": {
+    "file": "resources/views/hasil.blade.php",
+    "issue": "Polling transport text became visible without an Orca announcement because the status region itself started hidden",
+    "fix": "Keep a polite atomic status container exposed from initial render; toggle only its inner message",
+    "test": "tests/Feature/FinalResultStateTest.php: exposed live-region ancestor before first error",
+    "before": {
+      "screen_reader_transport_announcements": 0
+    },
+    "after": {
+      "HTTP_403_announcements": 1,
+      "HTTP_503_announcements": 1,
+      "repeated_announcements_during_6500ms_quiet_windows": 0,
+      "domain_state": "processing"
+    }
+  },
+  "screen_reader": {
+    "mode": "browser_fixture",
+    "status": "pass",
+    "cases": [
+      "QA-A11Y-03",
+      "QA-A11Y-08"
+    ],
+    "os": "CachyOS Linux",
+    "display": "Private X11/Xvfb 1280x900; isolated DBus/accessibility registry and Openbox",
+    "browser": "Firefox 157.0.1 headed",
+    "screen_reader": "Orca 51.0 (rev 856433b61)",
+    "atspi": "2.62.1",
+    "speech_dispatcher": "0.12.1",
+    "speech_engine": "eSpeak NG 1.52.0",
+    "measurement": "Actual Orca SPEECH OUTPUT stream triggered by browser/AT-SPI events and native keyboard; speech synthesized to an ALSA null sink",
+    "automation": "Native XTest keys and trusted BiDi input; Orca structural commands; F6 establishes content-frame focus before reading redirect notices",
+    "tools_scope": "Temporary extracted packages under QA snapshot; no global package installation or repository dependency change",
+    "limits": [
+      "Automated announcement/structure evaluation; no human speech-pronunciation or usability session",
+      "Representative shared admin table/form/infolist templates checked; no per-resource screen-reader pass claimed for A07/A08",
+      "Initial browser matrix reused for unchanged CSS/JS/templates; new wrapper gets four final viewport checks"
+    ],
+    "observations": [
+      {
+        "name": "home-headings-landmarks",
+        "status": "pass",
+        "observed": [
+          "Periksa sebelum percaya.",
+          "Pemeriksaan informasi",
+          "information"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "home-field-#teks-input",
+        "status": "pass",
+        "observed": [
+          "Teks informasi",
+          "entry",
+          "Masukkan 50–50.000 karakter. Teks yang cukup membantu model membaca konteks."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "home-field-#captcha-teks",
+        "status": "pass",
+        "observed": [
+          "Keamanan: 7 + 2 = ?",
+          "spin button",
+          "Jawab pertanyaan ini untuk mengirim pemeriksaan."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "login-field-#email",
+        "status": "pass",
+        "observed": [
+          "Alamat email",
+          "entry required"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "login-field-#password",
+        "status": "pass",
+        "observed": [
+          "Kata sandi",
+          "password text required"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "login-field-#remember_me",
+        "status": "pass",
+        "observed": [
+          "Ingat saya",
+          "check box not checked"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "login-server-error",
+        "status": "pass",
+        "observed": [
+          "Memproses...",
+          "button grayed",
+          "alert",
+          "Periksa kembali formulir• Email atau kata sandi yang kamu masukkan salah."
+        ],
+        "ordered": true
+      },
+      {
+        "name": "registration-structure",
+        "status": "pass",
+        "observed": [
+          "Buat akun",
+          "heading 1"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "registration-fields",
+        "status": "pass",
+        "observed": [
+          "Nama lengkap",
+          "Gunakan alamat email dengan huruf kecil.",
+          "Gunakan kata sandi yang unik untuk akun ini.",
+          "Konfirmasi kata sandi",
+          "Saya menyetujui Kebijakan Privasi dan memahami bahwa hasil analisis merupakan prediksi model, bukan verifikasi kebenaran yang definitif.",
+          "check box not checked required"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "verification-notice-heading",
+        "status": "pass",
+        "observed": [
+          "Verifikasi email"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "result-valid",
+        "status": "pass",
+        "observed": [
+          "Penjelasan analisis",
+          "Referensi terkait",
+          "Judul a <script>window.fixtureXss=true</script> panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang",
+          "Judul b <script>window.fixtureXss=true</script> panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "history-structure",
+        "status": "pass",
+        "observed": [
+          "Ringkasan seluruh riwayat",
+          "Cari dan filter riwayat",
+          "Daftar pemeriksaan"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "history-filter-name-hint",
+        "status": "pass",
+        "observed": [
+          "Cari teks atau URL",
+          "Cari pada teks, hasil ekstraksi, atau URL. Maksimal 100 karakter."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "history-filter-select",
+        "status": "pass",
+        "observed": [
+          "Label model",
+          "combo box",
+          "Semua label"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "profile-structure",
+        "status": "pass",
+        "observed": [
+          "Identitas akun",
+          "Ubah kata sandi",
+          "Hapus akun"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "profile-dialog",
+        "status": "pass",
+        "observed": [
+          "Hapus akun secara permanen?",
+          "dialog",
+          "Tindakan ini tidak dapat dibatalkan. Masukkan kata sandi akun untuk mengonfirmasi penghapusan.",
+          "Batal",
+          "escape",
+          "Hapus akun"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "statistics-table",
+        "status": "pass",
+        "observed": [
+          "Jumlah submission per bulan dan label tersimpan",
+          "table with 13 rows 4 columns",
+          "column header",
+          "November 2025 row header Total submission column header 0",
+          "Row 2, column 2."
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-dashboard",
+        "status": "pass",
+        "observed": [
+          "Dashboard",
+          "Ringkasan operasi",
+          "Tren submission · 30 hari"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-native-table",
+        "status": "pass",
+        "observed": [
+          "table with 10 rows 7 columns",
+          "Select/deselect all items for bulk actions."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "admin-table-control",
+        "status": "pass",
+        "observed": [
+          "Nama",
+          "Email"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "account-menu-expanded-escape",
+        "status": "pass",
+        "observed": [
+          "collapsed button",
+          "expanded",
+          "escape",
+          "collapsed"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "result-reading-valid",
+        "status": "pass",
+        "observed": [
+          "Hasil analisis",
+          "Prediksi model: Valid",
+          "Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.",
+          "Skor Keyakinan Model",
+          "Skor ini menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita.",
+          "Penjelasan analisis"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "result-reading-hoax",
+        "status": "pass",
+        "observed": [
+          "Hasil analisis",
+          "Prediksi model: Hoaks",
+          "Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.",
+          "Skor Keyakinan Model",
+          "Skor ini menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita.",
+          "Penjelasan analisis"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "result-reading-meragukan",
+        "status": "pass",
+        "observed": [
+          "Hasil analisis",
+          "Informasi belum terverifikasi oleh sumber terpercaya",
+          "Ini bukan bukti bahwa informasi benar atau palsu.",
+          "Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.",
+          "Skor Keyakinan Model",
+          "Skor ini menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita.",
+          "Penjelasan analisis"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "input-provenance-disclosure",
+        "status": "pass",
+        "observed": [
+          "Input dan teks analisis",
+          "collapsed button",
+          "expanded",
+          "collapsed"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "failed-reading",
+        "status": "pass",
+        "observed": [
+          "Pemrosesan Gagal",
+          "Status: Gagal. Tahap terakhir tercatat: Klasifikasi BERT.",
+          "Pemrosesan terhenti. Hasil final belum tersedia. Kembali ke form untuk mengirim pemeriksaan"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "progress-quiet-unchanged-polls",
+        "status": "pass",
+        "observed": [],
+        "duration_ms": 6500
+      },
+      {
+        "name": "progress-stage-retrieving",
+        "status": "pass",
+        "observed": [
+          "75 percent.",
+          "Status: Diproses. Tahap: Pencarian bukti."
+        ],
+        "ordered": true
+      },
+      {
+        "name": "progress-stage-explaining",
+        "status": "pass",
+        "observed": [
+          "85 percent.",
+          "Status: Diproses. Tahap: Penyusunan penjelasan."
+        ],
+        "ordered": true
+      },
+      {
+        "name": "progress-quiet-after-stage",
+        "status": "pass",
+        "observed": [],
+        "duration_ms": 6500
+      },
+      {
+        "name": "progress-terminal-completed",
+        "status": "pass",
+        "observed": [
+          "Finished loading Hasil analisis — hoaxlin.id."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "forgot-field-hint",
+        "status": "pass",
+        "observed": [
+          "Alamat email",
+          "Gunakan alamat email yang Anda gunakan saat mendaftar."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "reset-password-hints",
+        "status": "pass",
+        "observed": [
+          "Kata sandi baru",
+          "password text required",
+          "Konfirmasi kata sandi",
+          "Masukkan kembali kata sandi yang sama."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "error-template",
+        "status": "pass",
+        "observed": [
+          "Halaman atau hasil tidak ditemukan"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "admin-login-controls",
+        "status": "pass",
+        "observed": [
+          "Email address*",
+          "entry required",
+          "Password*",
+          "password text required"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "history-empty-reading",
+        "status": "pass",
+        "observed": [
+          "Belum ada riwayat pemeriksaan",
+          "Mulai pemeriksaan pertama Anda untuk menyimpan riwayat di akun ini.",
+          "Periksa informasi"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-dataset-controls",
+        "status": "pass",
+        "observed": [
+          "Teks informasi*",
+          "Label katalog*",
+          "combo box",
+          "Meragukan"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-readonly-detail",
+        "status": "pass",
+        "observed": [
+          "Input sumber",
+          "Terjemahan dan provenance"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "explanation_pending-reading",
+        "status": "pass",
+        "observed": [
+          "Status tercatat: Sedang disusun.",
+          "Penjelasan AI belum tersedia untuk hasil ini."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "explanation_unavailable-reading",
+        "status": "pass",
+        "observed": [
+          "Status tercatat: Tidak tersedia.",
+          "Penjelasan AI tidak tersedia. Prediksi classifier tetap ditampilkan."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "evidence-heading-quote-source",
+        "status": "pass",
+        "observed": [
+          "Judul a <script>window.fixtureXss=true</script> panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang panjang",
+          "heading 3",
+          "Sumber:",
+          "Tanggal publikasi:",
+          "block quote",
+          "https://example.test/a",
+          "link"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "input-tabs-focus-mode-arrow",
+        "status": "pass",
+        "observed": [
+          "Teks",
+          "page tab",
+          "Tautan artikel",
+          "page tab",
+          "Teks",
+          "page tab"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "flash-native-frame-focus",
+        "status": "pass",
+        "observed": [
+          "Pesan sistem",
+          "status bar",
+          "Tautan verifikasi baru telah dikirim. Periksa kotak",
+          "Tutup pesan: Informasi"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "admin-user-form-fields",
+        "status": "pass",
+        "observed": [
+          "Nama*",
+          "Email*",
+          "Kata sandi*",
+          "password text required"
+        ],
+        "ordered": false
+      },
+      {
+        "name": "admin-delete-dialog-default-mode",
+        "status": "pass",
+        "observed": [
+          "Hapus data kurasi ini?",
+          "dialog",
+          "Data akan dihapus dari katalog. Tindakan ini tidak dapat dibatalkan dan tidak melatih ulang atau mengganti model BERT aktif.",
+          "Cancel",
+          "Hapus data kurasi",
+          "escape",
+          "Delete"
+        ],
+        "ordered": true
+      },
+      {
+        "name": "transport-final-403",
+        "status": "pass",
+        "observed": [
+          "Sesi atau akses tidak lagi tersedia. Muat ulang halaman untuk memeriksa akses."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "transport-final-403-quiet",
+        "status": "pass",
+        "observed": [],
+        "duration_ms": 6500
+      },
+      {
+        "name": "transport-final-503",
+        "status": "pass",
+        "observed": [
+          "Belum dapat memperbarui status. Status terakhir tetap ditampilkan. Gunakan “Muat ulang status” jika diperlukan."
+        ],
+        "ordered": false
+      },
+      {
+        "name": "transport-final-503-quiet",
+        "status": "pass",
+        "observed": [],
+        "duration_ms": 6500
+      }
+    ],
+    "observation_count": 49,
+    "final_layout": [
+      {
+        "name": "transport-final-layout",
+        "width": 320,
+        "overflow": false,
+        "liveRegion": "status",
+        "emptyHidden": true
+      },
+      {
+        "name": "transport-final-layout",
+        "width": 360,
+        "overflow": false,
+        "liveRegion": "status",
+        "emptyHidden": true
+      },
+      {
+        "name": "transport-final-layout",
+        "width": 768,
+        "overflow": false,
+        "liveRegion": "status",
+        "emptyHidden": true
+      },
+      {
+        "name": "transport-final-layout",
+        "width": 1280,
+        "overflow": false,
+        "liveRegion": "status",
+        "emptyHidden": true
+      }
+    ],
+    "normal_final_smoke": {
+      "checks": [
+        {
+          "name": "processing",
+          "title": "Sedang Menganalisis",
+          "overflow": false,
+          "main": 1,
+          "status": "processing",
+          "transportRegion": "status"
+        },
+        {
+          "name": "pending",
+          "title": "Menunggu pemrosesan",
+          "overflow": false,
+          "main": 1,
+          "status": "pending",
+          "transportRegion": "status"
+        },
+        {
+          "name": "failed",
+          "title": "Pemrosesan Gagal",
+          "overflow": false,
+          "main": 1,
+          "status": "failed",
+          "transportRegion": "status"
+        },
+        {
+          "name": "valid",
+          "title": "Hasil analisis",
+          "overflow": false,
+          "main": 1
+        }
+      ],
+      "native_posts": 2,
+      "fallback_requests": 0,
+      "console_errors": [],
+      "server_errors": 0
+    },
+    "raw_artifact_hashes": {
+      "matrix-private.json": "d01cf45f4df4f066419673718b22490f2504d585f56620a59c6482069ef2afec",
+      "matrix-rest-private.json": "2ba0a1460e09893cce5499c05a9ffbeabbf63b714bb3dacddfe734fca49477c8",
+      "extra-private.json": "352221e8252248c23193548ff73c067d10fac73c76dd8b1ea9d40b9e6e9fc776",
+      "followup-private.json": "873b62f0dbe060ea53910e4f3986ad0b4266573043bc8a3d0b42c14ca79ec321",
+      "completion-private.json": "9a7c7ef2e9eafd4f9f8499a3a164c108898c781d592e2bc66f0933e3ce243b62",
+      "transport-final-private.json": "b56f70c1cdcc4b2db5eb39f960f173cc05e27e9249bbab3596de057ce2ec3313",
+      "focus-final-private.json": "0bc487b06b013481e738af2b28ed7dbb594f8e27e7832c32865c106e3773562a",
+      "orca-debug-private.out": "8aa3cc8d47cf12778e01f01a85f584967d0e965dcaf25acfe3b77ec46e9bb1fd",
+      "speech-dispatcher-private.log": "e7bf7bc8ac6ca885966f6c8d272608a21654d4c0deee498e568e71528aaf3518"
+    }
+  },
+  "diagnostics_resume": [
+    "Artisan test wrapper reports 25 existing DOMDocument HTML5 section warnings in SubmissionProgressPresentationTest; direct final PHPUnit run has no failure/warning and four BERT skips",
+    "Root build initially lacked vendor Filament CSS; exact-lock temporary symlink restored imports, final build passed and symlink removed",
+    "Orca setup needed canonical private accessibility bus, explicit registry and content-frame focus; setup/focus probes and wrong monitoring slug excluded from successful observations",
+    "Admin alertdialog rechecked after clearing sticky browse mode; native title, description, Cancel, confirm and Escape/focus return announced"
+  ],
+  "final_audit": {
+    "resume_tracked_initial": 661,
+    "tracked_unchanged": 654,
+    "changed_files": 7,
+    "task_statuses": {
+      "done": 37,
+      "pending": 2
+    },
+    "local_document_links_valid": 215,
+    "source_matches_tested_snapshot": true,
+    "root_vendor_temporary_link_removed": true,
+    "owned_qa_runtimes_stopped": true,
+    "qa_ports_listening": []
   }
 }

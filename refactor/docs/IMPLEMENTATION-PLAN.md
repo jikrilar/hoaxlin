@@ -4,7 +4,7 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 15 Oktober 2026 |
-| Status | IP-001–IP-036 selesai; 36 dari 39 task done, IP-037 review, IP-038–IP-039 pending |
+| Status | IP-001–IP-037 selesai; 37 dari 39 task done, IP-038–IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Arah desain | Warm Editorial Intelligence; light-only |
@@ -21,7 +21,7 @@ IP-001–IP-003 memiliki bukti pada [audit checkout](../reports/AUDIT-IP-001.md)
 
 IP-036 menyelesaikan [validasi regression final](../reports/REGRESSION-IP-036.md): build host dan Docker target test, manifest/import/font/variants, Blade cache/clear, 364 tests terkait, 69 Node serta Pint pada 80 non-Blade PHP refactor lulus. Suite penuh final 777 cases/5205 assertions: 773 passed/4 real-BERT skips tanpa failure/warning. Image test existing memerlukan tiga fixture repository read-only; dua error packaging run awal dibedakan dari regression aplikasi. Tidak mengubah produk/lockfile/assertion; 392 berkas source pada snapshot/root identik dengan IP-035 dan seluruh 16 output build host/Docker identik. Evidence browser IP-035 digunakan kembali, bukan run baru atau penutupan QA browser menyeluruh. IP-037–IP-039, audit gap existing dan gate F6 menyeluruh tetap terbuka.
 
-IP-037 memiliki [hasil QA browser dan perbaikan copy CAPTCHA](../reports/BROWSER-IP-037.md) dengan [evidence terstruktur](../reports/BROWSER-IP-037.json): 721 samples lintas Firefox/Chromium normal/no-JS/zoom/reduced/forced colors, 68 checks interaksi, 15 halaman DOM/semantic contrast dan pengiriman native lima input. Source final build/Blade/98 tests terkait/69 Node serta suite penuh 773 passed/4 BERT skips lulus. IP-037 tetap **review**: screen reader actual minimum QA §3/QA-A11Y-03/08 belum tersedia, tidak disamakan dengan DOM/keyboard pass. Dua kasus tersebut blocked; aggregate lain tetap konservatif. IP-038–039 dan gate F6 menyeluruh belum dimulai/ditutup.
+IP-037 memiliki [hasil QA browser dan perbaikan copy CAPTCHA](../reports/BROWSER-IP-037.md) dengan [evidence terstruktur](../reports/BROWSER-IP-037.json): 721 samples lintas Firefox/Chromium normal/no-JS/zoom/reduced/forced colors, 68 checks interaksi, 15 halaman DOM/semantic contrast dan pengiriman native lima input. Source sesi awal: build/Blade/98 tests terkait/69 Node serta suite penuh 773 passed/4 BERT skips lulus. Kelanjutan IP-037 menutup minimum screen reader aktual QA §3: Orca 51.0/Firefox 157.0.1 menghasilkan 49 observasi terverifikasi pada template/interaksi utama. Defect pengumuman gangguan polling diperbaiki dengan live region yang tetap exposed; fault 403/503 diumumkan sekali tanpa mengubah status domain. Test regresi red/green, 66 tests terkait, suite final 774 passed/4 BERT skips/5214 assertions, 69 Node, Pint, build/Blade dan smoke native lulus. IP-037 **done**, QA-A11Y-03/08 pass; aggregate 5 pass/89 not_run tetap konservatif. IP-038–039 dan gate F6 menyeluruh belum dimulai/ditutup.
 
 Kerjakan dependency sebelum task turunannya. Tuntaskan satu alur dengan error, empty, akses, mobile, dan keyboard sebelum memperluas perubahan. Untuk layout/CSS bersama, cek pula halaman yang masih memakai presentasi lama.
 
