@@ -6,10 +6,12 @@
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Dokumen | Overview refactoring antarmuka |
 | Versi dokumen | 1.0 |
-| Tanggal | 11 Oktober 2026 |
-| Status | Rencana refactoring; implementasi dan validasi runtime belum dilakukan dalam penyusunan dokumen ini |
+| Tanggal | 15 Oktober 2026 |
+| Status | Arah dan batas refactor; keputusan aktual diselaraskan IP-038, progres di TASKS.md |
 | Arah desain | Warm Editorial Intelligence |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
+
+Status task rinci berpusat pada [TASKS.md](TASKS.md). [rekonsiliasi IP-038](../reports/GAPS-IP-038.md) menghubungkan source, page/AC, FA-01–FA-10 dan G01–G08 ke evidence. Baseline serta catatan IP terdahulu adalah riwayat pemeriksaan pada saat task tersebut dikerjakan; batas runtime terbaru mengikuti laporan IP-038, tanpa klaim seluruh refactor/QA/E2E selesai.
 
 ## 1. Ringkasan proyek
 

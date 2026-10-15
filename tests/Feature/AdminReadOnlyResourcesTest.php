@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Actions\Submissions\CreateSubmission;
 use App\Filament\Resources\DetectionResults\DetectionResultResource;
 use App\Filament\Resources\DetectionResults\Pages\ListDetectionResults;
 use App\Filament\Resources\Feedback\FeedbackResource;
@@ -17,6 +18,7 @@ use App\View\Presenters\DetectionPresentation;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -171,6 +173,24 @@ class AdminReadOnlyResourcesTest extends TestCase
             ->filterTable('is_correct', true)->assertCanSeeTableRecords([$yes])->assertCanNotSeeTableRecords([$no])
             ->filterTable('is_correct', false)->assertCanSeeTableRecords([$no])->assertCanNotSeeTableRecords([$yes]);
         Livewire::test(ListFeedback::class)->searchTable('CommentTailFixture')->assertCanSeeTableRecords([$yes])->assertCanNotSeeTableRecords([$no]);
+    }
+
+    public function test_video_filter_includes_normalized_links_without_adding_a_video_url_option(): void
+    {
+        $this->admin();
+        Queue::fake();
+        $upload = Submission::factory()->create(['input_type' => 'video']);
+        $link = app(CreateSubmission::class)->handle([
+            'input_type' => 'video_url',
+            'source_url' => 'https://example.test/video.mp4',
+        ], auth()->user(), null);
+        $separateType = Submission::factory()->create(['input_type' => 'video_url']);
+
+        $page = Livewire::test(ListSubmissions::class)->filterTable('input_type', 'video')
+            ->assertCanSeeTableRecords([$upload, $link])->assertCanNotSeeTableRecords([$separateType])
+            ->assertTableColumnFormattedStateSet('input_type', 'Video', $link);
+        $this->assertSame('Video', $page->instance()->getTable()->getFilter('input_type')->getOptions()['video']);
+        $this->assertArrayNotHasKey('video_url', $page->instance()->getTable()->getFilter('input_type')->getOptions());
     }
 
     public function test_native_search_sort_filters_and_pagination_keep_existing_populations(): void

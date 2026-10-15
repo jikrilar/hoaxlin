@@ -337,7 +337,7 @@ IP-020 menambah [subhasil profil/konfirmasi](../reports/PROFILE-IP-020.md): 16 u
 | Kasus | Jalankan | Expected | Traceability |
 | --- | --- | --- | --- |
 | **QA-HISTORY-01 — Kosong dan mixed state** | Buka tanpa history, dengan history, serta query yang tidak menemukan hasil; sertakan pending/failed/partial/completed. | Empty awal berbeda dari empty filter; actions recovery nyata. Pending/failed tidak diberi final label/skor palsu; summary menjelaskan seluruh history, bukan filter aktif. | AC-P03; IP-021 |
-| **QA-HISTORY-02 — Filter dan search** | Uji search raw/extracted/source sampai 100 dan 101 karakter; label, input_type, status serta nilai tidak valid. | GET query/validation tetap; filter hanya text/image/video/url, tanpa video_url baru. Status pending/processing/completed/failed; label existing; copy Video tidak menyamakan domain yang tidak dicakup. | AC-P03; IP-021; G02 |
+| **QA-HISTORY-02 — Filter dan search** | Uji search raw/extracted/source sampai 100 dan 101 karakter; label, input_type, status serta nilai tidak valid. | GET query/validation tetap; filter hanya text/image/video/url, tanpa video_url baru. Status pending/processing/completed/failed; label existing; copy Video mengikuti normalisasi request ke kategori tersimpan; uji tautan melalui CreateSubmission selain fixture raw video_url yang terpisah. | AC-P03; IP-021; G02 |
 | **QA-HISTORY-03 — Sort/pagination** | Uji newest/oldest/confidence, halaman kedua, clear filter dan long cells pada mobile. | 15 item per halaman; query string dipertahankan; urutan mengikuti controller termasuk tie handling existing. Summary/CSV tidak diklaim mengikuti filter; tabel memakai scroll lokal bila perlu. | AC-P03, AC-P16; IP-021, IP-034; G03 |
 | **QA-HISTORY-04 — Detail history** | Buka masing-masing state dari history, gunakan back action, lalu coba ID milik user lain; bandingkan hasil direct route. | Semantik/komponen P02 dipakai konsisten tanpa data silang. Context kembali jelas; forUser tetap; progress/evidence/feedback lifecycle tidak diduplikasi untuk P04. | AC-P04; IP-022, IP-013–IP-016 |
 
@@ -594,16 +594,18 @@ Gate audit dapat selesai dengan inventaris blocker yang lengkap; itu tidak menut
 
 ### 9.1 Gap register G01–G08
 
-| Gap | Keputusan yang harus dapat ditinjau | Kasus terkait |
+Keputusan/status final dipelihara pada [register halaman](PAGE-SPECIFICATIONS.md#23-gap-baseline-dan-batas-implementasi); [IP-038](../reports/GAPS-IP-038.md) menghubungkan evidence serta batasnya.
+
+| Gap | Status IP-038 | Kasus terkait |
 | --- | --- | --- |
-| G01 — View data limit video | Limit/format/durasi berasal service/config; jika perlu view data tambahan, scope presentasi jelas | QA-INPUT-05, QA-INPUT-06 |
-| G02 — Filter video_url tidak ada | Pertahankan filter existing; jangan tampilkan opsi yang tidak didukung | QA-HISTORY-02, QA-ADMIN-05 |
-| G03 — CSV tanpa filter | Copy seluruh riwayat; filtered export adalah fitur/kontrak terpisah | QA-HISTORY-03, QA-EXPORT-04 |
-| G04 — byTopic/populasi | UI menyebut distribusi label dan total query existing; query change bukan koreksi visual diam-diam | QA-INFO-04, QA-INFO-05 |
-| G05 — PDF evidence contract | Align makna hasil; evidence hanya jika controller contract nyata dan perubahan eksplisit | QA-EXPORT-02, QA-EXPORT-03 |
-| G06 — File legacy inactive | Registered pages/actions/resource permissions tetap read-only | QA-ADMIN-05–QA-ADMIN-09 |
-| G07 — Service/artifact unavailable | Fixture vs real service dicatat; live checks yang blocked disebut dengan dampak | QA-ENV-02, QA-ENV-03, QA-ADMIN-02 |
-| G08 — CSS/JS legacy/bundled source | Review semua pemakai, cleanup bertahap dan rebuild image sesuai kebutuhan | QA-ASSET-02–QA-ASSET-04 |
+| G01 | resolved | QA-INPUT-05/06 |
+| G02 | retained | QA-HISTORY-02; QA-ADMIN-05 |
+| G03 | retained | QA-HISTORY-03; QA-EXPORT-04 |
+| G04 | resolved | QA-INFO-04/05 |
+| G05 | retained | QA-EXPORT-02/03 |
+| G06 | retained | QA-ADMIN-05–09 |
+| G07 | blocked | QA-ENV-02/03; QA-ADMIN-02 |
+| G08 | resolved | QA-ASSET-02–04 |
 
 Setiap gap dicatat `resolved`, `retained` atau `blocked` beserta alasan/evidence/task. `retained` berarti batas kontrak existing dijelaskan akurat; bukan waiver terhadap bug UI dalam scope. Gap tidak otomatis menjadi fitur baru.
 
@@ -720,3 +722,5 @@ Status setelah IP-002 (11 Oktober 2026): QA-ENV-02 **pass sebagai inventaris bas
 Status setelah IP-003 (13 Oktober 2026): QA-ENV-03 **pass sebagai review inventaris/rencana fixture**, berdasarkan [inventaris state](../reports/FIXTURES-IP-003.md) dan [jurnal IP-003](TASKS.md#ip-003--catatan-eksekusi). Total terkini: pass=3, not_run=91, fail=0, blocked=0, not_applicable=0. Rencana run fixture/browser/export/real service belum dijalankan; semua QA halaman/pipeline masih not_run. Catatan F0 lengkap untuk scope audit/inventaris, tetapi blocker backend/runtime dan harness browser fixture tetap terbuka.
 
 Ketika implementasi diminta, lanjutkan task pending sesuai dependency pada TASKS.md, pilih kasus yang relevan, jalankan pemeriksaan yang tersedia, lalu catat hasil aktual. Tuntaskan failure acceptance dan ulangi scope yang terdampak. Lanjutkan pekerjaan independen saat ada blocker, tetapi pertahankan batas klaim QA dan E2E sampai bukti tersedia.
+
+Status rekonsiliasi IP-038 (15 Oktober 2026): 27 page/AC dan FA-01–10 memiliki tautan source/evidence; G01–G08 berstatus 3 resolved/4 retained/1 blocked. Source G02 memperjelas kategori Video tanpa opsi filter baru; targeted/full suite, browser 42 samples/9 checks dan dua PDF diulang untuk dampak tersebut. Evidence CSV/admin/renderer lain digunakan ulang sesuai diff, tanpa mengubah laporan historis menjadi run baru. Katalog tetap **5 pass/89 not_run**; G07, backlog backend audit/retensi, IP-039 dan gate F6 menyeluruh belum ditutup. Lihat [laporan](../reports/GAPS-IP-038.md) dan [ledger 94 kasus](../reports/GAPS-IP-038.json).

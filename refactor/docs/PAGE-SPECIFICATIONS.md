@@ -3,17 +3,19 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 11 Oktober 2026 |
-| Status | Spesifikasi target refactoring; belum diterapkan atau diuji melalui browser |
+| Tanggal | 15 Oktober 2026 |
+| Status | Spesifikasi halaman dan keputusan gap diselaraskan IP-038; progres di TASKS.md |
 | Baseline repository | `jikrilar/hoaxlin`, `main`, `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Arah desain | Warm Editorial Intelligence; light-only |
 | Dokumen terkait | [AGENTS.md](../../AGENTS.md), [OVERVIEW.md](OVERVIEW.md), [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md) |
+
+Status task rinci berpusat pada [TASKS.md](TASKS.md). [rekonsiliasi IP-038](../reports/GAPS-IP-038.md) menghubungkan source, page/AC, FA-01–FA-10 dan G01–G08 ke evidence. Baseline serta catatan IP terdahulu adalah riwayat pemeriksaan pada saat task tersebut dikerjakan; batas runtime terbaru mengikuti laporan IP-038, tanpa klaim seluruh refactor/QA/E2E selesai.
 
 ## 1. Cara menggunakan spesifikasi
 
 Dokumen ini menetapkan tujuan, urutan konten, tindakan, state, responsive behavior, dan acceptance criteria tiap halaman. Token visual dan perilaku komponen mengikuti `DESIGN-SYSTEM.md`; workflow coding serta perlindungan backend mengikuti `AGENTS.md`.
 
-**Baseline** adalah perilaku yang terlihat pada route/controller/request/resource snapshot di atas. **Target** adalah presentasi baru yang perlu diimplementasikan. **Gap** adalah keterbatasan yang tidak boleh ditutup dengan kontrol palsu atau perubahan backend tersembunyi.
+**Baseline** adalah perilaku yang terlihat pada route/controller/request/resource snapshot di atas. **Target** adalah ketentuan presentasi yang menjadi acuan implementasi; bukti aktual ditelusuri ke laporan task, bukan disimpulkan dari teks spesifikasi. **Gap** adalah keterbatasan yang tidak boleh ditutup dengan kontrol palsu atau perubahan backend tersembunyi.
 
 Semua route publik di bawah sudah ada kecuali disebut sebagai target view error. Nama route adalah kontrak; gunakan helper `route()` dan metode HTTP existing. URL resource Filament diselesaikan dari resource/router runtime, bukan ditebak dari nama folder. Detail hasil riwayat memakai view hasil yang sama, bukan duplikasi template.
 
@@ -243,7 +245,7 @@ Data: `submissions` pagination 15 baris dengan query string, `stats` label milik
 | `status` | pending, processing, completed, failed |
 | `sort` | newest default, oldest, confidence |
 
-`video_url` belum menjadi filter yang diterima; lihat G02. Jangan memasukkan opsi itu atau menganggap “Video” mencakup kedua domain tanpa perubahan yang jelas.
+`video_url` belum menjadi filter yang diterima; lihat G02. Filter tetap mencocokkan input_type tersimpan secara persis: kiriman video_url melalui formulir dinormalisasi menjadi video oleh CreateSubmission/InputType::fromRequest dan termasuk kategori Video. Record dengan nilai mentah video_url terpisah tidak ikut; opsi filter baru tidak ditambahkan.
 
 Kolom: waktu, jenis input, ringkasan input, status pemrosesan, prediksi final, confidence final bila ada, “Lihat hasil”. Gunakan placeholder “Belum tersedia” untuk label/skor yang belum final, bukan valid/0%. Konten preview boleh dipotong dengan akses detail lengkap.
 
@@ -465,7 +467,7 @@ Gunakan label mapping yang sama dengan web, termasuk abstention; normalisasi pen
 
 Jika input/extraction dipotong untuk panjang dokumen, beri tanda bahwa cuplikan ditampilkan. Jangan memotong dengan kesan seluruh input sudah disertakan. Long text memiliki page break yang layak; white background dan font DomPDF yang didukung.
 
-Evidence belum menjadi contract data PDF eksplisit; penambahan data tersebut harus task yang jelas, bukan list referensi palsu. Explanation unavailable tidak tampil sebagai sukses explanation.
+IP-033 menyelaraskan makna label/skor/provenance dengan renderer DejaVu mandiri. IP-038 memperjelas kategori tersimpan Video untuk unggahan maupun tautan yang dinormalisasi. Evidence tetap tidak menjadi contract data PDF eksplisit; penambahan data tersebut harus task yang jelas, bukan list referensi palsu. Explanation unavailable tidak tampil sebagai sukses explanation.
 
 **AC-P15:** file PDF aktual dirender dan diperiksa, Bahasa Indonesia/font/URL panjang terbaca, label/skor sesuai web, path internal tidak tampil dan pengguna tanpa akses tidak dapat mengunduh, akses/404 untuk hasil belum final benar.
 
@@ -543,7 +545,7 @@ List: ID, pengguna/“Tamu”, jenis, konten preview, status, hasil, dikirim. Se
 
 Detail: informasi submission yang diberikan infolist, status/stage, input/provenance yang tersedia, serta relation yang dapat dibaca. State nonfinal membedakan record classifier parsial dari hasil final.
 
-Filter video_url belum tersedia pada options baseline seperti riwayat; jangan menambah option tanpa dukungan yang diperiksa.
+Filter video_url terpisah tidak ditambahkan. Request tautan video dinormalisasi menjadi video tersimpan dan memakai label Video pada daftar/detail/filter; record mentah video_url terpisah tidak dicakup query video.
 
 **AC-A04:** tidak ada create/edit/delete/reprocess action; field preview tidak menyembunyikan akses detail; status/final distinction tepat.
 
@@ -598,16 +600,16 @@ Jika network polling gagal, error lokal tidak berarti backend submission gagal. 
 
 ## 23. Gap baseline dan batas implementasi
 
-| ID | Temuan | Keputusan untuk refactor |
-| --- | --- | --- |
-| G01 | Ditutup IP-012: HomeController menyediakan submissionOptions melalui SubmissionFormOptions dari StoreSubmissionRequest/TranscriptionMediaContract/config | Policy/validator tidak berubah; lihat [MEDIA-FORM-IP-012.md](../reports/MEDIA-FORM-IP-012.md) |
-| G02 | HistoryRequest dan filter admin submission tidak mencakup video_url | Jangan tampilkan filter yang tidak didukung; perlu task terpisah jika ingin menambah/menyatukan filter |
-| G03 | CSV exporter tidak menggunakan filter history | Copy “seluruh riwayat”; filtered export merupakan perubahan kontrak tersendiri |
-| G04 | Statistik byTopic adalah distribusi label, bukan topik; query aggregate tidak secara eksplisit completed-only | Ubah penjelasan UI; jika ingin mengubah populasi, kerjakan query/test secara eksplisit |
-| G05 | PDF belum memberi evidence sebagai data contract eksplisit dan punya presentation label lama | Sinkronkan makna label/copy; perlu task data bila evidence ditambahkan |
-| G06 | File Create/Edit legacy ada untuk resource read-only, tetapi tidak terdaftar | Ikuti getPages/resource permissions; jangan mengaktifkan mutasi |
-| G07 | Runtime/metadata BERT dan layanan lain bisa unavailable | Gunakan state jujur, test fixture untuk QA, dan laporkan verifikasi end-to-end yang belum dilakukan |
-| G08 | CSS/JS global lama dan bundled Docker source | Migrasi dengan review lintas halaman; rebuild diperlukan untuk melihat perubahan di container |
+| ID | Status IP-038 | Keputusan final / batas | Bukti |
+| --- | --- | --- | --- |
+| G01 | **resolved** | Limit/format/durasi/host berasal dari SubmissionFormOptions + StoreSubmissionRequest/TranscriptionMediaContract/config; hanya data presentasi. Tidak mengubah policy; metadata/probe media nyata tetap bagian G07. | [MEDIA-FORM-IP-012](../reports/MEDIA-FORM-IP-012.md), [BROWSER-IP-037](../reports/BROWSER-IP-037.md) |
+| G02 | **retained** | Filter tetap text/image/video/url dengan query exact-match. Request video_url dinormalisasi ke video tersimpan oleh InputType::fromRequest; label kategori menjadi Video. Raw video_url terpisah tidak ditambahkan ke filter. Filter/subtype video_url tersendiri atau migrasi nilai legacy memerlukan task produk; tidak diimplementasikan. | [HISTORY-IP-021](../reports/HISTORY-IP-021.md), [READ-ONLY-IP-031](../reports/READ-ONLY-IP-031.md), [GAPS-IP-038](../reports/GAPS-IP-038.md) |
+| G03 | **retained** | CSV seluruh riwayat pengguna verified, tidak mengikuti search/filter/page/history detail; header/skala/BOM/CRLF/chunk/sanitizer tetap. Filtered/single-result CSV tetap fitur terpisah. | [CSV-IP-034](../reports/CSV-IP-034.md), [BROWSER-IP-037](../reports/BROWSER-IP-037.md) |
+| G04 | **resolved** | UI menyebut distribusi label dan populasi query existing, bukan topik/hasil completed-only. Month-start sebelum subMonths mencegah overflow tanggal 31. Completed-only population atau analitik baru memerlukan perubahan query/test tersendiri. | [STATISTICS-IP-025](../reports/STATISTICS-IP-025.md), [BROWSER-IP-037](../reports/BROWSER-IP-037.md) |
+| G05 | **retained** | PDF memakai submission/result, makna label/skor/provenance benar, cuplikan eksplisit dan DejaVu mandiri. Evidence tidak ditambahkan tanpa controller contract. Evidence PDF baru dan tagged-PDF memerlukan lingkup tersendiri; tidak mengklaim sumber palsu atau aksesibilitas PDF penuh. | [PDF-IP-033](../reports/PDF-IP-033.md), [GAPS-IP-038](../reports/GAPS-IP-038.md) |
+| G06 | **retained** | File Create/Edit/form legacy resource baca tidak terdaftar/diaktifkan. A04–A06 deny mutation; A07/A08 hanya index/view dan canCreate false, inherited permissions tidak diperluas atau disebut immutable. Policy/immutability/hapus file legacy bukan aktivasi CRUD; audit writer tetap B01/B02. | [READ-ONLY-IP-031](../reports/READ-ONLY-IP-031.md), [MONITORING-IP-032](../reports/MONITORING-IP-032.md), [BROWSER-IP-037](../reports/BROWSER-IP-037.md) |
+| G07 | **blocked** | UI unavailable/fixture diuji; real-service E2E belum tersambung/terverifikasi. Empat RealBertInferenceTest skip pada runtime terisolasi, bukan bukti layanan produksi mati atau inference sukses. Siapkan environment QA dengan artifact BERT frozen, RAG/model, dependency ekstraksi dan provider test yang sah; jalankan pipeline nyata dan catat output/provenance. Tidak dilakukan melalui perubahan backend/refactor UI. | [REGRESSION-IP-036](../reports/REGRESSION-IP-036.md), [BROWSER-IP-037](../reports/BROWSER-IP-037.md) |
+| G08 | **resolved** | Legacy CSS/JS/Axios tanpa consumer dibuang; scanner eksplisit, 15 CSS/15 JS dan 16 output build stabil pada task ini. Source Docker dibundel, penerapan ke stack memerlukan rebuild/recreate yang terpisah. Tidak mengklaim restart/release/deployment dilakukan; source/model operasional tidak disentuh. | [CLEANUP-IP-035](../reports/CLEANUP-IP-035.md), [REGRESSION-IP-036](../reports/REGRESSION-IP-036.md), [GAPS-IP-038](../reports/GAPS-IP-038.md) |
 
 Gap bukan instruksi untuk mengubah backend secara otomatis. Tugas UI harus menyebut kapan data view diperjelas dan kapan perilaku produk memang berubah.
 

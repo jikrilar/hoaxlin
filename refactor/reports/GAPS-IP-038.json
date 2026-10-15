@@ -1,0 +1,2096 @@
+{
+  "task": "IP-038",
+  "status": "done",
+  "date": "2026-10-15",
+  "initial_head": "1001d3b",
+  "scope": "Decision/evidence reconciliation plus G02 presentation correction; IP-039 not started",
+  "gap_counts": {
+    "resolved": 3,
+    "retained": 4,
+    "blocked": 1
+  },
+  "gaps": [
+    {
+      "id": "G01",
+      "status": "resolved",
+      "decision": "Limit/format/durasi/host berasal dari SubmissionFormOptions + StoreSubmissionRequest/TranscriptionMediaContract/config; hanya data presentasi.",
+      "source": [
+        "app/Support/SubmissionFormOptions.php",
+        "app/Http/Controllers/HomeController.php"
+      ],
+      "tasks": [
+        "IP-012"
+      ],
+      "evidence": [
+        "MEDIA-FORM-IP-012.md",
+        "BROWSER-IP-037.md"
+      ],
+      "remaining": "Tidak mengubah policy; metadata/probe media nyata tetap bagian G07."
+    },
+    {
+      "id": "G02",
+      "status": "retained",
+      "decision": "Filter tetap text/image/video/url dengan query exact-match. Request video_url dinormalisasi ke video tersimpan oleh InputType::fromRequest; label kategori menjadi Video. Raw video_url terpisah tidak ditambahkan ke filter.",
+      "source": [
+        "app/Enums/InputType.php",
+        "app/Actions/Submissions/CreateSubmission.php",
+        "app/Http/Requests/HistoryRequest.php",
+        "resources/views/riwayat.blade.php",
+        "app/Filament/Resources/Submissions/Tables/SubmissionsTable.php",
+        "app/View/Presenters/DetectionPresentation.php"
+      ],
+      "tasks": [
+        "IP-021",
+        "IP-031",
+        "IP-038"
+      ],
+      "evidence": [
+        "HISTORY-IP-021.md",
+        "READ-ONLY-IP-031.md",
+        "GAPS-IP-038.md"
+      ],
+      "remaining": "Filter/subtype video_url tersendiri atau migrasi nilai legacy memerlukan task produk; tidak diimplementasikan."
+    },
+    {
+      "id": "G03",
+      "status": "retained",
+      "decision": "CSV seluruh riwayat pengguna verified, tidak mengikuti search/filter/page/history detail; header/skala/BOM/CRLF/chunk/sanitizer tetap.",
+      "source": [
+        "app/Services/Export/SubmissionCsvExporter.php",
+        "app/Support/CsvCellSanitizer.php",
+        "app/Http/Controllers/DeteksiController.php"
+      ],
+      "tasks": [
+        "IP-016",
+        "IP-021",
+        "IP-034"
+      ],
+      "evidence": [
+        "CSV-IP-034.md",
+        "BROWSER-IP-037.md"
+      ],
+      "remaining": "Filtered/single-result CSV tetap fitur terpisah."
+    },
+    {
+      "id": "G04",
+      "status": "resolved",
+      "decision": "UI menyebut distribusi label dan populasi query existing, bukan topik/hasil completed-only. Month-start sebelum subMonths mencegah overflow tanggal 31.",
+      "source": [
+        "app/Http/Controllers/StatistikController.php",
+        "resources/views/statistik.blade.php"
+      ],
+      "tasks": [
+        "IP-025"
+      ],
+      "evidence": [
+        "STATISTICS-IP-025.md",
+        "BROWSER-IP-037.md"
+      ],
+      "remaining": "Completed-only population atau analitik baru memerlukan perubahan query/test tersendiri."
+    },
+    {
+      "id": "G05",
+      "status": "retained",
+      "decision": "PDF memakai submission/result, makna label/skor/provenance benar, cuplikan eksplisit dan DejaVu mandiri. Evidence tidak ditambahkan tanpa controller contract.",
+      "source": [
+        "app/Http/Controllers/DeteksiController.php",
+        "resources/views/hasil-pdf.blade.php"
+      ],
+      "tasks": [
+        "IP-033",
+        "IP-038"
+      ],
+      "evidence": [
+        "PDF-IP-033.md",
+        "GAPS-IP-038.md"
+      ],
+      "remaining": "Evidence PDF baru dan tagged-PDF memerlukan lingkup tersendiri; tidak mengklaim sumber palsu atau aksesibilitas PDF penuh."
+    },
+    {
+      "id": "G06",
+      "status": "retained",
+      "decision": "File Create/Edit/form legacy resource baca tidak terdaftar/diaktifkan. A04–A06 deny mutation; A07/A08 hanya index/view dan canCreate false, inherited permissions tidak diperluas atau disebut immutable.",
+      "source": [
+        "app/Filament/Resources/Submissions/SubmissionResource.php",
+        "app/Filament/Resources/DetectionResults/DetectionResultResource.php",
+        "app/Filament/Resources/Feedback/FeedbackResource.php",
+        "app/Filament/Resources/SubmissionProcessingEvents/SubmissionProcessingEventResource.php",
+        "app/Filament/Resources/AdminLogs/AdminLogResource.php"
+      ],
+      "tasks": [
+        "IP-031",
+        "IP-032"
+      ],
+      "evidence": [
+        "READ-ONLY-IP-031.md",
+        "MONITORING-IP-032.md",
+        "BROWSER-IP-037.md"
+      ],
+      "remaining": "Policy/immutability/hapus file legacy bukan aktivasi CRUD; audit writer tetap B01/B02."
+    },
+    {
+      "id": "G07",
+      "status": "blocked",
+      "decision": "UI unavailable/fixture diuji; real-service E2E belum tersambung/terverifikasi. Empat RealBertInferenceTest skip pada runtime terisolasi, bukan bukti layanan produksi mati atau inference sukses.",
+      "source": [
+        "tests/Feature/RealBertInferenceTest.php",
+        "app/Services/Bert/BertRuntimeMetadata.php"
+      ],
+      "tasks": [
+        "IP-002",
+        "IP-003",
+        "IP-028",
+        "IP-036",
+        "IP-037"
+      ],
+      "evidence": [
+        "REGRESSION-IP-036.md",
+        "BROWSER-IP-037.md"
+      ],
+      "remaining": "Siapkan environment QA dengan artifact BERT frozen, RAG/model, dependency ekstraksi dan provider test yang sah; jalankan pipeline nyata dan catat output/provenance. Tidak dilakukan melalui perubahan backend/refactor UI."
+    },
+    {
+      "id": "G08",
+      "status": "resolved",
+      "decision": "Legacy CSS/JS/Axios tanpa consumer dibuang; scanner eksplisit, 15 CSS/15 JS dan 16 output build stabil pada task ini. Source Docker dibundel, penerapan ke stack memerlukan rebuild/recreate yang terpisah.",
+      "source": [
+        "resources/css/app.css",
+        "resources/js/bootstrap.js",
+        "package-lock.json",
+        "Dockerfile",
+        "docker-compose.yml"
+      ],
+      "tasks": [
+        "IP-035",
+        "IP-036",
+        "IP-038"
+      ],
+      "evidence": [
+        "CLEANUP-IP-035.md",
+        "REGRESSION-IP-036.md",
+        "GAPS-IP-038.md"
+      ],
+      "remaining": "Tidak mengklaim restart/release/deployment dilakukan; source/model operasional tidak disentuh."
+    }
+  ],
+  "backlog": [
+    {
+      "id": "B01",
+      "status": "retained_existing_backend_gap",
+      "source": [
+        "app/Observers/FilamentAuditObserver.php"
+      ],
+      "evidence": [
+        "USERS-IP-029.md",
+        "DATASETS-IP-030.md",
+        "MONITORING-IP-032.md"
+      ],
+      "impact": "Guard request admin* tidak mencakup endpoint update Livewire; native mutation fixture menghasilkan nol log. UI tidak menjanjikan audit lengkap.",
+      "next_action": "Task backend terpisah untuk mengenali konteks panel yang terotorisasi dan menguji log create/update/delete native/deny/actor/transaction tanpa mempercayai header client."
+    },
+    {
+      "id": "B02",
+      "status": "retained_existing_data_contract",
+      "source": [
+        "app/Observers/FilamentAuditObserver.php",
+        "app/Filament/Support/MonitoringPresentation.php"
+      ],
+      "evidence": [
+        "MONITORING-IP-032.md"
+      ],
+      "impact": "Writer menyimpan getDirty() mentah; proyeksi UI menyembunyikan credential/free text, bukan sanitasi/retensi database audit.",
+      "next_action": "Review allowlist writer/retensi dan kebutuhan migrasi redaksi log dalam task backend/data terpisah; jangan menghapus atau menulis ulang log pengguna pada UI refactor."
+    },
+    {
+      "id": "B03",
+      "status": "not_verified_operational",
+      "source": [
+        "DOCKER-SETUP.md",
+        "RUNBOOK.md"
+      ],
+      "evidence": [
+        "BROWSER-IP-037.md",
+        "PDF-IP-033.md",
+        "CSV-IP-034.md"
+      ],
+      "impact": "Mobile fisik, MySQL/deployment, SMTP nyata, screen reader PDF dan Excel/LibreOffice tidak diklaim; web SR memakai Orca/Firefox representatif.",
+      "next_action": "Verifikasi pada platform/runtime yang menjadi target rilis dan audit varian QA yang belum ditutup sebelum menyatakan penerimaan menyeluruh."
+    }
+  ],
+  "pages": [
+    {
+      "page": "P00",
+      "acceptance": "AC-P00",
+      "tasks": [
+        "IP-008",
+        "IP-009"
+      ],
+      "source": [
+        "resources/views/layouts/app.blade.php",
+        "resources/views/partials/head.blade.php",
+        "resources/views/partials/runtime.blade.php",
+        "resources/js/components/navigation.js"
+      ],
+      "evidence": [
+        "SHELL-IP-008.md",
+        "NAVIGATION-IP-009.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Main/runtime/nav/flash; keyboard/mobile/role",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P01",
+      "acceptance": "AC-P01",
+      "tasks": [
+        "IP-011",
+        "IP-012"
+      ],
+      "source": [
+        "resources/views/welcome.blade.php",
+        "app/Http/Controllers/HomeController.php",
+        "app/Support/SubmissionFormOptions.php",
+        "app/Actions/Submissions/CreateSubmission.php"
+      ],
+      "evidence": [
+        "TEXT-FORM-IP-011.md",
+        "MEDIA-FORM-IP-012.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Semua input, CAPTCHA, validation recovery, native submit",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P02",
+      "acceptance": "AC-P02",
+      "tasks": [
+        "IP-013",
+        "IP-014",
+        "IP-015",
+        "IP-016"
+      ],
+      "source": [
+        "resources/views/hasil.blade.php",
+        "app/Livewire/SubmissionProgress.php",
+        "resources/js/pages/result.js",
+        "app/View/Presenters/DetectionPresentation.php"
+      ],
+      "evidence": [
+        "PROGRESS-IP-013.md",
+        "POLLING-IP-014.md",
+        "RESULT-IP-015.md",
+        "ACTIONS-IP-016.md",
+        "BROWSER-IP-037.md",
+        "GAPS-IP-038.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Progress/owner/final/labels/evidence/feedback/access",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P03",
+      "acceptance": "AC-P03",
+      "tasks": [
+        "IP-021"
+      ],
+      "source": [
+        "resources/views/riwayat.blade.php",
+        "app/Http/Controllers/RiwayatController.php",
+        "app/Http/Requests/HistoryRequest.php"
+      ],
+      "evidence": [
+        "HISTORY-IP-021.md",
+        "BROWSER-IP-037.md",
+        "GAPS-IP-038.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Scope/filter/sort/15-row pagination/empty/mobile",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P04",
+      "acceptance": "AC-P04",
+      "tasks": [
+        "IP-013",
+        "IP-014",
+        "IP-015",
+        "IP-016",
+        "IP-022"
+      ],
+      "source": [
+        "app/Http/Controllers/RiwayatController.php",
+        "resources/views/hasil.blade.php"
+      ],
+      "evidence": [
+        "PROGRESS-IP-013.md",
+        "POLLING-IP-014.md",
+        "RESULT-IP-015.md",
+        "ACTIONS-IP-016.md",
+        "HISTORY-DETAIL-IP-022.md",
+        "BROWSER-IP-037.md",
+        "GAPS-IP-038.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Shared result, forUser, back context, endpoint access",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P05",
+      "acceptance": "AC-P05",
+      "tasks": [
+        "IP-017"
+      ],
+      "source": [
+        "resources/views/auth/login.blade.php",
+        "app/Http/Controllers/Auth/AuthenticatedSessionController.php"
+      ],
+      "evidence": [
+        "LOGIN-REGISTER-IP-017.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Login/throttle/intended/remember/password safety",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P06",
+      "acceptance": "AC-P06",
+      "tasks": [
+        "IP-017"
+      ],
+      "source": [
+        "resources/views/auth/register.blade.php",
+        "app/Http/Controllers/Auth/RegisteredUserController.php"
+      ],
+      "evidence": [
+        "LOGIN-REGISTER-IP-017.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Terms/confirmation/unique email/verification redirect",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P07",
+      "acceptance": "AC-P07",
+      "tasks": [
+        "IP-018"
+      ],
+      "source": [
+        "resources/views/auth/forgot-password.blade.php",
+        "app/Http/Controllers/Auth/PasswordResetLinkController.php"
+      ],
+      "evidence": [
+        "PASSWORD-RESET-IP-018.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Broker status/error/email recovery/throttle",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P08",
+      "acceptance": "AC-P08",
+      "tasks": [
+        "IP-018"
+      ],
+      "source": [
+        "resources/views/auth/reset-password.blade.php",
+        "app/Http/Controllers/Auth/NewPasswordController.php"
+      ],
+      "evidence": [
+        "PASSWORD-RESET-IP-018.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Token/expired recovery/password policy/success redirect",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P09",
+      "acceptance": "AC-P09",
+      "tasks": [
+        "IP-019"
+      ],
+      "source": [
+        "resources/views/auth/verify-email.blade.php",
+        "app/Http/Controllers/Auth/VerifyEmailController.php",
+        "app/Http/Controllers/Auth/EmailVerificationNotificationController.php"
+      ],
+      "evidence": [
+        "EMAIL-VERIFICATION-IP-019.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Signed/auth verify, resend throttle, verified redirect",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P10",
+      "acceptance": "AC-P10",
+      "tasks": [
+        "IP-020"
+      ],
+      "source": [
+        "resources/views/profile.blade.php",
+        "app/Http/Controllers/ProfileController.php",
+        "resources/js/components/dialog.js"
+      ],
+      "evidence": [
+        "PROFILE-IP-020.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "PATCH/PUT/DELETE, email reverify, dialog/password/session",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P11",
+      "acceptance": "AC-P11",
+      "tasks": [
+        "IP-023"
+      ],
+      "source": [
+        "resources/views/cara-kerja.blade.php"
+      ],
+      "evidence": [
+        "INFORMATION-IP-023.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Input/pipeline/label limitations akurat",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P12",
+      "acceptance": "AC-P12",
+      "tasks": [
+        "IP-023"
+      ],
+      "source": [
+        "resources/views/tentang.blade.php"
+      ],
+      "evidence": [
+        "INFORMATION-IP-023.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Copy/identitas/link nyata/readability",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P13",
+      "acceptance": "AC-P13",
+      "tasks": [
+        "IP-024"
+      ],
+      "source": [
+        "resources/views/kebijakan-privasi.blade.php"
+      ],
+      "evidence": [
+        "PRIVACY-IP-024.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Praktik data/retensi/penghapusan dan long text",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P14",
+      "acceptance": "AC-P14",
+      "tasks": [
+        "IP-025"
+      ],
+      "source": [
+        "resources/views/statistik.blade.php",
+        "app/Http/Controllers/StatistikController.php",
+        "resources/js/pages/statistics.js"
+      ],
+      "evidence": [
+        "STATISTICS-IP-025.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Month boundary/population/table/chart fallback",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P15",
+      "acceptance": "AC-P15",
+      "tasks": [
+        "IP-033"
+      ],
+      "source": [
+        "resources/views/hasil-pdf.blade.php",
+        "app/Http/Controllers/DeteksiController.php",
+        "app/View/Presenters/DetectionPresentation.php"
+      ],
+      "evidence": [
+        "PDF-IP-033.md",
+        "BROWSER-IP-037.md",
+        "GAPS-IP-038.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "export_render"
+      ],
+      "scope": "PDF aktual, access/final, font/page break/provenance",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "P16",
+      "acceptance": "AC-P16",
+      "tasks": [
+        "IP-021",
+        "IP-034"
+      ],
+      "source": [
+        "app/Services/Export/SubmissionCsvExporter.php",
+        "app/Support/CsvCellSanitizer.php",
+        "app/Http/Controllers/DeteksiController.php"
+      ],
+      "evidence": [
+        "HISTORY-IP-021.md",
+        "CSV-IP-034.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Scope full history, header/scale/CSV sanitization",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "A00",
+      "acceptance": "AC-A00",
+      "tasks": [
+        "IP-027"
+      ],
+      "source": [
+        "app/Providers/Filament/AdminPanelProvider.php",
+        "resources/css/filament/admin/theme.css"
+      ],
+      "evidence": [
+        "ADMIN-THEME-IP-027.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Native login/light-only/canAccessPanel",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "A01",
+      "acceptance": "AC-A01",
+      "tasks": [
+        "IP-028"
+      ],
+      "source": [
+        "app/Filament/Widgets/StatsOverview.php",
+        "app/Filament/Widgets/SubmissionTrendChart.php",
+        "app/Filament/Widgets/ModelVersionWidget.php"
+      ],
+      "evidence": [
+        "DASHBOARD-IP-028.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Widget scope/periode/model/unavailable",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "A02",
+      "acceptance": "AC-A02",
+      "tasks": [
+        "IP-029"
+      ],
+      "source": [
+        "app/Filament/Resources/Users/UserResource.php",
+        "app/Filament/Resources/Users/Schemas/UserForm.php",
+        "app/Filament/Resources/Users/Schemas/UserInfolist.php"
+      ],
+      "evidence": [
+        "USERS-IP-029.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Native CRUD/actions, constraints, password safety",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "A03",
+      "acceptance": "AC-A03",
+      "tasks": [
+        "IP-030"
+      ],
+      "source": [
+        "app/Filament/Resources/Datasets/DatasetResource.php",
+        "app/Filament/Resources/Datasets/Schemas/DatasetForm.php",
+        "app/Filament/Resources/Datasets/Schemas/DatasetInfolist.php"
+      ],
+      "evidence": [
+        "DATASETS-IP-030.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Verifier/kurasi/label/source/policy",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "A04",
+      "acceptance": "AC-A04",
+      "tasks": [
+        "IP-031"
+      ],
+      "source": [
+        "app/Filament/Resources/Submissions/SubmissionResource.php",
+        "app/Filament/Resources/Submissions/Tables/SubmissionsTable.php",
+        "app/Filament/Resources/Submissions/Schemas/SubmissionInfolist.php"
+      ],
+      "evidence": [
+        "READ-ONLY-IP-031.md",
+        "BROWSER-IP-037.md",
+        "GAPS-IP-038.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "View-only submission, preview/status/final distinction",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "A05",
+      "acceptance": "AC-A05",
+      "tasks": [
+        "IP-031"
+      ],
+      "source": [
+        "app/Filament/Resources/DetectionResults/DetectionResultResource.php",
+        "app/Filament/Resources/DetectionResults/Schemas/DetectionResultInfolist.php"
+      ],
+      "evidence": [
+        "READ-ONLY-IP-031.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "View-only result, classifier confidence/version",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "A06",
+      "acceptance": "AC-A06",
+      "tasks": [
+        "IP-031"
+      ],
+      "source": [
+        "app/Filament/Resources/Feedback/FeedbackResource.php",
+        "app/Filament/Resources/Feedback/Schemas/FeedbackInfolist.php"
+      ],
+      "evidence": [
+        "READ-ONLY-IP-031.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "View-only feedback, escaped comment, boolean meaning",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "A07",
+      "acceptance": "AC-A07",
+      "tasks": [
+        "IP-032"
+      ],
+      "source": [
+        "app/Filament/Resources/SubmissionProcessingEvents/SubmissionProcessingEventResource.php",
+        "app/Filament/Support/MonitoringPresentation.php"
+      ],
+      "evidence": [
+        "MONITORING-IP-032.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Monitoring stage/outcome/duration/access",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "A08",
+      "acceptance": "AC-A08",
+      "tasks": [
+        "IP-032"
+      ],
+      "source": [
+        "app/Filament/Resources/AdminLogs/AdminLogResource.php",
+        "resources/views/filament/admin/resources/monitoring-metadata.blade.php"
+      ],
+      "evidence": [
+        "MONITORING-IP-032.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Monitoring action/target/time/access",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    },
+    {
+      "page": "E01",
+      "acceptance": "AC-E01",
+      "tasks": [
+        "IP-026"
+      ],
+      "source": [
+        "resources/css/errors.css",
+        "resources/views/errors/layout.blade.php"
+      ],
+      "evidence": [
+        "ERROR-PAGES-IP-026.md",
+        "BROWSER-IP-037.md"
+      ],
+      "evidence_modes": [
+        "source_review",
+        "automated_test",
+        "browser_fixture"
+      ],
+      "scope": "Safe message, status/JSON/recovery",
+      "acceptance_status": "evidence_mapped; catalog variants not automatically promoted"
+    }
+  ],
+  "architecture_decisions": [
+    {
+      "id": "FA-01",
+      "tasks": [
+        "IP-011",
+        "IP-012",
+        "IP-017",
+        "IP-020"
+      ],
+      "source": [
+        "routes/web.php",
+        "app/Http/Requests/StoreSubmissionRequest.php"
+      ],
+      "decision": "SSR/native forms; server owns access and validation",
+      "evidence": [
+        "TEXT-FORM-IP-011.md",
+        "MEDIA-FORM-IP-012.md",
+        "LOGIN-REGISTER-IP-017.md",
+        "PROFILE-IP-020.md"
+      ]
+    },
+    {
+      "id": "FA-02",
+      "tasks": [
+        "IP-006",
+        "IP-015",
+        "IP-038"
+      ],
+      "source": [
+        "resources/views/components/ui/field.blade.php",
+        "app/View/Presenters/DetectionPresentation.php"
+      ],
+      "decision": "Small Blade components and pure presenter; generic persisted Video category",
+      "evidence": [
+        "COMPONENTS-IP-006.md",
+        "RESULT-IP-015.md",
+        "GAPS-IP-038.md"
+      ]
+    },
+    {
+      "id": "FA-03",
+      "tasks": [
+        "IP-004",
+        "IP-027",
+        "IP-035"
+      ],
+      "source": [
+        "resources/css/design-tokens.css",
+        "resources/css/app.css",
+        "resources/css/filament/admin/theme.css"
+      ],
+      "decision": "Shared tokens, separate public/error/admin entries; no public reset in admin",
+      "evidence": [
+        "FOUNDATION-IP-004.md",
+        "ADMIN-THEME-IP-027.md",
+        "CLEANUP-IP-035.md"
+      ]
+    },
+    {
+      "id": "FA-04",
+      "tasks": [
+        "IP-007",
+        "IP-025"
+      ],
+      "source": [
+        "resources/js/bootstrap.js",
+        "resources/js/core/lifecycle.js",
+        "resources/js/core/scope.js"
+      ],
+      "decision": "Vanilla ES modules, guarded lazy mount and cleanup",
+      "evidence": [
+        "LIFECYCLE-IP-007.md",
+        "STATISTICS-IP-025.md"
+      ]
+    },
+    {
+      "id": "FA-05",
+      "tasks": [
+        "IP-013",
+        "IP-014",
+        "IP-037"
+      ],
+      "source": [
+        "resources/js/pages/result.js",
+        "resources/js/progress/livewire.js",
+        "resources/js/progress/fallback.js"
+      ],
+      "decision": "Hydrated Livewire owns progress; serial fallback otherwise; exposed transport live region",
+      "evidence": [
+        "PROGRESS-IP-013.md",
+        "POLLING-IP-014.md",
+        "BROWSER-IP-037.md"
+      ]
+    },
+    {
+      "id": "FA-06",
+      "tasks": [
+        "IP-027",
+        "IP-028",
+        "IP-029",
+        "IP-030",
+        "IP-031",
+        "IP-032"
+      ],
+      "source": [
+        "app/Providers/Filament/AdminPanelProvider.php",
+        "app/Filament/Support/MonitoringPresentation.php"
+      ],
+      "decision": "Native Filament; existing access and registered actions; audit observer remains a separate backend gap",
+      "evidence": [
+        "ADMIN-THEME-IP-027.md",
+        "DASHBOARD-IP-028.md",
+        "USERS-IP-029.md",
+        "DATASETS-IP-030.md",
+        "READ-ONLY-IP-031.md",
+        "MONITORING-IP-032.md"
+      ]
+    },
+    {
+      "id": "FA-07",
+      "tasks": [
+        "IP-033",
+        "IP-034",
+        "IP-038"
+      ],
+      "source": [
+        "resources/views/hasil-pdf.blade.php",
+        "app/Services/Export/SubmissionCsvExporter.php"
+      ],
+      "decision": "Independent DomPDF/DejaVu; CSV raw contract retained; rerender only changed video input label",
+      "evidence": [
+        "PDF-IP-033.md",
+        "CSV-IP-034.md",
+        "GAPS-IP-038.md"
+      ]
+    },
+    {
+      "id": "FA-08",
+      "tasks": [
+        "IP-035",
+        "IP-036",
+        "IP-037",
+        "IP-038"
+      ],
+      "source": [
+        "resources/css/components.css",
+        "resources/js/components/password.js"
+      ],
+      "decision": "Consumers migrated and unused legacy removed; IP-039 final handoff remains pending",
+      "evidence": [
+        "CLEANUP-IP-035.md",
+        "REGRESSION-IP-036.md",
+        "BROWSER-IP-037.md",
+        "GAPS-IP-038.md"
+      ]
+    },
+    {
+      "id": "FA-09",
+      "tasks": [
+        "IP-007",
+        "IP-012",
+        "IP-017",
+        "IP-020",
+        "IP-032"
+      ],
+      "source": [
+        "resources/js/pages/submission-media.js",
+        "resources/js/components/password.js",
+        "app/Filament/Support/MonitoringPresentation.php"
+      ],
+      "decision": "No new browser storage; object URL/secret cleanup; positive metadata projection does not rewrite stored audit data",
+      "evidence": [
+        "LIFECYCLE-IP-007.md",
+        "MEDIA-FORM-IP-012.md",
+        "LOGIN-REGISTER-IP-017.md",
+        "PROFILE-IP-020.md",
+        "MONITORING-IP-032.md"
+      ]
+    },
+    {
+      "id": "FA-10",
+      "tasks": [
+        "IP-004",
+        "IP-025",
+        "IP-027",
+        "IP-035"
+      ],
+      "source": [
+        "composer.lock",
+        "package-lock.json"
+      ],
+      "decision": "Self-hosted fonts; locked lazy Chart.js; unused Axios removed; no new task dependency",
+      "evidence": [
+        "FOUNDATION-IP-004.md",
+        "STATISTICS-IP-025.md",
+        "ADMIN-THEME-IP-027.md",
+        "CLEANUP-IP-035.md"
+      ]
+    }
+  ],
+  "module_inventory": [
+    "resources/css/app.css",
+    "resources/css/base.css",
+    "resources/css/components.css",
+    "resources/css/design-tokens.css",
+    "resources/css/errors.css",
+    "resources/css/filament/admin/theme.css",
+    "resources/css/fonts.css",
+    "resources/css/fonts/inter.css",
+    "resources/css/history.css",
+    "resources/css/information.css",
+    "resources/css/profile.css",
+    "resources/css/result.css",
+    "resources/css/statistics.css",
+    "resources/css/submission-progress.css",
+    "resources/css/theme.css",
+    "resources/js/app.js",
+    "resources/js/bootstrap.js",
+    "resources/js/components/dialog.js",
+    "resources/js/components/form-submit.js",
+    "resources/js/components/navigation.js",
+    "resources/js/components/password.js",
+    "resources/js/core/lifecycle.js",
+    "resources/js/core/scope.js",
+    "resources/js/pages/result.js",
+    "resources/js/pages/statistics-chart.js",
+    "resources/js/pages/statistics.js",
+    "resources/js/pages/submission-form.js",
+    "resources/js/pages/submission-media.js",
+    "resources/js/progress/fallback.js",
+    "resources/js/progress/livewire.js",
+    "app/Support/SubmissionFormOptions.php",
+    "app/View/Presenters/DetectionPresentation.php",
+    "app/Filament/Support/ReadOnlyPresentation.php",
+    "app/Filament/Support/MonitoringPresentation.php"
+  ],
+  "source_fingerprints": {
+    "DOCKER-SETUP.md": "e5def4855b972b90435e27e3dc4b5f3f5d9a8c9020d0c7d59f23fa3f703a9d28",
+    "Dockerfile": "c0e57ad83cfa857051f9151ca383a8788e8d01d72fc06530f95cefc46a0fcc68",
+    "RUNBOOK.md": "f390b4278ee8f0aff234da0fc415d64dbf4d4c8b88c21b1694598ac6f1a27b5a",
+    "app/Actions/Submissions/CreateSubmission.php": "9094fcf4d0f6a998a85b0f2895fea8c8228ebf4e317a0336656fa6dc90763d8e",
+    "app/Enums/InputType.php": "5a4f9cd6597a4c505ef93b643f5e08dbe1ea60c3ab88013c50fd4c3e5a94a447",
+    "app/Filament/Resources/AdminLogs/AdminLogResource.php": "3ff05c01c493f67f71428e5279467eb6aeefc315f531cf22572c70ac49baf919",
+    "app/Filament/Resources/Datasets/DatasetResource.php": "b643da1c84db60322a4954bc39e8133733baf2f31c100ad71a50ade569f03ec5",
+    "app/Filament/Resources/Datasets/Schemas/DatasetForm.php": "72f58e67ee6eb55f9680b4f20ac1591e0db724d5e0337a94a12186dcab4cae7f",
+    "app/Filament/Resources/Datasets/Schemas/DatasetInfolist.php": "d448b552095ab082193c8093e7a37e05a7eda3c91683a5e1f4bf3798553ca6e2",
+    "app/Filament/Resources/DetectionResults/DetectionResultResource.php": "95d844fc95d7a0955d0d697dba68f0ff9ded6ee8d6230d38866b7c2f724b3123",
+    "app/Filament/Resources/DetectionResults/Schemas/DetectionResultInfolist.php": "e98ab096086949c6a0b5b216804b97196407927a99a60523ba698006c940c6cb",
+    "app/Filament/Resources/Feedback/FeedbackResource.php": "747c872e564fcc8b04fb67475350e2eec17605723c790f651d44f0284cf7fc91",
+    "app/Filament/Resources/Feedback/Schemas/FeedbackInfolist.php": "69f9c2aa872fba4b3fcb131ba908044629116d2b9e0e65163d66ac45fdd78911",
+    "app/Filament/Resources/SubmissionProcessingEvents/SubmissionProcessingEventResource.php": "d3fb2711c350f29a63d8e1051c44ed63c6ad6181d51acf8caca8405a6dc8be8a",
+    "app/Filament/Resources/Submissions/Schemas/SubmissionInfolist.php": "e34469580f7f40ed52e84b1657e6400e3c7f02292f2cb03410b015ef0e6cb28a",
+    "app/Filament/Resources/Submissions/SubmissionResource.php": "9573d12181d511e0a8014bfa0d8d68dfbe7539e40921471d7c829f648f8f9322",
+    "app/Filament/Resources/Submissions/Tables/SubmissionsTable.php": "79454290dec84792eab1cbf208b3140b1de937ee0fb056c6684c170716f5b2bc",
+    "app/Filament/Resources/Users/Schemas/UserForm.php": "04d71381ecc23e06e2c74ba2aef0fe3ce60cd455201d315a4bf0ab7a8bb53ea3",
+    "app/Filament/Resources/Users/Schemas/UserInfolist.php": "df38c86b743d06e50257d9d3557ef158ec7795b6c0367f65dba86adc6be9f719",
+    "app/Filament/Resources/Users/UserResource.php": "a32eb79ecf51f14e34b118b87755d1314dd1b2f25a6edf5086762c2380a22009",
+    "app/Filament/Support/MonitoringPresentation.php": "837a42cc9b1cc6cbadf9d5f97bc46f935e25772763891ddc40e687837a433123",
+    "app/Filament/Support/ReadOnlyPresentation.php": "2333bab9f0ec959df325a1b6ef56c07aae1411b34e2bc17550c5752788094891",
+    "app/Filament/Widgets/ModelVersionWidget.php": "2daeabf56af37a5414657479a4594529a757750abb715326bc9dff6e93294310",
+    "app/Filament/Widgets/StatsOverview.php": "9c82485e962bbda2ce39f5825753a4f616afc4aef67f49f90bc4303fa43630d5",
+    "app/Filament/Widgets/SubmissionTrendChart.php": "e41bd2cdebd9b8f6e0f39be61f7c5379d7ca85929956cd8b14471498e7633cee",
+    "app/Http/Controllers/Auth/AuthenticatedSessionController.php": "44937aabadbcbe2d9183f04d2b792da4c25fb586927aa852b5628668966dfca3",
+    "app/Http/Controllers/Auth/EmailVerificationNotificationController.php": "97d36d83b4bd2ffc44801173324f4072b754207477458bbeae6e9ecbb20c5290",
+    "app/Http/Controllers/Auth/NewPasswordController.php": "a780ff6e9e4e19450099aee89782632961721837e93d26d1cce3502aab41cb4a",
+    "app/Http/Controllers/Auth/PasswordResetLinkController.php": "6e675c283f4f1d2e67708aa85c91ffb37a72e7b7619b9d7e274738ff40291f6a",
+    "app/Http/Controllers/Auth/RegisteredUserController.php": "73356af8693219a889271818c20e5f5cdd525f7d43c6b8d8fc20061252e94687",
+    "app/Http/Controllers/Auth/VerifyEmailController.php": "148698c31c966a2af70a7f3f29ae4942505c40e00e138a9f8f58e7f297b4b6a9",
+    "app/Http/Controllers/DeteksiController.php": "51447ad2eeafad006d772a3af07d68551ef916647c07fa1749398fd4ab6e6b26",
+    "app/Http/Controllers/HomeController.php": "55eec2d06540a976900e5f4ac3c8703273e7b2fbfa0e8e5d318115498b3f6fbd",
+    "app/Http/Controllers/ProfileController.php": "25033433f44a3a2c4c4db01b5be38b56fdf3164f49ca58e36c7c297a1dba23ac",
+    "app/Http/Controllers/RiwayatController.php": "7519bd59a30931936d2dd0dbdcf15c66a26a9358c65bf3890b4114982d18e75f",
+    "app/Http/Controllers/StatistikController.php": "c285ffd9b69ae89644a183de9a1fc56355b403c1fffcc2a41371fa0cde3fe320",
+    "app/Http/Requests/HistoryRequest.php": "b54af02aa12c77498bb58952a78634a599c408baf0420702e6e0a6b7d16b8db1",
+    "app/Http/Requests/StoreSubmissionRequest.php": "3dc8183f0bc7e40c5f37eef01afbfb61ece070066b9ddd4f9e6bcb36ca3c16c5",
+    "app/Livewire/SubmissionProgress.php": "0826689372976b901e17713917bd04e158bdf03abb1abfc391050153da807868",
+    "app/Observers/FilamentAuditObserver.php": "33d6fd2548e4cc1d9d71418446e7ec40edabec5f21882fa7b1c5103eb566230f",
+    "app/Providers/Filament/AdminPanelProvider.php": "d075afc1cc1ccd2ed35ce8dc9d09e4882a4844fd96587134627e9a2a333913c0",
+    "app/Services/Bert/BertRuntimeMetadata.php": "f966d1760d898224b7110e080922ae3afa1fc9037f0168dffa36e54d241e63df",
+    "app/Services/Export/SubmissionCsvExporter.php": "d782c1c0c94818dae21be0ada20b5156df11bb067e7d0ead7ca38e7cbacc719b",
+    "app/Support/CsvCellSanitizer.php": "247bb20a45c3065ff0f356bf78d978de4aa70f3a9cdc31d167e1d01a8eb39cb3",
+    "app/Support/SubmissionFormOptions.php": "6852cb4d03441018889fa080c72dc9b4364548302164679f9cb3ce3b4b0c51bc",
+    "app/View/Presenters/DetectionPresentation.php": "c731caa0e57cd3c3b44d2a51a518ef0d0fdde9f0e0bd8f23831d41883c7b35d3",
+    "composer.lock": "676a084936b5299efc80be6cf6413061a4be357df02ad58a87604dfc2986ccd6",
+    "docker-compose.yml": "43e6135ea831fd167e43c94302b620fb9db12a702fa791ec047ca952041aa9bd",
+    "package-lock.json": "af94944e8a5e45318cbb7750d1623aa097f888db830f5bb231a147a418d0a683",
+    "resources/css/app.css": "2154c2565728f70d3fc68420fe30fc1b53b286d5e15b8c558b26de14ce7a1d39",
+    "resources/css/base.css": "8700b3eddba71b85bbbab81945a1fc810eaaa41255b344e9a6038b750c5a0559",
+    "resources/css/components.css": "8a9aabad733bfec872d3a4ab9d7c6e8c4f8748083c35ee156be02b12b318be78",
+    "resources/css/design-tokens.css": "056ac7a2b9959e9c404de604f2b865c6a787f9900430b917de6b7b476f00c779",
+    "resources/css/errors.css": "40e3690dbf177a122e67dda0e5b05f8fecf455d901429a317be12bfe9f7918ab",
+    "resources/css/filament/admin/theme.css": "133f59026c242ef89dd3a91aa8ca7e9c7b6fb5a89ec44e4439e6eae12286a56e",
+    "resources/css/fonts.css": "b9a933e8d911ee3ca1536c88ed46593f0956eaf79986df361a66a8c7f63af1cb",
+    "resources/css/fonts/inter.css": "0234c88db29c5ef025f198c2db1efe768b700c2e254e33a1cdc5a73c7fdf30d2",
+    "resources/css/history.css": "5f0b6a1d0c116e6bb32f410dfd4bfbaad2a7a77cdc1d9c8812141ab64f52d1e6",
+    "resources/css/information.css": "fdaae6c33a60c9bf73c338dcec3c5bfccd7b763d7539eed2a03ee3c2dcc62d58",
+    "resources/css/profile.css": "00531570c9fa12b06a8533592b8a58683c2c2af5cb0a3927cbfa094ad37c0ba1",
+    "resources/css/result.css": "3a589c62714387e5c2eaf5acf64c47a331d3e8be56f216e78165e7c778a1cbf2",
+    "resources/css/statistics.css": "9981e7859acaf624ee8749b5d5798644c68a43e86c40d7d1267d6282c4cf2c72",
+    "resources/css/submission-progress.css": "27cdacb55494f4d54704dd6693304bab4ab190d976b50e96d12f7e7be2de5758",
+    "resources/css/theme.css": "027a801f544763eed0649ea3c0e2d9dcaf234e64d3b9c2677d01df3ae4b3d6dc",
+    "resources/js/app.js": "af07d4599cec25704ce0f398b44149e7dfe2c6682307c65b0afb951b5da19951",
+    "resources/js/bootstrap.js": "af09bf51e7e3627baa19630e88095513b32fed20772cb5c961082d3a83c9926e",
+    "resources/js/components/dialog.js": "f97ae0fdb85ebae4cc1bf3d6f995ab36f5d90517a7243b7c1c7f476fdd88b3f0",
+    "resources/js/components/form-submit.js": "74a0f0d4c41b0b67c81a9c52492d13ce5c9c4ec1dfe3704b49fe5efd76cc5872",
+    "resources/js/components/navigation.js": "46e9b80b7e6d4fa126eae039ff8b72fb87ef9b899ee0427d46089bad82adc0c1",
+    "resources/js/components/password.js": "9a77b40efcb3f8ae227f7ee57275e2d45cbb316e9f3609cb02cc01073b205163",
+    "resources/js/core/lifecycle.js": "004b803be646a4a458a0980968f99a2692fe3ea1c1097e223eaa143df2ec970a",
+    "resources/js/core/scope.js": "47783bf14e2a8a38380d954ae818831e1b96b15b469bdc165a7096ba64b31b40",
+    "resources/js/pages/result.js": "a5746f6af6370dbef76554167157bc99b15eb492df2856c2cb2a9a077ae2b14b",
+    "resources/js/pages/statistics-chart.js": "9f1e277619266d1dca67af09b3e78c2c1fe5947263259b3ae6d9472a1c3a61dc",
+    "resources/js/pages/statistics.js": "3faad9134b7d3308d37f895005c0c8a49e44832cdf202f4acf0f07d6d5a05d15",
+    "resources/js/pages/submission-form.js": "6993cba5e00d87e1b46879bc1ad06620d6b6cef0df6cb52bf4466c782395bf74",
+    "resources/js/pages/submission-media.js": "dc96187b9d26196e8a7b9ba3d8666afb588f67c02c1e533da7bd91326a402d26",
+    "resources/js/progress/fallback.js": "ef72c9d0fe456ae0e6e96f7d8c34a296ffab4aa7ec01178375c238f08b37c441",
+    "resources/js/progress/livewire.js": "b90c461959b9cf0edd357e7ddb19f8c34cac277f35ad5073acc216f17eeb7cf7",
+    "resources/views/auth/forgot-password.blade.php": "eb348a1bc28322ab3d1547f20c0e07c257e17a2c462b2a5d1504a26cad7934e3",
+    "resources/views/auth/login.blade.php": "c3989cbf41487bf528ef98344c04ba5886007d41158fc639612082c0452b6111",
+    "resources/views/auth/register.blade.php": "7b8dee6c237e0376f422efd4ad50f3b3a188ed0a955aa002aa1c10235a3ca515",
+    "resources/views/auth/reset-password.blade.php": "21bb0fe6e20767aa8cc9bb8ff617fe628077bdfa20c4b69c01b37754ee907f06",
+    "resources/views/auth/verify-email.blade.php": "708d949eca54b4c9e9dd984263a7b3fc1c560dba3af4fcc78c0236af3cdbae4a",
+    "resources/views/cara-kerja.blade.php": "dc5dc1e7e2cb270a32d2bba625f59506d27c8e5d59a26c7cc56aea79e1383bab",
+    "resources/views/components/ui/field.blade.php": "11eac196296cdb259ad6b5e1bf47a1545713bc3b3976774030127bf02e0e5c7e",
+    "resources/views/errors/layout.blade.php": "26d6815eb9e0eb3acd2d0e7f8d5f34e6f045831906a0940aa461bfde042e0cae",
+    "resources/views/filament/admin/resources/monitoring-metadata.blade.php": "d8e2d86d48d5924b36fdc8f8c171f4f7ae60823b9812941d8afc21f8a99ee646",
+    "resources/views/hasil-pdf.blade.php": "d36f5f0ccfc17d6b9a970b3949e5f6dac69a1c38fdefbe65709914c54decbf9b",
+    "resources/views/hasil.blade.php": "5ee190aeba1417fdd6e4be57436fbe4f13ff0296f8bd637c95b14c0bac6fe744",
+    "resources/views/kebijakan-privasi.blade.php": "74aba2843eb4a516225fd31cc5768e19adbecec67bd4cf8d59972b1fdc0a5615",
+    "resources/views/layouts/app.blade.php": "5c307714f6165658b6f2036b31513d35ed5021b930c965a8e2e8146373e6c860",
+    "resources/views/partials/head.blade.php": "357eb78331889d9522ec3ee9e99612330a182dcc6b268bacf747315c6dc128e4",
+    "resources/views/partials/runtime.blade.php": "fb55ca78ee2f97d1c888a7bd315fd81d764554330d0bc6f4ec119e807b2f9b17",
+    "resources/views/profile.blade.php": "b7667f4b154707a09c05b41f11a68291d4dcddf61a2bc481ee81c02e1f89813f",
+    "resources/views/riwayat.blade.php": "1e3320caeacb8d016bcbfdf970056661e7fec8a17e292596ad156e4b10a55364",
+    "resources/views/statistik.blade.php": "06e0a487711c1ef22530622b2ef58da795deafdc43e754b4b77aa53d4522754b",
+    "resources/views/tentang.blade.php": "2569306b4ff6fe4e7ec588a00420e6f4b6557a7c0ef4782daa5ab16025b11cae",
+    "resources/views/welcome.blade.php": "594d1264f47da46e769398f2f128c7dbe1e8602c1a3db542ab72cdd16ee6a4a0",
+    "routes/web.php": "1ca8566306e72efc841c80573db8c8efed4154174fdd7113a49bf4147f0efebe",
+    "tests/Feature/RealBertInferenceTest.php": "a0fee8330a955cebdb457cae56b49854f3b9dee51f92b9a45aecdfad757b75aa"
+  },
+  "locked_versions": {
+    "laravel/framework": "v12.64.0",
+    "livewire/livewire": "v4.3.3",
+    "filament/filament": "v5.7.3",
+    "dompdf/dompdf": "v3.1.6",
+    "phpunit/phpunit": "11.5.56",
+    "vite": "6.4.3",
+    "tailwindcss": "4.3.3",
+    "chart.js": "4.5.1"
+  },
+  "qa_case_statuses": {
+    "QA-ENV-01": "pass",
+    "QA-ENV-02": "pass",
+    "QA-ENV-03": "pass",
+    "QA-SHELL-01": "not_run",
+    "QA-SHELL-02": "not_run",
+    "QA-SHELL-03": "not_run",
+    "QA-SHELL-04": "not_run",
+    "QA-SHELL-05": "not_run",
+    "QA-INPUT-01": "not_run",
+    "QA-INPUT-02": "not_run",
+    "QA-INPUT-03": "not_run",
+    "QA-INPUT-04": "not_run",
+    "QA-INPUT-05": "not_run",
+    "QA-INPUT-06": "not_run",
+    "QA-INPUT-07": "not_run",
+    "QA-INPUT-08": "not_run",
+    "QA-INPUT-09": "not_run",
+    "QA-ACCESS-01": "not_run",
+    "QA-ACCESS-02": "not_run",
+    "QA-ACCESS-03": "not_run",
+    "QA-ACCESS-04": "not_run",
+    "QA-ACCESS-05": "not_run",
+    "QA-PROGRESS-01": "not_run",
+    "QA-PROGRESS-02": "not_run",
+    "QA-PROGRESS-03": "not_run",
+    "QA-PROGRESS-04": "not_run",
+    "QA-PROGRESS-05": "not_run",
+    "QA-PROGRESS-06": "not_run",
+    "QA-PROGRESS-07": "not_run",
+    "QA-PROGRESS-08": "not_run",
+    "QA-PROGRESS-09": "not_run",
+    "QA-RESULT-01": "not_run",
+    "QA-RESULT-02": "not_run",
+    "QA-RESULT-03": "not_run",
+    "QA-RESULT-04": "not_run",
+    "QA-RESULT-05": "not_run",
+    "QA-RESULT-06": "not_run",
+    "QA-RESULT-07": "not_run",
+    "QA-RESULT-08": "not_run",
+    "QA-RESULT-09": "not_run",
+    "QA-AUTH-01": "not_run",
+    "QA-AUTH-02": "not_run",
+    "QA-AUTH-03": "not_run",
+    "QA-AUTH-04": "not_run",
+    "QA-AUTH-05": "not_run",
+    "QA-AUTH-06": "not_run",
+    "QA-AUTH-07": "not_run",
+    "QA-AUTH-08": "not_run",
+    "QA-PROFILE-01": "not_run",
+    "QA-PROFILE-02": "not_run",
+    "QA-PROFILE-03": "not_run",
+    "QA-PROFILE-04": "not_run",
+    "QA-HISTORY-01": "not_run",
+    "QA-HISTORY-02": "not_run",
+    "QA-HISTORY-03": "not_run",
+    "QA-HISTORY-04": "not_run",
+    "QA-INFO-01": "not_run",
+    "QA-INFO-02": "not_run",
+    "QA-INFO-03": "not_run",
+    "QA-INFO-04": "not_run",
+    "QA-INFO-05": "not_run",
+    "QA-ADMIN-01": "not_run",
+    "QA-ADMIN-02": "not_run",
+    "QA-ADMIN-03": "not_run",
+    "QA-ADMIN-04": "not_run",
+    "QA-ADMIN-05": "not_run",
+    "QA-ADMIN-06": "not_run",
+    "QA-ADMIN-07": "not_run",
+    "QA-ADMIN-08": "not_run",
+    "QA-ADMIN-09": "not_run",
+    "QA-ADMIN-10": "not_run",
+    "QA-EXPORT-01": "not_run",
+    "QA-EXPORT-02": "not_run",
+    "QA-EXPORT-03": "not_run",
+    "QA-EXPORT-04": "not_run",
+    "QA-EXPORT-05": "not_run",
+    "QA-EXPORT-06": "not_run",
+    "QA-EXPORT-07": "not_run",
+    "QA-ERROR-01": "not_run",
+    "QA-ERROR-02": "not_run",
+    "QA-ERROR-03": "not_run",
+    "QA-A11Y-01": "not_run",
+    "QA-A11Y-02": "not_run",
+    "QA-A11Y-03": "pass",
+    "QA-A11Y-04": "not_run",
+    "QA-A11Y-05": "not_run",
+    "QA-A11Y-06": "not_run",
+    "QA-A11Y-07": "not_run",
+    "QA-A11Y-08": "pass",
+    "QA-ASSET-01": "not_run",
+    "QA-ASSET-02": "not_run",
+    "QA-ASSET-03": "not_run",
+    "QA-ASSET-04": "not_run",
+    "QA-ASSET-05": "not_run"
+  },
+  "qa_counts": {
+    "pass": 5,
+    "not_run": 89
+  },
+  "evidence_reuse": [
+    {
+      "area": "PDF layout/fonts/access",
+      "evidence": "PDF-IP-033.md",
+      "unchanged": [
+        "resources/views/hasil-pdf.blade.php"
+      ],
+      "impact": "Presenter inputType(video) label shortened only; rerender two changed video variants, keep 9 fixture/18-page geometry evidence for other states."
+    },
+    {
+      "area": "CSV",
+      "evidence": "CSV-IP-034.md",
+      "unchanged": [
+        "app/Services/Export/SubmissionCsvExporter.php",
+        "app/Support/CsvCellSanitizer.php"
+      ],
+      "impact": "Exporter, scope, bytes and raw video category unchanged; existing native downloads reused, automated CSV/provenance tests rerun with affected suite."
+    },
+    {
+      "area": "Native admin",
+      "evidence": "BROWSER-IP-037.md",
+      "unchanged": [
+        "app/Providers/Filament/AdminPanelProvider.php",
+        "app/Filament/Support/MonitoringPresentation.php"
+      ],
+      "impact": "51/52 Filament PHP unchanged; rerun A04 copy/filter/detail only. Historical resource/native mutation coverage reused; no new audit-completeness claim."
+    },
+    {
+      "area": "CSS/JS/accessibility",
+      "evidence": "BROWSER-IP-037.md",
+      "unchanged": [
+        "resources/css/app.css",
+        "resources/css/base.css",
+        "resources/css/components.css",
+        "resources/css/design-tokens.css",
+        "resources/css/errors.css",
+        "resources/css/filament/admin/theme.css",
+        "resources/css/fonts.css",
+        "resources/css/fonts/inter.css",
+        "resources/css/history.css",
+        "resources/css/information.css",
+        "resources/css/profile.css",
+        "resources/css/result.css",
+        "resources/css/statistics.css",
+        "resources/css/submission-progress.css",
+        "resources/css/theme.css",
+        "resources/js/app.js",
+        "resources/js/bootstrap.js",
+        "resources/js/components/dialog.js",
+        "resources/js/components/form-submit.js",
+        "resources/js/components/navigation.js",
+        "resources/js/components/password.js",
+        "resources/js/core/lifecycle.js",
+        "resources/js/core/scope.js",
+        "resources/js/pages/result.js",
+        "resources/js/pages/statistics-chart.js",
+        "resources/js/pages/statistics.js",
+        "resources/js/pages/submission-form.js",
+        "resources/js/pages/submission-media.js",
+        "resources/js/progress/fallback.js",
+        "resources/js/progress/livewire.js"
+      ],
+      "impact": "15 CSS +15 JS and 16 build outputs identical; input-kind copy changes only. Use existing SR/forced-colors/lifecycle evidence for unchanged structures; current responsive/noJS/zoom/keyboard/final-result checks recorded separately."
+    }
+  ],
+  "validation": {
+    "regression_red": {
+      "cases": 3,
+      "failures": 3
+    },
+    "php_related": {
+      "passed": 192,
+      "assertions": 1459
+    },
+    "php_full": {
+      "total": 780,
+      "passed": 776,
+      "skipped_real_bert": 4,
+      "assertions": 5235,
+      "failures": 0,
+      "warnings": 0
+    },
+    "node": {
+      "passed": 69
+    },
+    "pint_files": 6,
+    "build": "pass; 16 outputs byte-identical",
+    "blade": "cache/clear pass",
+    "browser": {
+      "normal": {
+        "mode": "normal",
+        "samples": [
+          {
+            "role": "owner",
+            "path": "/riwayat?input_type=video",
+            "requested_width": 320,
+            "width": 320,
+            "scroll": 308,
+            "dpr": 1,
+            "main": 1,
+            "title": "Riwayat pemeriksaan",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat?input_type=video",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "Riwayat pemeriksaan",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat?input_type=video",
+            "requested_width": 768,
+            "width": 768,
+            "scroll": 756,
+            "dpr": 1,
+            "main": 1,
+            "title": "Riwayat pemeriksaan",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat?input_type=video",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "Riwayat pemeriksaan",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat/54",
+            "requested_width": 320,
+            "width": 320,
+            "scroll": 308,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat/54",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat/54",
+            "requested_width": 768,
+            "width": 768,
+            "scroll": 756,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat/54",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/54",
+            "requested_width": 320,
+            "width": 320,
+            "scroll": 308,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/54",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/54",
+            "requested_width": 768,
+            "width": 768,
+            "scroll": 756,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/54",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/53",
+            "requested_width": 320,
+            "width": 320,
+            "scroll": 308,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/53",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/53",
+            "requested_width": 768,
+            "width": 768,
+            "scroll": 756,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/53",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions?search=IP038&filters[input_type][value]=video",
+            "requested_width": 320,
+            "width": 320,
+            "scroll": 320,
+            "dpr": 1,
+            "main": 1,
+            "title": "Submission",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions?search=IP038&filters[input_type][value]=video",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 360,
+            "dpr": 1,
+            "main": 1,
+            "title": "Submission",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions?search=IP038&filters[input_type][value]=video",
+            "requested_width": 768,
+            "width": 768,
+            "scroll": 768,
+            "dpr": 1,
+            "main": 1,
+            "title": "Submission",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions?search=IP038&filters[input_type][value]=video",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1280,
+            "dpr": 1,
+            "main": 1,
+            "title": "Submission",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions/54",
+            "requested_width": 320,
+            "width": 320,
+            "scroll": 308,
+            "dpr": 1,
+            "main": 1,
+            "title": "View Submission",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions/54",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "View Submission",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions/54",
+            "requested_width": 768,
+            "width": 768,
+            "scroll": 756,
+            "dpr": 1,
+            "main": 1,
+            "title": "View Submission",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions/54",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "View Submission",
+            "reduced": false,
+            "js": "object",
+            "copy": false
+          }
+        ],
+        "checks": [
+          "Persisted video filter includes normalized links, excludes separate raw value; option label Video.",
+          "Native filter Tab order preserved.",
+          "Unsupported filter server validation and recovery retained.",
+          "Native admin filter applies category video with unchanged options.",
+          "Admin filtered output includes normalized video and excludes separate raw video_url."
+        ],
+        "console_errors": 0,
+        "server_errors": 0
+      },
+      "nojs": {
+        "mode": "nojs",
+        "samples": [
+          {
+            "role": "owner",
+            "path": "/riwayat?input_type=video",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "Riwayat pemeriksaan",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat?input_type=video",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "Riwayat pemeriksaan",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat/54",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat/54",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/54",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/54",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/53",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/53",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions?search=IP038&filters[input_type][value]=video",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 360,
+            "dpr": 1,
+            "main": 1,
+            "title": "Submission",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions?search=IP038&filters[input_type][value]=video",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1280,
+            "dpr": 1,
+            "main": 1,
+            "title": "Submission",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions/54",
+            "requested_width": 360,
+            "width": 360,
+            "scroll": 348,
+            "dpr": 1,
+            "main": 1,
+            "title": "View Submission",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions/54",
+            "requested_width": 1280,
+            "width": 1280,
+            "scroll": 1268,
+            "dpr": 1,
+            "main": 1,
+            "title": "View Submission",
+            "reduced": true,
+            "js": "undefined",
+            "copy": false
+          }
+        ],
+        "checks": [
+          "Persisted video filter includes normalized links, excludes separate raw value; option label Video.",
+          "Admin filtered output includes normalized video and excludes separate raw video_url."
+        ],
+        "console_errors": 0,
+        "server_errors": 0
+      },
+      "zoom": {
+        "mode": "zoom",
+        "samples": [
+          {
+            "role": "owner",
+            "path": "/riwayat?input_type=video",
+            "requested_width": 1280,
+            "width": 640,
+            "scroll": 634,
+            "dpr": 2,
+            "main": 1,
+            "title": "Riwayat pemeriksaan",
+            "reduced": true,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/riwayat/54",
+            "requested_width": 1280,
+            "width": 640,
+            "scroll": 634,
+            "dpr": 2,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": true,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/54",
+            "requested_width": 1280,
+            "width": 640,
+            "scroll": 634,
+            "dpr": 2,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": true,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "owner",
+            "path": "/hasil/53",
+            "requested_width": 1280,
+            "width": 640,
+            "scroll": 634,
+            "dpr": 2,
+            "main": 1,
+            "title": "Hasil analisis",
+            "reduced": true,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions?search=IP038&filters[input_type][value]=video",
+            "requested_width": 1280,
+            "width": 640,
+            "scroll": 634,
+            "dpr": 2,
+            "main": 1,
+            "title": "Submission",
+            "reduced": true,
+            "js": "object",
+            "copy": false
+          },
+          {
+            "role": "admin",
+            "path": "/admin/submissions/54",
+            "requested_width": 1280,
+            "width": 640,
+            "scroll": 634,
+            "dpr": 2,
+            "main": 1,
+            "title": "View Submission",
+            "reduced": true,
+            "js": "object",
+            "copy": false
+          }
+        ],
+        "checks": [
+          "Persisted video filter includes normalized links, excludes separate raw value; option label Video.",
+          "Admin filtered output includes normalized video and excludes separate raw video_url."
+        ],
+        "console_errors": 0,
+        "server_errors": 0
+      }
+    },
+    "pdf": [
+      {
+        "fixture": "upload",
+        "pages": 1,
+        "paper": "A4",
+        "input_label": "Video",
+        "private_path_absent": true,
+        "source_url_preserved": false,
+        "fonts": [
+          "DejaVuSans",
+          "DejaVuSerif"
+        ]
+      },
+      {
+        "fixture": "normalized",
+        "pages": 1,
+        "paper": "A4",
+        "input_label": "Video",
+        "private_path_absent": true,
+        "source_url_preserved": true,
+        "fonts": [
+          "DejaVuSans",
+          "DejaVuSerif"
+        ]
+      }
+    ]
+  },
+  "artifact_hashes": {
+    "regression-red.log": "c14fec095f662e94f5714ed3aa52d62a8339bf8469d500fbae781cb4233271d1",
+    "targeted-green.log": "8d22fd2b648e1b8ed85d1b05d8286072dee10c0a013009641d00308aa6799551",
+    "full-suite.log": "efa3f7754cb8371ff56fecf8c47e408963c44db4c00e673a857d746e0ef9fd88",
+    "pint-final.log": "d4c0f98c6aabce5c15c404a55f0b15a9d62b82376009cd78e88ae22f2d743de2",
+    "node.log": "2b52584e19a56138d0901a7d94d191da1f4b8d2547de31b555f77500176d326a",
+    "build.log": "d6797a2e303086bc60cf7bb3c41ea63d0b4f36b03f57742352bdcef9e1165466",
+    "blade.log": "3f9431fcd9714f6dd47803cb20777c50c99c64c06e629ef631a2219e4d826c9a",
+    "browser-normal.json": "480d8123b1d47e81faaf137bc0d7a07427fab97072648fe22fce02ba96d8923e",
+    "browser-nojs.json": "7a197e8616de5dc9e9132510d67f8db2d3b3a441bdc55fb408313492e5c6df37",
+    "browser-zoom.json": "6617460a64d2455fe97783348cedb973f72570c4467d97a583d135cf4482841e",
+    "pdf-checks.json": "d8a295951f0def373eea79a9d19135fe572ab723cce4b04443e6c246d0814e28"
+  },
+  "final_audit": {
+    "task_counts": {
+      "done": 38,
+      "pending": 1
+    },
+    "ip038_checkboxes_checked": 4,
+    "ip039_checkboxes_unchecked": 4,
+    "page_ac_count": 27,
+    "fa_count": 10,
+    "gap_counts": {
+      "resolved": 3,
+      "retained": 4,
+      "blocked": 1
+    },
+    "qa_ids_unchanged": 94,
+    "qa_counts": {
+      "pass": 5,
+      "not_run": 89
+    },
+    "documentation_files_checked": 8,
+    "local_links_checked": 473,
+    "anchors_checked": 129,
+    "broken_links_or_anchors": 0,
+    "module_paths_checked": 34,
+    "source_fingerprints_checked": 101,
+    "artifact_hashes_checked": 11,
+    "initial_tracked_files": 661,
+    "initial_files_unchanged": 647,
+    "tracked_files_changed": 14,
+    "new_reports": [
+      "refactor/reports/GAPS-IP-038.json",
+      "refactor/reports/GAPS-IP-038.md"
+    ],
+    "tested_application_files_identical": [
+      "app/Filament/Resources/Submissions/Tables/SubmissionsTable.php",
+      "app/View/Presenters/DetectionPresentation.php",
+      "resources/views/riwayat.blade.php",
+      "tests/Feature/AdminReadOnlyResourcesTest.php",
+      "tests/Feature/PdfResultPresentationTest.php",
+      "tests/Feature/SubmissionHistoryTest.php",
+      "tests/Unit/HistoryPresentationTest.php"
+    ],
+    "unchanged_css_js_files": 30,
+    "identical_build_outputs": 16,
+    "cleanup": {
+      "docker_server_stopped": true,
+      "firefox_processes_stopped": [
+        "normal",
+        "nojs",
+        "zoom"
+      ],
+      "qa_ports_closed": [
+        8911,
+        9460,
+        9461,
+        9462
+      ],
+      "root_vendor_absent": true
+    },
+    "diff_check": "pass"
+  },
+  "validation_notes": {
+    "commands": {
+      "php_full": "vendor/bin/phpunit --colors=never --display-skipped",
+      "php_related_filter": "SubmissionTest|SubmissionHistoryTest|HistoryPresentationTest|AdminReadOnlyResourcesTest|DetectionPresentationTest|PdfResultPresentationTest|CsvExportTest|TranslationProvenanceExportTest",
+      "pint": "vendor/bin/pint --test <six changed PHP files>",
+      "node": "node --test tests/Frontend/*.test.mjs",
+      "build": "npm run build",
+      "blade": [
+        "php artisan view:cache",
+        "php artisan view:clear"
+      ]
+    },
+    "browser_sample_fields": {
+      "copy": "True means obsolete Video unggahan copy is present; all final samples false.",
+      "requested_width": "Requested desktop viewport before native zoom; effective CSS width is width.",
+      "js": "typeof Livewire, undefined when content JavaScript is disabled."
+    },
+    "pdf_source_url_preserved": "True for normalized remote URL fixture; false for upload fixture without source_url, as expected.",
+    "diagnostics": "Harness setup/oracle corrections are described in Markdown; final runs use restored final source and cleared Blade cache."
+  }
+}

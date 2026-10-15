@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 15 Oktober 2026 |
-| Status | IP-001–IP-037 selesai; 37 dari 39 task selesai, IP-038–IP-039 pending |
+| Status | IP-001–IP-038 selesai; 38 dari 39 task selesai, IP-039 pending |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-036 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-038 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -113,10 +113,10 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-035](#ip-035) | F6 | Cleanup setelah seluruh pemakai dimigrasi | done |
 | [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | done |
 | [IP-037](#ip-037) | F6 | Lengkapi QA browser lintas halaman/state | done |
-| [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | pending |
+| [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | done |
 | [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-037 selesai, termasuk minimum screen reader aktual IP-037; IP-038–IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-038 selesai, termasuk minimum screen reader aktual IP-037 dan rekonsiliasi keputusan IP-038; IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -809,10 +809,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-037 selesai, ter
 - **Arsitektur:** FA-01–FA-10.
 - **Source/target:** `TASKS.md`, `IMPLEMENTATION-PLAN.md`, `FRONTEND-ARCHITECTURE.md`, `DESIGN-SYSTEM.md`, `PAGE-SPECIFICATIONS.md` (bila keputusan berubah).
 
-- [ ] Cocokkan task, page/AC, FA decisions dan evidence; pastikan setiap gap G01–G08 memiliki keputusan/status yang jelas.
-- [ ] Gabungkan evidence PDF/CSV/admin yang sudah valid; ulangi hanya jika perubahan/failure/risiko baru memerlukannya.
-- [ ] Selaraskan nama module/helper serta keputusan final pada dokumen terkait; status progres rinci tetap berpusat di TASKS.md.
-- [ ] Catat batas E2E/runtime/retained contract; perubahan fitur yang di luar scope tetap backlog terpisah.
+- [x] Cocokkan task, page/AC, FA decisions dan evidence; pastikan setiap gap G01–G08 memiliki keputusan/status yang jelas.
+- [x] Gabungkan evidence PDF/CSV/admin yang sudah valid; ulangi hanya jika perubahan/failure/risiko baru memerlukannya.
+- [x] Selaraskan nama module/helper serta keputusan final pada dokumen terkait; status progres rinci tetap berpusat di TASKS.md.
+- [x] Catat batas E2E/runtime/retained contract; perubahan fitur yang di luar scope tetap backlog terpisah.
 
 **Validasi:** Traceability, known gaps, decision/evidence review.
 
@@ -1324,6 +1324,19 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Screen reader / perbaikan:** Orca 51.0, Firefox 157.0.1 headed/Xvfb privat, Speech Dispatcher 0.12.1 dan eSpeak NG 1.52.0 menghasilkan 49 observasi ucapan/struktur yang diverifikasi. Label/hint/error/loading, flash, tiga label hasil/disclaimer, explanation/evidence/disclosure, tabel, profil, native admin dan Escape/focus return terbaca. Stage berubah diumumkan sekali, dua jendela polling diam. Wadah live region transport kini tetap exposed sementara isi visual boleh hidden; fault 403/503 masing-masing diumumkan sekali, domain tetap processing dan jendela diam tidak mengulang pesan. QA-A11Y-03/08 pass; aggregate 5 pass/89 not_run tetap konservatif. Tidak mengklaim uji pelafalan manusia atau SR tiap resource individual.
 - **Batas/cleanup:** mobile fisik, MySQL/deployment/provider nyata dan audit gap Livewire existing tetap terbuka. Tool AT hanya diekstrak di snapshot; tidak ada instalasi global/dependency produk. Runtime/browser/DBus/display QA milik sesi ditutup; tidak mengubah data/env operasional.
 - **Berikutnya:** commit semantic untuk IP-037 dan berhenti sebelum IP-038; IP-038–039 serta gate F6 menyeluruh belum ditutup.
+
+### IP-038 — Catatan eksekusi
+
+- **Status:** done; lingkup rekonsiliasi, IP-039 tetap pending.
+- **Branch/commit awal:** `frontend-refactor/cleaunp-quality-assurance`, `1001d3b`; tree/index awal bersih.
+- **Files changed:** tujuh dokumen refactor, laporan [GAPS-IP-038.md](../reports/GAPS-IP-038.md)/[JSON](../reports/GAPS-IP-038.json), presenter jenis input, riwayat, opsi native admin dan empat file test.
+- **Page/AC dan FA:** 27 page/AC (P00–P16, A00–A08, E01), FA-01–FA-10 dipetakan ke source/evidence. G01/G04/G08 resolved; G02/G03/G05/G06 retained; G07 blocked untuk real-service E2E. Katalog QA tetap 5 pass/89 not_run, bukan penerimaan menyeluruh.
+- **Perilaku akhir:** label kategori tersimpan video menjadi Video. Request video_url sudah dinormalisasi oleh action existing sehingga ikut filter Video; copy unggahan-saja sebelumnya keliru. Query/filter/validasi/domain lima input, authorization, CSV raw dan pipeline tetap. Test action aktual melindungi normalisasi dan menolak filter video_url tersendiri.
+- **Keputusan dokumentasi:** inventaris module/helper/entry/font aktual diselaraskan; bukti PDF/CSV/admin yang tidak terdampak dipakai ulang berbasis hash/source. B01 audit observer native Livewire, B02 redaksi/retensi writer dan B03 verifikasi platform operasional tercatat sebagai backlog terpisah tanpa perubahan backend/data.
+- **Validasi:** regresi source lama 3 failures; final 192 tests terkait/1459 assertions lulus. Suite penuh 780 kasus/5235 assertions: 776 passed, 4 real-BERT skips. Pint 6 file PHP, 69 Node tests, build dan Blade cache/clear lulus; 16 output build identik. Firefox 42 samples/9 checks pada 320/360/768/1280, no-JS/reduced motion dan native zoom 200%; copy/filter/detail/keyboard/recovery lulus tanpa overflow/console error/server 5xx. Dua PDF A4 aktual diverifikasi teks/font/raster tanpa private path.
+- **Evidence/runtime:** snapshot source terisolasi, vendor exact-lock read-only, PHP 8.4.11/SQLite in-memory, CLI network none. Browser memakai database sintetis loopback tanpa worker/inference/API berbayar. Bukti lama tidak dihitung sebagai run baru; rincian hasil/hash/path/anchor/status ada pada ledger JSON.
+- **Skip/blocker:** empat test BERT skip berarti real-service E2E belum terverifikasi; tidak membuktikan layanan produksi mati. Batas PDF/CSV/filter/read-only/statistik dipertahankan secara eksplisit. Tidak ada deployment/push atau perubahan env/data operasional.
+- **Berikutnya:** commit semantic perubahan IP-038 lalu berhenti; IP-039 dan gate F6 menyeluruh belum dikerjakan.
 
 ### Format catatan berikutnya
 

@@ -11,6 +11,21 @@ use Tests\TestCase;
 
 class PdfResultPresentationTest extends TestCase
 {
+    public function test_pdf_video_category_does_not_misrepresent_a_normalized_link_as_an_upload(): void
+    {
+        foreach ([['media_path' => 'private/video.mp4'], ['source_url' => 'https://example.test/video.mp4']] as $source) {
+            $data = $this->data(['input_type' => 'video', 'raw_input' => null, ...$source]);
+            $html = view('hasil-pdf', $data)->render();
+
+            $this->assertStringContainsString('Jenis input: Video</p>', $html);
+            $this->assertStringNotContainsString('Video unggahan', $html);
+            $this->assertStringNotContainsString('private/video.mp4', $html);
+            $pdf = Pdf::loadView('hasil-pdf', $data)->setPaper('a4', 'portrait');
+            $this->assertStringStartsWith('%PDF-', $pdf->output());
+            $this->assertSame(1, $pdf->getDomPDF()->getCanvas()->get_page_count());
+        }
+    }
+
     #[DataProvider('labels')]
     public function test_pdf_labels_and_score_match_the_web_and_render_on_a4(string $label, string $expected): void
     {

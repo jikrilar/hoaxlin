@@ -3,8 +3,8 @@
 | Metadata | Nilai |
 | --- | --- |
 | Versi | 1.0 |
-| Tanggal | 13 Oktober 2026 |
-| Status | Fondasi IP-004/005 dan komponen reusable IP-006 diterapkan; lifecycle/halaman/admin/PDF masih pending |
+| Tanggal | 15 Oktober 2026 |
+| Status | Spesifikasi desain sesuai implementasi; keputusan aktual IP-038, progres dan QA di TASKS.md |
 | Arah visual | Warm Editorial Intelligence |
 | Theme | Light-only, publik dan admin |
 | Stack target | Laravel 12, Blade, Tailwind CSS 4, Vite, Livewire 4, Filament 5 |
@@ -12,6 +12,8 @@
 | Dokumen terkait | [AGENTS.md](../../AGENTS.md), [OVERVIEW.md](OVERVIEW.md) |
 
 Base publik/light/focus dan compatibility kini diterapkan pada [laporan IP-005](../reports/BASE-IP-005.md). Smoke fixture seluruh view publik tidak menutup seluruh acceptance state/interaksi aplikasi.
+
+Status task rinci berpusat pada [TASKS.md](TASKS.md). [rekonsiliasi IP-038](../reports/GAPS-IP-038.md) menghubungkan source, page/AC, FA-01–FA-10 dan G01–G08 ke evidence. Baseline serta catatan IP terdahulu adalah riwayat pemeriksaan pada saat task tersebut dikerjakan; batas runtime terbaru mengikuti laporan IP-038, tanpa klaim seluruh refactor/QA/E2E selesai.
 
 ## 1. Tujuan dan otoritas desain
 
@@ -47,7 +49,7 @@ Gunakan tiga lapisan:
 
 Nama `--ds-*` adalah kontrak CSS lintas UI. Utility Tailwind dipetakan ke token tersebut melalui `@theme inline`. Jangan membuat salinan hex per halaman. CSS admin mengonsumsi token bersama, tanpa mengimpor reset dan seluruh stylesheet publik.
 
-Token berikut adalah target baru. Mapping dari `--color-surface-0`, `--color-primary-light`, dan token lama harus dilakukan secara eksplisit ketika view dimigrasi. Alias sementara wajib memiliki daftar pemakai dan dihapus setelah migrasi; jangan menambahkan lapisan override tanpa akhir.
+Token berikut diterapkan melalui design-tokens.css/theme.css. Alias transisi legacy sudah dihapus pada IP-035 setelah migrasi consumer; container-app tetap API layout bersama. Jangan menambahkan lapisan override tanpa consumer.
 
 ## 3. Warna
 
@@ -156,7 +158,7 @@ Rasio berikut dihitung dari pasangan sRGB solid menggunakan relative luminance. 
 
 Inter: gunakan weight 400, 500, 600. Newsreader: 400 dan 500. Hindari weight 800/900, all-caps panjang, serta serif pada tombol, input, tabel, atau navigation.
 
-Utamakan self-hosted WOFF2 dengan lisensi font yang disertakan. Font assets belum dibuat oleh dokumen ini; tentukan file aktual ketika implementasi. Pakai `font-display: swap`, font fallback, dan preload hanya font kritis yang benar-benar dipakai. Jangan mengambil font proprietary Claude.
+Utamakan self-hosted WOFF2 dengan lisensi font yang disertakan. Asset aktual ada pada resources/fonts/inter dan resources/fonts/newsreader, dengan README dan OFL. CSS fonts/inter.css dibagi publik/admin, Newsreader melalui fonts.css; lihat [provenance font](../../resources/fonts/README.md). Pakai `font-display: swap`, font fallback, dan preload hanya font kritis yang benar-benar dipakai. Jangan mengambil font proprietary Claude.
 
 ### 4.2 Type scale
 
@@ -250,7 +252,7 @@ Focus outline harus terlihat dan tidak terpotong oleh parent overflow. Primary b
 
 ## 7. Komponen inti
 
-Tujuh API UI/form dasar kini tersedia dan dipakai pada [IP-006](../reports/COMPONENTS-IP-006.md); komponen hasil/upload/password khusus berikut masih target task turunan. Utamakan anonymous Blade components bila tidak membutuhkan logic server tambahan. Filament tetap memakai komponen native-nya.
+API UI/form dasar tersedia sejak [IP-006](../reports/COMPONENTS-IP-006.md); password/upload-field serta prediction/explanation/evidence-item sudah memiliki consumer. Struktur aktual dan batas helper tercatat pada arsitektur §5. Utamakan anonymous Blade components bila tidak membutuhkan logic server tambahan. Filament tetap memakai komponen native-nya.
 
 ### 7.1 Button dan link
 
@@ -500,7 +502,7 @@ Tidak ada halaman yang memerlukan hero besar hanya agar cocok dengan arah editor
 
 ## 12. Implementasi token di Tailwind 4
 
-Struktur berikut **diusulkan**, belum tersedia pada baseline repo:
+Struktur berikut **tersedia pada implementasi**; baseline historis tetap commit pada metadata. Detail path aktual berada pada arsitektur §5:
 
 | File target | Peran |
 | --- | --- |
@@ -509,7 +511,7 @@ Struktur berikut **diusulkan**, belum tersedia pada baseline repo:
 | `resources/css/filament/admin/theme.css` | Theme khusus admin, dibuat melalui alur Filament |
 | `resources/views/components/` | Komponen Blade reusable |
 | `resources/js/app.js` dan modul bila perlu | Interaksi bersama dan lifecycle yang aman |
-| `resources/fonts/` atau direktori font yang dipilih | Font berlisensi, jika memakai bundling Vite |
+| `resources/fonts/`, `resources/css/fonts.css`, `resources/css/fonts/inter.css` | Font OFL self-hosted melalui Vite; Inter dipakai admin lewat LocalFontProvider |
 
 ### 12.1 Starter tokens
 
@@ -640,7 +642,7 @@ Hindari kelas dinamis seperti `bg-${status}-500`. Petakan varian ke string class
 
 Gunakan `app/Providers/Filament/AdminPanelProvider.php` dan custom theme resmi. Panel tetap `/admin`; resources, authorization, serta operasi existing tetap dipertahankan.
 
-Target:
+Implementasi mengikuti ketentuan berikut (IP-027–IP-032):
 
 - Light-only melalui `->darkMode(false)`; menyembunyikan theme switcher saja tidak cukup.
 - Inter sebagai font admin. Serif editorial tidak diterapkan pada form/table/admin heading fungsional.
@@ -658,20 +660,17 @@ Langkah implementasi theme, mengikuti versi terpasang:
 5. Atur primary dan light-only; cek semua warna/ukuran kontrol yang dihasilkan.
 6. Build lalu review login admin, dashboard, resource list/form/detail, filter, modal, dan notification.
 
-Contoh penambahan konfigurasi ke chain existing, bukan pengganti seluruh provider:
+Potongan konfigurasi font/theme aktual; palette primary/gray lengkap tetap pada AdminPanelProvider:
 
 ```php
 ->darkMode(false)
-->font('Inter')
-->colors([
-    'primary' => '#235C50',
-])
+->font('Inter', provider: \Filament\FontProviders\LocalFontProvider::class)
 ->viteTheme('resources/css/filament/admin/theme.css')
 ```
 
-Palette yang dihasilkan Filament dari hex dapat berbeda dari shade Hoaxlin. Jika perlu kesamaan tepat, daftarkan palette yang sesuai API versi terpasang dan periksa kontras setiap penggunaan shade. Jangan menganggap memasukkan satu hex otomatis menyamakan seluruh semantic tokens.
+AdminPanelProvider memakai palette primary/gray eksplisit yang dipasangkan dengan semantic tokens; tidak membuat ulang shade dari satu hex. Theme generator dan scan scoped sudah diverifikasi pada IP-027/IP-036. Perubahan palette tetap memerlukan pemeriksaan kontras native.
 
-`->font('Inter')` tidak memastikan font self-hosted. Untuk self-hosting, gunakan font provider lokal sesuai API Filament dan stylesheet font aktual. Jangan menunjuk file yang belum dibuat.
+LocalFontProvider memperoleh @font-face Inter dari theme yang mengimpor fonts/inter.css. Reset publik dan Newsreader tidak dimuat pada admin.
 
 Jangan mengedit `public/css/filament/`, `public/js/filament/`, font vendor, atau template dalam `vendor/` secara langsung.
 
@@ -689,7 +688,7 @@ Jangan mengedit `public/css/filament/`, `public/js/filament/`, font vendor, atau
 - Jika suatu data/reference belum diberikan controller ke PDF, jangan membuat placeholder atau diam-diam memperluas kontrak; kerjakan perubahan itu sebagai task yang jelas.
 - CSV tetap data export, bukan media styling; heading tindakan dan data existing dijaga.
 
-Render PDF aktual untuk memeriksa page breaks, karakter Bahasa Indonesia, URL panjang, serta font fallback.
+IP-033 telah merender sembilan fixture PDF/18 halaman A4, dengan DejaVu Sans/Serif tertanam, margin 18mm dan page breaks; source template/font tetap mandiri. IP-038 mengulang renderer hanya untuk perubahan label kategori Video. Bukti CSV scope/bytes/sanitization dari IP-034 tetap berlaku karena exporter tidak berubah; lihat rekonsiliasi IP-038.
 
 ## 15. Aksesibilitas dan quality gates
 
@@ -730,7 +729,7 @@ Sumber teknis primer yang diperiksa pada 11 Oktober 2026:
 - [W3C — Target size minimum](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html).
 - [W3C — Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html).
 
-Nilai visual di dokumen ini adalah keputusan desain Hoaxlin, bukan token yang diambil dari referensi teknis. Contoh CSS/PHP adalah panduan target dan belum diuji di build repo dalam penyusunan dokumen ini; periksa kompatibilitas dengan versi pada lockfile ketika implementasi.
+Nilai visual di dokumen ini adalah keputusan desain Hoaxlin, bukan token yang diambil dari referensi teknis. Starter CSS tetap contoh ringkas, bukan salinan lengkap source. Konfigurasi aktual dan evidence kompatibilitas lockfile ditelusuri melalui arsitektur §5 serta IP-036–IP-038.
 
 Perubahan palet utama, font, theme, atau semantik prediksi harus memperbarui dokumen ini dan dokumen terkait secara konsisten. Perbaikan aksesibilitas boleh memperjelas token/state tanpa mengubah arah brand. Jangan mengembalikan pola visual lama untuk menyelesaikan satu masalah lokal.
 
