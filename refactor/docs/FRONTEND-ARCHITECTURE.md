@@ -650,7 +650,7 @@ Image normal memakai Composer no-dev; jangan menganggap test tools ada dalam con
 
 ## 21. Kriteria selesai arsitektur frontend
 
-Kriteria ini untuk implementasi berikutnya, bukan status lulus dokumen ini.
+Kriteria ini adalah acceptance implementasi, bukan status lulus otomatis dokumen ini. [Handoff IP-039](../reports/HANDOFF-IP-039.md#page-acceptance-dan-definition-of-done) memetakan seluruh 14 butir ke bukti/batas; checklist penerimaan menyeluruh tetap terbuka. Inventaris aktual mengikuti §5, FA-08 kini memiliki handoff, tanpa mengubah keputusan arsitektur lain.
 
 - [ ] View page hanya mengomposisi halaman; komponen tidak melakukan query atau inference.
 - [ ] Route/controller/request/policy dan nilai domain tetap sesuai kontrak.

@@ -4,14 +4,14 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 15 Oktober 2026 |
-| Status | IP-001–IP-038 selesai; 38 dari 39 task selesai, IP-039 pending |
+| Status | IP-001–IP-039 selesai; 39 dari 39 task selesai, acceptance menyeluruh belum selesai |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Tujuan | Refactor UI/UX Warm Editorial Intelligence, light-only |
 | Task pertama | IP-001 |
 | Cakupan ID | IP-001–IP-039, sama dengan implementation plan |
 
-Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-038 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
+Dokumen ini menyediakan backlog untuk eksekusi Codex. Progres aktual IP-001–IP-039 tercatat pada tabel status dan jurnal; penyusunan backlog tidak menjadi bukti kelulusan implementasi UI.
 
 ## Panduan eksekusi
 
@@ -114,9 +114,9 @@ Checklist umum ini diterapkan per task. Ia tidak dicentang sekali untuk seluruh 
 | [IP-036](#ip-036) | F6 | Validasi build, Blade, PHP dan regression final | done |
 | [IP-037](#ip-037) | F6 | Lengkapi QA browser lintas halaman/state | done |
 | [IP-038](#ip-038) | F6 | Tutup gap, sinkronkan keputusan dan bukti | done |
-| [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | pending |
+| [IP-039](#ip-039) | F6 | Siapkan handoff yang dapat ditinjau | done |
 
-Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-038 selesai, termasuk minimum screen reader aktual IP-037 dan rekonsiliasi keputusan IP-038; IP-039 tetap pending. Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
+Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-039 selesai, termasuk minimum screen reader aktual IP-037, rekonsiliasi keputusan IP-038 dan handoff IP-039. Penerimaan menyeluruh/gate F6 belum lulus: 89 kasus QA masih not_run dan G07 real-service E2E blocked; lihat [handoff](../reports/HANDOFF-IP-039.md). Tidak ada task yang dinyatakan selesai hanya karena dokumentasinya sudah tersedia.
 
 ## F0 — Audit dan baseline
 
@@ -827,10 +827,10 @@ Status diperbarui berdasarkan eksekusi pada jurnal; IP-001–IP-038 selesai, ter
 - **Arsitektur:** FA-08.
 - **Source/target:** `TASKS.md`, final diff/review notes dan dokumen yang berubah.
 
-- [ ] Review final diff, files changed dan task status; pastikan perubahan pengguna yang tidak terkait tetap terjaga.
-- [ ] Siapkan ringkasan perilaku akhir, cara menjalankan/meninjau, validasi dan risk/known limitations berbasis evidence.
-- [ ] Periksa seluruh page acceptance dan definition of done; jika ada blocker penting, nyatakan status pekerjaan belum selesai.
-- [ ] Sediakan next action yang konkret bila masih blocked; commit/PR/publish/deploy mengikuti lingkup instruksi pengguna, bukan dipicu hanya oleh checklist ini.
+- [x] Review final diff, files changed dan task status; pastikan perubahan pengguna yang tidak terkait tetap terjaga.
+- [x] Siapkan ringkasan perilaku akhir, cara menjalankan/meninjau, validasi dan risk/known limitations berbasis evidence.
+- [x] Periksa seluruh page acceptance dan definition of done; jika ada blocker penting, nyatakan status pekerjaan belum selesai.
+- [x] Sediakan next action yang konkret bila masih blocked; commit/PR/publish/deploy mengikuti lingkup instruksi pengguna, bukan dipicu hanya oleh checklist ini.
 
 **Validasi:** Final review dan definition of done.
 
@@ -1337,6 +1337,19 @@ Ulangi cek jika perubahan/failure/risiko baru mengharuskannya. Evidence yang mas
 - **Evidence/runtime:** snapshot source terisolasi, vendor exact-lock read-only, PHP 8.4.11/SQLite in-memory, CLI network none. Browser memakai database sintetis loopback tanpa worker/inference/API berbayar. Bukti lama tidak dihitung sebagai run baru; rincian hasil/hash/path/anchor/status ada pada ledger JSON.
 - **Skip/blocker:** empat test BERT skip berarti real-service E2E belum terverifikasi; tidak membuktikan layanan produksi mati. Batas PDF/CSV/filter/read-only/statistik dipertahankan secara eksplisit. Tidak ada deployment/push atau perubahan env/data operasional.
 - **Berikutnya:** commit semantic perubahan IP-038 lalu berhenti; IP-039 dan gate F6 menyeluruh belum dikerjakan.
+
+### IP-039 — Catatan eksekusi
+
+- **Status:** done untuk handoff; 39 done/0 pending. Penerimaan refactor menyeluruh tetap incomplete, gate F6 belum lulus.
+- **Branch/commit awal:** `frontend-refactor/cleaunp-quality-assurance`, `f56b055`; tree/index awal bersih, tidak ada perubahan pengguna yang belum di-commit.
+- **Files changed:** dokumen TASKS/IMPLEMENTATION-PLAN/OVERVIEW/FRONTEND-ARCHITECTURE/QA-ACCEPTANCE dan [HANDOFF-IP-039.md](../reports/HANDOFF-IP-039.md)/[JSON](../reports/HANDOFF-IP-039.json). Tidak mengubah source aplikasi/test/config/dependency/env/data operasional.
+- **Page/AC dan FA:** 27 page/AC dan 10 FA direview; 60 butir DoD dari lima sumber dipetakan ke 16 area. Reviewed/evidence_partial bukan status QA pass; checklist penerimaan keseluruhan tidak dicentang massal.
+- **Review akhir:** rentang baseline af173ec–f56b055 memuat 238 file; inventaris dan fingerprint source/evidence dicatat. AGENTS/trusted proxy dari commit 1278b13 dipisahkan sebagai inherited non-UI. Query/schema/jobs/services/actions/enums/models/policies/observers/config/Python/Composer/Compose/published vendor assets tetap terhadap baseline.
+- **Perilaku akhir:** handoff menyediakan ringkasan perubahan/alasan, urutan review, perintah reproduksi dari checkout baru, sumber bukti serta batas dan tindak lanjut. G01/G04/G08 resolved; G02/G03/G05/G06 retained; G07 blocked. B01/B02 audit observer/writer dan B03 platform tetap backlog terpisah.
+- **Validasi IP-039:** full PHPUnit pada source final snapshot ter-mount: 780 kasus/5235 assertions, 776 passed/4 real-BERT skips, tanpa failure/warning. Node 69 passed; Blade cache/clear lulus. Vendor exact-lock read-only, PHP 8.4.11/PHPUnit 11.5.56, SQLite in-memory, env kosong/fixture key dan network none. Setup symlink mount vendor gagal sebelum suite terbentuk; mountpoint snapshot dikoreksi tanpa mengubah autoload/source produk, lalu run final lulus.
+- **Evidence reuse:** build 16 output identik dan input source tidak berubah; browser/SR/PDF/CSV aktual menggunakan laporan IP-033–038 sesuai scope/hash. Tidak mengklaim run browser/build/Pint baru; tidak ada PHP atau halaman produk yang berubah. Fingerprint 616 file di luar refactor pada snapshot sesuai f56b055; tautan/anchor/ID/status dan diff check diperiksa pada audit JSON. Edit footer pengguna yang muncul saat finalisasi dipertahankan di luar commit dan belum termasuk hasil verifikasi snapshot.
+- **Skip/blocker:** katalog 5 pass/89 not_run; G07 layanan nyata, native audit B01, redaksi/retensi writer B02 dan platform B03 tetap terlihat. Reproduksi Docker test menyertakan tiga fixture mounts karena packaging existing; SMTP/deployment/provider/model nyata belum diverifikasi.
+- **Berikutnya:** commit semantic dokumen IP-039 lalu berhenti. Tindak lanjut QA/backend/operasional pada handoff bukan task baru yang otomatis dimulai; tidak membuat PR/push/publish/deploy.
 
 ### Format catatan berikutnya
 

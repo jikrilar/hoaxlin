@@ -4,7 +4,7 @@
 | --- | --- |
 | Versi | 1.0 |
 | Tanggal | 15 Oktober 2026 |
-| Status | IP-001–IP-038 selesai; 38 dari 39 task done, IP-039 pending |
+| Status | IP-001–IP-039 selesai; 39 dari 39 task done, acceptance menyeluruh belum selesai |
 | Repository | [jikrilar/hoaxlin](https://github.com/jikrilar/hoaxlin) |
 | Baseline kode | `main` — `af173ecb25aca930720db52b3d76201b4b27aaff` |
 | Arah desain | Warm Editorial Intelligence; light-only |
@@ -23,7 +23,7 @@ IP-036 menyelesaikan [validasi regression final](../reports/REGRESSION-IP-036.md
 
 IP-037 memiliki [hasil QA browser dan perbaikan copy CAPTCHA](../reports/BROWSER-IP-037.md) dengan [evidence terstruktur](../reports/BROWSER-IP-037.json): 721 samples lintas Firefox/Chromium normal/no-JS/zoom/reduced/forced colors, 68 checks interaksi, 15 halaman DOM/semantic contrast dan pengiriman native lima input. Source sesi awal: build/Blade/98 tests terkait/69 Node serta suite penuh 773 passed/4 BERT skips lulus. Kelanjutan IP-037 menutup minimum screen reader aktual QA §3: Orca 51.0/Firefox 157.0.1 menghasilkan 49 observasi terverifikasi pada template/interaksi utama. Defect pengumuman gangguan polling diperbaiki dengan live region yang tetap exposed; fault 403/503 diumumkan sekali tanpa mengubah status domain. Test regresi red/green, 66 tests terkait, suite final 774 passed/4 BERT skips/5214 assertions, 69 Node, Pint, build/Blade dan smoke native lulus. IP-037 **done**, QA-A11Y-03/08 pass; aggregate 5 pass/89 not_run tetap konservatif. Pada penutupan IP-037, IP-038–039 belum dijalankan; keputusan IP-038 terbaru dijelaskan di bawah.
 
-IP-038 menyelaraskan keputusan/module/path/font/entry aktual dan [register G01–G08](../reports/GAPS-IP-038.md): 3 resolved, 4 retained, G07 blocked untuk real-service E2E. Koreksi G02 memakai kategori Video karena CreateSubmission sudah menormalisasi video_url; tidak mengubah filter/query/request/pipeline. Bukti PDF/CSV/admin digunakan ulang sesuai diff; hanya label/kategori video diulang melalui test, browser dan dua PDF. Progres rinci serta hasil terbaru tetap pada TASKS.md; IP-039 dan penerimaan menyeluruh belum ditutup.
+IP-038 menyelaraskan keputusan/module/path/font/entry aktual dan [register G01–G08](../reports/GAPS-IP-038.md): 3 resolved, 4 retained, G07 blocked untuk real-service E2E. Koreksi G02 memakai kategori Video karena CreateSubmission sudah menormalisasi video_url; tidak mengubah filter/query/request/pipeline. Bukti PDF/CSV/admin digunakan ulang sesuai diff; hanya label/kategori video diulang melalui test, browser dan dua PDF. Progres rinci serta hasil terbaru tetap pada TASKS.md. Pada penutupan IP-038, IP-039 belum dikerjakan; status handoff terkini tercatat di bawah dan penerimaan menyeluruh tetap belum selesai.
 
 Kerjakan dependency sebelum task turunannya. Tuntaskan satu alur dengan error, empty, akses, mobile, dan keyboard sebelum memperluas perubahan. Untuk layout/CSS bersama, cek pula halaman yang masih memakai presentasi lama.
 
@@ -42,6 +42,8 @@ Halaman menggunakan ID P00–P16, A00–A08, E01 dari page specifications; accep
 Dependency adalah urutan kerja, bukan otomatis blocker teknis. IP-002 menutup inventaris kesiapan dan hasil baseline yang dapat dijalankan; mencatat service yang unavailable tidak berarti service itu sudah lulus QA. Task yang membutuhkan runtime tersebut tetap memiliki pemeriksaan yang blocked, sementara pekerjaan independen dapat dilanjutkan. Test skip atau fixture pass tidak berarti inference/pipeline nyata telah diverifikasi. Jika tidak ada perubahan yang diperlukan pada suatu task review, task tetap dapat ditutup dengan alasan dan bukti pemeriksaan.
 
 Tidak ada estimasi hari atau deadline yang dikarang. Urutan ditentukan oleh dependency dan risiko; jadwal dapat dibuat setelah baseline environment dan kapasitas pengerjaan diketahui.
+
+IP-039 menyediakan [handoff final](../reports/HANDOFF-IP-039.md) dan [ledger review](../reports/HANDOFF-IP-039.json): final diff 238 file hingga f56b055, 27 page/AC, 60 butir DoD, reproduksi dari checkout baru serta tindak lanjut yang konkret. Seluruh 39 task done sebagai lingkup implementasi/dokumentasi; **penerimaan menyeluruh dan gate F6 belum lulus**, karena 89 QA not_run dan G07 real-service E2E blocked. Suite final source IP-039: 776 passed/4 BERT skips/5235 assertions, 69 Node dan Blade lulus; build/browser/export dipakai kembali hanya untuk source identik.
 
 ## 2. Baseline dan asumsi pelaksanaan
 
@@ -505,9 +507,11 @@ Perubahan nama helper/module rutin boleh ditentukan saat implementasi; perbarui 
 
 ### 18.3 Kesiapan handoff
 
-Handoff memuat final diff, cara menjalankan/meninjau, task/AC coverage, hasil build/test/browser/export, serta known limitations. Deployment, domain/tunnel, SMTP, dan publikasi merupakan pekerjaan operasional terpisah. Penyusunan dokumen ini tidak mengubah repo atau melakukan deployment.
+[Handoff IP-039](../reports/HANDOFF-IP-039.md) memuat final diff, cara menjalankan/meninjau, task/AC coverage, hasil build/test/browser/export, serta known limitations. Task ini mengubah dokumentasi saja. Deployment, domain/tunnel, SMTP, dan publikasi merupakan pekerjaan operasional terpisah dan belum dilakukan.
 
 ## 19. Definition of done keseluruhan
+
+Review IP-039 memetakan seluruh 16 butir berikut bersama 44 butir dari AGENTS/Overview/Design System/Architecture ke [ledger DoD](../reports/HANDOFF-IP-039.json). Checklist tetap terbuka untuk penerimaan menyeluruh; task handoff done tidak mempromosikan seluruh AC/QA menjadi pass. Batas serta bukti tiap area tercantum pada [handoff](../reports/HANDOFF-IP-039.md#page-acceptance-dan-definition-of-done).
 
 - [ ] F0 baseline working copy/environment/state tercatat.
 - [ ] Seluruh halaman scope menggunakan fondasi light-only ivory–evergreen dan typography yang benar.
