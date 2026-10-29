@@ -1,0 +1,54 @@
+{
+  "task": "Q-008",
+  "status": "BLOCKED",
+  "verified_date": "2026-10-29",
+  "source_commit": "32e59a5328f958efec17f1b16f39e20d74584f5e",
+  "branch": "quality/03-bert-data",
+  "availability": {
+    "datasets/komdigi_hoaks.csv": false,
+    "datasets/valid_antara.csv": false,
+    "datasets/processed/komdigi-antara-v1/manifest.json": false,
+    "datasets/processed/komdigi-antara-v1/all.jsonl": false,
+    "datasets/processed/komdigi-antara-v1/train.jsonl": false,
+    "datasets/processed/komdigi-antara-v1/val.jsonl": false,
+    "datasets/processed/komdigi-antara-v1/test.jsonl": false,
+    "datasets/processed/komdigi-antara-v1/rejected.jsonl": false,
+    "models/runs": false
+  },
+  "measurements": {
+    "training_records_inspected": null,
+    "label_source_topic_date_length_text_source_matrix": null,
+    "cut_claim_fallback_count": null,
+    "cut_claim_fallback_denominator": null,
+    "duplicate_label_conflicts": null,
+    "samples_reviewed": null,
+    "quality_improvement_measured": false
+  },
+  "existing_regression_tests": {
+    "command": "bash reports/ai-quality/20261029-q002/run-tests.sh tests/test_normalize.py tests/test_reconcile.py tests/test_prepare.py tests/test_dedup.py tests/test_split.py",
+    "exit_code": 0, "passed": 38, "seconds": 0.84,
+    "meaning": "Existing fixture behavior only, not corpus quality validation"
+  },
+  "source_hashes": {
+    "bert-service/scripts/build_valid_news.py": "5cc1780f0af44a8cfda46fea08dc3fee7dfc880d1a82c458a63f55534dc5aa9d",
+    "bert-service/dataset/sources/komdigi_csv.py": "f50e3daa6301dc8d32850bdb90477d7f671f42fbc39431b274d06187c2b09b81",
+    "bert-service/dataset/sources/labeled_csv.py": "2089fec67b6adfcf25b6f76b874d096cf75451ddce2dfe2fee0164389750bb11",
+    "bert-service/dataset/normalize.py": "86d3064a91a3d5ac5cb9088ceac7e964886b0d24dba70ffa11a45bda9d023510",
+    "bert-service/dataset/schema.py": "1b2dadb48ccfbaf5f55096cea1c82b28a0224e53b7b338a98411cb78d673a335",
+    "bert-service/dataset/prepare.py": "91f796ef4e06a279e95d58f998fb6dbbdc2d700ab642afa9e36c38f3e6a69b51",
+    "bert-service/dataset/reconcile.py": "4d00091a2feb76be9396fa79f22bd11d7abda1b6080dd5616e1dadc59944607c",
+    "bert-service/dataset/dedup.py": "0ba4419d21287d3ba81c4057f89cec179893e6dd8722ff78d3c0c47bf7a7aadd",
+    "bert-service/dataset/split.py": "26a66b9922d54b349b8c89408f868e26d95610a38833d8f4f2c0a17b0aee4e70",
+    "bert-service/dataset/manifest.py": "042d4fc848f627201e54a9a92a02de231596a7ca24aed30c471c5e19d3be86ea"
+  },
+  "owner_files_preserved": {
+    "HOAXLIN-BERT-RAG-AUDIT-TASKS.md": "922425f51bc248d235d5c696c100a672d801d6df05097ad8ea7d0d67d11004d7",
+    "tests/Feature/FilamentAuditObserverTest.php": "2446116cfdd2698609c54cd458e42211e4e4336f64057d5302fa776828f29650"
+  },
+  "limits": [
+    "Code review risks are not observed corpus frequencies or causal shortcut proof",
+    "Empty quarantine entries mean blocked review, not a clean dataset",
+    "No corpus text, previews or PII copied into report",
+    "No collection, retraining, relabeling, model download, deployment or production data access"
+  ]
+}

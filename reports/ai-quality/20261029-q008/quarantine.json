@@ -1,0 +1,12 @@
+{
+  "task": "Q-008",
+  "status": "BLOCKED_SOURCE_DATA_UNAVAILABLE",
+  "record_review_performed": false,
+  "reviewed_record_count": null,
+  "entries": [],
+  "empty_entries_mean": "No source records could be inspected; not evidence of zero problematic labels",
+  "label_changes": 0,
+  "required_entry_fields_when_unblocked": ["record_id", "source_artifact_sha256", "reason_code", "review_status", "reviewer", "evidence_pointer"],
+  "allowed_pending_reason_categories": ["verdict_residue", "claim_verdict_mismatch", "source_implied_label", "duplicate_label_conflict", "context_loss", "ambiguous_or_out_of_scope"],
+  "policy": "Flags are review requests, not automatic relabeling or human approval"
+}
