@@ -18,6 +18,7 @@ use App\Jobs\RetrieveSubmissionEvidence;
 use App\Jobs\TranslateSubmissionText;
 use App\Models\Submission;
 use App\Services\Extraction\TextExtractorResolver;
+use App\Services\Fakes\FakeClassifier;
 use App\Services\Fakes\FakeEvidenceRetriever;
 use App\Support\TextNormalizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,6 +28,58 @@ use Tests\TestCase;
 class InputTraceTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_service_sequence_metadata_survives_threshold_and_cache_copies(): void
+    {
+        $classification = Classification::fromResponse([
+            'label' => 'valid', 'confidence_score' => 0.8, 'model_version' => 'fixture',
+            'token_count' => 700, 'truncated' => true, 'preprocessing_version' => '1.0.0',
+        ])->withConfidenceThreshold(0.99)->asCached();
+        $this->assertSame(700, $classification->tokenCount);
+        $this->assertTrue($classification->serviceTruncated);
+        $this->assertSame('1.0.0', $classification->preprocessingVersion);
+    }
+
+    public function test_malformed_service_sequence_metadata_is_rejected(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Classification::fromResponse([
+            'label' => 'valid', 'confidence_score' => 0.99, 'model_version' => 'fixture',
+            'token_count' => -1, 'truncated' => 'false',
+        ]);
+    }
+
+    public function test_whitespace_does_not_allow_oversized_unicode_input_past_service_boundary(): void
+    {
+        Queue::fake();
+        $text = str_repeat(' ', 20).str_repeat('é', 19999).str_repeat(' ', 20);
+        $submission = Submission::create([
+            'input_type' => 'text', 'extracted_text' => $text,
+            'source_language' => 'id', 'status' => 'processing',
+        ]);
+        $classifier = $this->createMock(Classifier::class);
+        $classifier->expects($this->once())->method('classify')
+            ->with($this->callback(fn (string $input): bool => mb_strlen($input) <= 20000))
+            ->willReturn(new Classification(DetectionLabel::Valid, 0.99, 'fixture'));
+        $this->app->instance(Classifier::class, $classifier);
+        $this->app->call([new ClassifySubmission($submission->id), 'handle']);
+    }
+
+    public function test_configured_boundary_is_recorded_with_its_actual_limit(): void
+    {
+        Queue::fake();
+        config(['services.bert.max_text_length' => 100]);
+        $submission = Submission::create([
+            'input_type' => 'text', 'extracted_text' => str_repeat('é', 101),
+            'source_language' => 'id', 'status' => 'processing',
+        ]);
+        $this->app->instance(Classifier::class, new FakeClassifier);
+        $this->app->call([new ClassifySubmission($submission->id), 'handle']);
+        $trace = $submission->processingEvents()->where('stage', 'classifying')
+            ->where('outcome', 'succeeded')->firstOrFail()->metadata['input_trace']['classifier_input'];
+        $this->assertSame('classifier-input:trim-head-100-v1', $trace['transform_version']);
+        $this->assertSame(100, $trace['characters']);
+    }
 
     public function test_extraction_translation_classifier_and_query_have_private_exact_fingerprints(): void
     {
@@ -153,5 +206,54 @@ class InputTraceTest extends TestCase
         }
         $this->assertSame('meragukan', $submission->refresh()->detectionResult->label);
         $this->assertStringNotContainsString($text, json_encode($submission->processingEvents()->pluck('metadata'), JSON_THROW_ON_ERROR));
+    }
+
+    public function test_long_analysis_text_over_20000_chars_is_safely_bounded_with_trace_and_service_tokens(): void
+    {
+        Queue::fake();
+        $baseText = 'Pernyataan resmi bahwa Menkes TIDAK membagikan bantuan tunai. ';
+        // Construct 25,000 character analysis text
+        $longText = str_repeat($baseText, (int) ceil(25000 / strlen($baseText)));
+        $submission = Submission::create([
+            'input_type' => 'text',
+            'raw_input' => $longText,
+            'extracted_text' => $longText,
+            'source_language' => 'id',
+            'status' => 'processing',
+        ]);
+
+        $classifier = $this->createMock(Classifier::class);
+        $classifier->expects($this->once())
+            ->method('classify')
+            ->with($this->callback(function (string $input): bool {
+                return mb_strlen($input) === 20000;
+            }))
+            ->willReturn(new Classification(
+                DetectionLabel::Hoax,
+                0.97,
+                'indobert-hoax-v1.0.0',
+                tokenCount: 4500,
+                serviceTruncated: true,
+                preprocessingVersion: '1.0.0',
+            ));
+        $this->app->instance(Classifier::class, $classifier);
+
+        $this->app->call([(new ClassifySubmission($submission->id)), 'handle']);
+
+        $event = $submission->processingEvents()
+            ->where('stage', 'classifying')
+            ->where('outcome', 'succeeded')
+            ->first();
+
+        $trace = $event->metadata['input_trace']['classifier_input'];
+        $this->assertSame(hash('sha256', mb_substr(trim($longText), 0, 20000)), $trace['sha256']);
+        $this->assertSame(hash('sha256', $longText), $trace['parent_sha256']);
+        $this->assertTrue($trace['truncated']);
+        $this->assertSame('classifier-input:trim-head-20000-v1', $trace['transform_version']);
+        $this->assertSame(20000, $trace['characters']);
+        $this->assertSame(4500, $trace['tokens']);
+        $this->assertSame('reported_by_bert_service', $trace['token_count_status']);
+        $this->assertTrue($trace['service_truncated']);
+        $this->assertSame('reported_by_bert_service', $trace['service_truncation_status']);
     }
 }

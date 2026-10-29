@@ -35,6 +35,7 @@ from app.model_release import (  # noqa: E402
     load_json,
     require_regular_file,
     sha256,
+    sequence_contract,
     validate_model_contract,
     validate_release,
 )
@@ -132,7 +133,12 @@ def validate_source(source: Path, version: str) -> dict[str, Any]:
         "base_model": entry.get("base_model"),
         "exported_at": entry.get("exported_at"),
     }
-    return {"contract": contract, "hashes": source_hashes, "provenance": provenance}
+    sequence_fields_present = "preprocessing_version" in entry
+    sequence = sequence_contract(entry, legacy=not sequence_fields_present)
+    provenance["sequence_contract_basis"] = (
+        "source-export" if sequence_fields_present else "legacy-serving-512-not-training-provenance"
+    )
+    return {"contract": contract, "sequence": sequence, "hashes": source_hashes, "provenance": provenance}
 
 
 def build_manifest(
@@ -148,8 +154,10 @@ def build_manifest(
         for name in sorted(EXPORT_FILES)
     }
     contract = source_validation["contract"]
+    tokenizer_hash = files.get("tokenizer.json", {}).get("sha256")
+    tokenizer_config_hash = files.get("tokenizer_config.json", {}).get("sha256")
     return {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "model": MODEL_IDENTIFIER,
         "version": version,
         "task": TASK,
@@ -161,6 +169,9 @@ def build_manifest(
             "method": "temperature_scaling",
             "temperature": contract["temperature"],
         },
+        **source_validation["sequence"],
+        "tokenizer_hash": tokenizer_hash,
+        "tokenizer_config_hash": tokenizer_config_hash,
         "local_files_only": True,
         "critical_files": list(CRITICAL_FILES),
         "files": files,

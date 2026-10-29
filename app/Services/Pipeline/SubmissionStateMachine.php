@@ -53,8 +53,13 @@ class SubmissionStateMachine
         );
     }
 
-    public function markClassified(Submission $submission, Classification $classification, int $attempt, int $durationMs): void
-    {
+    public function markClassified(
+        Submission $submission,
+        Classification $classification,
+        int $attempt,
+        int $durationMs,
+        ?string $classifierInput = null,
+    ): void {
         $submission->update(['processing_stage' => ProcessingStage::Classifying->value]);
 
         DetectionResult::updateOrCreate(['submission_id' => $submission->id], [
@@ -74,8 +79,19 @@ class SubmissionStateMachine
             'bert',
             $attempt,
             $durationMs,
-            metadata: ['cached' => $classification->cached, 'model_version' => $classification->modelVersion,
-                'input_trace' => ['classifier_input' => InputTrace::analysis($submission)]],
+            metadata: [
+                'cached' => $classification->cached,
+                'model_version' => $classification->modelVersion,
+                'preprocessing_version' => $classification->preprocessingVersion,
+                'input_trace' => [
+                    'classifier_input' => InputTrace::analysis(
+                        $submission,
+                        tokens: $classification->tokenCount,
+                        serviceTruncated: $classification->serviceTruncated,
+                        classifierInput: $classifierInput,
+                    ),
+                ],
+            ],
         );
     }
 

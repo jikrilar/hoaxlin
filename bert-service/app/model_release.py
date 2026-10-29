@@ -39,6 +39,33 @@ class PackagingError(RuntimeError):
     """Raised when a source or packaged release violates the contract."""
 
 
+def sequence_contract(metadata: dict[str, Any], *, legacy: bool = False) -> dict[str, Any]:
+    """Only the implemented right-truncated, single-sequence policy may serve.
+
+    Schema 1.0 predates these fields: 512 is historical serving behavior,
+    not evidence of the length used to train the frozen weights.
+    """
+    defaults = {
+        "preprocessing_version": "1.0.0", "max_sequence_length": 512,
+        "max_token_length": 512, "truncation_strategy": "head-only",
+        "multi_claim_policy": "single-sequence-head-only",
+    }
+    result = {}
+    for key, default in defaults.items():
+        if key not in metadata and not legacy:
+            raise PackagingError(f"Missing release sequence contract field: {key}")
+        result[key] = metadata.get(key, default)
+    length = result["max_sequence_length"]
+    if type(length) is not int or not 2 <= length <= 512:
+        raise PackagingError("max_sequence_length must be an integer between 2 and 512")
+    if type(result["max_token_length"]) is not int or result["max_token_length"] != length:
+        raise PackagingError("max_token_length must match max_sequence_length")
+    for key in ("preprocessing_version", "truncation_strategy", "multi_claim_policy"):
+        if result[key] != defaults[key]:
+            raise PackagingError(f"Unsupported {key}: {result[key]!r}")
+    return result
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -170,8 +197,8 @@ def validate_release(
         raise PackagingError("Release manifest must contain an object")
     if contains_absolute_path(manifest):
         raise PackagingError("Release manifest must not contain absolute paths")
-    if manifest.get("schema_version") != "1.0":
-        raise PackagingError("Release manifest schema_version must be '1.0'")
+    if manifest.get("schema_version") not in ("1.0", "1.1"):
+        raise PackagingError("Release manifest schema_version must be '1.0' or '1.1'")
 
     expected_top_level = {
         "model": MODEL_IDENTIFIER,
@@ -245,6 +272,13 @@ def validate_release(
     if known_hash is not None and actual_model_hash != known_hash:
         raise PackagingError("Release model hash does not match the frozen known hash")
 
+    sequence = sequence_contract(manifest, legacy=manifest["schema_version"] == "1.0")
+    for field, filename in (("tokenizer_hash", "tokenizer.json"),
+                            ("tokenizer_config_hash", "tokenizer_config.json")):
+        if manifest["schema_version"] == "1.1" or field in manifest:
+            if manifest.get(field) != file_entries[filename]["sha256"]:
+                raise PackagingError(f"Release manifest {field} does not match {filename} hash")
+
     contract = validate_model_contract(release)
     return {
         "path": str(release.resolve()),
@@ -252,5 +286,6 @@ def validate_release(
         "files": len(file_entries),
         "payload_size": sum((release / name).stat().st_size for name in EXPORT_FILES),
         "model_sha256": actual_model_hash,
+        **sequence,
         **contract,
     }

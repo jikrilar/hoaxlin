@@ -45,6 +45,7 @@ return [
         'connect_timeout' => (int) env('BERT_SERVICE_CONNECT_TIMEOUT', 3),
         'timeout' => (int) env('BERT_SERVICE_TIMEOUT', 30),
         'metadata_timeout' => (int) env('BERT_METADATA_TIMEOUT', 3),
+        'max_text_length' => (int) env('BERT_MAX_TEXT_LENGTH', 20000),
         'tries' => (int) env('BERT_SERVICE_TRIES', 5),
         'backoff' => [5, 15, 45, 120, 300],
         'breaker' => [

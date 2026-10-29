@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from transformers import AutoTokenizer
 
 from train.config import FineTuneConfig
+from app.preprocessing import encode_sequence
+
+
+def encode_training(tokenizer, text, max_length, **kwargs):
+    return encode_sequence(tokenizer, text, max_length, padding="max_length", **kwargs)
 
 
 def tokenize_jsonl(config: FineTuneConfig, splits: list[str] | None = None):
@@ -23,11 +26,10 @@ def tokenize_jsonl(config: FineTuneConfig, splits: list[str] | None = None):
     tokenizer = AutoTokenizer.from_pretrained(config.base_model)
 
     def tokenize_batch(batch):
-        return tokenizer(
+        return encode_training(
+            tokenizer,
             batch["text"],
-            truncation=True,
-            max_length=config.max_length,
-            padding="max_length",
+            config.max_length,
         )
 
     tokenized = dataset.map(tokenize_batch, batched=True)

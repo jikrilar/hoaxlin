@@ -12,7 +12,8 @@ from pathlib import Path
 from typing import Any
 
 from .config import Settings
-from .model_release import validate_release
+from .model_release import sequence_contract, validate_release
+from .preprocessing import encode_sequence
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -29,6 +30,9 @@ class Prediction:
     confidence: float
     raw_scores: dict[str, float]
     inference_ms: float
+    token_count: int | None = None
+    truncated: bool = False
+    preprocessing_version: str | None = None
 
 
 class ModelRuntime:
@@ -41,6 +45,10 @@ class ModelRuntime:
         self.temperature: float | None = None
         self.evaluation_metadata: dict[str, Any] = {}
         self.label_map: dict[int, str] = {}
+        self.preprocessing_version: str = "1.0.0"
+        self.max_sequence_length: int = settings.max_sequence_length
+        self.truncation_strategy: str = "head-only"
+        self.multi_claim_policy: str = "single-sequence-head-only"
         self._tokenizer: Any = None
         self._model: Any = None
         self._torch: Any = None
@@ -64,6 +72,7 @@ class ModelRuntime:
                     expected_version=self.settings.model_version,
                 )
                 self.model_version = release["version"]
+                self._apply_release_sequence_contract(release)
                 logger.info(
                     "Release manifest verified: version=%s files=%s model_sha256=%s",
                     release["version"],
@@ -75,6 +84,7 @@ class ModelRuntime:
             self._load_sidecars()
             self._load_evaluation_metadata()
             if not self.settings.require_release_manifest:
+                self._load_sequence_contract_from_manifest_if_available()
                 self._verify_checksum_if_available()
             self.status = "ready"
             logger.info(
@@ -89,6 +99,31 @@ class ModelRuntime:
             self.status = "failed"
             self.load_error = f"{type(exc).__name__}: {exc}"
             logger.error("Model failed to load: %s", self.load_error)
+
+    def _apply_release_sequence_contract(self, release_or_manifest: dict[str, Any]) -> None:
+        contract = sequence_contract(
+            release_or_manifest, legacy=release_or_manifest.get("schema_version") == "1.0"
+        )
+        self.preprocessing_version = contract["preprocessing_version"]
+        manifest_seq_len = contract["max_sequence_length"]
+        if manifest_seq_len is not None:
+            if self.settings.sequence_length_explicit and self.settings.max_sequence_length != manifest_seq_len:
+                raise ValueError(
+                    f"Configuration mismatch: configured max_sequence_length ({self.settings.max_sequence_length}) "
+                    f"does not match release contract ({manifest_seq_len})"
+                )
+            self.max_sequence_length = manifest_seq_len
+        self.truncation_strategy = contract["truncation_strategy"]
+        self.multi_claim_policy = contract["multi_claim_policy"]
+
+    def _load_sequence_contract_from_manifest_if_available(self) -> None:
+        source = Path(self.settings.model_path)
+        version = self.model_version or Path(source).name
+        entry = self._release_manifest_entry(source, version)
+        if isinstance(entry, dict):
+            if "preprocessing_version" not in entry and "schema_version" not in entry:
+                entry = {**entry, "schema_version": "1.0"}
+            self._apply_release_sequence_contract(entry)
 
     def _verify_model_directory(self) -> None:
         source = Path(self.settings.model_path)
@@ -395,14 +430,18 @@ class ModelRuntime:
         async with self._semaphore:
             return await asyncio.to_thread(self._predict_sync, text)
 
+    def _encode(self, text: str) -> Any:
+        return encode_sequence(
+            self._tokenizer, text, self.max_sequence_length, return_tensors="pt"
+        )
+
     def _predict_sync(self, text: str) -> Prediction:
         started = time.perf_counter()
-        encoded = self._tokenizer(
-            text,
-            return_tensors="pt",
-            truncation=True,
-            max_length=self.settings.max_sequence_length,
-        )
+        full_encoded = self._tokenizer(text, add_special_tokens=True)
+        token_count = len(full_encoded["input_ids"])
+        truncated = token_count > self.max_sequence_length
+
+        encoded = self._encode(text)
         with self._torch.inference_mode():
             logits = self._model(**encoded).logits[0]
             # Apply temperature scaling if available (for better calibrated confidence)
@@ -424,6 +463,9 @@ class ModelRuntime:
             confidence=best_confidence,
             raw_scores=raw_scores,
             inference_ms=round((time.perf_counter() - started) * 1000, 3),
+            token_count=token_count,
+            truncated=truncated,
+            preprocessing_version=self.preprocessing_version,
         )
 
     def _labels(self, count: int) -> list[str]:

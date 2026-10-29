@@ -1,0 +1,73 @@
+{
+  "task": "Q-006",
+  "status": "DONE_CONTRACT_AND_BOUNDED_FIXTURE_EVALUATION_NOT_QUALITY_IMPROVEMENT",
+  "source_commit": "40fa7106fb2510864e0611ab887196af1c1ad7dd",
+  "verified_date": "2026-10-29",
+  "owner_files_preserved": {
+    "HOAXLIN-BERT-RAG-AUDIT-TASKS.md": "e2e1b125a0ca1fba75d7d3ca6905b3a18c637fb3bb8b63cef2196eb830a23449",
+    "tests/Feature/FilamentAuditObserverTest.php": "2446116cfdd2698609c54cd458e42211e4e4336f64057d5302fa776828f29650"
+  },
+  "validation": {
+    "targeted_python": {"exit_code": 0, "passed": 37, "warnings": 2, "seconds": 16.26},
+    "targeted_laravel": {"exit_code": 0, "passed": 8, "assertions": 186, "seconds": 1.26},
+    "full_python": {
+      "exit_code": 1, "passed": 144, "failed": 5, "warnings": 2, "seconds": 25.88,
+      "unchanged_baseline_failure_tests": [
+        "test_api.py::test_readiness_200_when_ready",
+        "test_api.py::test_version_exposes_labels_and_threshold",
+        "test_api.py::test_predict_happy_path_hoax_and_valid",
+        "test_api.py::test_predict_threshold_meragukan",
+        "test_api.py::test_request_id_propagation"
+      ],
+      "failure_reason": "Hardcoded unavailable Windows model directory on Linux"
+    },
+    "full_laravel": {
+      "exit_code": 1, "passed": 759, "failed": 4, "warnings": 25,
+      "skipped": 4, "assertions": 5434, "seconds": 39.24,
+      "unchanged_baseline_failure_file": "tests/Feature/FilamentAuditObserverTest.php",
+      "failure_categories": ["user_redaction", "unknown_nested_attributes", "dataset_redaction", "submission_redaction"],
+      "skip_reason": "RealBertInferenceTest needs a background HTTP service; Python local real inference verified separately"
+    },
+    "pint": {"exit_code": 0, "files": 6},
+    "git_diff_check": {"exit_code": 0},
+    "real_frozen_inference": {"exit_code": 0, "short_and_long": true, "quality_evaluation": false},
+    "red_green": {
+      "additional_contract_regressions_failed_before_fix": 10,
+      "additional_laravel_boundary_regressions_failed_before_fix": 2,
+      "malformed_dto_failed_before_fix": true,
+      "shared_preprocessing_guards_failed_before_fix": 2
+    }
+  },
+  "limits": [
+    "Historical original training tokenizer revision/artifact unavailable; no historical run parity claim",
+    "No quality improvement measured; challenge is historical regression only",
+    "No runtime release payload modified; legacy schema 1.0 serving contract remains explicit 512 head-only",
+    "User-facing truncation disclosure and Q-007 exact-input cache/policy identity remain outside this commit",
+    "No full Laravel to HTTP BERT integration verified; local Python real inference is separate"
+  ],
+  "artifacts": {
+    "app/DataObjects/Classification.php": "3d2dfed678d688c9792b63e5164b87c43dc9260329af1388e0cfd93ff0052fbd",
+    "app/Jobs/ClassifySubmission.php": "782df49a1ef1ff6fc9378decbd1428edd8d49bce80dec46b434af2068a88aaf0",
+    "app/Services/Pipeline/InputTrace.php": "a1842dd0a6ca063244c69db983357b3783466011d0cf85606452ff2cb1577b2c",
+    "app/Services/Pipeline/SubmissionStateMachine.php": "1ddcc0367bd9b12e21c3b477beb6fb264394128d4f8a286c619ad9c735e5dbe3",
+    "bert-service/app/config.py": "800af99441051cc15c46b22ee2ab5ff764540bbf70fb7b923c7b673e982083ed",
+    "bert-service/app/contracts.py": "d2d59162f815efb30ddc975f0a53c855a4f06eddfda8310f34d1fb0d4477acfc",
+    "bert-service/app/inference.py": "285ea428ac07405818fc26c8fab79515835a4ebb066e26a48aa0b43c94b53cbf",
+    "bert-service/app/main.py": "bf74fb802bd99e244e6362fe76e063761f65ffc8fb8cc47310c4c8cb0601b18d",
+    "bert-service/app/model_release.py": "4046437dd08111610c3252899e054540b34d9bbc172575394b882e96fce7091d",
+    "bert-service/scripts/package_model_release.py": "dc66bae33c6c65b7b1d83c44964cd8d8fa460d6adec6754f9f86212d1b488a9e",
+    "bert-service/train/config.py": "22f3c047280a1010eb6daa30d1cbbb640af70467f9f7c3830aea4d717d95cd23",
+    "bert-service/train/data.py": "06de4a2c9f2b7f37a4705a59a1592648f55a7bfb17da83da904c863740d3b383",
+    "bert-service/train/evaluate.py": "a070b76465267ddf71d4adb6b16ec0708ba322afa0fd4c42be241ac5a03c41e8",
+    "bert-service/train/export.py": "b1e8888efb56c8b8b2854b62a8aaf139fb620e99d3327e3da109047dd34751c2",
+    "config/services.php": "83aa569794a4a9ed858841ae588231409ee4379f5dd13362044e4c45ca330f2f",
+    "tests/Feature/InputTraceTest.php": "cd145b54a922bf98b95a9b69545b63586ada957c8cd170ac9d1400b86b8f4a16",
+    "bert-service/app/preprocessing.py": "55ca8f00ed3ac98bbf040b9cec640dbf8e27cfde6ca6144841d255fe4f306443",
+    "bert-service/tests/test_sequence_policy.py": "c7568197244b0aa93ebd644d5ef1010071fb33509e7104ecf6cdd1b961cb055d",
+    "bert-service/train/sequence_policy.py": "ae81b04330f0435cd1a41a6cbb9137b459a60e0cb6f6bd9dcd7d2893b2636f71",
+    "reports/ai-quality/20261029-q006/execution-log.md": "9b38c34acfa21efc7bb3cbc5eeba9fa4e599c11813e3659e8af2f4b3ee936f93",
+    "reports/ai-quality/20261029-q006/measure.py": "e37d4ac38db8d37c5e89eeef3b8a4540a1c8ebf971e15d490d7304aa2bd0b2d4",
+    "reports/ai-quality/20261029-q006/measurements.json": "ae8962de7994dcefae9738a8b8f0e8560be3741c43a0e1c02f73f5d2713a299c",
+    "reports/ai-quality/20261029-q006/run-tests.sh": "694f549b2ea117162c1f9ed930f8185ce4d62a7cc42cd4ffd8539ceffa956e0b"
+  }
+}

@@ -75,6 +75,8 @@ class Settings:
     max_sequence_length: int
     local_files_only: bool
     require_release_manifest: bool = False
+    # Direct Settings construction is explicit; env defaults defer to the release.
+    sequence_length_explicit: bool = True
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -94,6 +96,7 @@ class Settings:
             max_concurrency=_positive_int("BERT_MAX_CONCURRENCY", 2),
             max_text_length=_positive_int("BERT_MAX_TEXT_LENGTH", 20_000),
             max_sequence_length=_positive_int("BERT_MAX_SEQUENCE_LENGTH", 512),
+            sequence_length_explicit="BERT_MAX_SEQUENCE_LENGTH" in os.environ,
             local_files_only=_boolean("BERT_LOCAL_FILES_ONLY", True),
             require_release_manifest=_boolean(
                 "BERT_REQUIRE_RELEASE_MANIFEST", False

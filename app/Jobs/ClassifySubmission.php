@@ -60,14 +60,29 @@ class ClassifySubmission implements ShouldBeUnique, ShouldQueue
                 return;
             }
 
+            $serviceLimit = (int) config('services.bert.max_text_length', 20000);
+            $rawAnalysis = (string) $submission->analysis_text;
+            $classifierInput = mb_strlen($rawAnalysis) > $serviceLimit
+                ? mb_substr(trim($rawAnalysis), 0, $serviceLimit)
+                : $rawAnalysis;
+
             $started = hrtime(true);
 
             try {
+                if ($serviceLimit < 1 || $serviceLimit > 20000) {
+                    throw new \InvalidArgumentException('BERT text limit must be between 1 and 20000.');
+                }
                 $state->markProcessing($submission, ProcessingStage::Classifying, $this->attempts(), [
-                    'input_trace' => ['classifier_input' => InputTrace::analysis($submission)],
+                    'input_trace' => ['classifier_input' => InputTrace::analysis($submission, classifierInput: $classifierInput)],
                 ]);
-                $classification = $classifier->classify((string) $submission->analysis_text);
-                $state->markClassified($submission, $classification, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000));
+                $classification = $classifier->classify($classifierInput);
+                $state->markClassified(
+                    $submission,
+                    $classification,
+                    $this->attempts(),
+                    (int) ((hrtime(true) - $started) / 1_000_000),
+                    classifierInput: $classifierInput,
+                );
             } catch (Throwable $exception) {
                 $this->handlePipelineFailure($submission, ProcessingStage::Classifying, $exception, $state, $this->tries, $this->backoff());
 

@@ -174,6 +174,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             model_labels=labels,
             threshold=runtime.threshold,
             temperature=runtime.temperature,
+            preprocessing_version=runtime.preprocessing_version,
+            max_sequence_length=runtime.max_sequence_length,
+            truncation_strategy=runtime.truncation_strategy,
             evaluation_model_version=runtime.evaluation_metadata.get("model_version"),
             evaluation_accuracy=runtime.evaluation_metadata.get("accuracy"),
             evaluation_macro_f1=runtime.evaluation_metadata.get("macro_f1"),
@@ -243,6 +246,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raw_scores=result.raw_scores,
             model_version=runtime.model_version or "unknown",
             inference_ms=result.inference_ms,
+            token_count=result.token_count,
+            truncated=result.truncated,
+            preprocessing_version=result.preprocessing_version or runtime.preprocessing_version,
         )
 
     return application
