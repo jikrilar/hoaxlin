@@ -1,0 +1,36 @@
+{
+  "task": "Q-009",
+  "status": "DONE_PROTOCOL_ONLY_NO_APPROVED_GROUND_TRUTH",
+  "base_commit": "fd727a08f4db25632a634c27c65632b451aa362b",
+  "branch": "quality/03-bert-data",
+  "validation": {
+    "json_parse": "PASS",
+    "local_refs_resolve": "PASS",
+    "required_properties_consistent": "PASS",
+    "full_json_schema_meta_validation": "NOT_RUN_jsonschema_unavailable_host_and_pinned_image",
+    "semantic_export_gate": "NOT_IMPLEMENTED_PROTOCOL_ONLY",
+    "full_test_suite": "NOT_RUN_DOCUMENTATION_ONLY",
+    "owner_csv_and_q008_evidence_preservation": "PASS"
+  },
+  "evidence": {
+    "url": "https://www.who.int/news-room/questions-and-answers/item/vaccines-and-immunization-vaccine-safety",
+    "retrieved_date": "2026-10-29",
+    "published_date": "2025-09-23",
+    "section": "Is there a link between vaccines and autism?",
+    "fetch": "SUCCESS",
+    "human_review": "PENDING",
+    "illustrations_benchmark_eligible": false
+  },
+  "owner_files_preserved": {
+    "HOAXLIN-BERT-RAG-AUDIT-TASKS.md": "922425f51bc248d235d5c696c100a672d801d6df05097ad8ea7d0d67d11004d7",
+    "tests/Feature/FilamentAuditObserverTest.php": "2446116cfdd2698609c54cd458e42211e4e4336f64057d5302fa776828f29650"
+  },
+  "csv_sha256": "32fc99f809a39ab6528430fb2966577ffdfbc0f6c2f6533bb420add0fb9face7",
+  "artifacts": {
+    "reports/ai-quality/20261029-q009/annotation-guide.md": "8d2c7928e40a564a0114ed9b6ef3678a1bb6612f548daffaa1809200acdf28a6",
+    "reports/ai-quality/20261029-q009/annotation.schema.json": "bb1db0a69477c9d87902d488b052d852304df56be37d813e7dec1817b79afae2",
+    "reports/ai-quality/20261029-q009/collection-plan.md": "e8c13bbc75c666d4140d1052349e75ded637cbc81cdb082021803eebd9797cf9",
+    "reports/ai-quality/20261029-q009/evidence-backed-examples.md": "4566852e8337ca562bfda63fe2f1d66329123979e20de4693e6e3c40cc9f0c43",
+    "reports/ai-quality/20261029-q009/execution-log.md": "7e73f99453152455c3029fbcd5203656ca776c6f9ff63344e0567f04a15c1dc7"
+  }
+}

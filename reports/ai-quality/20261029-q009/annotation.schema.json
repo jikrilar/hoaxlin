@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:hoaxlin:claim-annotation:v1",
+  "title": "Hoaxlin proposed claim annotation v1",
+  "description": "Structural contract only; semantic evidence and human approval require separate export review gate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "record_id", "origin", "source", "claim", "context", "evidence", "proposed_label", "final_label", "justification", "disposition", "claim_group", "event_group", "reviews", "adjudication", "review_status", "benchmark_eligible"],
+  "properties": {
+    "schema_version": {"const": "claim-annotation-v1"},
+    "record_id": {"type": "string", "minLength": 1},
+    "origin": {"enum": ["observed_source", "documented_translation", "illustrative_paraphrase", "synthetic_fixture"]},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["url", "publisher", "artifact_ref", "artifact_sha256", "published_at", "retrieved_at", "rights_status", "text_source"],
+      "properties": {
+        "url": {"type": "string", "pattern": "^https://"},
+        "publisher": {"type": "string", "minLength": 1},
+        "artifact_ref": {"type": "string", "minLength": 1},
+        "artifact_sha256": {"anyOf": [{"$ref": "#/$defs/hash"}, {"type": "null"}]},
+        "published_at": {"type": ["string", "null"]},
+        "retrieved_at": {"type": "string", "format": "date-time"},
+        "rights_status": {"enum": ["pending", "authorized_private", "redistribution_authorized", "restricted"]},
+        "text_source": {"enum": ["claim_span", "article", "ocr", "transcript", "illustration"]}
+      }
+    },
+    "claim": {
+      "type": "object", "additionalProperties": false,
+      "required": ["text", "language", "representation", "source_span", "transform_version", "translation_provenance"],
+      "properties": {
+        "text": {"type": "string", "minLength": 1},
+        "language": {"type": "string", "minLength": 2},
+        "representation": {"enum": ["verbatim", "paraphrase", "translation"]},
+        "source_span": {"anyOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["start", "end"], "properties": {"start": {"type": "integer", "minimum": 0}, "end": {"type": "integer", "minimum": 1}}}]},
+        "transform_version": {"type": "string", "minLength": 1},
+        "translation_provenance": {"type": ["string", "null"]}
+      }
+    },
+    "context": {
+      "type": "object", "additionalProperties": false,
+      "required": ["time", "place", "limitations", "topic", "style", "valid_as_of"],
+      "properties": {
+        "time": {"type": ["string", "null"]}, "place": {"type": ["string", "null"]},
+        "limitations": {"type": "string", "minLength": 1},
+        "topic": {"type": "string", "minLength": 1},
+        "style": {"enum": ["formal", "viral_message", "conversational", "other"]},
+        "valid_as_of": {"type": "string", "format": "date"}
+      }
+    },
+    "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+    "proposed_label": {"enum": ["valid", "hoax", null]},
+    "final_label": {"enum": ["valid", "hoax", null]},
+    "justification": {"type": "string", "minLength": 1},
+    "disposition": {"enum": ["binary_candidate", "abstention_candidate", "out_of_scope"]},
+    "claim_group": {"type": "string", "minLength": 1},
+    "event_group": {"type": "string", "minLength": 1},
+    "reviews": {"type": "array", "items": {"$ref": "#/$defs/review"}},
+    "adjudication": {"type": ["string", "null"], "description": "Internal human adjudication record pointer, not AI-generated approval"},
+    "review_status": {"enum": ["draft", "proposed", "in_review", "disputed", "quarantined", "approved"]},
+    "benchmark_eligible": {"type": "boolean", "default": false}
+  },
+  "allOf": [
+    {"if": {"properties": {"review_status": {"not": {"const": "approved"}}}}, "then": {"properties": {"final_label": {"type": "null"}, "benchmark_eligible": {"const": false}}}},
+    {"if": {"properties": {"benchmark_eligible": {"const": true}}}, "then": {"properties": {"review_status": {"const": "approved"}, "disposition": {"const": "binary_candidate"}, "origin": {"enum": ["observed_source", "documented_translation"]}, "final_label": {"enum": ["valid", "hoax"]}, "reviews": {"minItems": 2}, "evidence": {"minItems": 1}, "source": {"properties": {"artifact_sha256": {"$ref": "#/$defs/hash"}, "rights_status": {"enum": ["authorized_private", "redistribution_authorized"]}}}}}},
+    {"if": {"properties": {"disposition": {"enum": ["abstention_candidate", "out_of_scope"]}}}, "then": {"properties": {"final_label": {"type": "null"}, "benchmark_eligible": {"const": false}}}}
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["url", "publisher", "title", "published_at", "accessed_at", "locator", "excerpt", "relation", "artifact_sha256"],
+      "properties": {
+        "url": {"type": "string", "pattern": "^https://"},
+        "publisher": {"type": "string", "minLength": 1}, "title": {"type": "string", "minLength": 1},
+        "published_at": {"type": ["string", "null"]}, "accessed_at": {"type": "string", "format": "date"},
+        "locator": {"type": "string", "minLength": 1}, "excerpt": {"type": "string", "minLength": 1},
+        "relation": {"enum": ["supports", "refutes", "context"]},
+        "artifact_sha256": {"anyOf": [{"$ref": "#/$defs/hash"}, {"type": "null"}]}
+      }
+    },
+    "review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reviewer_id", "actor_type", "label", "confidence", "justification", "reviewed_at"],
+      "properties": {
+        "reviewer_id": {"type": "string", "minLength": 1}, "actor_type": {"const": "human"},
+        "label": {"enum": ["valid", "hoax", null]}, "confidence": {"enum": ["high", "medium", "low"]},
+        "justification": {"type": "string", "minLength": 1}, "reviewed_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}
