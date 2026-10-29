@@ -1,0 +1,1205 @@
+{
+  "task": "Q-001",
+  "observed_at_utc": "2026-10-29T07:48:28.028384+00:00",
+  "audit_sha": "3f17a203d338cec837b48e4ce24f48162f2457ec",
+  "head": "3f17a203d338cec837b48e4ce24f48162f2457ec",
+  "branch": "quality/01-baseline",
+  "status": "## quality/01-baseline\n?? HOAXLIN-BERT-RAG-AUDIT-TASKS.md\n?? reports/ai-quality/\n?? tests/Feature/FilamentAuditObserverTest.php",
+  "tracked_diff_from_audit": "",
+  "evaluation": {
+    "inference_run": false,
+    "seed": null,
+    "sample_count": 0,
+    "metrics": null,
+    "reason": "Inventory only; no quality measurement or tuning."
+  },
+  "host": {
+    "python": "3.14.8 (main, Oct 13 2026, 10:33:10) [GCC 16.2.1 20260810]",
+    "platform": "Linux-7.3.0-4-cachyos-x86_64-with-glibc2.44",
+    "cpu_count": 4,
+    "memory_total_kib": 8002676,
+    "dependencies": {
+      "torch": null,
+      "transformers": null,
+      "tokenizers": null,
+      "sentence-transformers": null,
+      "fastapi": null,
+      "uvicorn": null,
+      "pytest": null,
+      "numpy": null,
+      "scikit-learn": null,
+      "pydantic": "2.14.1"
+    }
+  },
+  "path_availability": {
+    ".env": true,
+    "bert-service/.env": false,
+    "rag-service/.env": false,
+    "vendor": false,
+    "node_modules": true,
+    "bootstrap/cache/config.php": false,
+    ".venv": false,
+    "bert-service/.venv": false,
+    "rag-service/.venv": false,
+    "models": false,
+    "artifacts": false,
+    "datasets/komdigi_hoaks.csv": false,
+    "datasets/valid_antara.csv": false,
+    "datasets/processed": false,
+    "models/runs": false
+  },
+  "allowlisted_local_config_not_live": {
+    "BERT_SERVICE_URL": {
+      "scheme": "http",
+      "host": "bert",
+      "port": 8001,
+      "credentials_present": false,
+      "path_present": false
+    },
+    "BERT_MODEL_VERSION": "v1.0.0",
+    "BERT_CONFIDENCE_THRESHOLD": "0.99",
+    "RAG_SERVICE_URL": {
+      "scheme": "http",
+      "host": "rag",
+      "port": 8002,
+      "credentials_present": false,
+      "path_present": false
+    },
+    "RAG_TOP_K": "3",
+    "RAG_MIN_SCORE": ""
+  },
+  "files": {
+    ".gitattributes": {
+      "size": 186,
+      "sha256": "a40eb27ee0b545ca5b5542daaf99fec51f84f23b3766a6353864ef2a115bc51c"
+    },
+    "AGENTS.md": {
+      "size": 23016,
+      "sha256": "cd3558f0ccda468c7ba382cc2a38bbadaca7318b858270f4556c108b64efa1d2"
+    },
+    "HOAXLIN-BERT-RAG-AUDIT-TASKS.md": {
+      "size": 73200,
+      "sha256": "da2600df7144985f4d2140c1f36cb7b1c8bd98a2d3bd7975ddd017cee68bfc88"
+    },
+    "bert-service/requirements-runtime.txt": {
+      "size": 328,
+      "sha256": "61ae5bb787b4d2e2bbd40f974345c1f3b4ecd3740d6aa73bd06e9ddf332f12dc"
+    },
+    "bert-service/requirements.txt": {
+      "size": 359,
+      "sha256": "b76ee4319520f30751adecf08b5afde5e26d8c5225a4f6a00de06f04b2a76fd0"
+    },
+    "bert-service/train/config.py": {
+      "size": 1198,
+      "sha256": "8429247f73d759323c2401e5a1f436b05ea61d418f5d9a3ef3e3044b1e124f72"
+    },
+    "composer.lock": {
+      "size": 423499,
+      "sha256": "676a084936b5299efc80be6cf6413061a4be357df02ad58a87604dfc2986ccd6"
+    },
+    "config/services.php": {
+      "size": 5531,
+      "sha256": "f9e87d04442fbc24b14e507f96347358ebff0b6d8d32ed048373a6c6993a0560"
+    },
+    "datasets/challenge/external-challenge-v1/candidates.csv": {
+      "size": 41936,
+      "sha256": "d9237395948dc42cbcfec328a4f2a74bbff73d66537bced27ef4746b76c32f7b",
+      "columns": [
+        "id",
+        "text",
+        "label",
+        "text_source",
+        "evidence_source",
+        "evidence_url",
+        "published_at",
+        "topic",
+        "verification_method",
+        "notes",
+        "approved"
+      ],
+      "record_count": 120
+    },
+    "datasets/challenge/external-challenge-v1/challenge.csv": {
+      "size": 41936,
+      "sha256": "d9237395948dc42cbcfec328a4f2a74bbff73d66537bced27ef4746b76c32f7b",
+      "columns": [
+        "id",
+        "text",
+        "label",
+        "text_source",
+        "evidence_source",
+        "evidence_url",
+        "published_at",
+        "topic",
+        "verification_method",
+        "notes",
+        "approved"
+      ],
+      "record_count": 120
+    },
+    "datasets/challenge/external-challenge-v1/collection_report.json": {
+      "size": 8672,
+      "sha256": "58ab8ebd962f96083b07025612f625e79f476656de3fe246b80edf6d13572841"
+    },
+    "datasets/challenge/external-challenge-v1/manifest.json": {
+      "size": 2814,
+      "sha256": "b5b7c033acf5ef04e92f0728aa7b5f02bdb634c359e92419771b28f9b6ea2186"
+    },
+    "datasets/challenge/external-challenge-v1/rejected.csv": {
+      "size": 43112,
+      "sha256": "e4a5a970d32907f42548c054e61326fdb50887a1e3eb27d1fc0bcdc9185fe6b4",
+      "columns": [
+        "id",
+        "text",
+        "label",
+        "text_source",
+        "evidence_source",
+        "evidence_url",
+        "published_at",
+        "topic",
+        "verification_method",
+        "notes",
+        "approved",
+        "rejection_reason",
+        "similarity",
+        "matched_id"
+      ],
+      "record_count": 129
+    },
+    "datasets/challenge/external-challenge-v1/results/abstention_evaluation.json": {
+      "size": 1479,
+      "sha256": "752572e86e55cf68b43aa9e263028322954951e79362920979f69ceb75aa2e16"
+    },
+    "datasets/challenge/external-challenge-v1/results/baseline_evaluation_report.md": {
+      "size": 3156,
+      "sha256": "58c189886d8f84ab2d791699ba73d3da7db52e2772f9551b303c9066e8cc5ab3"
+    },
+    "datasets/challenge/external-challenge-v1/results/baseline_external_confusion_matrix.png": {
+      "size": 28444,
+      "sha256": "5f002ee9fa01f9f09588538301a8285dff99f1b8dc8a6994b2a927cf2c83b2dd"
+    },
+    "datasets/challenge/external-challenge-v1/results/baseline_external_evaluation.json": {
+      "size": 2492,
+      "sha256": "6636a119ce68fb9371a0156c6c0648528f07c5c9944bf393d7f24bd3a9d99ae0"
+    },
+    "datasets/challenge/external-challenge-v1/results/baseline_external_predictions.csv": {
+      "size": 38509,
+      "sha256": "6afbdf854b99e18467be900f19b019c5ce6c3aa03859e59201a563fcb2100e4f",
+      "columns": [
+        "id",
+        "text",
+        "true_label",
+        "predicted_label",
+        "prob_valid",
+        "prob_hoax",
+        "confidence",
+        "correct",
+        "text_source",
+        "evidence_source",
+        "evidence_url",
+        "topic"
+      ],
+      "record_count": 120
+    },
+    "datasets/challenge/external-challenge-v1/results/baseline_internal_confusion_matrix.png": {
+      "size": 28959,
+      "sha256": "8a7e23c41de05c585c29c9fd7743146b15be1299cde3134755d169d4b56e1bea"
+    },
+    "datasets/challenge/external-challenge-v1/results/baseline_internal_evaluation.json": {
+      "size": 2463,
+      "sha256": "39b061597713ac0fa4d7387e72932f20a9ae51aebdc0cd9c8bb24655132baf46"
+    },
+    "datasets/challenge/external-challenge-v1/results/baseline_internal_predictions.csv": {
+      "size": 1233667,
+      "sha256": "c2e481e07e7335d0375048da9e015f9157151838c7b42068298baffd7d489ee4",
+      "columns": [
+        "id",
+        "text",
+        "true_label",
+        "predicted_label",
+        "prob_valid",
+        "prob_hoax",
+        "confidence",
+        "correct",
+        "text_source",
+        "source",
+        "url",
+        "topic"
+      ],
+      "record_count": 781
+    },
+    "datasets/challenge/external-challenge-v1/results/binary_evaluation.json": {
+      "size": 1357,
+      "sha256": "1cb5c92354338e9057c1351bbf8efc39b89b313fda6fd0e1ae8f892d0b2d7222"
+    },
+    "datasets/challenge/external-challenge-v1/results/confusion_matrix.png": {
+      "size": 27703,
+      "sha256": "8563fc686cb1cd33c8ae74cbee4ff23a633a9dd628b577d4f603ce39bed8153c"
+    },
+    "datasets/challenge/external-challenge-v1/results/error_analysis.csv": {
+      "size": 41009,
+      "sha256": "f3b48747b1eeb0149951f801016fd4acd2aa381aab4f544cf058227647cae1f7",
+      "columns": [
+        "id",
+        "text",
+        "true_label",
+        "predicted_binary_label",
+        "error_type",
+        "prob_valid",
+        "prob_hoax",
+        "confidence",
+        "served_label",
+        "abstained",
+        "text_source",
+        "evidence_source",
+        "evidence_url",
+        "topic",
+        "text_length"
+      ],
+      "record_count": 120
+    },
+    "datasets/challenge/external-challenge-v1/results/error_analysis.json": {
+      "size": 18391,
+      "sha256": "b43b858a5d3bddd0eb930ad23e0d18f822c2c665f6e7f835fff4253c7f696203"
+    },
+    "datasets/challenge/external-challenge-v1/results/error_analysis_report.md": {
+      "size": 12759,
+      "sha256": "cf9e778e018ad6f056af7778a0e14ca9b8f9c8354cad7bed81348c561e5f893f"
+    },
+    "datasets/challenge/external-challenge-v1/results/evaluation_report.md": {
+      "size": 2168,
+      "sha256": "c98e7cc4b594f3138defecf9c19e878942b347328be85c038ebc0c49aba1442e"
+    },
+    "datasets/challenge/external-challenge-v1/results/model_comparison.json": {
+      "size": 1565,
+      "sha256": "57b5c89c2193fe8ca051da72b8c8068a5f2755b181c0c5026edf4850febfd22b"
+    },
+    "datasets/challenge/external-challenge-v1/results/model_comparison.md": {
+      "size": 923,
+      "sha256": "a6941816be1745348167cec5a06d09de39502bd5795d9956de58e0bea5f32504"
+    },
+    "datasets/challenge/external-challenge-v1/results/predictions.csv": {
+      "size": 49294,
+      "sha256": "1d85ee56eb217b36a9d3e39bdd7e946797be185777744cd70aee9239cee0bf2c",
+      "columns": [
+        "id",
+        "text",
+        "true_label",
+        "predicted_binary_label",
+        "prob_valid",
+        "prob_hoax",
+        "confidence",
+        "correct",
+        "served_label",
+        "abstained",
+        "text_source",
+        "evidence_source",
+        "evidence_url",
+        "published_at",
+        "topic",
+        "verification_method",
+        "notes",
+        "approved"
+      ],
+      "record_count": 120
+    },
+    "datasets/challenge_set.json": {
+      "size": 939,
+      "sha256": "9cfd7f65ac52ad17f9aa0f1dfe3e2c982fe6b89a5e4f86f2fb7b8d1da0445308"
+    },
+    "datasets/rag/README.md": {
+      "size": 5657,
+      "sha256": "f949472e20626d90816d50aceccb37b0d3a0c7dafb3f079c45ae35160484dce6"
+    },
+    "datasets/rag/evaluation-v1/manifest.json": {
+      "size": 469,
+      "sha256": "b5079e60a7a15f5d7765d13869d278f35ae90727de6def0390bf8fb39a339ec4"
+    },
+    "datasets/rag/evaluation-v1/queries.jsonl": {
+      "size": 4490,
+      "sha256": "0010336a9a3c1060cf0d12e5ddf6772448d74a46960eb049098378cffa3bc0de",
+      "record_count": 20
+    },
+    "datasets/rag/evaluation-v1/relevance-review.md": {
+      "size": 12469,
+      "sha256": "419ec31deee205e9cc43264eacfc7db6aae50d319cdf70f1e72c80ca032ae9e8"
+    },
+    "datasets/rag/knowledge-base-v1/documents.jsonl": {
+      "size": 15599,
+      "sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2",
+      "record_count": 24
+    },
+    "datasets/rag/knowledge-base-v1/manifest.json": {
+      "size": 358,
+      "sha256": "5479f68b67624f6c94e059444cfee8925f95df0ccde4679fe3696602a8c3bedc"
+    },
+    "datasets/rag/knowledge-base-v1.1.0/documents.jsonl": {
+      "size": 55235,
+      "sha256": "2d6945ea68b2be604e8d2737cfbed5f33e6c2d61fa468b5cc2a5aafc3daf4bdc",
+      "record_count": 98
+    },
+    "datasets/rag/knowledge-base-v1.1.0/manifest.json": {
+      "size": 358,
+      "sha256": "4f2f110e9dbc01186512f96217146eabbe8b71248843690ab7d8a4952b2f0b27"
+    },
+    "datasets/rag/knowledge-base-v1.1.0/review-report.md": {
+      "size": 68884,
+      "sha256": "d457439488869d55575054bd560be5c3894030408c850804ef0a4a5906565c79"
+    },
+    "datasets/rag/knowledge-base-v1.1.1/documents.jsonl": {
+      "size": 35372,
+      "sha256": "c937f0ac221b3d6fd5ce829a969c0712832e1c873959ed531ff8bc363366877d",
+      "record_count": 61
+    },
+    "datasets/rag/knowledge-base-v1.1.1/manifest.json": {
+      "size": 358,
+      "sha256": "a967c55cfff029872b8e12aa4e4836965d9f1c3e07ee3ab487d72b668a89c239"
+    },
+    "datasets/rag/knowledge-base-v1.1.1/review-report.md": {
+      "size": 42881,
+      "sha256": "61370e7b849a34094fe99f5560ec360eb67cadb885aa9e1ac283952bfb1096db"
+    },
+    "docker-compose.yml": {
+      "size": 9108,
+      "sha256": "43e6135ea831fd167e43c94302b620fb9db12a702fa791ec047ca952041aa9bd"
+    },
+    "package-lock.json": {
+      "size": 83903,
+      "sha256": "af94944e8a5e45318cbb7750d1623aa097f888db830f5bb231a147a418d0a683"
+    },
+    "rag-service/requirements.txt": {
+      "size": 78,
+      "sha256": "a311641c1e58c9a1ccc2f7275af8aa0cff6c6535221b5f885d3619276468d093"
+    },
+    "reports/rag-retrieval-evaluation-v1.1.1.json": {
+      "size": 15496,
+      "sha256": "0f6255c4bed3a3dcd0dba35dbcb427fa2eb5860406d725de6b95c4251a5b019f"
+    },
+    "reports/rag-retrieval-evaluation-v1.json": {
+      "size": 4741,
+      "sha256": "c0f8129468a10cbf458cec8b20f22240a4eecf7bc43f6cdddd33d0c8473eda4b"
+    },
+    "tests/Feature/FilamentAuditObserverTest.php": {
+      "size": 7207,
+      "sha256": "2446116cfdd2698609c54cd458e42211e4e4336f64057d5302fa776828f29650"
+    }
+  },
+  "manifests": {
+    "datasets/challenge/external-challenge-v1/manifest.json": {
+      "dataset_name": "external-challenge",
+      "version": "1.0.0",
+      "created_at": "2026-09-21T10:43:51.310651+00:00",
+      "rows": 120,
+      "labels": {
+        "hoax": 60,
+        "valid": 60
+      },
+      "sources": {
+        "TurnBackHoax / MAFINDO": 20,
+        "CekFakta": 20,
+        "AFP Fact Check Indonesia": 20,
+        "Bank Indonesia": 20,
+        "BMKG": 20,
+        "Kementerian Kesehatan RI": 20
+      },
+      "date_range": {
+        "min": "2026-07-30",
+        "max": "2026-09-21"
+      },
+      "temporal": {
+        "reference_date": "2026-08-20",
+        "count_strictly_after": 112,
+        "count_on_or_after": 114,
+        "note": "Samples were prioritized after the training-dataset creation date; not all records are a strict temporal holdout."
+      },
+      "file": {
+        "name": "challenge.csv",
+        "path": "datasets/challenge/external-challenge-v1/challenge.csv",
+        "sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708",
+        "encoding": "UTF-8 with BOM",
+        "newline": "CRLF",
+        "columns": [
+          "id",
+          "text",
+          "label",
+          "text_source",
+          "evidence_source",
+          "evidence_url",
+          "published_at",
+          "topic",
+          "verification_method",
+          "notes",
+          "approved"
+        ]
+      },
+      "quality": {
+        "exact_duplicates": 0,
+        "near_duplicate_threshold": 0.65,
+        "training_overlap_at_or_above_threshold": 0,
+        "challenge_overlap_at_or_above_threshold": 0,
+        "max_similarity_vs_training": {
+          "similarity": 0.14893617021276595,
+          "candidate_id": "afp-C4AR4CR",
+          "training_id": "komdigi:64813"
+        },
+        "max_similarity_inside_challenge": {
+          "similarity": 0.5714285714285714,
+          "left_id": "bank_indonesia-sp_2818126",
+          "right_id": "bank_indonesia-sp_2817626"
+        },
+        "missing_required_fields": 0,
+        "verdict_leakage": 0,
+        "unique_ids": true
+      },
+      "collection_review": {
+        "source_discovered_records": 293,
+        "source_fetched_records": 265,
+        "source_parsed_records": 249,
+        "candidate_rows": 120,
+        "rejected_rows": 129,
+        "approved_rows": 120,
+        "rejections_by_reason": {
+          "exact_duplicate": 36,
+          "source_quota_exceeded": 88,
+          "semantic_duplicate_manual": 5
+        },
+        "review_status": {
+          "approved": true,
+          "approved_count": 120,
+          "unapproved_ids": [],
+          "basis": "explicit fact-check verdict for hoax and official primary source for valid; final quality validation passed"
+        }
+      },
+      "source_snapshot": {
+        "path": "datasets/challenge/external-challenge-v1/candidates.csv",
+        "filter": "approved == 1",
+        "selected_rows": 120,
+        "text_and_labels_changed": false
+      },
+      "usage_policy": {
+        "evaluation_only": true,
+        "statement": "This frozen dataset is for external evaluation only. It is not used for training, validation, calibration, or threshold tuning. Do not modify it after model results are observed."
+      }
+    },
+    "datasets/rag/evaluation-v1/manifest.json": {
+      "dataset_name": "hoaxlin-rag-retrieval-evaluation",
+      "version": "1.0.0",
+      "schema_version": "1.0.0",
+      "query_count": 20,
+      "queries": {
+        "path": "queries.jsonl",
+        "sha256": "0010336a9a3c1060cf0d12e5ddf6772448d74a46960eb049098378cffa3bc0de"
+      },
+      "corpus": {
+        "path": "../knowledge-base-v1",
+        "version": "1.0.0",
+        "documents_sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2"
+      },
+      "evaluation_script_version": "1.0.0"
+    },
+    "datasets/rag/knowledge-base-v1/manifest.json": {
+      "dataset_name": "hoaxlin-rag-knowledge-base",
+      "version": "1.0.0",
+      "schema_version": "1.0.0",
+      "document_count": 24,
+      "documents": {
+        "path": "documents.jsonl",
+        "sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2"
+      },
+      "provenance": {
+        "source_type": "original_publication_url",
+        "local_input_files": []
+      }
+    },
+    "datasets/rag/knowledge-base-v1.1.0/manifest.json": {
+      "dataset_name": "hoaxlin-rag-knowledge-base",
+      "version": "1.1.0",
+      "schema_version": "1.0.0",
+      "document_count": 98,
+      "documents": {
+        "path": "documents.jsonl",
+        "sha256": "2d6945ea68b2be604e8d2737cfbed5f33e6c2d61fa468b5cc2a5aafc3daf4bdc"
+      },
+      "provenance": {
+        "source_type": "original_publication_url",
+        "local_input_files": []
+      }
+    },
+    "datasets/rag/knowledge-base-v1.1.1/manifest.json": {
+      "dataset_name": "hoaxlin-rag-knowledge-base",
+      "version": "1.1.1",
+      "schema_version": "1.0.0",
+      "document_count": 61,
+      "documents": {
+        "path": "documents.jsonl",
+        "sha256": "c937f0ac221b3d6fd5ce829a969c0712832e1c873959ed531ff8bc363366877d"
+      },
+      "provenance": {
+        "source_type": "original_publication_url",
+        "local_input_files": []
+      }
+    }
+  },
+  "kb_validation_stdout": "Knowledge base valid: 61 documents",
+  "compose_ps_stdout": "",
+  "images": {
+    "hoaxlin-bert:v1.0.0": "\"sha256:046ca71ead3af0bbb8a6be04e109f41b86dc29e1314eb19f899f46c53cafd688\" [\"hoaxlin-bert@sha256:046ca71ead3af0bbb8a6be04e109f41b86dc29e1314eb19f899f46c53cafd688\"] \"2026-09-14T15:33:23.844804887Z\" 2615723913",
+    "hoaxlin-rag:local": "\"sha256:826666a6ff0ee45de6251b250a7d3e368d2813710d724ecac584b58cf548a98b\" [\"hoaxlin-rag@sha256:826666a6ff0ee45de6251b250a7d3e368d2813710d724ecac584b58cf548a98b\"] \"2026-10-05T20:47:00.986634698+07:00\" 2893206012",
+    "hoaxlin-app:local": "\"sha256:35a8f57a7eff53ab6073d6b7642bceef30ee4dea87e8d8c1ef016a943d106dc7\" [\"hoaxlin-app@sha256:35a8f57a7eff53ab6073d6b7642bceef30ee4dea87e8d8c1ef016a943d106dc7\"] \"2026-10-15T13:45:17.099996104+07:00\" 970590546",
+    "hoaxlin-app:test-rc006": "\"sha256:7a9c88f9b9345037ef841e4366bc31abe57b7ef29bdd449b9f7f599bfd9e7eb3\" [\"hoaxlin-app@sha256:7a9c88f9b9345037ef841e4366bc31abe57b7ef29bdd449b9f7f599bfd9e7eb3\"] \"2026-10-25T14:00:11.655385684+07:00\" 1046909465"
+  },
+  "bert_image_payload": {
+    "python": "3.12.12 (main, Feb 24 2026, 20:29:11) [GCC 12.2.0]",
+    "source_files": {
+      "app/__init__.py": {
+        "size": 34,
+        "sha256": "35ec7810a74a7b396ad9cce3321980f32d5a1fb0bf9be7bcb645f427fdaad7ba"
+      },
+      "app/config.py": {
+        "size": 3405,
+        "sha256": "8f36abde0af29427a2c2340f02d16022094bd56a06e8d86d85e78823b9f41e0f"
+      },
+      "app/contracts.py": {
+        "size": 1275,
+        "sha256": "a8f312ec1527737e0c039fe915ae7c444fa1711669843454106a424e6e4d9c22"
+      },
+      "app/inference.py": {
+        "size": 13607,
+        "sha256": "9301deaeb51b24ebf1fdf00e02347ca776f29fc2313463ef51f6629e49d4f5b7"
+      },
+      "app/main.py": {
+        "size": 9393,
+        "sha256": "ae3161ba697a0a3e1bba5105eedfa9594d6cc63e53cc7db6943a2fd057cb5e5c"
+      },
+      "app/model_release.py": {
+        "size": 9715,
+        "sha256": "350d610dd90359ad66af8bd053a413763e8bbebc5efa92699ff8247680fff3fe"
+      }
+    },
+    "validation": {
+      "path": "/app/models/indobert-hoax/v1.0.0",
+      "version": "v1.0.0",
+      "files": 8,
+      "payload_size": 498522007,
+      "model_sha256": "0fea71d7d5fd18c61f4e854d1059bb19ce62e3ec3f573718166417e18f2a1e40",
+      "architecture": "BertForSequenceClassification",
+      "num_labels": 2,
+      "id2label": {
+        "0": "valid",
+        "1": "hoax"
+      },
+      "label2id": {
+        "valid": 0,
+        "hoax": 1
+      },
+      "threshold": 0.99,
+      "temperature": 0.8706620666110391
+    },
+    "manifest": {
+      "architecture": "BertForSequenceClassification",
+      "calibration": {
+        "method": "temperature_scaling",
+        "temperature": 0.8706620666110391
+      },
+      "critical_files": [
+        "model.safetensors",
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "threshold.json",
+        "calibration.json"
+      ],
+      "files": {
+        "MODEL_CARD.md": {
+          "sha256": "73f9c99e218e0d8cc7365d2106af68385de2dad3dcc6d20ddc2f2d1ec3d6f1b3",
+          "size": 803
+        },
+        "calibration.json": {
+          "sha256": "47bbeee876f89a2d75f8641c19b8743ed023908df4b18b74b31ad4801e1be21e",
+          "size": 68
+        },
+        "config.json": {
+          "sha256": "d86612009986dd90b07ca9acecb12cb206e26dda9a29ef2f61d9e8b1ba416456",
+          "size": 1332
+        },
+        "evaluation.json": {
+          "sha256": "60c6704f66c961ac9db403497c0a5b9a387c089e26146898c50c303b3ed5fae9",
+          "size": 975
+        },
+        "model.safetensors": {
+          "sha256": "0fea71d7d5fd18c61f4e854d1059bb19ce62e3ec3f573718166417e18f2a1e40",
+          "size": 497795072
+        },
+        "threshold.json": {
+          "sha256": "3e16e8f0839721c8e59fccc4e497c27a80d9e04edd2d8e92e79974f91ef2591a",
+          "size": 14336
+        },
+        "tokenizer.json": {
+          "sha256": "da8791ba8d7a1459108876b0a0e105c5df39929cc8e7826499f63e74239b0181",
+          "size": 709027
+        },
+        "tokenizer_config.json": {
+          "sha256": "81d76ff64c6837a77a26739668e51d61831f35d35e8a7043673b2c614a43c982",
+          "size": 394
+        }
+      },
+      "labels": [
+        "valid",
+        "hoax"
+      ],
+      "local_files_only": true,
+      "model": "indobert-hoax",
+      "num_labels": 2,
+      "provenance": {
+        "base_model": "indobenchmark/indobert-base-p1",
+        "exported_at": "2026-08-21T01:03:52.509812+00:00",
+        "kind": "versioned-export",
+        "source_checkpoint": "checkpoint-391",
+        "source_export_version": "1.0.0",
+        "source_manifest_sha256": "1ca6b737fbf4a6e541e0e57b083330bf9495d5114c0a456f671e5c6776fe440c"
+      },
+      "redistribution": {
+        "public_release": "not_verified"
+      },
+      "schema_version": "1.0",
+      "task": "text-classification",
+      "threshold": 0.99,
+      "version": "v1.0.0"
+    },
+    "manifest_identity": {
+      "size": 2047,
+      "sha256": "25d740d8f06dfc9b7727e623f9bddb9de6be5e37b86d3c11a19a647cd67ccd72"
+    },
+    "model_card": "# indobert-hoax v1.0.0\n\nFine-tuned indobenchmark/indobert-base-p1 for binary Indonesian hoax/valid classification.\n\n- Labels: ['valid', 'hoax'] (id2label {0: 'valid', 1: 'hoax'})\n- Dataset: komdigi-antara v1.0.0 (Komdigi hoax clarifications + Antara news)\n- Training: 4 epochs max, early stopping on validation macro-F1,\n  checkpoint selection by validation macro-F1\n- Calibration: temperature scaling (see calibration.json)\n- meragukan threshold: see threshold.json (confidence below it is reported\n  as \"meragukan\" by the serving layer)\n\n## Serving contract\n\n`AutoModelForSequenceClassification` + `AutoTokenizer` from this directory.\nLogits -> probabilities via softmax(logits / T). Confidence = max probability.\nLabel = id2label[argmax] if confidence >= threshold else \"meragukan\".\n",
+    "tokenizer_config": {
+      "backend": "tokenizers",
+      "cls_token": "[CLS]",
+      "do_lower_case": true,
+      "is_local": false,
+      "local_files_only": false,
+      "mask_token": "[MASK]",
+      "model_max_length": 1000000000000000019884624838656,
+      "pad_token": "[PAD]",
+      "sep_token": "[SEP]",
+      "strip_accents": null,
+      "tokenize_chinese_chars": true,
+      "tokenizer_class": "BertTokenizer",
+      "unk_token": "[UNK]"
+    },
+    "calibration": {
+      "temperature": 0.8706620666110391,
+      "method": "temperature_scaling"
+    },
+    "threshold_summary": {
+      "threshold": 0.99,
+      "accuracy": 1.0,
+      "coverage": 1.0,
+      "abstain_rate": 0.0,
+      "n_covered": 782,
+      "n_total": 782
+    },
+    "evaluation_historical_not_rerun": {
+      "n": 781,
+      "class_names": [
+        "valid",
+        "hoax"
+      ],
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "per_class": {
+        "valid": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "hoax": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          398,
+          0
+        ],
+        [
+          0,
+          383
+        ]
+      ],
+      "auc": {
+        "valid": 1.0,
+        "hoax": 1.0
+      },
+      "calibration": {
+        "temperature": 0.8706620666110391,
+        "ece_raw": 0.0007326602935791016,
+        "ece_calibrated": 0.0005506438116105357,
+        "brier_raw": 0.0003937674919143319,
+        "brier_calibrated": 0.0003632764855865389,
+        "reliability": [
+          {
+            "confidence": 0.6234,
+            "accuracy": 1.0,
+            "count": 1
+          },
+          {
+            "confidence": 0.9999,
+            "accuracy": 1.0,
+            "count": 780
+          }
+        ]
+      }
+    },
+    "dependencies": {
+      "torch": "2.13.0+cpu",
+      "transformers": "5.14.1",
+      "tokenizers": "0.22.2",
+      "fastapi": "0.136.3",
+      "uvicorn": "0.52.0",
+      "pydantic": "2.13.4",
+      "pytest": null,
+      "numpy": "2.5.1",
+      "scikit-learn": null
+    },
+    "source_comparison_to_checkout": {
+      "app/__init__.py": {
+        "checkout_sha256": "35ec7810a74a7b396ad9cce3321980f32d5a1fb0bf9be7bcb645f427fdaad7ba",
+        "image_sha256": "35ec7810a74a7b396ad9cce3321980f32d5a1fb0bf9be7bcb645f427fdaad7ba",
+        "matches": true
+      },
+      "app/config.py": {
+        "checkout_sha256": "8f36abde0af29427a2c2340f02d16022094bd56a06e8d86d85e78823b9f41e0f",
+        "image_sha256": "8f36abde0af29427a2c2340f02d16022094bd56a06e8d86d85e78823b9f41e0f",
+        "matches": true
+      },
+      "app/contracts.py": {
+        "checkout_sha256": "70334c456d40b0edc32c3e00db00cf4ae3c549eed53467862e8b03396ce7d620",
+        "image_sha256": "a8f312ec1527737e0c039fe915ae7c444fa1711669843454106a424e6e4d9c22",
+        "matches": false
+      },
+      "app/inference.py": {
+        "checkout_sha256": "1eafb67586dabe064d6bf8cd8ca632bbcfdc13c0cbffdb4e40922f9a1184a3ec",
+        "image_sha256": "9301deaeb51b24ebf1fdf00e02347ca776f29fc2313463ef51f6629e49d4f5b7",
+        "matches": false
+      },
+      "app/main.py": {
+        "checkout_sha256": "80ca0e18ef45ca320e94cc8c6eed26a1511cc9eb90224a36f88ab2c483e745fc",
+        "image_sha256": "ae3161ba697a0a3e1bba5105eedfa9594d6cc63e53cc7db6943a2fd057cb5e5c",
+        "matches": false
+      },
+      "app/model_release.py": {
+        "checkout_sha256": "350d610dd90359ad66af8bd053a413763e8bbebc5efa92699ff8247680fff3fe",
+        "image_sha256": "350d610dd90359ad66af8bd053a413763e8bbebc5efa92699ff8247680fff3fe",
+        "matches": true
+      }
+    }
+  },
+  "rag_image_payload": {
+    "python": "3.12.12 (main, Feb 24 2026, 20:29:11) [GCC 12.2.0]",
+    "source_files": {
+      "app/__init__.py": {
+        "size": 48,
+        "sha256": "5f521360faac3cd9ad76aaaa4393caaae16f3da90326623655042641e539dbd0"
+      },
+      "app/config.py": {
+        "size": 335,
+        "sha256": "4556992cf74612fdad74f2628f0d30b9872338de176fdc2748b18ee1690f96c6"
+      },
+      "app/embedding.py": {
+        "size": 1336,
+        "sha256": "3d37ad37476c5c861134f7de47291b56b34dbfee91b786405eb9734b976278b2"
+      },
+      "app/index.py": {
+        "size": 3800,
+        "sha256": "a1840251204ce229fc0ed386ec7097b07ebf09cd08e9a452cb2582d6f1087e52"
+      },
+      "app/knowledge_base.py": {
+        "size": 1913,
+        "sha256": "c5f41ce2fe245072098125f85c7dff531e8b444ff8ee9c0a98f68edc6850bec8"
+      },
+      "app/main.py": {
+        "size": 6026,
+        "sha256": "879e2c5d575954b5f9e5ad28b123b26591472d9abedafade14aa75bc7b454782"
+      },
+      "app/prepare_model.py": {
+        "size": 421,
+        "sha256": "7035cbcf860909e6b03a166b52f5b46c6c82de596da24ae097c247316b3eb52e"
+      }
+    },
+    "knowledge_base": {
+      "path": "/app/datasets/rag/knowledge-base-v1.1.1",
+      "version": "1.1.1",
+      "document_count": 61,
+      "sha256": "c937f0ac221b3d6fd5ce829a969c0712832e1c873959ed531ff8bc363366877d"
+    },
+    "embedding": {
+      "id": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "revision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42",
+      "path": "/opt/huggingface/hub/models--sentence-transformers--paraphrase-multilingual-MiniLM-L12-v2/snapshots/e8f8c211226b894fcb81acc59f3b34ba3efd5f42",
+      "files": {
+        "1_Pooling/config.json": {
+          "size": 190,
+          "sha256": "4be450dde3b0273bb9787637cfbd28fe04a7ba6ab9d36ac48e92b11e350ffc23"
+        },
+        "README.md": {
+          "size": 3888,
+          "sha256": "1e98ea05b0de579fcaad3d625b62ea55647142ed674d5f5ebf1440e4bbbb6f23"
+        },
+        "config.json": {
+          "size": 645,
+          "sha256": "6300193cb75e01cf80c96decef7187dfb33094d97cc1490b7ead6ff134476e4e"
+        },
+        "config_sentence_transformers.json": {
+          "size": 122,
+          "sha256": "b8c64b5cece00d8424b4896ea75b512b6008576088497609dfeb6bd63e6d36b8"
+        },
+        "model.safetensors": {
+          "size": 470641600,
+          "sha256": "eaa086f0ffee582aeb45b36e34cdd1fe2d6de2bef61f8a559a1bbc9bd955917b"
+        },
+        "modules.json": {
+          "size": 229,
+          "sha256": "8f4b264b80206c830bebbdcae377e137925650a433b689343a63bdc9b3145460"
+        },
+        "sentence_bert_config.json": {
+          "size": 53,
+          "sha256": "70f4448f31320443fe3557cacea5abf2dcc4915dda8c80646bec9f3bb0aa5a1f"
+        },
+        "special_tokens_map.json": {
+          "size": 239,
+          "sha256": "378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d"
+        },
+        "tokenizer.json": {
+          "size": 9081518,
+          "sha256": "2c3387be76557bd40970cec13153b3bbf80407865484b209e655e5e4729076b8"
+        },
+        "tokenizer_config.json": {
+          "size": 526,
+          "sha256": "5036ea374ffedd706e3bef33e2e0d6953cb868ef8a490e76e32ba0faa37a6b9b"
+        }
+      },
+      "sequence_config": {
+        "max_seq_length": 128,
+        "do_lower_case": false
+      }
+    },
+    "dependencies": {
+      "torch": "2.13.0+cpu",
+      "transformers": "5.18.0",
+      "tokenizers": "0.23.2",
+      "sentence-transformers": "5.7.0",
+      "fastapi": "0.142.2",
+      "uvicorn": "0.54.0",
+      "numpy": "2.5.3",
+      "scikit-learn": "1.9.1",
+      "pydantic": "2.13.5",
+      "pytest": null
+    },
+    "source_comparison_to_checkout": {
+      "app/__init__.py": {
+        "checkout_sha256": "5f521360faac3cd9ad76aaaa4393caaae16f3da90326623655042641e539dbd0",
+        "image_sha256": "5f521360faac3cd9ad76aaaa4393caaae16f3da90326623655042641e539dbd0",
+        "matches": true
+      },
+      "app/config.py": {
+        "checkout_sha256": "4556992cf74612fdad74f2628f0d30b9872338de176fdc2748b18ee1690f96c6",
+        "image_sha256": "4556992cf74612fdad74f2628f0d30b9872338de176fdc2748b18ee1690f96c6",
+        "matches": true
+      },
+      "app/embedding.py": {
+        "checkout_sha256": "3d37ad37476c5c861134f7de47291b56b34dbfee91b786405eb9734b976278b2",
+        "image_sha256": "3d37ad37476c5c861134f7de47291b56b34dbfee91b786405eb9734b976278b2",
+        "matches": true
+      },
+      "app/index.py": {
+        "checkout_sha256": "a1840251204ce229fc0ed386ec7097b07ebf09cd08e9a452cb2582d6f1087e52",
+        "image_sha256": "a1840251204ce229fc0ed386ec7097b07ebf09cd08e9a452cb2582d6f1087e52",
+        "matches": true
+      },
+      "app/knowledge_base.py": {
+        "checkout_sha256": "c5f41ce2fe245072098125f85c7dff531e8b444ff8ee9c0a98f68edc6850bec8",
+        "image_sha256": "c5f41ce2fe245072098125f85c7dff531e8b444ff8ee9c0a98f68edc6850bec8",
+        "matches": true
+      },
+      "app/main.py": {
+        "checkout_sha256": "879e2c5d575954b5f9e5ad28b123b26591472d9abedafade14aa75bc7b454782",
+        "image_sha256": "879e2c5d575954b5f9e5ad28b123b26591472d9abedafade14aa75bc7b454782",
+        "matches": true
+      },
+      "app/prepare_model.py": {
+        "checkout_sha256": "7035cbcf860909e6b03a166b52f5b46c6c82de596da24ae097c247316b3eb52e",
+        "image_sha256": "7035cbcf860909e6b03a166b52f5b46c6c82de596da24ae097c247316b3eb52e",
+        "matches": true
+      }
+    }
+  },
+  "loopback_probes": [
+    {
+      "url": "http://127.0.0.1:8001/version",
+      "available": false,
+      "error_type": "ConnectionRefusedError"
+    },
+    {
+      "url": "http://127.0.0.1:8001/health/ready",
+      "available": false,
+      "error_type": "ConnectionRefusedError"
+    },
+    {
+      "url": "http://127.0.0.1:8002/version",
+      "available": false,
+      "error_type": "ConnectionRefusedError"
+    },
+    {
+      "url": "http://127.0.0.1:8002/health/ready",
+      "available": false,
+      "error_type": "ConnectionRefusedError"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.007,
+      "stdout": "3f17a203d338cec837b48e4ce24f48162f2457ec",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.006,
+      "stdout": "quality/01-baseline",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--short",
+        "--branch"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.009,
+      "stdout": "## quality/01-baseline\n?? HOAXLIN-BERT-RAG-AUDIT-TASKS.md\n?? reports/ai-quality/\n?? tests/Feature/FilamentAuditObserverTest.php",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--stat",
+        "3f17a203d338cec837b48e4ce24f48162f2457ec"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.005,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "php",
+        "-v"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.132,
+      "stdout": "PHP 8.5.12 (cli) (built: Oct 21 2026 20:05:19) (NTS)\nCopyright (c) The PHP Group\nZend Engine v4.5.12, Copyright (c) Zend Technologies\n    with Zend OPcache v8.5.12, Copyright (c), by Zend Technologies",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.064,
+      "stdout": "v26.12.1",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.147,
+      "stdout": "12.2.1",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "version",
+        "--format",
+        "{{json .}}"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.059,
+      "stdout": "{\"Client\":{\"Version\":\"29.9.2\",\"ApiVersion\":\"1.56\",\"DefaultAPIVersion\":\"1.56\",\"GitCommit\":\"a82e528901\",\"GoVersion\":\"go1.27.3-X:nodwarf5\",\"Os\":\"linux\",\"Arch\":\"amd64\",\"BuildTime\":\"Tue Oct 20 23:56:35 2026\",\"Context\":\"default\"},\"Server\":{\"Platform\":{\"Name\":\"\"},\"Version\":\"29.9.2\",\"ApiVersion\":\"1.56\",\"MinAPIVersion\":\"1.40\",\"Os\":\"linux\",\"Arch\":\"amd64\",\"Components\":[{\"Name\":\"Engine\",\"Version\":\"29.9.2\",\"Details\":{\"ApiVersion\":\"1.56\",\"Arch\":\"amd64\",\"BuildTime\":\"Tue Oct 20 23:56:35 2026\",\"Experimental\":\"false\",\"GitCommit\":\"0367cbeb49\",\"GoVersion\":\"go1.27.3-X:nodwarf5\",\"KernelVersion\":\"7.3.0-4-cachyos\",\"MinAPIVersion\":\"1.40\",\"Module\":\"github.com/moby/moby/v2\",\"ModuleVersion\":\"v2.0.0+unknown\",\"Os\":\"linux\"}},{\"Name\":\"containerd\",\"Version\":\"v2.4.2\",\"Details\":{\"GitCommit\":\"b7a25261e029d68978bbf290df0a62fc819b3c51.m\"}},{\"Name\":\"runc\",\"Version\":\"1.5.2\",\"Details\":{\"GitCommit\":\"1.5.2-1-0-g17cc947-dirty\"}},{\"Name\":\"docker-init\",\"Version\":\"0.19.0\",\"Details\":{\"GitCommit\":\"de40ad0\"}}],\"GitCommit\":\"0367cbeb49\",\"GoVersion\":\"go1.27.3-X:nodwarf5\",\"KernelVersion\":\"7.3.0-4-cachyos\",\"BuildTime\":\"2026-10-20T23:56:35.000000000+00:00\"}}",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validate_rag_knowledge_base.py"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.135,
+      "stdout": "Knowledge base valid: 61 documents",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "compose",
+        "ps",
+        "--all",
+        "--format",
+        "json"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.16,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .RepoDigests}} {{json .Created}} {{json .Size}}",
+        "hoaxlin-bert:v1.0.0"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.176,
+      "stdout": "\"sha256:046ca71ead3af0bbb8a6be04e109f41b86dc29e1314eb19f899f46c53cafd688\" [\"hoaxlin-bert@sha256:046ca71ead3af0bbb8a6be04e109f41b86dc29e1314eb19f899f46c53cafd688\"] \"2026-09-14T15:33:23.844804887Z\" 2615723913",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .RepoDigests}} {{json .Created}} {{json .Size}}",
+        "hoaxlin-rag:local"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.112,
+      "stdout": "\"sha256:826666a6ff0ee45de6251b250a7d3e368d2813710d724ecac584b58cf548a98b\" [\"hoaxlin-rag@sha256:826666a6ff0ee45de6251b250a7d3e368d2813710d724ecac584b58cf548a98b\"] \"2026-10-05T20:47:00.986634698+07:00\" 2893206012",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .RepoDigests}} {{json .Created}} {{json .Size}}",
+        "hoaxlin-app:local"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.097,
+      "stdout": "\"sha256:35a8f57a7eff53ab6073d6b7642bceef30ee4dea87e8d8c1ef016a943d106dc7\" [\"hoaxlin-app@sha256:35a8f57a7eff53ab6073d6b7642bceef30ee4dea87e8d8c1ef016a943d106dc7\"] \"2026-10-15T13:45:17.099996104+07:00\" 970590546",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .Id}} {{json .RepoDigests}} {{json .Created}} {{json .Size}}",
+        "hoaxlin-app:test-rc006"
+      ],
+      "stdin": null,
+      "exit_code": 0,
+      "seconds": 0.118,
+      "stdout": "\"sha256:7a9c88f9b9345037ef841e4366bc31abe57b7ef29bdd449b9f7f599bfd9e7eb3\" [\"hoaxlin-app@sha256:7a9c88f9b9345037ef841e4366bc31abe57b7ef29bdd449b9f7f599bfd9e7eb3\"] \"2026-10-25T14:00:11.655385684+07:00\" 1046909465",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--pull=never",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--entrypoint",
+        "python",
+        "-i",
+        "sha256:046ca71ead3af0bbb8a6be04e109f41b86dc29e1314eb19f899f46c53cafd688",
+        "-"
+      ],
+      "stdin": "\nimport hashlib, importlib.metadata as m, json, sys\nfrom pathlib import Path\ndef file_info(p):\n    h = hashlib.sha256()\n    with p.open('rb') as f:\n        for chunk in iter(lambda: f.read(1 << 20), b''): h.update(chunk)\n    return {'size': p.stat().st_size, 'sha256': h.hexdigest()}\ndef versions(names):\n    result = {}\n    for name in names:\n        try: result[name] = m.version(name)\n        except m.PackageNotFoundError: result[name] = None\n    return result\nresult = {'python': sys.version, 'source_files': {str(p): file_info(p) for p in sorted(Path('app').glob('*.py'))}}\n\nfrom app.model_release import validate_release\nroot = Path('/app/models/indobert-hoax/v1.0.0')\nresult['validation'] = validate_release(root, expected_version='v1.0.0')\nresult['manifest'] = json.loads((root / 'manifest.json').read_text())\nresult['manifest_identity'] = file_info(root / 'manifest.json')\nresult['model_card'] = (root / 'MODEL_CARD.md').read_text()\nresult['tokenizer_config'] = json.loads((root / 'tokenizer_config.json').read_text())\nresult['calibration'] = json.loads((root / 'calibration.json').read_text())\nresult['threshold_summary'] = {k: v for k, v in json.loads((root / 'threshold.json').read_text()).items() if k != 'search'}\nresult['evaluation_historical_not_rerun'] = json.loads((root / 'evaluation.json').read_text())\nresult['dependencies'] = versions(['torch', 'transformers', 'tokenizers', 'fastapi', 'uvicorn', 'pydantic', 'pytest', 'numpy', 'scikit-learn'])\nprint(json.dumps(result))\n",
+      "exit_code": 0,
+      "seconds": 5.686,
+      "stdout": "{\"python\": \"3.12.12 (main, Feb 24 2026, 20:29:11) [GCC 12.2.0]\", \"source_files\": {\"app/__init__.py\": {\"size\": 34, \"sha256\": \"35ec7810a74a7b396ad9cce3321980f32d5a1fb0bf9be7bcb645f427fdaad7ba\"}, \"app/config.py\": {\"size\": 3405, \"sha256\": \"8f36abde0af29427a2c2340f02d16022094bd56a06e8d86d85e78823b9f41e0f\"}, \"app/contracts.py\": {\"size\": 1275, \"sha256\": \"a8f312ec1527737e0c039fe915ae7c444fa1711669843454106a424e6e4d9c22\"}, \"app/inference.py\": {\"size\": 13607, \"sha256\": \"9301deaeb51b24ebf1fdf00e02347ca776f29fc2313463ef51f6629e49d4f5b7\"}, \"app/main.py\": {\"size\": 9393, \"sha256\": \"ae3161ba697a0a3e1bba5105eedfa9594d6cc63e53cc7db6943a2fd057cb5e5c\"}, \"app/model_release.py\": {\"size\": 9715, \"sha256\": \"350d610dd90359ad66af8bd053a413763e8bbebc5efa92699ff8247680fff3fe\"}}, \"validation\": {\"path\": \"/app/models/indobert-hoax/v1.0.0\", \"version\": \"v1.0.0\", \"files\": 8, \"payload_size\": 498522007, \"model_sha256\": \"0fea71d7d5fd18c61f4e854d1059bb19ce62e3ec3f573718166417e18f2a1e40\", \"architecture\": \"BertForSequenceClassification\", \"num_labels\": 2, \"id2label\": {\"0\": \"valid\", \"1\": \"hoax\"}, \"label2id\": {\"valid\": 0, \"hoax\": 1}, \"threshold\": 0.99, \"temperature\": 0.8706620666110391}, \"manifest\": {\"architecture\": \"BertForSequenceClassification\", \"calibration\": {\"method\": \"temperature_scaling\", \"temperature\": 0.8706620666110391}, \"critical_files\": [\"model.safetensors\", \"config.json\", \"tokenizer.json\", \"tokenizer_config.json\", \"threshold.json\", \"calibration.json\"], \"files\": {\"MODEL_CARD.md\": {\"sha256\": \"73f9c99e218e0d8cc7365d2106af68385de2dad3dcc6d20ddc2f2d1ec3d6f1b3\", \"size\": 803}, \"calibration.json\": {\"sha256\": \"47bbeee876f89a2d75f8641c19b8743ed023908df4b18b74b31ad4801e1be21e\", \"size\": 68}, \"config.json\": {\"sha256\": \"d86612009986dd90b07ca9acecb12cb206e26dda9a29ef2f61d9e8b1ba416456\", \"size\": 1332}, \"evaluation.json\": {\"sha256\": \"60c6704f66c961ac9db403497c0a5b9a387c089e26146898c50c303b3ed5fae9\", \"size\": 975}, \"model.safetensors\": {\"sha256\": \"0fea71d7d5fd18c61f4e854d1059bb19ce62e3ec3f573718166417e18f2a1e40\", \"size\": 497795072}, \"threshold.json\": {\"sha256\": \"3e16e8f0839721c8e59fccc4e497c27a80d9e04edd2d8e92e79974f91ef2591a\", \"size\": 14336}, \"tokenizer.json\": {\"sha256\": \"da8791ba8d7a1459108876b0a0e105c5df39929cc8e7826499f63e74239b0181\", \"size\": 709027}, \"tokenizer_config.json\": {\"sha256\": \"81d76ff64c6837a77a26739668e51d61831f35d35e8a7043673b2c614a43c982\", \"size\": 394}}, \"labels\": [\"valid\", \"hoax\"], \"local_files_only\": true, \"model\": \"indobert-hoax\", \"num_labels\": 2, \"provenance\": {\"base_model\": \"indobenchmark/indobert-base-p1\", \"exported_at\": \"2026-08-21T01:03:52.509812+00:00\", \"kind\": \"versioned-export\", \"source_checkpoint\": \"checkpoint-391\", \"source_export_version\": \"1.0.0\", \"source_manifest_sha256\": \"1ca6b737fbf4a6e541e0e57b083330bf9495d5114c0a456f671e5c6776fe440c\"}, \"redistribution\": {\"public_release\": \"not_verified\"}, \"schema_version\": \"1.0\", \"task\": \"text-classification\", \"threshold\": 0.99, \"version\": \"v1.0.0\"}, \"manifest_identity\": {\"size\": 2047, \"sha256\": \"25d740d8f06dfc9b7727e623f9bddb9de6be5e37b86d3c11a19a647cd67ccd72\"}, \"model_card\": \"# indobert-hoax v1.0.0\\n\\nFine-tuned indobenchmark/indobert-base-p1 for binary Indonesian hoax/valid classification.\\n\\n- Labels: ['valid', 'hoax'] (id2label {0: 'valid', 1: 'hoax'})\\n- Dataset: komdigi-antara v1.0.0 (Komdigi hoax clarifications + Antara news)\\n- Training: 4 epochs max, early stopping on validation macro-F1,\\n  checkpoint selection by validation macro-F1\\n- Calibration: temperature scaling (see calibration.json)\\n- meragukan threshold: see threshold.json (confidence below it is reported\\n  as \\\"meragukan\\\" by the serving layer)\\n\\n## Serving contract\\n\\n`AutoModelForSequenceClassification` + `AutoTokenizer` from this directory.\\nLogits -> probabilities via softmax(logits / T). Confidence = max probability.\\nLabel = id2label[argmax] if confidence >= threshold else \\\"meragukan\\\".\\n\", \"tokenizer_config\": {\"backend\": \"tokenizers\", \"cls_token\": \"[CLS]\", \"do_lower_case\": true, \"is_local\": false, \"local_files_only\": false, \"mask_token\": \"[MASK]\", \"model_max_length\": 1000000000000000019884624838656, \"pad_token\": \"[PAD]\", \"sep_token\": \"[SEP]\", \"strip_accents\": null, \"tokenize_chinese_chars\": true, \"tokenizer_class\": \"BertTokenizer\", \"unk_token\": \"[UNK]\"}, \"calibration\": {\"temperature\": 0.8706620666110391, \"method\": \"temperature_scaling\"}, \"threshold_summary\": {\"threshold\": 0.99, \"accuracy\": 1.0, \"coverage\": 1.0, \"abstain_rate\": 0.0, \"n_covered\": 782, \"n_total\": 782}, \"evaluation_historical_not_rerun\": {\"n\": 781, \"class_names\": [\"valid\", \"hoax\"], \"accuracy\": 1.0, \"macro_precision\": 1.0, \"macro_recall\": 1.0, \"macro_f1\": 1.0, \"per_class\": {\"valid\": {\"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0}, \"hoax\": {\"precision\": 1.0, \"recall\": 1.0, \"f1\": 1.0}}, \"confusion_matrix\": [[398, 0], [0, 383]], \"auc\": {\"valid\": 1.0, \"hoax\": 1.0}, \"calibration\": {\"temperature\": 0.8706620666110391, \"ece_raw\": 0.0007326602935791016, \"ece_calibrated\": 0.0005506438116105357, \"brier_raw\": 0.0003937674919143319, \"brier_calibrated\": 0.0003632764855865389, \"reliability\": [{\"confidence\": 0.6234, \"accuracy\": 1.0, \"count\": 1}, {\"confidence\": 0.9999, \"accuracy\": 1.0, \"count\": 780}]}}, \"dependencies\": {\"torch\": \"2.13.0+cpu\", \"transformers\": \"5.14.1\", \"tokenizers\": \"0.22.2\", \"fastapi\": \"0.136.3\", \"uvicorn\": \"0.52.0\", \"pydantic\": \"2.13.4\", \"pytest\": null, \"numpy\": \"2.5.1\", \"scikit-learn\": null}}",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "docker",
+        "run",
+        "--rm",
+        "--pull=never",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--memory",
+        "512m",
+        "--cpus",
+        "1",
+        "--entrypoint",
+        "python",
+        "-i",
+        "sha256:826666a6ff0ee45de6251b250a7d3e368d2813710d724ecac584b58cf548a98b",
+        "-"
+      ],
+      "stdin": "\nimport hashlib, importlib.metadata as m, json, sys\nfrom pathlib import Path\ndef file_info(p):\n    h = hashlib.sha256()\n    with p.open('rb') as f:\n        for chunk in iter(lambda: f.read(1 << 20), b''): h.update(chunk)\n    return {'size': p.stat().st_size, 'sha256': h.hexdigest()}\ndef versions(names):\n    result = {}\n    for name in names:\n        try: result[name] = m.version(name)\n        except m.PackageNotFoundError: result[name] = None\n    return result\nresult = {'python': sys.version, 'source_files': {str(p): file_info(p) for p in sorted(Path('app').glob('*.py'))}}\n\nfrom app.config import KNOWLEDGE_BASE_DIRECTORY, MODEL_ID, MODEL_REVISION\nfrom app.knowledge_base import load_knowledge_base\nkb = load_knowledge_base(KNOWLEDGE_BASE_DIRECTORY)\nroot = Path('/opt/huggingface/hub') / ('models--' + MODEL_ID.replace('/', '--')) / 'snapshots' / MODEL_REVISION\nresult['knowledge_base'] = {'path': str(KNOWLEDGE_BASE_DIRECTORY), 'version': kb.version, 'document_count': len(kb.documents), 'sha256': kb.sha256}\nresult['embedding'] = {'id': MODEL_ID, 'revision': MODEL_REVISION, 'path': str(root), 'files': {str(p.relative_to(root)): file_info(p) for p in sorted(root.rglob('*')) if p.is_file()}}\nresult['embedding']['sequence_config'] = json.loads((root / 'sentence_bert_config.json').read_text())\nresult['dependencies'] = versions(['torch', 'transformers', 'tokenizers', 'sentence-transformers', 'fastapi', 'uvicorn', 'numpy', 'scikit-learn', 'pydantic', 'pytest'])\nprint(json.dumps(result))\n",
+      "exit_code": 0,
+      "seconds": 2.995,
+      "stdout": "{\"python\": \"3.12.12 (main, Feb 24 2026, 20:29:11) [GCC 12.2.0]\", \"source_files\": {\"app/__init__.py\": {\"size\": 48, \"sha256\": \"5f521360faac3cd9ad76aaaa4393caaae16f3da90326623655042641e539dbd0\"}, \"app/config.py\": {\"size\": 335, \"sha256\": \"4556992cf74612fdad74f2628f0d30b9872338de176fdc2748b18ee1690f96c6\"}, \"app/embedding.py\": {\"size\": 1336, \"sha256\": \"3d37ad37476c5c861134f7de47291b56b34dbfee91b786405eb9734b976278b2\"}, \"app/index.py\": {\"size\": 3800, \"sha256\": \"a1840251204ce229fc0ed386ec7097b07ebf09cd08e9a452cb2582d6f1087e52\"}, \"app/knowledge_base.py\": {\"size\": 1913, \"sha256\": \"c5f41ce2fe245072098125f85c7dff531e8b444ff8ee9c0a98f68edc6850bec8\"}, \"app/main.py\": {\"size\": 6026, \"sha256\": \"879e2c5d575954b5f9e5ad28b123b26591472d9abedafade14aa75bc7b454782\"}, \"app/prepare_model.py\": {\"size\": 421, \"sha256\": \"7035cbcf860909e6b03a166b52f5b46c6c82de596da24ae097c247316b3eb52e\"}}, \"knowledge_base\": {\"path\": \"/app/datasets/rag/knowledge-base-v1.1.1\", \"version\": \"1.1.1\", \"document_count\": 61, \"sha256\": \"c937f0ac221b3d6fd5ce829a969c0712832e1c873959ed531ff8bc363366877d\"}, \"embedding\": {\"id\": \"sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2\", \"revision\": \"e8f8c211226b894fcb81acc59f3b34ba3efd5f42\", \"path\": \"/opt/huggingface/hub/models--sentence-transformers--paraphrase-multilingual-MiniLM-L12-v2/snapshots/e8f8c211226b894fcb81acc59f3b34ba3efd5f42\", \"files\": {\"1_Pooling/config.json\": {\"size\": 190, \"sha256\": \"4be450dde3b0273bb9787637cfbd28fe04a7ba6ab9d36ac48e92b11e350ffc23\"}, \"README.md\": {\"size\": 3888, \"sha256\": \"1e98ea05b0de579fcaad3d625b62ea55647142ed674d5f5ebf1440e4bbbb6f23\"}, \"config.json\": {\"size\": 645, \"sha256\": \"6300193cb75e01cf80c96decef7187dfb33094d97cc1490b7ead6ff134476e4e\"}, \"config_sentence_transformers.json\": {\"size\": 122, \"sha256\": \"b8c64b5cece00d8424b4896ea75b512b6008576088497609dfeb6bd63e6d36b8\"}, \"model.safetensors\": {\"size\": 470641600, \"sha256\": \"eaa086f0ffee582aeb45b36e34cdd1fe2d6de2bef61f8a559a1bbc9bd955917b\"}, \"modules.json\": {\"size\": 229, \"sha256\": \"8f4b264b80206c830bebbdcae377e137925650a433b689343a63bdc9b3145460\"}, \"sentence_bert_config.json\": {\"size\": 53, \"sha256\": \"70f4448f31320443fe3557cacea5abf2dcc4915dda8c80646bec9f3bb0aa5a1f\"}, \"special_tokens_map.json\": {\"size\": 239, \"sha256\": \"378eb3bf733eb16e65792d7e3fda5b8a4631387ca04d2015199c4d4f22ae554d\"}, \"tokenizer.json\": {\"size\": 9081518, \"sha256\": \"2c3387be76557bd40970cec13153b3bbf80407865484b209e655e5e4729076b8\"}, \"tokenizer_config.json\": {\"size\": 526, \"sha256\": \"5036ea374ffedd706e3bef33e2e0d6953cb868ef8a490e76e32ba0faa37a6b9b\"}}, \"sequence_config\": {\"max_seq_length\": 128, \"do_lower_case\": false}}, \"dependencies\": {\"torch\": \"2.13.0+cpu\", \"transformers\": \"5.18.0\", \"tokenizers\": \"0.23.2\", \"sentence-transformers\": \"5.7.0\", \"fastapi\": \"0.142.2\", \"uvicorn\": \"0.54.0\", \"numpy\": \"2.5.3\", \"scikit-learn\": \"1.9.1\", \"pydantic\": \"2.13.5\", \"pytest\": null}}",
+      "stderr": ""
+    }
+  ],
+  "elapsed_seconds": 9.987
+}
