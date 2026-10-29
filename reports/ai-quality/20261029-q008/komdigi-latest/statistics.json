@@ -1,0 +1,96 @@
+{
+  "audit_version": "q008-komdigi-latest-audit-v1",
+  "category_counts": {
+    "Klarifikasi Hoaks": 3480
+  },
+  "columns": [
+    "id",
+    "url",
+    "title",
+    "slug",
+    "published_at",
+    "view_count",
+    "excerpt",
+    "body_html",
+    "body_text",
+    "main_image_url",
+    "category",
+    "tags",
+    "topics"
+  ],
+  "dataset_role": "UPDATED_KAGGLE_SNAPSHOT_NOT_V1_TRAINING_REPRODUCTION",
+  "extra_columns": [],
+  "human_review_performed": false,
+  "label_changes": 0,
+  "length_characters": {
+    "adapter_full_chars": {
+      "max": 1987,
+      "mean": 832.8359,
+      "min": 310,
+      "n": 3480,
+      "p50": 815,
+      "p90": 1101,
+      "p95": 1180
+    },
+    "raw_body_clean_chars": {
+      "max": 1992,
+      "mean": 1003.3325,
+      "min": 377,
+      "n": 3480,
+      "p50": 984,
+      "p90": 1317,
+      "p95": 1415
+    },
+    "selected_chars": {
+      "max": 1189,
+      "mean": 238.7026,
+      "min": 119,
+      "n": 3480,
+      "p50": 211,
+      "p90": 350,
+      "p95": 420
+    }
+  },
+  "length_quantile_method": "sorted floor((n-1)*p), Unicode chars not tokens",
+  "normalized_raw_duplicate_groups": 6,
+  "normalized_selected_duplicate_groups": 8,
+  "normalized_selected_duplicate_members": 16,
+  "normalized_selected_first_wins_excess": 8,
+  "provenance_basis": "user reports Kaggle author update; dataset slug/version/retrieval time not supplied",
+  "published_date_range": [
+    "2024-10-01 23:04:00",
+    "2026-10-27 23:04:00"
+  ],
+  "quarantine_candidates": 116,
+  "raw_records": 3480,
+  "reason_counts": {
+    "full_fallback:earliest_marker_before_120": 86,
+    "full_fallback:no_marker": 1,
+    "normalized_selected_duplicate": 16,
+    "source_marker": 86,
+    "verdict_phrase": 86
+  },
+  "record_deletions": 0,
+  "source_bytes": 11436440,
+  "source_sha256": "32fc99f809a39ab6528430fb2966577ffdfbc0f6c2f6533bb420add0fb9face7",
+  "stage_counts": {
+    "adapter_emitted": 3480,
+    "adapter_full_indicator:source_marker": 3182,
+    "adapter_full_indicator:verdict_phrase": 3442,
+    "cut_reason:cut": 3393,
+    "cut_reason:earliest_marker_before_120": 86,
+    "cut_reason:no_marker": 1,
+    "default_quality_gate_pass_before_dedup": 3480,
+    "link_counter_pretrim": 3477,
+    "raw_body_indicator:source_marker": 3282,
+    "raw_body_indicator:verdict_phrase": 3442,
+    "text_source:claim": 3393,
+    "text_source:full": 87,
+    "title_bracket_hoax_marker": 3479
+  },
+  "unique_source_ids": 3480,
+  "verdict_indicator_by_text_source": {
+    "claim": 2,
+    "full": 84
+  }
+}
