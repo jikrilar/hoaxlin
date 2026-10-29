@@ -21,6 +21,8 @@ class BertClassifierTest extends TestCase
         // Use a high threshold matching the exported model (0.99) for meragukan tests,
         // but keep the default 0.65 for most tests — override per-test as needed.
         config(['services.bert.confidence_threshold' => 0.65]);
+        // This suite explicitly covers compatibility with the pre-policy API.
+        config(['services.bert.allow_legacy_response' => true]);
     }
 
     private function classifier(): BertClassifier

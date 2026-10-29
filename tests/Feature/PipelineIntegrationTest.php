@@ -52,6 +52,8 @@ class PipelineIntegrationTest extends TestCase
 
     public function test_bert_cache_hit_reuses_previous_result(): void
     {
+        $fingerprint = str_repeat('a', 64);
+        config(['services.bert.policy_fingerprint' => $fingerprint]);
         Http::fake([
             config('services.bert.url').'*' => Http::response([
                 'request_id' => 'req-1',
@@ -60,6 +62,13 @@ class PipelineIntegrationTest extends TestCase
                 'raw_scores' => ['valid' => 0.08, 'hoax' => 0.92],
                 'model_version' => 'v1.0.0',
                 'inference_ms' => 42,
+                'decision' => [
+                    'schema_version' => 'bert-decision-v1', 'fingerprint' => $fingerprint,
+                    'threshold' => 0.65, 'raw_argmax' => 'hoax', 'served_label' => 'hoax',
+                    'abstention_reason' => null,
+                    'uncalibrated_scores' => ['valid' => 0.08, 'hoax' => 0.92],
+                    'calibrated_scores' => ['valid' => 0.08, 'hoax' => 0.92],
+                ],
             ], 200),
         ]);
 

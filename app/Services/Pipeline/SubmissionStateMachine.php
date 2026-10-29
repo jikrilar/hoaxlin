@@ -83,6 +83,7 @@ class SubmissionStateMachine
                 'cached' => $classification->cached,
                 'model_version' => $classification->modelVersion,
                 'preprocessing_version' => $classification->preprocessingVersion,
+                'decision' => $classification->decision,
                 'input_trace' => [
                     'classifier_input' => InputTrace::analysis(
                         $submission,

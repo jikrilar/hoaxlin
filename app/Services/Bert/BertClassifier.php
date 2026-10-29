@@ -47,8 +47,20 @@ class BertClassifier implements Classifier
         $this->guardAgainstFailure($response);
 
         try {
-            return Classification::fromResponse($response->json())
-                ->withConfidenceThreshold((float) $config['confidence_threshold']);
+            $payload = $response->json();
+            if (! is_array($payload)) {
+                throw new InvalidArgumentException('Expected BERT JSON object.');
+            }
+            if (isset($payload['decision'])) {
+                DecisionPolicy::validate($payload);
+
+                return Classification::fromResponse($payload);
+            }
+            if (! ($config['allow_legacy_response'] ?? false) || filled($config['policy_fingerprint'] ?? null)) {
+                throw new InvalidArgumentException('Legacy BERT response requires explicit opt-in without a pinned policy.');
+            }
+
+            return Classification::fromResponse($payload)->withConfidenceThreshold((float) $config['confidence_threshold']);
         } catch (InvalidArgumentException $exception) {
             throw AiServiceException::permanent(
                 service: self::SERVICE,

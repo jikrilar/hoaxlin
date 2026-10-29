@@ -14,6 +14,7 @@ from typing import Any
 from .config import Settings
 from .model_release import sequence_contract, validate_release
 from .preprocessing import encode_sequence
+from .decision_policy import decide, fingerprint
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -33,6 +34,7 @@ class Prediction:
     token_count: int | None = None
     truncated: bool = False
     preprocessing_version: str | None = None
+    decision: dict | None = None
 
 
 class ModelRuntime:
@@ -49,6 +51,7 @@ class ModelRuntime:
         self.max_sequence_length: int = settings.max_sequence_length
         self.truncation_strategy: str = "head-only"
         self.multi_claim_policy: str = "single-sequence-head-only"
+        self.policy_fingerprint: str | None = None
         self._tokenizer: Any = None
         self._model: Any = None
         self._torch: Any = None
@@ -86,6 +89,17 @@ class ModelRuntime:
             if not self.settings.require_release_manifest:
                 self._load_sequence_contract_from_manifest_if_available()
                 self._verify_checksum_if_available()
+            source = Path(self.settings.model_path)
+            self.policy_fingerprint = fingerprint({
+                'schema': 'bert-decision-v1',
+                'files': {name: _sha256(source / name) if (source / name).is_file() else None
+                          for name in ('model.safetensors', 'config.json', 'tokenizer.json',
+                                       'tokenizer_config.json', 'calibration.json', 'threshold.json')},
+                'model_version': self.model_version, 'temperature': self.temperature,
+                'threshold': self.threshold, 'preprocessing': self.preprocessing_version,
+                'max_sequence_length': self.max_sequence_length,
+                'truncation': self.truncation_strategy, 'multi_claim': self.multi_claim_policy,
+            })
             self.status = "ready"
             logger.info(
                 "Model ready: %s (version %s, labels %s, threshold %s, temp %s)",
@@ -207,6 +221,8 @@ class ModelRuntime:
 
     def _load_sidecars(self) -> None:
         source = Path(self.settings.model_path)
+        self.threshold = None
+        self.temperature = None
         # threshold.json — meragukan derived from confidence < threshold
         threshold_path = source / "threshold.json"
         if threshold_path.exists():
@@ -225,7 +241,7 @@ class ModelRuntime:
             except Exception as exc:
                 logger.warning("Failed to load threshold.json: %s", exc)
         else:
-            logger.info("threshold.json not found in %s — meragukan will be handled at Laravel layer", source)
+            logger.warning("Required threshold sidecar not found")
 
         # calibration.json — temperature scaling
         calibration_path = source / "calibration.json"
@@ -241,6 +257,9 @@ class ModelRuntime:
                     logger.info("Loaded calibration sidecar: T=%s", temp)
             except Exception as exc:
                 logger.warning("Failed to load calibration.json: %s", exc)
+
+        if self.threshold is None or self.temperature is None:
+            raise ValueError("Valid threshold and calibration sidecars are required for decision authority")
 
     def _load_evaluation_metadata(self) -> None:
         """Load safe, optional provenance for the active model artifact.
@@ -444,6 +463,7 @@ class ModelRuntime:
         encoded = self._encode(text)
         with self._torch.inference_mode():
             logits = self._model(**encoded).logits[0]
+            uncalibrated = self._torch.softmax(logits, dim=-1).detach().cpu().tolist()
             # Apply temperature scaling if available (for better calibrated confidence)
             if self.temperature is not None and self.temperature != 1.0:
                 logits = logits / self.temperature
@@ -454,10 +474,14 @@ class ModelRuntime:
         best_index = max(range(len(probabilities)), key=probabilities.__getitem__)
         best_label = labels[best_index]
         best_confidence = float(probabilities[best_index])
-        # Apply meragukan threshold if available — per exported MODEL_CARD contract:
-        # label = id2label[argmax] if confidence >= threshold else "meragukan"
-        if self.threshold is not None and best_confidence < self.threshold:
-            best_label = "meragukan"
+        decision = {
+            'schema_version': 'bert-decision-v1', 'fingerprint': self.policy_fingerprint,
+            'threshold': self.threshold if self.threshold is not None else 0.0,
+            **decide(raw_scores, self.threshold if self.threshold is not None else 0.0),
+            'uncalibrated_scores': dict(zip(labels, uncalibrated)),
+            'calibrated_scores': raw_scores,
+        }
+        best_label = decision['served_label']
         return Prediction(
             label=best_label,
             confidence=best_confidence,
@@ -466,6 +490,7 @@ class ModelRuntime:
             token_count=token_count,
             truncated=truncated,
             preprocessing_version=self.preprocessing_version,
+            decision=decision,
         )
 
     def _labels(self, count: int) -> list[str]:

@@ -19,6 +19,7 @@ class PredictionRequest(BaseModel):
 
 
 class PredictionResponse(BaseModel):
+    decision: dict[str, Any] | None = None
     request_id: str
     label: str
     confidence_score: float = Field(ge=0.0, le=1.0)
@@ -41,6 +42,7 @@ class ReadinessResponse(BaseModel):
 
 
 class VersionResponse(BaseModel):
+    policy_fingerprint: str | None = None
     service: str
     service_version: str
     model_version: str | None

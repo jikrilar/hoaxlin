@@ -27,6 +27,7 @@ final readonly class Classification
         public ?int $tokenCount = null,
         public ?bool $serviceTruncated = null,
         public ?string $preprocessingVersion = null,
+        public ?array $decision = null,
     ) {
         if ($tokenCount !== null && $tokenCount < 0) {
             throw new InvalidArgumentException('Token count must not be negative.');
@@ -100,15 +101,18 @@ final readonly class Classification
             tokenCount: isset($payload['token_count']) ? (int) $payload['token_count'] : null,
             serviceTruncated: isset($payload['truncated']) ? (bool) $payload['truncated'] : null,
             preprocessingVersion: isset($payload['preprocessing_version']) ? (string) $payload['preprocessing_version'] : null,
+            decision: $payload['decision'] ?? null,
         );
     }
 
     /**
-     * Re-evaluate the reported label against the configured threshold. Keeps
-     * the "meragukan" band tunable from config without retraining the model.
+     * Legacy compatibility only. A versioned release decision is authoritative.
      */
     public function withConfidenceThreshold(float $threshold): self
     {
+        if ($this->decision !== null) {
+            return $this;
+        }
         $label = DetectionLabel::fromConfidence($this->label, $this->confidenceScore, $threshold);
 
         if ($label === $this->label) {
@@ -125,6 +129,7 @@ final readonly class Classification
             tokenCount: $this->tokenCount,
             serviceTruncated: $this->serviceTruncated,
             preprocessingVersion: $this->preprocessingVersion,
+            decision: $this->decision,
         );
     }
 
@@ -140,6 +145,7 @@ final readonly class Classification
             tokenCount: $this->tokenCount,
             serviceTruncated: $this->serviceTruncated,
             preprocessingVersion: $this->preprocessingVersion,
+            decision: $this->decision,
         );
     }
 
@@ -169,6 +175,10 @@ final readonly class Classification
             'raw_scores' => $this->rawScores,
             'inference_ms' => $this->inferenceMs,
             'cached' => $this->cached,
+            'token_count' => $this->tokenCount,
+            'truncated' => $this->serviceTruncated,
+            'preprocessing_version' => $this->preprocessingVersion,
+            'decision' => $this->decision,
         ];
     }
 }

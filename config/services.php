@@ -40,6 +40,8 @@ return [
     */
 
     'bert' => [
+        'policy_fingerprint' => env('BERT_POLICY_FINGERPRINT'),
+        'allow_legacy_response' => (bool) env('BERT_ALLOW_LEGACY_RESPONSE', false),
         'url' => env('BERT_SERVICE_URL', 'http://127.0.0.1:8001'),
         'internal_token' => env('BERT_SERVICE_TOKEN'),
         'connect_timeout' => (int) env('BERT_SERVICE_CONNECT_TIMEOUT', 3),

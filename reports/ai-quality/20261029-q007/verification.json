@@ -1,0 +1,42 @@
+{
+  "task": "Q-007",
+  "status": "DONE_CONTRACT_AND_CACHE_NOT_QUALITY_IMPROVEMENT",
+  "base_commit": "7c47994",
+  "verified_date": "2026-10-29",
+  "targeted_python": {"exit_code": 0, "passed": 39, "warnings": 2, "seconds": 17.60},
+  "targeted_laravel": {"exit_code": 0, "passed": 35, "assertions": 257, "seconds": 2.37},
+  "full_python": {
+    "exit_code": 1, "passed": 149, "failed": 5, "warnings": 2, "seconds": 28.04,
+    "baseline_failures": [
+      "test_api.py::test_readiness_200_when_ready",
+      "test_api.py::test_version_exposes_labels_and_threshold",
+      "test_api.py::test_predict_happy_path_hoax_and_valid",
+      "test_api.py::test_predict_threshold_meragukan",
+      "test_api.py::test_request_id_propagation"
+    ]
+  },
+  "full_laravel": {
+    "exit_code": 1, "passed": 767, "failed": 4, "warnings": 25,
+    "skipped": 4, "assertions": 5453, "seconds": 41.32,
+    "baseline_failure_file": "tests/Feature/FilamentAuditObserverTest.php"
+  },
+  "pint": {"exit_code": 0, "files": 9},
+  "git_diff_check": {"exit_code": 0},
+  "real_local_inference": {
+    "exit_code": 0,
+    "fingerprint": "0c2331e8f85ab15ebf0763e14d9d36dc9a2bfd3d2dbbbc77f7209d9faf6ddb47",
+    "decision_schema": "bert-decision-v1",
+    "threshold": 0.99,
+    "quality_measurement": false
+  },
+  "owner_files_preserved": {
+    "HOAXLIN-BERT-RAG-AUDIT-TASKS.md": "922425f51bc248d235d5c696c100a672d801d6df05097ad8ea7d0d67d11004d7",
+    "tests/Feature/FilamentAuditObserverTest.php": "2446116cfdd2698609c54cd458e42211e4e4336f64057d5302fa776828f29650"
+  },
+  "deployment_limits": [
+    "Cache disabled without immutable policy pin",
+    "Warm hits rely on immutable server artifacts and coordinated deployment pin rotation",
+    "Legacy responses default rejected, explicit opt-in never caches",
+    "No actual deployment, env edit, user data migration or historical label rewrite"
+  ]
+}

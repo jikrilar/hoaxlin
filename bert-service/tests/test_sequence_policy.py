@@ -326,6 +326,7 @@ def test_real_predict_endpoint_reports_observed_tokens_and_truncation(tokenizer)
         version = client.get("/version").json()
         assert version["max_sequence_length"] == 512
         assert version["truncation_strategy"] == "head-only"
+        assert len(version['policy_fingerprint']) == 64
         for text, count, truncated in [("pengantar", 3, False), ("pengantar " * 700, 702, True)]:
             response = client.post("/predict", json={"text": text},
                                    headers={"Authorization": "Bearer q006-test-fixture"})
@@ -334,3 +335,9 @@ def test_real_predict_endpoint_reports_observed_tokens_and_truncation(tokenizer)
             assert body["token_count"] == count
             assert body["truncated"] is truncated
             assert body["preprocessing_version"] == "1.0.0"
+            decision = body['decision']
+            assert decision['fingerprint'] == version['policy_fingerprint']
+            assert decision['threshold'] == 0.99
+            assert decision['served_label'] == body['label']
+            assert decision['calibrated_scores'] == body['raw_scores']
+            assert set(decision['uncalibrated_scores']) == {'valid', 'hoax'}
