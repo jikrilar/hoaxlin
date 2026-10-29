@@ -1,5 +1,39 @@
 # Q-011 — Grouped benchmark freeze preflight
 
+## Owner-directed closeout 2026-10-30
+
+Q-010/Q-011 remain BLOCKED, not phase acceptance. Q-012–Q-016 explicitly must
+not start. No corpus approved, benchmark allocation or freeze timestamp supplied.
+Owner pilot is20 records; Komdigi metadata/license verification pending.
+
+Dataset-review tooling finalized separately on quality/03-bert-data commit
+`d889d21` (private copy-verification, configurable persistent storage, deterministic
+review packets and owner handoff). Not merged/cherry-picked into this model branch.
+Read that commit's `reports/ai-quality/dataset-review-readiness/phase-closeout.md`
+for operational steps. This branch contains only Q-011 and this log addendum above
+the prior data base; dataset tooling stays in its appropriate phase branch.
+
+3485 staging files now verified on persistent local storage
+`$HOME/.local/share/hoaxlin/dataset-review/komdigi-proposals-v0.1.1` against saved
+receipt. Pilot20 tasks there remain UNASSIGNED/null; no human review performed.
+Oct30 stdlib checks validate hashes/permissions/new deterministic packet/copy-only
+no-overwrite. Fresh pytest blocked because temporary pytest deps disappeared after
+restart. Oct29 targeted/full results below are preserved historical evidence,
+not represented as fresh passing results. Existing baseline failures remain open.
+
+Remaining acceptance: human reviews/evidence/rights, multi-source label coverage,
+semantic claim/event grouping, temporal/source-holdout signoff, actual partition
+overlap audit, sufficient dev/holdout and immutable hashes/counts/freeze UTC.
+Tooling availability cannot satisfy those data-quality gates.
+
+Git transition check: local main remains3f17a20 (stale); remote main verified via
+ls-remote at57649cb81b8895d95ea18251988369c77dcc5a4f, includes baseline/input/data
+through9cc78ce. Recommended RAG base is that approved main snapshot, not this
+unfinished model branch. No quality/05-rag-evaluation branch/worktree created,
+no Q-017 started. Wait for owner approval; recheck refs before transition. If
+owner first integrates dataset follow-up, choose newly approved main SHA instead.
+No push/merge/rebase/deployment or branch deletion performed.
+
 **Status BLOCKED. No partition freeze or release gate pass.**
 Branch at start: quality/04-bert-model (already selected by owner/environment).
 Base dependency Q-010: 9cc78ce. Did not switch/reset user branch or modify datasets.
