@@ -1,0 +1,2373 @@
+{
+  "task": "Q-003",
+  "measurement": "real_cpu_model_inference_not_full_legacy_runner",
+  "status": "PARTIAL_BLOCKED",
+  "blocked_checks": {
+    "training_overlap_revalidation": "Training comparison corpus not found: /workspace/datasets/processed/komdigi-antara-v1/all.jsonl",
+    "legacy_evaluator_model_metadata": "Model release is not indobert-hoax",
+    "legacy_evaluator_runtime_loader": "Production model failed to load: ValueError: Checksum verification failed: slice(None, 8, None)"
+  },
+  "dataset": {
+    "raw_sha256": "d9237395948dc42cbcfec328a4f2a74bbff73d66537bced27ef4746b76c32f7b",
+    "canonical_sha256": "d9237395948dc42cbcfec328a4f2a74bbff73d66537bced27ef4746b76c32f7b",
+    "legacy_sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708",
+    "rows": 120
+  },
+  "release_validation": {
+    "path": "/app/models/indobert-hoax/v1.0.0",
+    "version": "v1.0.0",
+    "files": 8,
+    "payload_size": 498522007,
+    "model_sha256": "0fea71d7d5fd18c61f4e854d1059bb19ce62e3ec3f573718166417e18f2a1e40",
+    "architecture": "BertForSequenceClassification",
+    "num_labels": 2,
+    "id2label": {
+      "0": "valid",
+      "1": "hoax"
+    },
+    "label2id": {
+      "valid": 0,
+      "hoax": 1
+    },
+    "threshold": 0.99,
+    "temperature": 0.8706620666110391
+  },
+  "effective_config": {
+    "seed": 42,
+    "batch_size": 1,
+    "cpu_threads": 2,
+    "max_sequence_length": 512,
+    "max_text_length": 20000,
+    "threshold": 0.99,
+    "temperature": 0.8706620666110391,
+    "local_files_only": true,
+    "preprocessing_version": "unversioned_existing_serving",
+    "tokenizer_upstream_revision": null
+  },
+  "historical_prediction_recalculation": {
+    "binary": {
+      "samples": 120,
+      "accuracy": 0.5083333333333333,
+      "macro_precision": 0.525020850708924,
+      "macro_recall": 0.5083333333333333,
+      "macro_f1": 0.40995082923576964,
+      "per_class": {
+        "valid": {
+          "precision": 0.5454545454545454,
+          "recall": 0.1,
+          "f1": 0.16901408450704225,
+          "support": 60
+        },
+        "hoax": {
+          "precision": 0.5045871559633027,
+          "recall": 0.9166666666666666,
+          "f1": 0.650887573964497,
+          "support": 60
+        }
+      },
+      "confusion_matrix": [
+        [
+          6,
+          54
+        ],
+        [
+          5,
+          55
+        ]
+      ],
+      "label_order": [
+        "valid",
+        "hoax"
+      ],
+      "zero_division_policy": "undefined precision/recall/F1 is recorded as 0.0"
+    },
+    "abstention": {
+      "threshold": 0.99,
+      "total_samples": 120,
+      "covered_samples": 85,
+      "abstained_samples": 35,
+      "coverage": 0.7083333333333334,
+      "abstention_rate": 0.2916666666666667,
+      "covered_accuracy": 0.4235294117647059,
+      "covered_macro_precision": 0.7083333333333334,
+      "covered_macro_recall": 0.51,
+      "covered_macro_f1": 0.3137254901960784,
+      "covered_per_class": {
+        "valid": {
+          "precision": 1.0,
+          "recall": 0.02,
+          "f1": 0.0392156862745098,
+          "support": 50
+        },
+        "hoax": {
+          "precision": 0.4166666666666667,
+          "recall": 1.0,
+          "f1": 0.5882352941176471,
+          "support": 35
+        }
+      },
+      "label_order": [
+        "valid",
+        "hoax"
+      ],
+      "note": "meragukan is a serving abstention, not a third ground-truth or training class",
+      "zero_division_policy": "undefined precision/recall/F1 is recorded as 0.0"
+    }
+  },
+  "new_inference": {
+    "binary": {
+      "samples": 120,
+      "accuracy": 0.5083333333333333,
+      "macro_precision": 0.525020850708924,
+      "macro_recall": 0.5083333333333333,
+      "macro_f1": 0.40995082923576964,
+      "per_class": {
+        "valid": {
+          "precision": 0.5454545454545454,
+          "recall": 0.1,
+          "f1": 0.16901408450704225,
+          "support": 60
+        },
+        "hoax": {
+          "precision": 0.5045871559633027,
+          "recall": 0.9166666666666666,
+          "f1": 0.650887573964497,
+          "support": 60
+        }
+      },
+      "confusion_matrix": [
+        [
+          6,
+          54
+        ],
+        [
+          5,
+          55
+        ]
+      ],
+      "label_order": [
+        "valid",
+        "hoax"
+      ],
+      "zero_division_policy": "undefined precision/recall/F1 is recorded as 0.0"
+    },
+    "abstention": {
+      "threshold": 0.99,
+      "total_samples": 120,
+      "covered_samples": 85,
+      "abstained_samples": 35,
+      "coverage": 0.7083333333333334,
+      "abstention_rate": 0.2916666666666667,
+      "covered_accuracy": 0.4235294117647059,
+      "covered_macro_precision": 0.7083333333333334,
+      "covered_macro_recall": 0.51,
+      "covered_macro_f1": 0.3137254901960784,
+      "covered_per_class": {
+        "valid": {
+          "precision": 1.0,
+          "recall": 0.02,
+          "f1": 0.0392156862745098,
+          "support": 50
+        },
+        "hoax": {
+          "precision": 0.4166666666666667,
+          "recall": 1.0,
+          "f1": 0.5882352941176471,
+          "support": 35
+        }
+      },
+      "label_order": [
+        "valid",
+        "hoax"
+      ],
+      "note": "meragukan is a serving abstention, not a third ground-truth or training class",
+      "zero_division_policy": "undefined precision/recall/F1 is recorded as 0.0"
+    },
+    "predictions": [
+      {
+        "id": "turnbackhoax-36648",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.009018493816256523,
+        "prob_hoax": 0.9909815192222595,
+        "confidence": 0.9909815192222595,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "e0cc24a488852481cb01d56aa40f824d0654ef36b195fb072e50a368a1b75000"
+      },
+      {
+        "id": "turnbackhoax-36649",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.006311164237558842,
+        "prob_hoax": 0.9936888217926025,
+        "confidence": 0.9936888217926025,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "754416ff18c844ab3d852aad00870fa8b9b9d51416aba148d7af7a21d15cff90"
+      },
+      {
+        "id": "turnbackhoax-36654",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0050498610362410545,
+        "prob_hoax": 0.9949501752853394,
+        "confidence": 0.9949501752853394,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "23a29ff068b3d99a4328fa08c82af473098b5e43a5a2a4702deed6665d8d241f"
+      },
+      {
+        "id": "turnbackhoax-36655",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.012574856169521809,
+        "prob_hoax": 0.9874251484870911,
+        "confidence": 0.9874251484870911,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "e55bb19687e94613c1ea91f934d4ed0f03ddc6b4b8f4eaccc9f8353e0f19121e"
+      },
+      {
+        "id": "turnbackhoax-36672",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.04199370741844177,
+        "prob_hoax": 0.9580063223838806,
+        "confidence": 0.9580063223838806,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "4901141135cb2e53e9f270e5bcd57826d28cdf077bb6ed4fb5c6994b0211dec5"
+      },
+      {
+        "id": "turnbackhoax-36680",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.04375390335917473,
+        "prob_hoax": 0.9562461376190186,
+        "confidence": 0.9562461376190186,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "9f1dcacca358677ae1484fccd3805db07e6ae3d4b797d6d4a819b48dd20e0bb5"
+      },
+      {
+        "id": "turnbackhoax-36681",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0013514136662706733,
+        "prob_hoax": 0.9986485838890076,
+        "confidence": 0.9986485838890076,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "7c2eaeb2c0d49ca7777fb90102ddd1469b14b99ea1369a53898439ee943a212f"
+      },
+      {
+        "id": "turnbackhoax-36682",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.003428052645176649,
+        "prob_hoax": 0.9965718984603882,
+        "confidence": 0.9965718984603882,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "c7160791579e7a5894c1ff76c9392116851cc3725cc5485e183bc4c04acea2b5"
+      },
+      {
+        "id": "turnbackhoax-36520",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.003649674588814378,
+        "prob_hoax": 0.9963502883911133,
+        "confidence": 0.9963502883911133,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "210df13082f68e02cead0c66a504a5b366fa0ad0bfcce3eda67e414dbe640e31"
+      },
+      {
+        "id": "turnbackhoax-36701",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.01722099259495735,
+        "prob_hoax": 0.9827790856361389,
+        "confidence": 0.9827790856361389,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "f1fa806ade4925d3bfea4b44c117b717d546bb1b33730ffdc0ac246f2cf07dd7"
+      },
+      {
+        "id": "turnbackhoax-36706",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.008380928076803684,
+        "prob_hoax": 0.9916189908981323,
+        "confidence": 0.9916189908981323,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "db018e5ceb67981fdb828f8df1bacb28e2db86ea20fd23d22b4078118c2264fa"
+      },
+      {
+        "id": "turnbackhoax-36590",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.04358644783496857,
+        "prob_hoax": 0.9564135670661926,
+        "confidence": 0.9564135670661926,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "37d4b34871545eb7177c032e81fd35bc66ba6fdd91fd14f9b49694bb9dedaaad"
+      },
+      {
+        "id": "turnbackhoax-36729",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.002462913515046239,
+        "prob_hoax": 0.9975371360778809,
+        "confidence": 0.9975371360778809,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "ca347966cedd4d4a96535ba8ab3792242c8437abd26057f1ccf823a206626d66"
+      },
+      {
+        "id": "turnbackhoax-36730",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.015170643106102943,
+        "prob_hoax": 0.9848293662071228,
+        "confidence": 0.9848293662071228,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "5653d1c2deedcb29bdbaad58e01af753b7335438520ff31b4274e19e018f43a4"
+      },
+      {
+        "id": "turnbackhoax-36731",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.009012031368911266,
+        "prob_hoax": 0.9909879565238953,
+        "confidence": 0.9909879565238953,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "5f6d6e5a597f997ba8c6d8177d3712766b45d42a6f4bf1a3d723d1ef3e6d482e"
+      },
+      {
+        "id": "turnbackhoax-36737",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.00605120649561286,
+        "prob_hoax": 0.9939488172531128,
+        "confidence": 0.9939488172531128,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "b300b039d3c9dabcb6ee291076399da22fe5f193a6598651d5dfd0952a20d29c"
+      },
+      {
+        "id": "turnbackhoax-36738",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0034152851440012455,
+        "prob_hoax": 0.9965846538543701,
+        "confidence": 0.9965846538543701,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "f8f181ad6bf9d093df315e0cccfdb644f4a49006c8d43809aeece781d89c3267"
+      },
+      {
+        "id": "turnbackhoax-36774",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0027794267516583204,
+        "prob_hoax": 0.997220516204834,
+        "confidence": 0.997220516204834,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "c39878e2caf50b5950b1478df580da642d44d0c3606fc0a04065e659ab1a38fe"
+      },
+      {
+        "id": "turnbackhoax-36596",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.03300902619957924,
+        "prob_hoax": 0.9669909477233887,
+        "confidence": 0.9669909477233887,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "f1b6314d4ffc31ea00681e7edee1364793bac79d1c19b22676188f9139cc13ba"
+      },
+      {
+        "id": "turnbackhoax-36776",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0048067523166537285,
+        "prob_hoax": 0.9951932430267334,
+        "confidence": 0.9951932430267334,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "a483585511ffb4487f99a32307157f3474cc7b943bcddf53d5c252f82fff5615"
+      },
+      {
+        "id": "cekfakta-36763",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0025226790457963943,
+        "prob_hoax": 0.9974773526191711,
+        "confidence": 0.9974773526191711,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "2db72895cc0f91e898d0cd0d30c907ff9901375b37eeaba48a80a243bcf3489f"
+      },
+      {
+        "id": "cekfakta-36700",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.030585359781980515,
+        "prob_hoax": 0.9694147109985352,
+        "confidence": 0.9694147109985352,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "a10f614d1f2cc087aaa056ff7ed1a42b332abbd8bd9c168ceeb72f9b8a159989"
+      },
+      {
+        "id": "cekfakta-36702",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.001577859977260232,
+        "prob_hoax": 0.9984221458435059,
+        "confidence": 0.9984221458435059,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "ef180c980328d6bd42a1c34e72d03cff9cff0002bb7c7d1e221097c099e9e027"
+      },
+      {
+        "id": "cekfakta-36707",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.002957375254482031,
+        "prob_hoax": 0.9970425963401794,
+        "confidence": 0.9970425963401794,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "bd2054b8bc4fe4fe0b583188dba63e6a462a5cd9b14f710ec599353cd26682cd"
+      },
+      {
+        "id": "cekfakta-36708",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.00021825787553098053,
+        "prob_hoax": 0.9997817873954773,
+        "confidence": 0.9997817873954773,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "69fdbcdf78f31f8f533fd130242440272e1af6185d957ceaf0877bac61f50657"
+      },
+      {
+        "id": "cekfakta-36765",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0016285211313515902,
+        "prob_hoax": 0.9983715415000916,
+        "confidence": 0.9983715415000916,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "8d52af3bcc58f6e990ecf2095d4b5d4594f93ec17275e2978d15d80e251fdd8e"
+      },
+      {
+        "id": "cekfakta-36766",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.000867140362970531,
+        "prob_hoax": 0.9991329312324524,
+        "confidence": 0.9991329312324524,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "455bf964150b52a16f8f168dd81251d5b2be15ea6aa34e42241f779ba3056518"
+      },
+      {
+        "id": "cekfakta-36767",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0002724277146626264,
+        "prob_hoax": 0.9997275471687317,
+        "confidence": 0.9997275471687317,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "84723be76c86e10d36ceb4d433e660c92161f669069b1d3b084601eee12bfef1"
+      },
+      {
+        "id": "cekfakta-36768",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0002853222831618041,
+        "prob_hoax": 0.9997146725654602,
+        "confidence": 0.9997146725654602,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "98dd8698292c7a92f1ce89366fb224a6d5208bcbc0313ca2abe2fcd3b07b6b49"
+      },
+      {
+        "id": "cekfakta-36727",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.09583422541618347,
+        "prob_hoax": 0.9041658043861389,
+        "confidence": 0.9041658043861389,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "ebc2664a684eb9890383ee49e51f385f8c75d31e50a04b202eea8d6c1407c3b4"
+      },
+      {
+        "id": "cekfakta-36674",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.00034693561610765755,
+        "prob_hoax": 0.9996531009674072,
+        "confidence": 0.9996531009674072,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "2fe24ca580165a25e6d3f0ac3ac6bd2858a4b97b20678d9448bfc42152d7e0a0"
+      },
+      {
+        "id": "cekfakta-36734",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0041422112844884396,
+        "prob_hoax": 0.9958577752113342,
+        "confidence": 0.9958577752113342,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "067c55a0fff28c357fd32494e51880555086d33c9e7ed44dd35958b3459400c3"
+      },
+      {
+        "id": "cekfakta-36735",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0045457989908754826,
+        "prob_hoax": 0.9954541921615601,
+        "confidence": 0.9954541921615601,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "724cff428005b096adadd1ffd0365919c53e043cd778592870ed697d8d0b2e3a"
+      },
+      {
+        "id": "cekfakta-36769",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0031361293513327837,
+        "prob_hoax": 0.996863842010498,
+        "confidence": 0.996863842010498,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "8e17df7bdd106062bc51e107ed39835ef872ff2face663f4ce3afc54a36aaf39"
+      },
+      {
+        "id": "cekfakta-36770",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0005645918427035213,
+        "prob_hoax": 0.9994353652000427,
+        "confidence": 0.9994353652000427,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "0863248b4b78d8eaf5b99222176de5d74e13453194686658a893e54f0c539ac1"
+      },
+      {
+        "id": "cekfakta-36741",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.000368801731383428,
+        "prob_hoax": 0.9996311664581299,
+        "confidence": 0.9996311664581299,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "a7e54d0c06ef80b92988b1275c8749fd1eb51372fb5d6876dc706116059f14d0"
+      },
+      {
+        "id": "cekfakta-36771",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0004221431154292077,
+        "prob_hoax": 0.9995778203010559,
+        "confidence": 0.9995778203010559,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "bc4eb8aee716d8f0d647b497ce710c2c164fc170da259b434efaa3f3db702afa"
+      },
+      {
+        "id": "cekfakta-36772",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.014569386839866638,
+        "prob_hoax": 0.9854305982589722,
+        "confidence": 0.9854305982589722,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "6242b8068ccfd044e334e110198de94e6c694cff2a678a9925e44425ea6f99d7"
+      },
+      {
+        "id": "cekfakta-36773",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0019874100107699633,
+        "prob_hoax": 0.9980125427246094,
+        "confidence": 0.9980125427246094,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "c16822130c75d8f4518459b88dc0cfc22cf3c08ae0764453328f434c6c4256ed"
+      },
+      {
+        "id": "cekfakta-36777",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0009326982544735074,
+        "prob_hoax": 0.9990673661231995,
+        "confidence": 0.9990673661231995,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "7e2cc3ea70d1102c1f468367a666528757ee52f23c1492ecd6c7fe2881212931"
+      },
+      {
+        "id": "afp-C3JA6TA",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.06162178888916969,
+        "prob_hoax": 0.9383782744407654,
+        "confidence": 0.9383782744407654,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "00edee18cd379b864204c3f44edf9c3f32c841b0eedd1eed98528bae4078959e"
+      },
+      {
+        "id": "afp-C3N92ZQ",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.002106213243678212,
+        "prob_hoax": 0.9978938698768616,
+        "confidence": 0.9978938698768616,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "2ecd53c2db2b4709c527d1ba2a1ab7c6eec2fe7a10bb6810b25d30b2dec3c4af"
+      },
+      {
+        "id": "afp-C43B9ZV",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.009103811345994473,
+        "prob_hoax": 0.9908961653709412,
+        "confidence": 0.9908961653709412,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "a3d42abd1a8e25524a32a2dc567a03a328f5373ba448eaf28f1ba6bb3bc31d07"
+      },
+      {
+        "id": "afp-C43D2T4",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.011794615536928177,
+        "prob_hoax": 0.9882054328918457,
+        "confidence": 0.9882054328918457,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "78f0d558c225ae4ee28d1e58ad4fca18c6fdbc6a3bf7f7c3087fd53540311371"
+      },
+      {
+        "id": "afp-C4AR4CR",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.11076362431049347,
+        "prob_hoax": 0.8892363905906677,
+        "confidence": 0.8892363905906677,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "a046d6ea2f90238147fe128cc18d7d630c2e8358ac304a23c3ae72e1841dd43f"
+      },
+      {
+        "id": "afp-C46U463",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 7.099725917214528e-05,
+        "prob_hoax": 0.9999289512634277,
+        "confidence": 0.9999289512634277,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "9b19399d2fc98674c91e71c562de8d08b6492583fdc304a717a25ee1249d5b09"
+      },
+      {
+        "id": "afp-C4YU8NR",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.044876936823129654,
+        "prob_hoax": 0.9551230669021606,
+        "confidence": 0.9551230669021606,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "2a8127b0ebd73d4f7fc8f383d123a3ba2e8c3d7546be494b14909a12cc769b20"
+      },
+      {
+        "id": "afp-C63B8NR",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.790984034538269,
+        "prob_hoax": 0.20901593565940857,
+        "confidence": 0.790984034538269,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "cdcc5f7dff02cdcdc8caaa511afef3b43ca0c0ea3d890309a085022e97465309"
+      },
+      {
+        "id": "afp-C67B39E",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.8375117182731628,
+        "prob_hoax": 0.16248823702335358,
+        "confidence": 0.8375117182731628,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "845bef3d34ce9d5c34a3fab010d6d2e854d47905efb46e58fca12ca88f7c17db"
+      },
+      {
+        "id": "afp-C67T6KE",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.006907343864440918,
+        "prob_hoax": 0.9930926561355591,
+        "confidence": 0.9930926561355591,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "59e73f98aab3566408db03bccc69e7ac6a432601d561e9e65dc1ce344bfb7b2b"
+      },
+      {
+        "id": "afp-C6L8869",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.07256634533405304,
+        "prob_hoax": 0.9274336695671082,
+        "confidence": 0.9274336695671082,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "80cec267220d4e6ceadab97fbe13d9ac08a4b2cd8f2a699306768d4cc432bcfd"
+      },
+      {
+        "id": "afp-C6YK89E",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0637858584523201,
+        "prob_hoax": 0.9362141489982605,
+        "confidence": 0.9362141489982605,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "09f278bc953d1acf137a3a34324fecb4a91e923a9be51819310db539f29d945e"
+      },
+      {
+        "id": "afp-C7868T3",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.5799621939659119,
+        "prob_hoax": 0.42003780603408813,
+        "confidence": 0.5799621939659119,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "42c8c849ee1a1584fecc41c73ae194dc8454a59ca1b96bccf02cb06beb2f3b44"
+      },
+      {
+        "id": "afp-C7DR9ZT",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.43357378244400024,
+        "prob_hoax": 0.5664262175559998,
+        "confidence": 0.5664262175559998,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "4b808073d90feb5b21235b9ce0914b35bb773610f939235ad3ffc111a43b17d1"
+      },
+      {
+        "id": "afp-C7HH4KE",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.8674979209899902,
+        "prob_hoax": 0.13250207901000977,
+        "confidence": 0.8674979209899902,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "ff34082f4beef9b12b82191d1d328e9bbe1da5b6840db13231a514bfc11d7389"
+      },
+      {
+        "id": "afp-C7E489E",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.027012377977371216,
+        "prob_hoax": 0.9729876518249512,
+        "confidence": 0.9729876518249512,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "87592efb8769f547a58b3e4f48e01d6500f67344a9e283629542bbd25668ab2d"
+      },
+      {
+        "id": "afp-C7HQ8T8",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.015482999384403229,
+        "prob_hoax": 0.9845170378684998,
+        "confidence": 0.9845170378684998,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "41967a1559315438860c204a8d4aae9e73008c070cb44703836c476970ac2d0f"
+      },
+      {
+        "id": "afp-C7QM7CW",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0009619485936127603,
+        "prob_hoax": 0.9990381002426147,
+        "confidence": 0.9990381002426147,
+        "correct": true,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "8ae478e0ceba3ba7de489d41d951330aabccc41103368fc860175dc052bb717e"
+      },
+      {
+        "id": "afp-C7RB2CQ",
+        "true_label": "hoax",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.22440804541110992,
+        "prob_hoax": 0.7755919694900513,
+        "confidence": 0.7755919694900513,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "1f45e5f0d86924b15b424743f299d267fd1b13c4e60c771586d23ad3400cbf8c"
+      },
+      {
+        "id": "afp-C7VL29F",
+        "true_label": "hoax",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.7935444712638855,
+        "prob_hoax": 0.2064555287361145,
+        "confidence": 0.7935444712638855,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "2551df54f394865e680f22f851d259415580112db093ecf3aa3a32c02d379630"
+      },
+      {
+        "id": "bank_indonesia-sp_2817126",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.00215053278952837,
+        "prob_hoax": 0.9978494644165039,
+        "confidence": 0.9978494644165039,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "6bb37feb8a07473444c7374735660e3790b64cd9c47aef72067d79016676f41d"
+      },
+      {
+        "id": "bank_indonesia-sp_2817226",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.008057226426899433,
+        "prob_hoax": 0.9919427633285522,
+        "confidence": 0.9919427633285522,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "70f5f82b1509c8f057aa846df003465f47ef89392b3e1eeb35b542f475954bbb"
+      },
+      {
+        "id": "bank_indonesia-sp_2817326",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0036907410249114037,
+        "prob_hoax": 0.996309220790863,
+        "confidence": 0.996309220790863,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "b1fc8309dedb8a43e12edabcf36bcd5cc3210add9916e5b53adc47670a5ec559"
+      },
+      {
+        "id": "bank_indonesia-sp_2817426",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.00237728888168931,
+        "prob_hoax": 0.9976226687431335,
+        "confidence": 0.9976226687431335,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "3b913bbf3e7ce85ef4c7c3e179229b5f8080d28134436538935dc860e809aad4"
+      },
+      {
+        "id": "bank_indonesia-sp_2817526",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.003470900235697627,
+        "prob_hoax": 0.9965291619300842,
+        "confidence": 0.9965291619300842,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "082f395b560c22e79a9ceab2f0e8562a8bbe6469357a43b8833c01dbdc43e715"
+      },
+      {
+        "id": "bank_indonesia-sp_2817626",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.006406603846698999,
+        "prob_hoax": 0.9935933947563171,
+        "confidence": 0.9935933947563171,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "099f77c0e00f62627ffa4e4ad3e24c8f58b74e5811d3ceeef5675025bf08091c"
+      },
+      {
+        "id": "bank_indonesia-sp_2817726",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.04667450115084648,
+        "prob_hoax": 0.9533255696296692,
+        "confidence": 0.9533255696296692,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "cda6ddbdddf219c263faf61951f21e2fa20bcaa50e47ec2e33051a8b14a635f0"
+      },
+      {
+        "id": "bank_indonesia-sp_2817826",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.005077926442027092,
+        "prob_hoax": 0.9949221014976501,
+        "confidence": 0.9949221014976501,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "d94f243d10b76d21ff0071637a2730ddbd838f789f82911f3d407ab134931b4c"
+      },
+      {
+        "id": "bank_indonesia-sp_2817926",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.00972951389849186,
+        "prob_hoax": 0.9902704954147339,
+        "confidence": 0.9902704954147339,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "0ac69fb5b7bd33624e99586e968a9ca9013cdd3ad6d14fd470c387802a28f469"
+      },
+      {
+        "id": "bank_indonesia-sp_2818026",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.002542283618822694,
+        "prob_hoax": 0.9974576830863953,
+        "confidence": 0.9974576830863953,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "38f13c0769c1216eeaa3779028f08d6b5c7d2990fbfc4c1f299b597b18004c8c"
+      },
+      {
+        "id": "bank_indonesia-sp_2818126",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0071799540892243385,
+        "prob_hoax": 0.9928200840950012,
+        "confidence": 0.9928200840950012,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "0c1fc3f784029a7ca3ebd7dfccb58070f2d50129d28840cdbf89086c580ff300"
+      },
+      {
+        "id": "bank_indonesia-sp_2818226",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.27153241634368896,
+        "prob_hoax": 0.728467583656311,
+        "confidence": 0.728467583656311,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "06fe6e55705e9b9eda268d3aecc1c0fcbf24d820a2e487bd7a649509cc56e48d"
+      },
+      {
+        "id": "bank_indonesia-sp_2818326",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0026955134235322475,
+        "prob_hoax": 0.9973044395446777,
+        "confidence": 0.9973044395446777,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "7d546ff351951340f8c2b5058c9aab14912ca905adc00c8f4fd14f811eed26e4"
+      },
+      {
+        "id": "bank_indonesia-sp_2818426",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.002434986410662532,
+        "prob_hoax": 0.9975650310516357,
+        "confidence": 0.9975650310516357,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "a5e8393d2b445982078ff5050478872b2580dd1dd063966b3f7db800c028ede2"
+      },
+      {
+        "id": "bank_indonesia-sp_2818526",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.006275374908000231,
+        "prob_hoax": 0.9937246441841125,
+        "confidence": 0.9937246441841125,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "1ef6aece5d29b86cef98e105387e98677b995816000bd0b178fcd8df99b2748f"
+      },
+      {
+        "id": "bank_indonesia-sp_2818626",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0015368338208645582,
+        "prob_hoax": 0.9984631538391113,
+        "confidence": 0.9984631538391113,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "858be2dd49e2af91f862607d439a864173d756ac07efea013ac9bafeb64d5935"
+      },
+      {
+        "id": "bank_indonesia-sp_2818726",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.007914824411273003,
+        "prob_hoax": 0.9920851588249207,
+        "confidence": 0.9920851588249207,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "b3f49e4f6e5565c3f81b0479e06136a33bc567f7960f75ddf3f0006534306c33"
+      },
+      {
+        "id": "bank_indonesia-sp_2818826",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.003455220954492688,
+        "prob_hoax": 0.9965447783470154,
+        "confidence": 0.9965447783470154,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "94e99bee13d33ec17e0c4229d421e6571fdbd1f03d9061a2ed4620c6afd98f9b"
+      },
+      {
+        "id": "bank_indonesia-sp_2818926",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0017155673122033477,
+        "prob_hoax": 0.9982843995094299,
+        "confidence": 0.9982843995094299,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "4f07566d76d1f291dec339ab49b81769908dee570d8af29fafd9f01bda2ee23e"
+      },
+      {
+        "id": "bank_indonesia-sp_2819026",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0022286251187324524,
+        "prob_hoax": 0.9977713823318481,
+        "confidence": 0.9977713823318481,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "28f2f209419e2895ba0c4babe53033b6e3206dc7fd8b4744f24371e9c00ea3a9"
+      },
+      {
+        "id": "bmkg-bmkg-dan-bakamla-ri-berkolaborasi-dalam-mendukung-keselamatan-dan-keamanan-maritim",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.001258533331565559,
+        "prob_hoax": 0.9987414479255676,
+        "confidence": 0.9987414479255676,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "228c20d3d413a608c143539256e1e8516f49601b63052f1f0ac386a0d66b82d1"
+      },
+      {
+        "id": "bmkg-bmkg-bengkulu-rakor-karhutla-perkuat-early-warning-dan-pencegahan-dini",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0028176780324429274,
+        "prob_hoax": 0.9971823692321777,
+        "confidence": 0.9971823692321777,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "3f03ecbd018025af53e81a7bd8a5b95e5ea9b98b19dd5451af9f4589374fd53e"
+      },
+      {
+        "id": "bmkg-bmkg-gelar-pengukuhan-dewan-pengurus-korpri-bmkg-masa-bakti-2023-2028",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0029670700896531343,
+        "prob_hoax": 0.997032880783081,
+        "confidence": 0.997032880783081,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "97f6f214cb854e16b066ed944611d5794f9b69ae3039ecc28bc7ef1b3ac98844"
+      },
+      {
+        "id": "bmkg-bmkg-hadiri-rdp-komisi-v-dpr-ri-bahas-evaluasi-dan-penyesuaian-anggaran-2026-serta-penetapan-rka-k-l-2027",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0012478609569370747,
+        "prob_hoax": 0.9987521171569824,
+        "confidence": 0.9987521171569824,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "5fc70101f8622ae0baca421c39426b63d100d99fd14f762d154cf074674b60e1"
+      },
+      {
+        "id": "bmkg-forum-konsultasi-publik-ptsp-bmkg-wujudkan-kemudahan-layanan-dan-tata-kelola-pnbp",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0010484493104740977,
+        "prob_hoax": 0.9989515542984009,
+        "confidence": 0.9989515542984009,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "700383fb3980fd18521472996fe91e1002c98b3fefa44da0a3aae6bc127fd369"
+      },
+      {
+        "id": "bmkg-lantik-pejabat-pimpinan-tinggi-pratama-bmkg-tekankan-integritas-dan-kinerja-nyata",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.004253128543496132,
+        "prob_hoax": 0.995746910572052,
+        "confidence": 0.995746910572052,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "1281330f1cebe507a5b77484cdd999758bfd3151dacc50d09fa64a2d2402d7aa"
+      },
+      {
+        "id": "bmkg-bmkg-dan-pemkab-natuna-perkuat-observasi-maritim-untuk-dukung-keselamatan-di-wilayah-perbatasan",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0010016007581725717,
+        "prob_hoax": 0.9989984631538391,
+        "confidence": 0.9989984631538391,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "3baa46c82cf9dbc1751e53490f4df059fca679a6d140a01cf72ea28cf008e432"
+      },
+      {
+        "id": "bmkg-siswa-smak-penabur-gading-serpong-matangkan-persiapan-osn-kebumian-di-bmkg",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.003494488773867488,
+        "prob_hoax": 0.9965054988861084,
+        "confidence": 0.9965054988861084,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "c5e694df6c509e70f8d9d1029e6a376c07f546a9cfb386955bcdcae00be8c966"
+      },
+      {
+        "id": "bmkg-dampak-el-nino-masih-perlu-diwaspadai-bmkg-perkuat-dukungan-pengendalian-karhutla",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.001143238740041852,
+        "prob_hoax": 0.998856782913208,
+        "confidence": 0.998856782913208,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "ee69d6784cfa4e08452d186e64587186d587b04db177470b41f865fd1facdf90"
+      },
+      {
+        "id": "bmkg-bmkg-sampaikan-pendalaman-rka-k-l-2027-dalam-rdp-bersama-dpr-ri",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0007121541420929134,
+        "prob_hoax": 0.9992879033088684,
+        "confidence": 0.9992879033088684,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "fc3688816a1196231565a34ad807c4e24a41188fe455efe24ec66a4ed2a9ec57"
+      },
+      {
+        "id": "bmkg-perkuat-mitigasi-bencana-di-karanganyar-stasiun-geofisika-sleman-gelar-audiensi-dan-siapkan-sekolah-lapang-gempa-bumi",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.002802749630063772,
+        "prob_hoax": 0.9971972703933716,
+        "confidence": 0.9971972703933716,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "c24f2419d4c881439e69facae67813286c6cd0e4f8477e74d5bd2a9e26964e29"
+      },
+      {
+        "id": "bmkg-sdit-bening-bogor-kunjungi-bmkg-kenali-cuaca-hingga-mitigasi-bencana",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0023408972192555666,
+        "prob_hoax": 0.9976590871810913,
+        "confidence": 0.9976590871810913,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "42e8f01a87192dd03baf670a655671ad01b3fc60da5b4434d16a8cc28c3836ad"
+      },
+      {
+        "id": "bmkg-bmkg-perkuat-kolaborasi-dalam-pengembangan-teknologi-modifikasi-cuaca-melalui-asean-workshop-on-weather-modification-science-2026",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.001773004187270999,
+        "prob_hoax": 0.998227059841156,
+        "confidence": 0.998227059841156,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "ab50a6afefd034981a629d64a971bdc8a8662575c269f4b8d50e532dcee0416e"
+      },
+      {
+        "id": "bmkg-dwp-bmkg-gelar-seminar-parenting-tegas-tanpa-harus-keras-berdayakan-peran-orang-tua-dalam-pengasuhan-anak",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0022104091476649046,
+        "prob_hoax": 0.9977896213531494,
+        "confidence": 0.9977896213531494,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "ff9ad46dbf6609585d29be06459bebd74a3af7855915f58ea117680c172253b8"
+      },
+      {
+        "id": "bmkg-gempa-flores-m77-jadi-momentum-penguatan-mitigasi-bencana-berbasis-sains-dan-teknologi",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0019017545273527503,
+        "prob_hoax": 0.9980983138084412,
+        "confidence": 0.9980983138084412,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "d59b24a4273c4549c8cc48ae38c4a610d4334adc37b6ce77194ba4830013c41e"
+      },
+      {
+        "id": "bmkg-bmkg-laksanakan-survei-meteo-oseanografi-terpadu-di-selat-sunda-untuk-perkuat-akurasi-layanan-maritim",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0010693009244278073,
+        "prob_hoax": 0.9989306330680847,
+        "confidence": 0.9989306330680847,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "ac56ef3961dcecdd737731af2d6e13d926667f2c124b291aec505b26c4bd9cb0"
+      },
+      {
+        "id": "bmkg-bmkg-tekankan-pentingnya-informasi-iklim-dalam-perencanaan-produksi-dan-distribusi-pupuk-nasional",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0008472254266962409,
+        "prob_hoax": 0.9991527795791626,
+        "confidence": 0.9991527795791626,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "62b47b4ed4011c2aaf374efdbfeea29b279eebd6e5080759fa29cbb3b2cc1d45"
+      },
+      {
+        "id": "bmkg-bmkg-paparkan-mitigasi-karhutla-dan-penanganan-pascagempa-flores-dalam-ratas-presiden",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0012664094101637602,
+        "prob_hoax": 0.9987335801124573,
+        "confidence": 0.9987335801124573,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "42b15f0404da59e67cef476cef62ca9e6558f6f1522b65bbb1a32b4c2a55c147"
+      },
+      {
+        "id": "bmkg-bmkg-perkuat-budaya-selamat-hadapi-ancaman-gempabumi-dan-tsunami-di-the-sanur",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0015895345713943243,
+        "prob_hoax": 0.9984104633331299,
+        "confidence": 0.9984104633331299,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "83026676bba28f9ee7c4da82accee347a3b8b35b97b0422b3cdc8fccfe0cca36"
+      },
+      {
+        "id": "bmkg-tingkatkan-kesiapsiagaan-bencana-bmkg-perkuat-sinergi-dengan-pemkab-buleleng",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.004957943223416805,
+        "prob_hoax": 0.995042085647583,
+        "confidence": 0.995042085647583,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "3f2fba9604f544bb2645b6d754cb7f9aa4a2a03736c71e48cd470bbab8b1b909"
+      },
+      {
+        "id": "kemkes-kesehatan-masyarakat-terancam-kemenkes-dan-komdigi-kolaborasi-dengan-mitra-strategis-membangun-ekosistem-penanganan-hoaks",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.005053235683590174,
+        "prob_hoax": 0.9949467778205872,
+        "confidence": 0.9949467778205872,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "b80b766872f68fa848587ae38fecce2ad2ea0076472b6517395ec9ae36341177"
+      },
+      {
+        "id": "kemkes-lawan-hoaks-kesehatan-kemenkes-bangun-sistem-dan-kolaborasi-respons-cepat-",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0012627587420865893,
+        "prob_hoax": 0.9987372756004333,
+        "confidence": 0.9987372756004333,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "1c7dfe894084fbde67a4cf722b0af40199146b85e4284a242116a396cfe2145b"
+      },
+      {
+        "id": "kemkes-4-dari-10-anak-sekolah-alami-gigi-berlubang-kemenkes-dorong-periksa-gigi-rutin",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0013612546026706696,
+        "prob_hoax": 0.9986386895179749,
+        "confidence": 0.9986386895179749,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "b23e429fb0b1a73e12a639302ce1c1177391f1a30046f4ccbdb433d8bd6e1fdb"
+      },
+      {
+        "id": "kemkes-perkuat-sinergi-kesehatan-kemenkes-usung-tiga-prinsip-utama-one-plan-one-budget-one-evaluation",
+        "true_label": "valid",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.9746379852294922,
+        "prob_hoax": 0.025362033396959305,
+        "confidence": 0.9746379852294922,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "e27f32f0b4b7b06a596566a4aa46af9284b48b93fdbb3fee366c4fc1291d1c6b"
+      },
+      {
+        "id": "kemkes-menkes-kemitraan-kesehatan-harus-berujung-pada-dampak-nyata",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.002184815239161253,
+        "prob_hoax": 0.9978151321411133,
+        "confidence": 0.9978151321411133,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "294a27f6b888e0d1685cd25a89e33f42af845417ac85aa3ff9e2fff105258ae1"
+      },
+      {
+        "id": "kemkes-usai-kajian-komnas-kipi-kemenkes-pastikan-bias-tetap-dilanjutkan-di-karo",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.006797730922698975,
+        "prob_hoax": 0.993202269077301,
+        "confidence": 0.993202269077301,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "9d2010d866fa5220aff01c316576b28430f3be9deb1f2aa7d35a6c0185af70dc"
+      },
+      {
+        "id": "kemkes-kemenkes-perkuat-pemantauan-kualitas-udara-hadapi-dampak-erupsi-anak-krakatau",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0009374860674142838,
+        "prob_hoax": 0.9990624785423279,
+        "confidence": 0.9990624785423279,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "5beff9e5017702794177d917ea14d4ccb3f85f81c42ddc311e1f35eb6ab58abb"
+      },
+      {
+        "id": "kemkes-kemenkes-siagakan-413-rumah-sakit-dan-830-puskesmas-hadapi-dampak-erupsi-anak-krakatau",
+        "true_label": "valid",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.9827713370323181,
+        "prob_hoax": 0.017228659242391586,
+        "confidence": 0.9827713370323181,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "af6a71f01aec128568f753f5a53a164cc773776073c70b950ca75d5b3f71678e"
+      },
+      {
+        "id": "kemkes-kemenkes-kirim-160-nakes-batch-2-ke-ntt-perkuat-pemulihan-psikososial-korban-gempa",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.4796275794506073,
+        "prob_hoax": 0.5203723907470703,
+        "confidence": 0.5203723907470703,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "4b14c3b14a1d62f39c498d8b11555783d7dcc94239eb77b1319d5e96c261f57d"
+      },
+      {
+        "id": "kemkes-abu-vulkanik-anak-krakatau-menyebar-menkes-meminta-masyarakat-batasi-aktivitas-di-luar-rumah",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0014876724453642964,
+        "prob_hoax": 0.998512327671051,
+        "confidence": 0.998512327671051,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "8e10ffd0b23765ea641d0afdf4a7cfedd93e1c11d97d6513799433f67b45e381"
+      },
+      {
+        "id": "kemkes-tembus-jalur-ekstrem-nakes-tak-tinggalkan-warga-pelosok-ende-pascagempa",
+        "true_label": "valid",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.9765209555625916,
+        "prob_hoax": 0.02347906120121479,
+        "confidence": 0.9765209555625916,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "d0e4f4e1debb21ad90df7c5c6e8d0b6b1e8499291cc10015e3aeee6d3e0bf764"
+      },
+      {
+        "id": "kemkes-wamenkes-dante-ajak-masyarakat-kenali-gejala-gangguan-jiwa",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.015437236987054348,
+        "prob_hoax": 0.9845628142356873,
+        "confidence": 0.9845628142356873,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "101604ebfd0a309000ee9ed97a4f61b86621715d292992b73764275ee702a2bf"
+      },
+      {
+        "id": "kemkes-pemerintah-tunjukan-inovasi-genomik-ri-ke-putri-mahkota-swedia",
+        "true_label": "valid",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.999334990978241,
+        "prob_hoax": 0.0006649870192632079,
+        "confidence": 0.999334990978241,
+        "correct": true,
+        "served_label": "valid",
+        "abstained": false,
+        "text_sha256": "4f4d7e6f8f5abd8f16837b717e8c361408883cc94699660e43a122954c7bc97d"
+      },
+      {
+        "id": "kemkes-kemenkes-perkuat-dua-pilar-kegawatdaruratan-hadapi-krisis-bencana-",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.002368771703913808,
+        "prob_hoax": 0.9976311922073364,
+        "confidence": 0.9976311922073364,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "76b752f4ca2868ea0b72da32e6aa07e59f2504b8e0fa520037a8b9ccac06d51d"
+      },
+      {
+        "id": "kemkes-kemenkes-luncurkan-seleksi-25-prodi-baru-rsppu-dan-serah-terima-54-ppds-batch-iv",
+        "true_label": "valid",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.8273352980613708,
+        "prob_hoax": 0.17266473174095154,
+        "confidence": 0.8273352980613708,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "3044de3dfe97fd6880ffcc885db27c7c6ecd610f7dfd38555a39532c24f90a75"
+      },
+      {
+        "id": "kemkes-kemenkes-dan-ojk-perkuat-ekosistem-pembiayaan-kesehatan",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.0065969424322247505,
+        "prob_hoax": 0.9934030175209045,
+        "confidence": 0.9934030175209045,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "eceefa1b4f4a67b5ff52102543287832cb67b0ea892a989493c1808e2cd53ceb"
+      },
+      {
+        "id": "kemkes-antisipasi-pandemi-baru-indonesia-jadi-negara-ketiga-penguji-target-vaksin-100-hari",
+        "true_label": "valid",
+        "predicted_binary_label": "valid",
+        "prob_valid": 0.9867264032363892,
+        "prob_hoax": 0.013273575343191624,
+        "confidence": 0.9867264032363892,
+        "correct": true,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "bc18ecc25c5112c5ab1ccdb09bd4fff2aa6b0d7e0a8f42ea86dfccff1f653a24"
+      },
+      {
+        "id": "kemkes-satusehat-rme-dukung-bpjs-kesehatan-wujudkan-pembiayaan-berbasis-mutu-dan-outcome",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.001517043448984623,
+        "prob_hoax": 0.9984830021858215,
+        "confidence": 0.9984830021858215,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "86d19f75dc5274780554ac095fa9dfb35eaac9600189636ce8100382e625fb15"
+      },
+      {
+        "id": "kemkes-pemerintah-buka-25-prodi-dokter-spesialis-hospital-based-prioritas-untuk-dokter-di-daerah-3t-",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.04067854955792427,
+        "prob_hoax": 0.9593214392662048,
+        "confidence": 0.9593214392662048,
+        "correct": false,
+        "served_label": "meragukan",
+        "abstained": true,
+        "text_sha256": "f222f2bfaeacac8418ea7f34e234ee2dca63f8cbca6ff18681634fef63fa3dbd"
+      },
+      {
+        "id": "kemkes-kemenkes-siap-siaga-hadapi-dampak-karhutla-848-tenaga-kesehatan-dimobilisasi",
+        "true_label": "valid",
+        "predicted_binary_label": "hoax",
+        "prob_valid": 0.00652284873649478,
+        "prob_hoax": 0.9934771656990051,
+        "confidence": 0.9934771656990051,
+        "correct": false,
+        "served_label": "hoax",
+        "abstained": false,
+        "text_sha256": "7371e12464f2befc35ca72e3918feeca65c3cd9a9e55cedc21e494055f38e5e7"
+      }
+    ]
+  },
+  "comparison_to_historical": {
+    "max_probability_absolute_delta": 5.662439118703233e-07,
+    "binary_label_changes": 0,
+    "served_label_changes": 0,
+    "per_record": [
+      {
+        "id": "turnbackhoax-36648",
+        "max_score_delta": 3.725743477622778e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36649",
+        "max_score_delta": 4.411583945373998e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36654",
+        "max_score_delta": 2.3282410548108867e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36655",
+        "max_score_delta": 1.2107478191900056e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36672",
+        "max_score_delta": 7.450441770473493e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36680",
+        "max_score_delta": 4.4703174731375306e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36681",
+        "max_score_delta": 5.817293268189222e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36682",
+        "max_score_delta": 3.8813396940895473e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36520",
+        "max_score_delta": 3.492185622275268e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36701",
+        "max_score_delta": 1.3888890038060708e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36706",
+        "max_score_delta": 1.5832196316109548e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36590",
+        "max_score_delta": 1.9262369477246466e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36729",
+        "max_score_delta": 1.191269305422793e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36730",
+        "max_score_delta": 6.519102943233768e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36731",
+        "max_score_delta": 1.0469403122215226e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36737",
+        "max_score_delta": 3.8713997285722e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36738",
+        "max_score_delta": 1.6300012455235102e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36774",
+        "max_score_delta": 1.1920916598295861e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36596",
+        "max_score_delta": 1.4901579241388685e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "turnbackhoax-36776",
+        "max_score_delta": 3.462716224866824e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36763",
+        "max_score_delta": 2.0360579541800483e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36700",
+        "max_score_delta": 2.7939980513230767e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36702",
+        "max_score_delta": 4.941602682606572e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36707",
+        "max_score_delta": 1.3974820307037505e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36708",
+        "max_score_delta": 4.772848782863548e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36765",
+        "max_score_delta": 1.5133515900937061e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36766",
+        "max_score_delta": 8.729705310408023e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36767",
+        "max_score_delta": 2.6166262640783464e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36768",
+        "max_score_delta": 4.601874437071274e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36727",
+        "max_score_delta": 2.0861618346690314e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36674",
+        "max_score_delta": 5.241076575556239e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36734",
+        "max_score_delta": 4.884391502368857e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36735",
+        "max_score_delta": 1.863124517512138e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36769",
+        "max_score_delta": 1.6296672162782744e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36770",
+        "max_score_delta": 2.9647877035354764e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36741",
+        "max_score_delta": 3.834279898792814e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36771",
+        "max_score_delta": 4.292076676709611e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36772",
+        "max_score_delta": 6.518866637467147e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36773",
+        "max_score_delta": 9.317699632693799e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "cekfakta-36777",
+        "max_score_delta": 4.735074094971981e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C3JA6TA",
+        "max_score_delta": 2.345901251032956e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C3N92ZQ",
+        "max_score_delta": 1.6296782122567077e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C43B9ZV",
+        "max_score_delta": 8.382005527163283e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C43D2T4",
+        "max_score_delta": 1.1176071823201794e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C4AR4CR",
+        "max_score_delta": 2.235149347551424e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C46U463",
+        "max_score_delta": 6.517214528190939e-11,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C4YU8NR",
+        "max_score_delta": 1.1920883935534476e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C63B8NR",
+        "max_score_delta": 2.9802340856255327e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C67B39E",
+        "max_score_delta": 3.5357827776749673e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C67T6KE",
+        "max_score_delta": 4.40918135335977e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C6L8869",
+        "max_score_delta": 5.215405303460319e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C6YK89E",
+        "max_score_delta": 2.2351320100311156e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C7868T3",
+        "max_score_delta": 5.662439118703233e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C7DR9ZT",
+        "max_score_delta": 3.5762799976968296e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C7HH4KE",
+        "max_score_delta": 2.9802009776647154e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C7E489E",
+        "max_score_delta": 3.725337121424088e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C7HQ8T8",
+        "max_score_delta": 1.192094997159998e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C7QM7CW",
+        "max_score_delta": 3.872397194570887e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C7RB2CQ",
+        "max_score_delta": 5.960494875445477e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "afp-C7VL29F",
+        "max_score_delta": 1.1920888554062259e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2817126",
+        "max_score_delta": 4.960476474025199e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2817226",
+        "max_score_delta": 4.4775294583132563e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2817326",
+        "max_score_delta": 1.6299114037610085e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2817426",
+        "max_score_delta": 2.3283106900806594e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2817526",
+        "max_score_delta": 1.6296976272818509e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2817626",
+        "max_score_delta": 3.171907181354072e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2817726",
+        "max_score_delta": 3.3084646133829665e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2817826",
+        "max_score_delta": 5.122027092394066e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2817926",
+        "max_score_delta": 9.313508140054716e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818026",
+        "max_score_delta": 1.1641773062058547e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818126",
+        "max_score_delta": 2.2433877672201064e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818226",
+        "max_score_delta": 3.278253110083895e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818326",
+        "max_score_delta": 2.5615322475983082e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818426",
+        "max_score_delta": 2.0956625319638877e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818526",
+        "max_score_delta": 1.1641999769600175e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818626",
+        "max_score_delta": 6.981354418178487e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818726",
+        "max_score_delta": 3.7252730032688586e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818826",
+        "max_score_delta": 3.026507311692378e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2818926",
+        "max_score_delta": 8.152033477513282e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bank_indonesia-sp_2819026",
+        "max_score_delta": 2.328732452532012e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-dan-bakamla-ri-berkolaborasi-dalam-mendukung-keselamatan-dan-keamanan-maritim",
+        "max_score_delta": 4.344411115575486e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-bengkulu-rakor-karhutla-perkuat-early-warning-dan-pencegahan-dini",
+        "max_score_delta": 4.4292737880202715e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-gelar-pengukuhan-dewan-pengurus-korpri-bmkg-masa-bakti-2023-2028",
+        "max_score_delta": 1.3966531342904376e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-hadiri-rdp-komisi-v-dpr-ri-bahas-evaluasi-dan-penyesuaian-anggaran-2026-serta-penetapan-rka-k-l-2027",
+        "max_score_delta": 1.1640629252619022e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-forum-konsultasi-publik-ptsp-bmkg-wujudkan-kemudahan-layanan-dan-tata-kelola-pnbp",
+        "max_score_delta": 9.31474097723775e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-lantik-pejabat-pimpinan-tinggi-pratama-bmkg-tekankan-integritas-dan-kinerja-nyata",
+        "max_score_delta": 4.961317814911048e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-dan-pemkab-natuna-perkuat-observasi-maritim-untuk-dukung-keselamatan-di-wilayah-perbatasan",
+        "max_score_delta": 4.651725716859484e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-siswa-smak-penabur-gading-serpong-matangkan-persiapan-osn-kebumian-di-bmkg",
+        "max_score_delta": 3.4928674878635657e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-dampak-el-nino-masih-perlu-diwaspadai-bmkg-perkuat-dukungan-pengendalian-karhutla",
+        "max_score_delta": 2.0805579481475434e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-sampaikan-pendalaman-rka-k-l-2027-dalam-rdp-bersama-dpr-ri",
+        "max_score_delta": 6.980929133371117e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-perkuat-mitigasi-bencana-di-karanganyar-stasiun-geofisika-sleman-gelar-audiensi-dan-siapkan-sekolah-lapang-gempa-bumi",
+        "max_score_delta": 3.715916463420399e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-sdit-bening-bogor-kunjungi-bmkg-kenali-cuaca-hingga-mitigasi-bencana",
+        "max_score_delta": 1.1637444332843194e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-perkuat-kolaborasi-dalam-pengembangan-teknologi-modifikasi-cuaca-melalui-asean-workshop-on-weather-modification-science-2026",
+        "max_score_delta": 2.709989350979658e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-dwp-bmkg-gelar-seminar-parenting-tegas-tanpa-harus-keras-berdayakan-peran-orang-tua-dalam-pengasuhan-anak",
+        "max_score_delta": 9.31664904512547e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-gempa-flores-m77-jadi-momentum-penguatan-mitigasi-bencana-berbasis-sains-dan-teknologi",
+        "max_score_delta": 1.7463527503432108e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-laksanakan-survei-meteo-oseanografi-terpadu-di-selat-sunda-untuk-perkuat-akurasi-layanan-maritim",
+        "max_score_delta": 1.5134278073380275e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-tekankan-pentingnya-informasi-iklim-dalam-perencanaan-produksi-dan-distribusi-pupuk-nasional",
+        "max_score_delta": 3.0375907952157055e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-paparkan-mitigasi-karhutla-dan-penanganan-pascagempa-flores-dalam-ratas-presiden",
+        "max_score_delta": 4.57300863843102e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-bmkg-perkuat-budaya-selamat-hadapi-ancaman-gempabumi-dan-tsunami-di-the-sanur",
+        "max_score_delta": 3.9432433013297796e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "bmkg-tingkatkan-kesiapsiagaan-bencana-bmkg-perkuat-sinergi-dengan-pemkab-buleleng",
+        "max_score_delta": 2.7935831946324097e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-kesehatan-masyarakat-terancam-kemenkes-dan-komdigi-kolaborasi-dengan-mitra-strategis-membangun-ekosistem-penanganan-hoaks",
+        "max_score_delta": 4.128919428580957e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-lawan-hoaks-kesehatan-kemenkes-bangun-sistem-dan-kolaborasi-respons-cepat-",
+        "max_score_delta": 5.819134106868629e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-4-dari-10-anak-sekolah-alami-gigi-berlubang-kemenkes-dorong-periksa-gigi-rutin",
+        "max_score_delta": 3.293305298607274e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-perkuat-sinergi-kesehatan-kemenkes-usung-tiga-prinsip-utama-one-plan-one-budget-one-evaluation",
+        "max_score_delta": 3.166495930392865e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-menkes-kemitraan-kesehatan-harus-berujung-pada-dampak-nyata",
+        "max_score_delta": 2.095838746909301e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-usai-kajian-komnas-kipi-kemenkes-pastikan-bias-tetap-dilanjutkan-di-karo",
+        "max_score_delta": 6.053698974398114e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-kemenkes-perkuat-pemantauan-kualitas-udara-hadapi-dampak-erupsi-anak-krakatau",
+        "max_score_delta": 9.314142836993819e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-kemenkes-siagakan-413-rumah-sakit-dan-830-puskesmas-hadapi-dampak-erupsi-anak-krakatau",
+        "max_score_delta": 7.450391584923333e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-kemenkes-kirim-160-nakes-batch-2-ke-ntt-perkuat-pemulihan-psikososial-korban-gempa",
+        "max_score_delta": 4.768376072883385e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-abu-vulkanik-anak-krakatau-menyebar-menkes-meminta-masyarakat-batasi-aktivitas-di-luar-rumah",
+        "max_score_delta": 6.983642965134595e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-tembus-jalur-ekstrem-nakes-tak-tinggalkan-warga-pelosok-ende-pascagempa",
+        "max_score_delta": 4.2841214790978466e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-wamenkes-dante-ajak-masyarakat-kenali-gejala-gangguan-jiwa",
+        "max_score_delta": 3.127498260369066e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-pemerintah-tunjukan-inovasi-genomik-ri-ke-putri-mahkota-swedia",
+        "max_score_delta": 3.4973679204422514e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-kemenkes-perkuat-dua-pilar-kegawatdaruratan-hadapi-krisis-bencana-",
+        "max_score_delta": 2.327913807900761e-09,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-kemenkes-luncurkan-seleksi-25-prodi-baru-rsppu-dan-serah-terima-54-ppds-batch-iv",
+        "max_score_delta": 4.17232370875098e-07,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-kemenkes-dan-ojk-perkuat-ekosistem-pembiayaan-kesehatan",
+        "max_score_delta": 1.2572775249727886e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-antisipasi-pandemi-baru-indonesia-jadi-negara-ketiga-penguji-target-vaksin-100-hari",
+        "max_score_delta": 1.3038191623571116e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-satusehat-rme-dukung-bpjs-kesehatan-wujudkan-pembiayaan-berbasis-mutu-dan-outcome",
+        "max_score_delta": 5.820153770822595e-10,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-pemerintah-buka-25-prodi-dokter-spesialis-hospital-based-prioritas-untuk-dokter-di-daerah-3t-",
+        "max_score_delta": 5.58790757276828e-08,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      },
+      {
+        "id": "kemkes-kemenkes-siap-siaga-hadapi-dampak-karhutla-848-tenaga-kesehatan-dimobilisasi",
+        "max_score_delta": 4.947795645415809e-13,
+        "binary_label_changed": false,
+        "served_label_changed": false
+      }
+    ]
+  },
+  "runtime": {
+    "load_and_validation_seconds": 13.303682243000367,
+    "inference_seconds": 15.009477384999627,
+    "total_seconds": 28.319146235000517,
+    "max_rss_kib": 763468
+  },
+  "dependencies": {
+    "torch": "2.13.0+cpu",
+    "transformers": "5.14.1",
+    "tokenizers": "0.22.2",
+    "numpy": "2.5.1"
+  },
+  "limits": [
+    "No fresh training-overlap validation without actual training corpus.",
+    "Historical challenge is known, not a new blind holdout.",
+    "No calibration, threshold search, fitting or model selection performed."
+  ]
+}

@@ -115,6 +115,8 @@ class DatasetSplit:
     path: Path
     rows: tuple[dict[str, str], ...]
     sha256: str
+    raw_sha256: str | None = None
+    canonical_sha256: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -190,7 +192,10 @@ def load_external_split(dataset: FrozenDataset) -> DatasetSplit:
         }
         for row in dataset.rows
     )
-    return DatasetSplit(name="external_challenge", path=dataset.path, rows=rows, sha256=dataset.sha256)
+    return DatasetSplit(
+        name="external_challenge", path=dataset.path, rows=rows, sha256=dataset.sha256,
+        raw_sha256=dataset.raw_sha256, canonical_sha256=dataset.canonical_sha256,
+    )
 
 
 def build_pipeline() -> Pipeline:
@@ -366,6 +371,9 @@ def evaluation_payload(
             "split": split.name,
             "path": str(split.path.resolve().relative_to(PROJECT_ROOT)).replace("\\", "/"),
             "sha256": split.sha256,
+            "raw_sha256": split.raw_sha256 or split.sha256,
+            "canonical_sha256": split.canonical_sha256,
+            "sha256_role": "legacy_manifest_identity" if split.name == "external_challenge" else "raw_bytes",
             "rows": len(split.rows),
             "label_distribution": dict(_labels(split.rows)),
             "fit_or_selection_use": False,

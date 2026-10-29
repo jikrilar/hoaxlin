@@ -12,6 +12,7 @@ import argparse
 import asyncio
 import csv
 import hashlib
+import io
 import json
 import math
 import re
@@ -103,6 +104,8 @@ class FrozenDataset:
     fields: tuple[str, ...]
     rows: tuple[dict[str, str], ...]
     sha256: str
+    raw_sha256: str
+    canonical_sha256: str | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -138,6 +141,55 @@ def _counter_equals(actual: Counter[str], expected: dict[str, int]) -> bool:
     return actual == Counter(expected)
 
 
+def validate_csv_identity(dataset_path: Path, metadata: dict[str, Any]) -> tuple[str, str, str | None]:
+    """Keep legacy report identity; verify both serialized forms for explicit migrations.
+
+    Parse CSV with newline='' so embedded field line endings remain significant.
+    Only record separators differ between the two allowed byte representations.
+    Never strip/normalize/reorder fields, record values, Unicode or whitespace.
+    """
+    def valid_hash(value: Any) -> bool:
+        return isinstance(value, str) and re.fullmatch(r"[0-9a-fA-F]{64}", value) is not None
+
+    expected = metadata.get("sha256")
+    if not valid_hash(expected):
+        raise EvaluationError("Manifest does not contain a valid challenge SHA-256")
+    raw = dataset_path.read_bytes()
+    actual = hashlib.sha256(raw).hexdigest()
+    if "integrity" not in metadata:
+        if actual != expected.lower():
+            raise EvaluationError("challenge.csv SHA-256 does not match manifest")
+        return expected.lower(), actual, None
+
+    integrity = metadata["integrity"]
+    keys = {"policy", "raw_sha256", "canonical_sha256", "historical_raw_sha256"}
+    if not isinstance(integrity, dict) or set(integrity) != keys:
+        raise EvaluationError("Manifest integrity metadata is invalid")
+    if integrity["policy"] != "csv-utf8-bom-lf-v1":
+        raise EvaluationError("Manifest integrity policy is unsupported")
+    if any(not valid_hash(integrity[key]) for key in keys - {"policy"}):
+        raise EvaluationError("Manifest integrity SHA-256 is invalid")
+    try:
+        records = list(csv.reader(io.StringIO(raw.decode("utf-8-sig"), newline=""), strict=True))
+        hashes = []
+        for separator in ("\n", "\r\n"):
+            output = io.StringIO(newline="")
+            csv.writer(output, lineterminator=separator).writerows(records)
+            hashes.append(hashlib.sha256(output.getvalue().encode("utf-8-sig")).hexdigest())
+    except (UnicodeError, csv.Error) as exc:
+        raise EvaluationError("Unable to canonicalize challenge CSV integrity") from exc
+    canonical, historical = hashes
+    if (
+        canonical != integrity["canonical_sha256"].lower()
+        or canonical != integrity["raw_sha256"].lower()
+        or historical != integrity["historical_raw_sha256"].lower()
+        or historical != expected.lower()
+        or actual not in hashes
+    ):
+        raise EvaluationError("challenge.csv integrity SHA-256 does not match manifest")
+    return expected.lower(), actual, canonical
+
+
 def validate_frozen_dataset(dataset_path: Path, manifest_path: Path) -> FrozenDataset:
     """Validate the immutable snapshot before any model is loaded."""
 
@@ -158,12 +210,7 @@ def validate_frozen_dataset(dataset_path: Path, manifest_path: Path) -> FrozenDa
     file_metadata = manifest.get("file")
     if not isinstance(file_metadata, dict):
         raise EvaluationError("Manifest file metadata is missing")
-    expected_sha = file_metadata.get("sha256")
-    if not isinstance(expected_sha, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", expected_sha):
-        raise EvaluationError("Manifest does not contain a valid challenge SHA-256")
-    actual_sha = sha256_file(dataset_path)
-    if actual_sha.lower() != expected_sha.lower():
-        raise EvaluationError("challenge.csv SHA-256 does not match manifest")
+    identity_sha, actual_sha, canonical_sha = validate_csv_identity(dataset_path, file_metadata)
 
     fields, rows = read_csv(dataset_path)
     missing_schema = [field for field in REQUIRED_DATASET_FIELDS if field not in fields]
@@ -207,7 +254,9 @@ def validate_frozen_dataset(dataset_path: Path, manifest_path: Path) -> FrozenDa
         manifest=manifest,
         fields=fields,
         rows=rows,
-        sha256=actual_sha,
+        sha256=identity_sha,
+        raw_sha256=actual_sha,
+        canonical_sha256=canonical_sha,
     )
 
 
@@ -802,6 +851,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "name": dataset.manifest["dataset_name"],
             "version": dataset.manifest["version"],
             "sha256": dataset.sha256,
+            "raw_sha256": dataset.raw_sha256,
+            "canonical_sha256": dataset.canonical_sha256,
+            "sha256_role": "legacy_manifest_identity",
             "rows": len(dataset.rows),
             "evaluation_only": True,
         },
@@ -815,6 +867,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "name": dataset.manifest["dataset_name"],
             "version": dataset.manifest["version"],
             "sha256": dataset.sha256,
+            "raw_sha256": dataset.raw_sha256,
+            "canonical_sha256": dataset.canonical_sha256,
+            "sha256_role": "legacy_manifest_identity",
             "rows": len(dataset.rows),
             "evaluation_only": True,
         },

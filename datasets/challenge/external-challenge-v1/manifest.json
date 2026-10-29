@@ -31,6 +31,12 @@
     "sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708",
     "encoding": "UTF-8 with BOM",
     "newline": "CRLF",
+    "integrity": {
+      "policy": "csv-utf8-bom-lf-v1",
+      "raw_sha256": "d9237395948dc42cbcfec328a4f2a74bbff73d66537bced27ef4746b76c32f7b",
+      "canonical_sha256": "d9237395948dc42cbcfec328a4f2a74bbff73d66537bced27ef4746b76c32f7b",
+      "historical_raw_sha256": "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708"
+    },
     "columns": [
       "id",
       "text",

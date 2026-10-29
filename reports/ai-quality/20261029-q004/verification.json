@@ -1,0 +1,56 @@
+{
+  "task": "Q-004",
+  "status": "DONE_PROTOCOL_ONLY_NO_CANDIDATE_PASS",
+  "source_commit": "702b4e10d079e083ccd3cfb365835bd596958501",
+  "verified_at_utc": "2026-10-29T10:39:27.823400+00:00",
+  "protocol_version": "q004-v1",
+  "q003_status": "BLOCKED_PARTIAL",
+  "q003_artifact_hashes_verified": 11,
+  "historical_user_file_hashes_verified": 47,
+  "owner_files_preserved": {
+    "HOAXLIN-BERT-RAG-AUDIT-TASKS.md": "da2600df7144985f4d2140c1f36cb7b1c8bd98a2d3bd7975ddd017cee68bfc88",
+    "tests/Feature/FilamentAuditObserverTest.php": "2446116cfdd2698609c54cd458e42211e4e4336f64057d5302fa776828f29650"
+  },
+  "current_komdigi_expected_path_present": false,
+  "default_cli_unit_smoke": {
+    "exit_code": 0,
+    "replicates": 2000,
+    "seconds": 0.701,
+    "synthetic_unit_fixture_only": true,
+    "benchmark_measurement": false
+  },
+  "validation": {
+    "targeted": {
+      "exit_code": 0,
+      "passed": 44,
+      "seconds": 10.14
+    },
+    "full_bert": {
+      "exit_code": 1,
+      "passed": 114,
+      "failed": 5,
+      "warnings": 2,
+      "skipped": 0,
+      "seconds": 26.36,
+      "failures": [
+        "tests/test_api.py::test_readiness_200_when_ready",
+        "tests/test_api.py::test_version_exposes_labels_and_threshold",
+        "tests/test_api.py::test_predict_happy_path_hoax_and_valid",
+        "tests/test_api.py::test_predict_threshold_meragukan",
+        "tests/test_api.py::test_request_id_propagation"
+      ]
+    },
+    "python_ast": "PASS",
+    "cli_help": "PASS"
+  },
+  "new_inference_samples": 0,
+  "training_runs": 0,
+  "quality_improvement_measured": false,
+  "artifacts": {
+    "reports/ai-quality/20261029-q004/evaluation-protocol.md": "de3716047ab19b238f00baf4527a30e1a9419753daedb58be2f6b68d214cd501",
+    "reports/ai-quality/20261029-q004/q003-review.md": "c6968448347966bf35944af4afa838571f6dfa428f9594296a61eccfc46dca4b",
+    "reports/ai-quality/20261029-q004/execution-log.md": "56be48d59fe39a35dd15d3dee352094b600d3c23052b228500cbc3ba3636273f",
+    "bert-service/scripts/classifier_protocol_report.py": "795297d97e9ab28f83a961100149d12f7a669b666c9951d99eb6656d504d8511",
+    "bert-service/tests/test_classifier_protocol_report.py": "e89db504b0afa058f4b205696355331f052a73ae00b3e02326d264e21449f8c7"
+  }
+}
