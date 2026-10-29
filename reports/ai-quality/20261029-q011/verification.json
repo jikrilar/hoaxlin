@@ -1,0 +1,38 @@
+{
+  "base_commit": "9cc78ce1a909d04a365171d7c7ce17a02162e5b6",
+  "branch": "quality/04-bert-model",
+  "eligible_reviewed_records": 0,
+  "freeze_time": null,
+  "full_python": {
+    "baseline_failure_file": "test_api.py (Windows model path)",
+    "exit_code": 1,
+    "failed": 5,
+    "passed": 163,
+    "seconds": 26.91,
+    "warnings": 2
+  },
+  "limits": [
+    "No real partitions available for overlap audit",
+    "No temporal/source holdout assigned",
+    "Helper cannot authenticate human reviews or detect unknown semantic paraphrases",
+    "No actual benchmark counts/hashes/freeze manifest generated"
+  ],
+  "partitions_frozen": false,
+  "preservation": "PASS owner files, CSV, prior Q008-Q010 evidence and private staging hashes",
+  "report_hashes": {
+    "reports/ai-quality/20261029-q011/execution-log.md": "848d25bb5559b584ab671bf6b8e56e063342fc4ed35c5944416106781d8ced06",
+    "reports/ai-quality/20261029-q011/preflight-result.json": "f00e4e4260607717212aee2f5e619379da6440d264cbfd44ad3f4f6f5b13020f",
+    "reports/ai-quality/20261029-q011/preflight.py": "eefcd127146a9eaed50627d4771853e9d77c82bf3798fead27193ad134a84a38"
+  },
+  "source_hashes": {
+    "bert-service/dataset/benchmark_partitions.py": "65b4750eefdeb76f5b5d0e570d4655a63f618d4a56923c0a3b1be91aa155eec1",
+    "bert-service/tests/test_benchmark_partitions.py": "75481085c68fe5150a5c6089efbb05be6fb1a8f7825eeac718535cd91915500c"
+  },
+  "status": "BLOCKED",
+  "targeted_tests": {
+    "exit_code": 0,
+    "passed": 24,
+    "seconds": 0.56
+  },
+  "task": "Q-011"
+}
