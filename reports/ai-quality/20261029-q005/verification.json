@@ -1,0 +1,50 @@
+{
+  "task": "Q-005",
+  "status": "DONE_INSTRUMENTATION_ONLY",
+  "source_commit": "88a10cfa873dddb3f6139d9225f677d41c77d752",
+  "verified_at_utc": "2026-10-29T11:20:54.533679+00:00",
+  "owner_files_preserved": {
+    "HOAXLIN-BERT-RAG-AUDIT-TASKS.md": "e2e1b125a0ca1fba75d7d3ca6905b3a18c637fb3bb8b63cef2196eb830a23449",
+    "tests/Feature/FilamentAuditObserverTest.php": "2446116cfdd2698609c54cd458e42211e4e4336f64057d5302fa776828f29650"
+  },
+  "validation": {
+    "targeted_pipeline": {
+      "exit_code": 0,
+      "passed": 25,
+      "failed": 0,
+      "assertions": 287,
+      "filter": "InputTraceTest|RetrieveSubmissionEvidenceTest|PipelineIntegrationTest|OpenAiTranslatorTest|TranslationProvenanceExportTest|AiPipelineTest"
+    },
+    "full_suite": {
+      "exit_code": 1,
+      "passed": 754,
+      "failed": 4,
+      "warnings": 25,
+      "skipped": 4,
+      "assertions": 5415,
+      "failures": [
+        "Tests\\Feature\\FilamentAuditObserverTest > writer persists only allowlisted user changes and redacts credentials and free text",
+        "Tests\\Feature\\FilamentAuditObserverTest > writer ignores unknown and nested dirty attributes",
+        "Tests\\Feature\\FilamentAuditObserverTest > writer keeps safe dataset label and verifier but redacts curation text",
+        "Tests\\Feature\\FilamentAuditObserverTest > writer redacts submission content and credentials but keeps operational state"
+      ],
+      "preexisting_untracked_failures_confirmed": true
+    },
+    "pint": {
+      "exit_code": 0,
+      "checked_files": 7,
+      "status": "PASS"
+    }
+  },
+  "artifacts": {
+    "app/Services/Pipeline/InputTrace.php": "2592c9cbfe87d49b71570b6382c75f92717a6d285334f4f57941a3c2c7fb1f23",
+    "app/Services/Pipeline/SubmissionStateMachine.php": "c0cc85af9ca675dba49ad0853c62dec7c5d9900bd1c9635a8913c5bfe10fde9f",
+    "app/Jobs/ExtractSubmissionText.php": "bdc866e90ef03b694dcf8839931835b4cce37e9313af1a044f494a9680c45583",
+    "app/Jobs/TranslateSubmissionText.php": "fdd8d0f9c675424f89a6aad30eec2ac9475925becda30ad27cff3033acb20b9e",
+    "app/Jobs/ClassifySubmission.php": "cea1c5edcf757273de14f63f4847f4ec88f71a0a640db7788c31b68fc67b478e",
+    "app/Jobs/RetrieveSubmissionEvidence.php": "5b2172664d1666264d365871b558e3d2d6d0a35fc02c8530ca03f23d5a832043",
+    "tests/Feature/InputTraceTest.php": "fb187b04fc60e23115a9b706c539bceda5461eb6f222ce834e9761531293621b",
+    "reports/ai-quality/20261029-q005/execution-log.md": "9e753feb0fbb34a7b4badb0878e245c812a72cdbf9ad1f7e9f99582989777e7d",
+    "reports/ai-quality/20261029-q005/run-tests.sh": "f5f4bf68b7c4f1b7215fd7d3729e747d63f721356fe7aafcc846b60e18d61e16"
+  }
+}

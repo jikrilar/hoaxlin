@@ -10,6 +10,7 @@ use App\Jobs\Concerns\HandlesPipelineFailures;
 use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\DetectionResult;
 use App\Models\Submission;
+use App\Services\Pipeline\InputTrace;
 use App\Services\Pipeline\PipelineFailureReporter;
 use App\Services\Pipeline\ProcessingEventRecorder;
 use App\Services\Pipeline\SubmissionStateMachine;
@@ -62,7 +63,9 @@ class ClassifySubmission implements ShouldBeUnique, ShouldQueue
             $started = hrtime(true);
 
             try {
-                $state->markProcessing($submission, ProcessingStage::Classifying, $this->attempts());
+                $state->markProcessing($submission, ProcessingStage::Classifying, $this->attempts(), [
+                    'input_trace' => ['classifier_input' => InputTrace::analysis($submission)],
+                ]);
                 $classification = $classifier->classify((string) $submission->analysis_text);
                 $state->markClassified($submission, $classification, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000));
             } catch (Throwable $exception) {

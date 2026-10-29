@@ -8,6 +8,7 @@ use App\Enums\ProcessingStage;
 use App\Jobs\Concerns\HandlesPipelineFailures;
 use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\Submission;
+use App\Services\Pipeline\InputTrace;
 use App\Services\Pipeline\ProcessingEventRecorder;
 use App\Services\Pipeline\SubmissionStateMachine;
 use Illuminate\Bus\Queueable;
@@ -52,8 +53,11 @@ class TranslateSubmissionText implements ShouldBeUnique, ShouldQueue
             $started = hrtime(true);
 
             try {
-                $state->markProcessing($submission, ProcessingStage::Translating, $this->attempts());
-                $translation = $translator->translate((string) $submission->extracted_text);
+                $input = (string) $submission->extracted_text;
+                $state->markProcessing($submission, ProcessingStage::Translating, $this->attempts(), [
+                    'input_trace' => ['translation_input' => InputTrace::text($input, 'translation-input:identity-v1')],
+                ]);
+                $translation = $translator->translate($input);
                 $submission->update([
                     'source_language' => $translation->sourceLanguage,
                     'translated_text' => $translation->translated ? $translation->text : null,
@@ -76,6 +80,16 @@ class TranslateSubmissionText implements ShouldBeUnique, ShouldQueue
                         'translated' => $translation->translated,
                         'model' => $translation->model,
                         'cached' => $translation->cached,
+                        'input_trace' => [
+                            'translation_input' => InputTrace::text($input, 'translation-input:identity-v1', $translation->sourceLanguage),
+                            'translated_text' => InputTrace::text(
+                                $translation->translated ? $translation->text : null,
+                                $translation->translated ? 'translation:prompt-'.config('services.openai.translation_prompt_version', '1.0') : 'translation:not-required-v1',
+                                $translation->translated ? 'id' : null,
+                                $input,
+                            ),
+                            'analysis_text' => InputTrace::analysis($submission),
+                        ],
                     ],
                 );
                 $this->continueToClassification($submission->id);

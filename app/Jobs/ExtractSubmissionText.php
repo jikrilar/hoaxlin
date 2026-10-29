@@ -7,6 +7,7 @@ use App\Jobs\Concerns\HandlesPipelineFailures;
 use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\Submission;
 use App\Services\Extraction\TextExtractorResolver;
+use App\Services\Pipeline\InputTrace;
 use App\Services\Pipeline\SubmissionStateMachine;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -54,9 +55,16 @@ class ExtractSubmissionText implements ShouldBeUnique, ShouldQueue
             $started = hrtime(true);
 
             try {
-                $state->markProcessing($submission, ProcessingStage::Extracting, $this->attempts());
+                $rawTrace = InputTrace::text($submission->raw_input, 'raw-input:identity-v1');
+                $state->markProcessing($submission, ProcessingStage::Extracting, $this->attempts(), [
+                    'input_trace' => ['raw_input' => $rawTrace],
+                ]);
                 $extracted = $resolver->resolve($submission)->extract($submission);
-                $state->markExtracted($submission, $extracted->contentHash(), $extracted->provider, $extracted->cached, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000), $extracted->normalized());
+                $state->markExtracted($submission, $extracted->contentHash(), $extracted->provider, $extracted->cached, $this->attempts(), (int) ((hrtime(true) - $started) / 1_000_000), $extracted->normalized(), [
+                    'raw_input' => $rawTrace,
+                    'extractor_output' => InputTrace::text($extracted->text, 'extractor-output:provider-unversioned-v1', parent: $submission->input_type === 'text' ? $submission->raw_input : null),
+                    'extracted_text' => InputTrace::text($extracted->normalized(), 'text-normalizer:'.config('app.ai_normalizer_version', '1.0'), parent: $extracted->text),
+                ]);
                 $this->continueToTranslation($submission->id);
             } catch (Throwable $exception) {
                 $this->handlePipelineFailure($submission, ProcessingStage::Extracting, $exception, $state, $this->tries, $this->backoff());

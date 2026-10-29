@@ -7,6 +7,7 @@ use App\Enums\EventOutcome;
 use App\Enums\ProcessingStage;
 use App\Jobs\Concerns\UniqueSubmissionStage;
 use App\Models\Submission;
+use App\Services\Pipeline\InputTrace;
 use App\Services\Pipeline\PipelineFailureReporter;
 use App\Services\Pipeline\ProcessingEventRecorder;
 use App\Services\Pipeline\SubmissionStateMachine;
@@ -57,8 +58,18 @@ class RetrieveSubmissionEvidence implements ShouldBeUnique, ShouldQueue
             $attempt = max(1, $this->attempts());
 
             try {
-                $state->markProcessing($submission, ProcessingStage::Retrieving, $attempt);
                 $query = mb_substr(trim((string) $submission->analysis_text), 0, 4000);
+                $inputTrace = [
+                    'analysis_text' => InputTrace::analysis($submission),
+                    'retrieval_query' => InputTrace::text(
+                        $query,
+                        'retrieval-query:trim-head-4000-v1',
+                        filled($submission->translated_text) ? 'id' : $submission->source_language,
+                        (string) $submission->analysis_text,
+                        mb_strlen(trim((string) $submission->analysis_text)) > 4000,
+                    ),
+                ];
+                $state->markProcessing($submission, ProcessingStage::Retrieving, $attempt, ['input_trace' => $inputTrace]);
                 $evidence = $retriever->retrieve($query);
                 $persister->persist($submission, $evidence);
 
@@ -69,7 +80,7 @@ class RetrieveSubmissionEvidence implements ShouldBeUnique, ShouldQueue
                     'rag',
                     $attempt,
                     (int) ((hrtime(true) - $started) / 1_000_000),
-                    metadata: ['result_count' => count($evidence)],
+                    metadata: ['result_count' => count($evidence), 'input_trace' => $inputTrace],
                 );
             } catch (Throwable $exception) {
                 try {
