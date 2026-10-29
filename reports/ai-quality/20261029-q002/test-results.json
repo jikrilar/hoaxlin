@@ -1,0 +1,47 @@
+{
+  "task": "Q-002",
+  "runner": "reports/ai-quality/20261029-q002/run-tests.sh",
+  "red_before_implementation": {
+    "exit_code": 1,
+    "passed": 13,
+    "failed": 8,
+    "log": "/tmp/opencode/q002-evidence/red.log"
+  },
+  "red_report_identity": {
+    "exit_code": 1,
+    "failed": 1,
+    "reason": "Missing raw_sha256 in new baseline output",
+    "log": "/tmp/opencode/q002-evidence/red-report-identity.log"
+  },
+  "targeted_final": {
+    "exit_code": 0,
+    "passed": 36,
+    "failed": 0,
+    "seconds": 3.19,
+    "arguments": [
+      "tests/test_external_challenge_evaluator.py",
+      "tests/test_external_challenge_builder.py",
+      "tests/test_tfidf_logreg_baseline.py",
+      "tests/test_external_challenge_error_analysis.py"
+    ]
+  },
+  "full_bert_suite": {
+    "exit_code": 1,
+    "passed": 105,
+    "failed": 5,
+    "warnings": 2,
+    "skipped": 0,
+    "seconds": 12.61,
+    "arguments": [],
+    "log": "/tmp/opencode/q002-evidence/full-final.log",
+    "reason": "Existing test_api.py hardcodes unavailable Windows model path; model load fails before inference, readiness/predict return 503",
+    "failures": [
+      "tests/test_api.py::test_readiness_200_when_ready",
+      "tests/test_api.py::test_version_exposes_labels_and_threshold",
+      "tests/test_api.py::test_predict_happy_path_hoax_and_valid",
+      "tests/test_api.py::test_predict_threshold_meragukan",
+      "tests/test_api.py::test_request_id_propagation"
+    ]
+  },
+  "quality_improvement_measured": false
+}

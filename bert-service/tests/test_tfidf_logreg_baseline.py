@@ -11,11 +11,37 @@ from scripts.evaluate_tfidf_logreg_baseline import (
     ID_TO_LABEL,
     LABEL_TO_ID,
     DatasetSplit,
+    build_comparison,
     compute_metrics,
     evaluate_split,
     train_baseline,
+    load_external_split,
+    evaluation_payload,
     write_predictions,
 )
+from scripts.evaluate_external_challenge import validate_frozen_dataset
+
+
+def test_lf_checkout_retains_identity_for_historical_baseline_comparison() -> None:
+    import json
+
+    root = Path(__file__).resolve().parents[2] / "datasets/challenge/external-challenge-v1"
+    dataset = validate_frozen_dataset(root / "challenge.csv", root / "manifest.json")
+    split = load_external_split(dataset)
+    results = root / "results"
+    payloads = [json.loads((results / name).read_text()) for name in [
+        "baseline_internal_evaluation.json", "binary_evaluation.json",
+        "baseline_internal_evaluation.json", "baseline_external_evaluation.json",
+    ]]
+    # The comparison consumes only n and metrics for the internal BERT report.
+    payloads[0]["n"] = 781
+    comparison = build_comparison(*payloads, split.sha256)
+    assert comparison["datasets"]["external_challenge_sha256"] == "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708"
+    assert split.rows[0]["text"] == dataset.rows[0]["text"]
+    payload = evaluation_payload({}, split, {})
+    assert payload["dataset"]["raw_sha256"] == "d9237395948dc42cbcfec328a4f2a74bbff73d66537bced27ef4746b76c32f7b"
+    assert payload["dataset"]["canonical_sha256"] == payload["dataset"]["raw_sha256"]
+    assert payload["dataset"]["sha256_role"] == "legacy_manifest_identity"
 
 
 def _split(name: str, rows: list[tuple[str, str, str]]) -> DatasetSplit:

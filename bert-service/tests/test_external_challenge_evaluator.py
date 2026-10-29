@@ -99,6 +99,95 @@ def test_invalid_label_blocks_frozen_dataset(tmp_path: Path) -> None:
         validate_frozen_dataset(dataset_path, manifest_path)
 
 
+def _migrate_fixture(dataset_path: Path, manifest_path: Path) -> dict:
+    """Independent test metadata for the fixture's original CRLF bytes."""
+    original = dataset_path.read_bytes()
+    lf = original.replace(b"\r\n", b"\n")
+    manifest = json.loads(manifest_path.read_text())
+    manifest["file"]["integrity"] = {
+        "policy": "csv-utf8-bom-lf-v1",
+        "raw_sha256": hashlib.sha256(lf).hexdigest(),
+        "canonical_sha256": hashlib.sha256(lf).hexdigest(),
+        "historical_raw_sha256": hashlib.sha256(original).hexdigest(),
+    }
+    manifest_path.write_text(json.dumps(manifest))
+    return manifest
+
+
+@pytest.mark.parametrize("newline", [b"\n", b"\r\n"])
+def test_migrated_identity_accepts_only_equivalent_line_endings(tmp_path: Path, newline: bytes) -> None:
+    dataset_path, manifest_path = _write_frozen_fixture(tmp_path)
+    manifest = _migrate_fixture(dataset_path, manifest_path)
+    dataset_path.write_bytes(dataset_path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", newline))
+    dataset = validate_frozen_dataset(dataset_path, manifest_path)
+    assert len(dataset.rows) == 120
+    assert dataset.sha256 == manifest["file"]["sha256"]  # explicit historical compatibility identity
+    assert dataset.raw_sha256 == hashlib.sha256(dataset_path.read_bytes()).hexdigest()
+    assert dataset.canonical_sha256 == manifest["file"]["integrity"]["canonical_sha256"]
+
+
+@pytest.mark.parametrize("change", ["text", "id", "label", "order", "count", "field_newline"])
+def test_migrated_identity_rejects_record_changes(tmp_path: Path, change: str) -> None:
+    dataset_path, manifest_path = _write_frozen_fixture(tmp_path)
+    _migrate_fixture(dataset_path, manifest_path)
+    with dataset_path.open(encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.reader(handle))
+    if change == "order":
+        rows[1], rows[2] = rows[2], rows[1]
+    elif change == "count":
+        rows.pop()
+    else:
+        column = {"text": 1, "id": 0, "label": 2, "field_newline": 1}[change]
+        rows[1][column] = "valid" if change == "label" else rows[1][column] + ("\n" if change == "field_newline" else " changed")
+    with dataset_path.open("w", encoding="utf-8-sig", newline="") as handle:
+        csv.writer(handle, lineterminator="\n").writerows(rows)
+    with pytest.raises(EvaluationError, match="SHA-256"):
+        validate_frozen_dataset(dataset_path, manifest_path)
+
+
+@pytest.mark.parametrize("key", ["policy", "raw_sha256", "canonical_sha256", "historical_raw_sha256"])
+def test_migration_metadata_cannot_silently_disable_integrity(tmp_path: Path, key: str) -> None:
+    dataset_path, manifest_path = _write_frozen_fixture(tmp_path)
+    manifest = _migrate_fixture(dataset_path, manifest_path)
+    manifest["file"]["integrity"][key] = "unsupported-policy" if key == "policy" else "0" * 64
+    manifest_path.write_text(json.dumps(manifest))
+    with pytest.raises(EvaluationError, match="integrity|SHA-256"):
+        validate_frozen_dataset(dataset_path, manifest_path)
+
+
+def test_unmigrated_manifest_remains_strict_raw_byte_identity(tmp_path: Path) -> None:
+    dataset_path, manifest_path = _write_frozen_fixture(tmp_path)
+    validate_frozen_dataset(dataset_path, manifest_path)
+    dataset_path.write_bytes(dataset_path.read_bytes().replace(b"\r\n", b"\n"))
+    with pytest.raises(EvaluationError, match="SHA-256"):
+        validate_frozen_dataset(dataset_path, manifest_path)
+
+
+@pytest.mark.parametrize("change", ["mixed_separators", "missing_bom", "extra_blank_line"])
+def test_migrated_identity_rejects_unlisted_serializations(tmp_path: Path, change: str) -> None:
+    dataset_path, manifest_path = _write_frozen_fixture(tmp_path)
+    _migrate_fixture(dataset_path, manifest_path)
+    raw = dataset_path.read_bytes()
+    if change == "mixed_separators":
+        raw = raw.replace(b"\r\n", b"\n", 1)
+    elif change == "missing_bom":
+        raw = raw[3:]
+    else:
+        raw += b"\r\n"
+    dataset_path.write_bytes(raw)
+    with pytest.raises(EvaluationError, match="SHA-256"):
+        validate_frozen_dataset(dataset_path, manifest_path)
+
+
+def test_linux_checkout_validates_without_rewriting_challenge_or_historical_reports() -> None:
+    root = Path(__file__).resolve().parents[2] / "datasets/challenge/external-challenge-v1"
+    dataset = validate_frozen_dataset(root / "challenge.csv", root / "manifest.json")
+    assert dataset.raw_sha256 == "d9237395948dc42cbcfec328a4f2a74bbff73d66537bced27ef4746b76c32f7b"
+    assert dataset.canonical_sha256 == dataset.raw_sha256
+    assert dataset.sha256 == "8ff83e37e7db10b0ab231618c6834d45325a9aacb2676ae0fcd2069b30e51708"
+    assert tuple(dataset.rows[0]) == dataset.fields
+
+
 def test_binary_prediction_uses_argmax_and_valid_wins_ties() -> None:
     assert binary_label_from_probabilities(0.8, 0.2) == "valid"
     assert binary_label_from_probabilities(0.2, 0.8) == "hoax"
