@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +16,10 @@ class FineTuneConfig(BaseModel):
     model_name: str = "indobert-hoax"
     version: str = "1.0.0"
 
-    max_length: int = 256
+    max_length: int = Field(default=256, ge=2, le=512)
+    preprocessing_version: Literal["1.0.0"] = "1.0.0"
+    truncation_strategy: Literal["head-only"] = "head-only"
+    multi_claim_policy: Literal["single-sequence-head-only"] = "single-sequence-head-only"
     batch_size: int = 16
     eval_batch_size: int = 32
     num_epochs: int = 4

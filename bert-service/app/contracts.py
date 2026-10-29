@@ -19,12 +19,16 @@ class PredictionRequest(BaseModel):
 
 
 class PredictionResponse(BaseModel):
+    decision: dict[str, Any] | None = None
     request_id: str
     label: str
     confidence_score: float = Field(ge=0.0, le=1.0)
     raw_scores: dict[str, float]
     model_version: str
     inference_ms: float = Field(ge=0.0)
+    token_count: int | None = None
+    truncated: bool | None = None
+    preprocessing_version: str | None = None
 
 
 class HealthResponse(BaseModel):
@@ -38,6 +42,7 @@ class ReadinessResponse(BaseModel):
 
 
 class VersionResponse(BaseModel):
+    policy_fingerprint: str | None = None
     service: str
     service_version: str
     model_version: str | None
@@ -45,6 +50,9 @@ class VersionResponse(BaseModel):
     model_labels: list[str] | None = None
     threshold: float | None = None
     temperature: float | None = None
+    preprocessing_version: str | None = None
+    max_sequence_length: int | None = None
+    truncation_strategy: str | None = None
     # Optional provenance from the evaluation artifact shipped with the
     # active release. Missing metadata is represented as null.
     evaluation_model_version: str | None = None

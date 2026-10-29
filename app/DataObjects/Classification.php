@@ -24,7 +24,14 @@ final readonly class Classification
         public array $rawScores = [],
         public int $inferenceMs = 0,
         public bool $cached = false,
+        public ?int $tokenCount = null,
+        public ?bool $serviceTruncated = null,
+        public ?string $preprocessingVersion = null,
+        public ?array $decision = null,
     ) {
+        if ($tokenCount !== null && $tokenCount < 0) {
+            throw new InvalidArgumentException('Token count must not be negative.');
+        }
         if ($confidenceScore < 0.0 || $confidenceScore > 1.0) {
             throw new InvalidArgumentException('Confidence score must be between 0 and 1.');
         }
@@ -53,6 +60,15 @@ final readonly class Classification
      */
     public static function fromResponse(array $payload, bool $cached = false): self
     {
+        if (isset($payload['token_count']) && (! is_int($payload['token_count']) || $payload['token_count'] < 0)) {
+            throw new InvalidArgumentException('Invalid service token count.');
+        }
+        if (isset($payload['truncated']) && ! is_bool($payload['truncated'])) {
+            throw new InvalidArgumentException('Invalid service truncation flag.');
+        }
+        if (isset($payload['preprocessing_version']) && (! is_string($payload['preprocessing_version']) || trim($payload['preprocessing_version']) === '')) {
+            throw new InvalidArgumentException('Invalid service preprocessing version.');
+        }
         foreach (['label', 'confidence_score', 'model_version'] as $key) {
             if (! array_key_exists($key, $payload)) {
                 throw new InvalidArgumentException("Classifier response is missing the [{$key}] field.");
@@ -82,15 +98,21 @@ final readonly class Classification
             rawScores: $rawScores,
             inferenceMs: (int) ($payload['inference_ms'] ?? 0),
             cached: $cached,
+            tokenCount: isset($payload['token_count']) ? (int) $payload['token_count'] : null,
+            serviceTruncated: isset($payload['truncated']) ? (bool) $payload['truncated'] : null,
+            preprocessingVersion: isset($payload['preprocessing_version']) ? (string) $payload['preprocessing_version'] : null,
+            decision: $payload['decision'] ?? null,
         );
     }
 
     /**
-     * Re-evaluate the reported label against the configured threshold. Keeps
-     * the "meragukan" band tunable from config without retraining the model.
+     * Legacy compatibility only. A versioned release decision is authoritative.
      */
     public function withConfidenceThreshold(float $threshold): self
     {
+        if ($this->decision !== null) {
+            return $this;
+        }
         $label = DetectionLabel::fromConfidence($this->label, $this->confidenceScore, $threshold);
 
         if ($label === $this->label) {
@@ -104,6 +126,10 @@ final readonly class Classification
             rawScores: $this->rawScores,
             inferenceMs: $this->inferenceMs,
             cached: $this->cached,
+            tokenCount: $this->tokenCount,
+            serviceTruncated: $this->serviceTruncated,
+            preprocessingVersion: $this->preprocessingVersion,
+            decision: $this->decision,
         );
     }
 
@@ -116,6 +142,10 @@ final readonly class Classification
             rawScores: $this->rawScores,
             inferenceMs: $this->inferenceMs,
             cached: true,
+            tokenCount: $this->tokenCount,
+            serviceTruncated: $this->serviceTruncated,
+            preprocessingVersion: $this->preprocessingVersion,
+            decision: $this->decision,
         );
     }
 
@@ -145,6 +175,10 @@ final readonly class Classification
             'raw_scores' => $this->rawScores,
             'inference_ms' => $this->inferenceMs,
             'cached' => $this->cached,
+            'token_count' => $this->tokenCount,
+            'truncated' => $this->serviceTruncated,
+            'preprocessing_version' => $this->preprocessingVersion,
+            'decision' => $this->decision,
         ];
     }
 }

@@ -1,0 +1,27 @@
+{
+  "task": "Q-006",
+  "dataset_role": "historical-regression-only-not-tuning-or-blind-holdout",
+  "challenge_sha256": "d9237395948dc42cbcfec328a4f2a74bbff73d66537bced27ef4746b76c32f7b",
+  "release_hashes": {
+    "model.safetensors": "0fea71d7d5fd18c61f4e854d1059bb19ce62e3ec3f573718166417e18f2a1e40",
+    "tokenizer.json": "da8791ba8d7a1459108876b0a0e105c5df39929cc8e7826499f63e74239b0181",
+    "tokenizer_config.json": "81d76ff64c6837a77a26739668e51d61831f35d35e8a7043673b2c614a43c982",
+    "manifest.json": "25d740d8f06dfc9b7727e623f9bddb9de6be5e37b86d3c11a19a647cd67ccd72"
+  },
+  "truncation": {
+    "total_samples": 120, "min_tokens": 7, "median_tokens": 16,
+    "mean_tokens": 19.14, "max_tokens": 76,
+    "over_256_tokens_count": 0, "over_256_tokens_rate": 0.0,
+    "over_512_tokens_count": 0, "over_512_tokens_rate": 0.0
+  },
+  "synthetic_fixtures_only": {
+    "sample_count": 8, "over_256": 3, "over_512": 2,
+    "claim_at_end_head_preserves_marker": false,
+    "claim_at_end_sentence_selection_preserves_marker": true,
+    "quality_improvement_measured": false
+  },
+  "real_frozen_inference_smoke_not_accuracy_evaluation": [
+    {"characters": 53, "tokens": 10, "truncated": false, "label": "hoax", "preprocessing_version": "1.0.0"},
+    {"characters": 7000, "tokens": 702, "truncated": true, "label": "valid", "preprocessing_version": "1.0.0"}
+  ]
+}

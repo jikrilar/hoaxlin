@@ -6,12 +6,17 @@ from pathlib import Path
 import numpy as np
 
 from train.config import FineTuneConfig
+from train.data import encode_training
 from train.metrics import (
     brier_score,
     classification_metrics,
     expected_calibration_error,
     roc_auc,
 )
+
+
+def encode_evaluation(tokenizer, text, max_length, **kwargs):
+    return encode_training(tokenizer, text, max_length, **kwargs)
 
 
 def _softmax(logits: np.ndarray) -> np.ndarray:
@@ -46,11 +51,10 @@ def evaluate_checkpoint(
     with torch.inference_mode():
         for i in range(0, len(dataset), config.eval_batch_size):
             batch = dataset[i : i + config.eval_batch_size]
-            encoded = tokenizer(
+            encoded = encode_evaluation(
+                tokenizer,
                 batch["text"],
-                truncation=True,
-                max_length=config.max_length,
-                padding="max_length",
+                config.max_length,
                 return_tensors="pt",
             )
             logits = model(**encoded).logits.detach().cpu().numpy()
