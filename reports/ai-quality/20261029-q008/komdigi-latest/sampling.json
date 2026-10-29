@@ -1,0 +1,3472 @@
+{
+  "by_matrix_stratum": [
+    {
+      "audit_ids": [
+        "komdigi:369@row-3392",
+        "komdigi:316@row-3411",
+        "komdigi:413@row-3365",
+        "komdigi:434@row-3356",
+        "komdigi:198@row-3468"
+      ],
+      "population": 78,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2024-10",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:415@row-3363",
+        "komdigi:433@row-3357",
+        "komdigi:501@row-3320",
+        "komdigi:318@row-3409",
+        "komdigi:497@row-3324"
+      ],
+      "population": 60,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2024-10",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:379@row-3387"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2024-10",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:668@row-3224",
+        "komdigi:713@row-3208",
+        "komdigi:740@row-3190",
+        "komdigi:763@row-3189",
+        "komdigi:674@row-3220"
+      ],
+      "population": 60,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2024-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:686@row-3217",
+        "komdigi:766@row-3186",
+        "komdigi:958@row-3130",
+        "komdigi:673@row-3221",
+        "komdigi:934@row-3141"
+      ],
+      "population": 51,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2024-11",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59225@row-3024",
+        "komdigi:59181@row-3038",
+        "komdigi:59169@row-3046",
+        "komdigi:59119@row-3067",
+        "komdigi:59279@row-2996"
+      ],
+      "population": 58,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2024-12",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:1027@row-3094",
+        "komdigi:59162@row-3048",
+        "komdigi:59207@row-3031",
+        "komdigi:1056@row-3083",
+        "komdigi:59160@row-3050"
+      ],
+      "population": 47,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2024-12",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59590@row-2852",
+        "komdigi:59581@row-2859",
+        "komdigi:59444@row-2930",
+        "komdigi:59443@row-2931",
+        "komdigi:59597@row-2846"
+      ],
+      "population": 41,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-01",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59403@row-2947",
+        "komdigi:59524@row-2885",
+        "komdigi:59569@row-2863",
+        "komdigi:59457@row-2919",
+        "komdigi:59367@row-2966"
+      ],
+      "population": 47,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-01",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59694@row-2803",
+        "komdigi:59679@row-2813",
+        "komdigi:59706@row-2794",
+        "komdigi:59659@row-2822",
+        "komdigi:59855@row-2714"
+      ],
+      "population": 54,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-02",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59738@row-2772"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-02",
+        "1000-3999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59724@row-2785",
+        "komdigi:59729@row-2780",
+        "komdigi:59736@row-2774",
+        "komdigi:59614@row-2835",
+        "komdigi:59851@row-2717"
+      ],
+      "population": 37,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-02",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59967@row-2659",
+        "komdigi:59964@row-2662",
+        "komdigi:60000@row-2642",
+        "komdigi:59983@row-2649",
+        "komdigi:60014@row-2637"
+      ],
+      "population": 63,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-03",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60008@row-2639",
+        "komdigi:59865@row-2704",
+        "komdigi:59947@row-2669",
+        "komdigi:59949@row-2667",
+        "komdigi:60056@row-2624"
+      ],
+      "population": 37,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-03",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60177@row-2547",
+        "komdigi:60170@row-2552",
+        "komdigi:60137@row-2574",
+        "komdigi:60224@row-2525",
+        "komdigi:60238@row-2515"
+      ],
+      "population": 65,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-04",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60229@row-2521",
+        "komdigi:60216@row-2529",
+        "komdigi:60256@row-2505",
+        "komdigi:60277@row-2498",
+        "komdigi:60139@row-2572"
+      ],
+      "population": 12,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-04",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60173@row-2550",
+        "komdigi:60282@row-2493",
+        "komdigi:60161@row-2554",
+        "komdigi:60276@row-2499",
+        "komdigi:60294@row-2487"
+      ],
+      "population": 7,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-04",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60325@row-2477",
+        "komdigi:60356@row-2463",
+        "komdigi:60342@row-2469",
+        "komdigi:60333@row-2475",
+        "komdigi:60410@row-2448"
+      ],
+      "population": 70,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-05",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60420@row-2440",
+        "komdigi:60541@row-2386",
+        "komdigi:60447@row-2425",
+        "komdigi:60421@row-2439",
+        "komdigi:60371@row-2457"
+      ],
+      "population": 15,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-05",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60323@row-2479",
+        "komdigi:60556@row-2380",
+        "komdigi:60344@row-2467",
+        "komdigi:60324@row-2478",
+        "komdigi:60531@row-2395"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-05",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60845@row-2265",
+        "komdigi:60778@row-2299",
+        "komdigi:60836@row-2269",
+        "komdigi:60762@row-2300",
+        "komdigi:60678@row-2337"
+      ],
+      "population": 89,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-06",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60709@row-2319",
+        "komdigi:60847@row-2263",
+        "komdigi:60825@row-2279",
+        "komdigi:60722@row-2311",
+        "komdigi:60746@row-2306"
+      ],
+      "population": 17,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-06",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60745@row-2307",
+        "komdigi:60724@row-2309",
+        "komdigi:60609@row-2350"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-06",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60940@row-2208",
+        "komdigi:60921@row-2221",
+        "komdigi:61147@row-2094",
+        "komdigi:61009@row-2170",
+        "komdigi:60941@row-2207"
+      ],
+      "population": 94,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-07",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60997@row-2175"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-07",
+        "1000-3999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60943@row-2205",
+        "komdigi:61178@row-2071",
+        "komdigi:61153@row-2088",
+        "komdigi:61019@row-2160",
+        "komdigi:61080@row-2119"
+      ],
+      "population": 17,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-07",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61030@row-2153",
+        "komdigi:60965@row-2195",
+        "komdigi:60930@row-2215",
+        "komdigi:61018@row-2161",
+        "komdigi:60964@row-2196"
+      ],
+      "population": 10,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-07",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61280@row-2018",
+        "komdigi:61440@row-1947",
+        "komdigi:61199@row-2061",
+        "komdigi:61201@row-2059",
+        "komdigi:61296@row-2007"
+      ],
+      "population": 88,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-08",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61446@row-1942",
+        "komdigi:61202@row-2058",
+        "komdigi:61423@row-1958",
+        "komdigi:61381@row-1983",
+        "komdigi:61198@row-2062"
+      ],
+      "population": 36,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-08",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61297@row-2006"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-08",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61716@row-1807",
+        "komdigi:61478@row-1918",
+        "komdigi:61634@row-1824",
+        "komdigi:61581@row-1852",
+        "komdigi:61578@row-1855"
+      ],
+      "population": 83,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-09",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61748@row-1786",
+        "komdigi:61714@row-1809",
+        "komdigi:61625@row-1827",
+        "komdigi:61663@row-1818",
+        "komdigi:61613@row-1835"
+      ],
+      "population": 31,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-09",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61531@row-1888",
+        "komdigi:61715@row-1808",
+        "komdigi:61721@row-1804",
+        "komdigi:61606@row-1841",
+        "komdigi:61740@row-1789"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-09",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61891@row-1716",
+        "komdigi:61854@row-1734",
+        "komdigi:61958@row-1692",
+        "komdigi:62030@row-1671",
+        "komdigi:61783@row-1769"
+      ],
+      "population": 96,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-10",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62050@row-1656",
+        "komdigi:62042@row-1663",
+        "komdigi:62038@row-1666",
+        "komdigi:61945@row-1697",
+        "komdigi:61957@row-1693"
+      ],
+      "population": 25,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-10",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61893@row-1714",
+        "komdigi:62047@row-1658"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-10",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62253@row-1560",
+        "komdigi:62230@row-1572",
+        "komdigi:62121@row-1616",
+        "komdigi:62354@row-1503",
+        "komdigi:62284@row-1542"
+      ],
+      "population": 87,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62096@row-1626",
+        "komdigi:62094@row-1628",
+        "komdigi:62228@row-1574",
+        "komdigi:62215@row-1579",
+        "komdigi:62135@row-1606"
+      ],
+      "population": 24,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-11",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62197@row-1593",
+        "komdigi:62342@row-1508"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-11",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62591@row-1393",
+        "komdigi:62609@row-1382",
+        "komdigi:62592@row-1392",
+        "komdigi:62558@row-1411",
+        "komdigi:62469@row-1444"
+      ],
+      "population": 88,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-12",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62523@row-1423",
+        "komdigi:62584@row-1400",
+        "komdigi:62610@row-1381",
+        "komdigi:62579@row-1402",
+        "komdigi:62481@row-1439"
+      ],
+      "population": 29,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-12",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62402@row-1483",
+        "komdigi:62637@row-1365",
+        "komdigi:62373@row-1492",
+        "komdigi:62490@row-1437"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2025-12",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62969@row-1230",
+        "komdigi:62917@row-1258",
+        "komdigi:62738@row-1335",
+        "komdigi:62952@row-1241",
+        "komdigi:62986@row-1222"
+      ],
+      "population": 77,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-01",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62692@row-1348"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-01",
+        "1000-3999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62753@row-1326",
+        "komdigi:62915@row-1260",
+        "komdigi:62861@row-1289",
+        "komdigi:62967@row-1232",
+        "komdigi:62768@row-1321"
+      ],
+      "population": 34,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-01",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62803@row-1300",
+        "komdigi:62863@row-1287"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-01",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63107@row-1153",
+        "komdigi:63255@row-1089",
+        "komdigi:63009@row-1210",
+        "komdigi:63143@row-1125",
+        "komdigi:63008@row-1211"
+      ],
+      "population": 92,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-02",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63070@row-1174",
+        "komdigi:63063@row-1177",
+        "komdigi:63191@row-1122",
+        "komdigi:63011@row-1208",
+        "komdigi:63216@row-1107"
+      ],
+      "population": 30,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-02",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63077@row-1169",
+        "komdigi:63029@row-1200"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-02",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63476@row-980",
+        "komdigi:63403@row-1026",
+        "komdigi:63380@row-1043",
+        "komdigi:63485@row-973",
+        "komdigi:63354@row-1055"
+      ],
+      "population": 94,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-03",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63434@row-1010",
+        "komdigi:63385@row-1041",
+        "komdigi:63423@row-1019",
+        "komdigi:63459@row-990",
+        "komdigi:63282@row-1076"
+      ],
+      "population": 22,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-03",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63402@row-1027"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-03",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63817@row-823",
+        "komdigi:63758@row-851",
+        "komdigi:63624@row-909",
+        "komdigi:63634@row-906",
+        "komdigi:63537@row-961"
+      ],
+      "population": 108,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-04",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63695@row-885"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-04",
+        "1000-3999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63611@row-921",
+        "komdigi:63744@row-856",
+        "komdigi:63556@row-947",
+        "komdigi:63613@row-919",
+        "komdigi:63782@row-838"
+      ],
+      "population": 33,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-04",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63711@row-875",
+        "komdigi:63616@row-916"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-04",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63868@row-801",
+        "komdigi:63951@row-763",
+        "komdigi:64020@row-739",
+        "komdigi:63833@row-818",
+        "komdigi:63957@row-758"
+      ],
+      "population": 77,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-05",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63850@row-806",
+        "komdigi:64102@row-721",
+        "komdigi:63917@row-776",
+        "komdigi:63838@row-814",
+        "komdigi:64022@row-737"
+      ],
+      "population": 28,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-05",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:64101@row-722",
+        "komdigi:64032@row-734",
+        "komdigi:64105@row-718",
+        "komdigi:63871@row-798"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-05",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:64318@row-611",
+        "komdigi:64166@row-684",
+        "komdigi:64121@row-705",
+        "komdigi:64146@row-694",
+        "komdigi:64244@row-652"
+      ],
+      "population": 93,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-06",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:64148@row-692",
+        "komdigi:64163@row-686",
+        "komdigi:64387@row-580",
+        "komdigi:64372@row-588",
+        "komdigi:64201@row-671"
+      ],
+      "population": 41,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-06",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:64172@row-681",
+        "komdigi:64160@row-689",
+        "komdigi:64374@row-586",
+        "komdigi:64199@row-673",
+        "komdigi:64344@row-602"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-06",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:64634@row-475",
+        "komdigi:64493@row-542",
+        "komdigi:64552@row-518",
+        "komdigi:64658@row-466",
+        "komdigi:64540@row-523"
+      ],
+      "population": 112,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-07",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:64693@row-451",
+        "komdigi:64742@row-426",
+        "komdigi:64488@row-543",
+        "komdigi:64584@row-502",
+        "komdigi:64466@row-560"
+      ],
+      "population": 37,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-07",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:64714@row-438",
+        "komdigi:64671@row-460",
+        "komdigi:64425@row-566",
+        "komdigi:64587@row-499",
+        "komdigi:64593@row-496"
+      ],
+      "population": 9,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-07",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65062@row-312",
+        "komdigi:64859@row-376",
+        "komdigi:65029@row-325",
+        "komdigi:64976@row-348",
+        "komdigi:64861@row-374"
+      ],
+      "population": 87,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-08",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:64838@row-390",
+        "komdigi:64878@row-365",
+        "komdigi:64771@row-416",
+        "komdigi:65104@row-294",
+        "komdigi:64781@row-409"
+      ],
+      "population": 40,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-08",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65102@row-296",
+        "komdigi:64798@row-404",
+        "komdigi:64999@row-338"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-08",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65428@row-131",
+        "komdigi:65420@row-136",
+        "komdigi:65399@row-147",
+        "komdigi:65316@row-190",
+        "komdigi:65351@row-166"
+      ],
+      "population": 101,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-09",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65264@row-218",
+        "komdigi:65310@row-194",
+        "komdigi:65205@row-245",
+        "komdigi:65167@row-264",
+        "komdigi:65256@row-221"
+      ],
+      "population": 49,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-09",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65408@row-144",
+        "komdigi:65231@row-234",
+        "komdigi:65312@row-192",
+        "komdigi:65341@row-173",
+        "komdigi:65319@row-187"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-09",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65639@row-31",
+        "komdigi:65576@row-50",
+        "komdigi:65534@row-71",
+        "komdigi:65458@row-113",
+        "komdigi:65508@row-89"
+      ],
+      "population": 85,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-10",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65456@row-115",
+        "komdigi:65511@row-86",
+        "komdigi:65548@row-64",
+        "komdigi:65667@row-20",
+        "komdigi:65562@row-57"
+      ],
+      "population": 41,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-10",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65512@row-85"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Hoaks"
+        ],
+        "2026-10",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:222@row-3457",
+        "komdigi:467@row-3343",
+        "komdigi:221@row-3458",
+        "komdigi:492@row-3328"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2024-10",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:589@row-3268",
+        "komdigi:632@row-3248",
+        "komdigi:883@row-3161"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2024-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:658@row-3233"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2024-11",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59350@row-2977",
+        "komdigi:59173@row-3042",
+        "komdigi:59130@row-3063",
+        "komdigi:59104@row-3077",
+        "komdigi:59246@row-3013"
+      ],
+      "population": 6,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2024-12",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59425@row-2936",
+        "komdigi:59475@row-2909",
+        "komdigi:59564@row-2868"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-01",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59428@row-2933",
+        "komdigi:59605@row-2841",
+        "komdigi:59522@row-2887",
+        "komdigi:59582@row-2858",
+        "komdigi:59453@row-2922"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-01",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59714@row-2787",
+        "komdigi:59731@row-2778"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-02",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59859@row-2710",
+        "komdigi:59841@row-2723"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-02",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60042@row-2631"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-03",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60270@row-2501"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-04",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60148@row-2563"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-04",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60336@row-2472",
+        "komdigi:60590@row-2362",
+        "komdigi:60482@row-2405",
+        "komdigi:60347@row-2464",
+        "komdigi:60468@row-2413"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-05",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60595@row-2359",
+        "komdigi:60539@row-2388",
+        "komdigi:60417@row-2443"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-05",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60675@row-2340",
+        "komdigi:60699@row-2326",
+        "komdigi:60804@row-2288",
+        "komdigi:60889@row-2239"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-06",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60851@row-2259"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-06",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60933@row-2212"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-07",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60935@row-2210",
+        "komdigi:61149@row-2092"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-07",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61432@row-1951"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-08",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61558@row-1871"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-09",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62363@row-1497",
+        "komdigi:62098@row-1625",
+        "komdigi:62290@row-1537"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62227@row-1575"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2025-11",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62976@row-1228"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2026-01",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62706@row-1336"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Kesehatan"
+        ],
+        "2026-01",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:299@row-3420",
+        "komdigi:550@row-3292",
+        "komdigi:300@row-3419",
+        "komdigi:461@row-3349",
+        "komdigi:487@row-3333"
+      ],
+      "population": 20,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2024-10",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:301@row-3418",
+        "komdigi:486@row-3334",
+        "komdigi:263@row-3432",
+        "komdigi:231@row-3448",
+        "komdigi:491@row-3329"
+      ],
+      "population": 9,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2024-10",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:564@row-3284"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2024-10",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:714@row-3207",
+        "komdigi:816@row-3180",
+        "komdigi:666@row-3226",
+        "komdigi:586@row-3271",
+        "komdigi:585@row-3272"
+      ],
+      "population": 13,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2024-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:594@row-3265",
+        "komdigi:597@row-3262",
+        "komdigi:820@row-3176",
+        "komdigi:631@row-3249"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2024-11",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59102@row-3079",
+        "komdigi:59286@row-2989",
+        "komdigi:1055@row-3084",
+        "komdigi:994@row-3108",
+        "komdigi:59129@row-3064"
+      ],
+      "population": 6,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2024-12",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59224@row-3025",
+        "komdigi:1026@row-3095",
+        "komdigi:59184@row-3035",
+        "komdigi:59245@row-3014"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2024-12",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59546@row-2876",
+        "komdigi:59474@row-2910",
+        "komdigi:59507@row-2899",
+        "komdigi:59459@row-2917",
+        "komdigi:59592@row-2850"
+      ],
+      "population": 7,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-01",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59567@row-2865",
+        "komdigi:59523@row-2886",
+        "komdigi:59449@row-2926",
+        "komdigi:59504@row-2902",
+        "komdigi:59565@row-2867"
+      ],
+      "population": 6,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-01",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59743@row-2768",
+        "komdigi:59673@row-2818",
+        "komdigi:59692@row-2805",
+        "komdigi:59796@row-2750"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-02",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59730@row-2779",
+        "komdigi:59854@row-2715"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-02",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60118@row-2587",
+        "komdigi:59994@row-2647"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-03",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60007@row-2640",
+        "komdigi:60044@row-2629",
+        "komdigi:60094@row-2603",
+        "komdigi:59958@row-2665",
+        "komdigi:59881@row-2699"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-03",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60899@row-2232"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-06",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61058@row-2133",
+        "komdigi:61015@row-2164",
+        "komdigi:61090@row-2114",
+        "komdigi:61026@row-2154",
+        "komdigi:60978@row-2184"
+      ],
+      "population": 10,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-07",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60958@row-2200",
+        "komdigi:61161@row-2082"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-07",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61262@row-2020",
+        "komdigi:61304@row-2002"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-08",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61217@row-2047",
+        "komdigi:61230@row-2038"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-08",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61730@row-1795",
+        "komdigi:61633@row-1825"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-09",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61819@row-1755",
+        "komdigi:61928@row-1710",
+        "komdigi:62072@row-1641",
+        "komdigi:61883@row-1719",
+        "komdigi:61838@row-1744"
+      ],
+      "population": 7,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-10",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62274@row-1548",
+        "komdigi:62276@row-1546",
+        "komdigi:62192@row-1596",
+        "komdigi:62316@row-1517",
+        "komdigi:62244@row-1562"
+      ],
+      "population": 7,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62671@row-1355",
+        "komdigi:62515@row-1427",
+        "komdigi:62431@row-1464",
+        "komdigi:62428@row-1467",
+        "komdigi:62410@row-1479"
+      ],
+      "population": 7,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-12",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62471@row-1442"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2025-12",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62704@row-1338"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2026-01",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62774@row-1317"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2026-01",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63776@row-843",
+        "komdigi:63701@row-882",
+        "komdigi:63703@row-880"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2026-04",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65116@row-286",
+        "komdigi:65117@row-285"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Pejabat Publik"
+        ],
+        "2026-08",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:432@row-3358",
+        "komdigi:401@row-3370",
+        "komdigi:488@row-3332",
+        "komdigi:463@row-3347",
+        "komdigi:259@row-3436"
+      ],
+      "population": 12,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2024-10",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:512@row-3317",
+        "komdigi:257@row-3438",
+        "komdigi:335@row-3402",
+        "komdigi:464@row-3346",
+        "komdigi:490@row-3330"
+      ],
+      "population": 7,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2024-10",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:596@row-3263",
+        "komdigi:901@row-3150",
+        "komdigi:602@row-3260",
+        "komdigi:667@row-3225",
+        "komdigi:933@row-3142"
+      ],
+      "population": 12,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2024-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:588@row-3269",
+        "komdigi:980@row-3117",
+        "komdigi:598@row-3261",
+        "komdigi:961@row-3127",
+        "komdigi:657@row-3234"
+      ],
+      "population": 15,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2024-11",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59221@row-3028",
+        "komdigi:59275@row-2998",
+        "komdigi:59361@row-2971",
+        "komdigi:59243@row-3016",
+        "komdigi:59360@row-2972"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2024-12",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59358@row-2974",
+        "komdigi:59153@row-3055",
+        "komdigi:59363@row-2969",
+        "komdigi:59222@row-3027",
+        "komdigi:59241@row-3018"
+      ],
+      "population": 11,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2024-12",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59611@row-2838",
+        "komdigi:59427@row-2934",
+        "komdigi:59450@row-2925",
+        "komdigi:59517@row-2891",
+        "komdigi:59392@row-2954"
+      ],
+      "population": 10,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-01",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59525@row-2884",
+        "komdigi:59602@row-2844",
+        "komdigi:59460@row-2916",
+        "komdigi:59426@row-2935",
+        "komdigi:59566@row-2866"
+      ],
+      "population": 13,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-01",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59773@row-2762",
+        "komdigi:59621@row-2830",
+        "komdigi:59742@row-2769",
+        "komdigi:59702@row-2797",
+        "komdigi:59733@row-2776"
+      ],
+      "population": 13,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-02",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59676@row-2815",
+        "komdigi:59839@row-2725",
+        "komdigi:59837@row-2727",
+        "komdigi:59823@row-2732",
+        "komdigi:59691@row-2806"
+      ],
+      "population": 11,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-02",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59883@row-2697",
+        "komdigi:60092@row-2605",
+        "komdigi:59923@row-2683",
+        "komdigi:60106@row-2594",
+        "komdigi:59935@row-2676"
+      ],
+      "population": 6,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-03",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60107@row-2593",
+        "komdigi:59924@row-2682",
+        "komdigi:60105@row-2595",
+        "komdigi:60103@row-2597",
+        "komdigi:60116@row-2589"
+      ],
+      "population": 7,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-03",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60134@row-2577",
+        "komdigi:60318@row-2483",
+        "komdigi:60149@row-2562",
+        "komdigi:60183@row-2543",
+        "komdigi:60133@row-2578"
+      ],
+      "population": 12,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-04",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60194@row-2538",
+        "komdigi:60269@row-2502"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-04",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60135@row-2576"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-04",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60440@row-2426",
+        "komdigi:60469@row-2412",
+        "komdigi:60460@row-2419",
+        "komdigi:60438@row-2428",
+        "komdigi:60369@row-2459"
+      ],
+      "population": 20,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-05",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60372@row-2456",
+        "komdigi:60578@row-2369",
+        "komdigi:60459@row-2420",
+        "komdigi:60436@row-2430"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-05",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60593@row-2361"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-05",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60912@row-2224",
+        "komdigi:60807@row-2285",
+        "komdigi:60680@row-2335",
+        "komdigi:60610@row-2349",
+        "komdigi:60710@row-2318"
+      ],
+      "population": 10,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-06",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60674@row-2341",
+        "komdigi:60721@row-2312",
+        "komdigi:60844@row-2266",
+        "komdigi:60611@row-2348"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-06",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60784@row-2294"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-06",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61012@row-2167",
+        "komdigi:61016@row-2163",
+        "komdigi:61131@row-2104",
+        "komdigi:61187@row-2067",
+        "komdigi:61013@row-2166"
+      ],
+      "population": 21,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-07",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61261@row-2021",
+        "komdigi:61337@row-1987",
+        "komdigi:61246@row-2030",
+        "komdigi:61303@row-2003",
+        "komdigi:61233@row-2035"
+      ],
+      "population": 7,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-08",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61207@row-2054",
+        "komdigi:61327@row-1995",
+        "komdigi:61218@row-2046",
+        "komdigi:61425@row-1956",
+        "komdigi:61302@row-2004"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-08",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61585@row-1849",
+        "komdigi:61751@row-1783",
+        "komdigi:61747@row-1787",
+        "komdigi:61582@row-1851",
+        "komdigi:61616@row-1832"
+      ],
+      "population": 9,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-09",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61573@row-1856",
+        "komdigi:61611@row-1837"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-09",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62053@row-1653",
+        "komdigi:61837@row-1745",
+        "komdigi:61817@row-1757",
+        "komdigi:61869@row-1725",
+        "komdigi:62008@row-1679"
+      ],
+      "population": 14,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-10",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62075@row-1638",
+        "komdigi:61839@row-1743"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-10",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61941@row-1701"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-10",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62208@row-1586",
+        "komdigi:62340@row-1510",
+        "komdigi:62191@row-1597",
+        "komdigi:62142@row-1603",
+        "komdigi:62190@row-1598"
+      ],
+      "population": 8,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62099@row-1624",
+        "komdigi:62312@row-1521"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-11",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62493@row-1434",
+        "komdigi:62468@row-1445",
+        "komdigi:62516@row-1426",
+        "komdigi:62430@row-1465",
+        "komdigi:62412@row-1477"
+      ],
+      "population": 9,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-12",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62492@row-1435",
+        "komdigi:62601@row-1388",
+        "komdigi:62600@row-1389",
+        "komdigi:62562@row-1407"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2025-12",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62975@row-1229",
+        "komdigi:62908@row-1261",
+        "komdigi:63004@row-1214",
+        "komdigi:63005@row-1213",
+        "komdigi:63006@row-1212"
+      ],
+      "population": 17,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2026-01",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62948@row-1245",
+        "komdigi:62693@row-1347",
+        "komdigi:62793@row-1305",
+        "komdigi:62999@row-1215",
+        "komdigi:62806@row-1297"
+      ],
+      "population": 5,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2026-01",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:63018@row-1206"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Penipuan"
+        ],
+        "2026-02",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:568@row-3280",
+        "komdigi:258@row-3437",
+        "komdigi:234@row-3445",
+        "komdigi:498@row-3323",
+        "komdigi:220@row-3459"
+      ],
+      "population": 6,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2024-10",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:493@row-3327",
+        "komdigi:303@row-3416",
+        "komdigi:380@row-3386"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2024-10",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:936@row-3139",
+        "komdigi:593@row-3266",
+        "komdigi:712@row-3209",
+        "komdigi:963@row-3125"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2024-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:839@row-3174",
+        "komdigi:715@row-3206",
+        "komdigi:801@row-3183",
+        "komdigi:738@row-3192"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2024-11",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59171@row-3044",
+        "komdigi:59276@row-2997",
+        "komdigi:59170@row-3045",
+        "komdigi:59257@row-3007"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2024-12",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59359@row-2973",
+        "komdigi:59272@row-3001"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2024-12",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59244@row-3015"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2024-12",
+        "256-999",
+        "full"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:59477@row-2907"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-01",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60009@row-2638",
+        "komdigi:59910@row-2689"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-03",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60071@row-2617",
+        "komdigi:60041@row-2632",
+        "komdigi:59977@row-2654"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-03",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60245@row-2511",
+        "komdigi:60140@row-2571"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-04",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60405@row-2450",
+        "komdigi:60418@row-2442"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-05",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60868@row-2246",
+        "komdigi:60828@row-2276"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-06",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:60867@row-2247"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-06",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61174@row-2075",
+        "komdigi:61024@row-2156"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-07",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61431@row-1952"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-08",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61408@row-1969"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-08",
+        "256-999",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61562@row-1867",
+        "komdigi:61717@row-1806",
+        "komdigi:61560@row-1869"
+      ],
+      "population": 3,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-09",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:61852@row-1736",
+        "komdigi:61836@row-1746",
+        "komdigi:62086@row-1634",
+        "komdigi:61939@row-1703"
+      ],
+      "population": 4,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-10",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62339@row-1511",
+        "komdigi:62300@row-1531"
+      ],
+      "population": 2,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-11",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62535@row-1417"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2025-12",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:62979@row-1225"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2026-01",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65115@row-287"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2026-08",
+        "100-255",
+        "claim"
+      ]
+    },
+    {
+      "audit_ids": [
+        "komdigi:65359@row-162"
+      ],
+      "population": 1,
+      "stratum": [
+        "hoax",
+        "komdigi",
+        [
+          "Program/Kebijakan"
+        ],
+        "2026-09",
+        "100-255",
+        "claim"
+      ]
+    }
+  ],
+  "by_reason": {
+    "full_fallback:earliest_marker_before_120": {
+      "audit_ids": [
+        "komdigi:59244@row-3015",
+        "komdigi:64714@row-438",
+        "komdigi:61030@row-2153",
+        "komdigi:60173@row-2550",
+        "komdigi:64172@row-681"
+      ],
+      "population": 86
+    },
+    "full_fallback:no_marker": {
+      "audit_ids": [
+        "komdigi:60724@row-2309"
+      ],
+      "population": 1
+    },
+    "normalized_selected_duplicate": {
+      "audit_ids": [
+        "komdigi:60420@row-2440",
+        "komdigi:60421@row-2439",
+        "komdigi:61233@row-2035",
+        "komdigi:59774@row-2761",
+        "komdigi:59281@row-2994"
+      ],
+      "population": 16
+    },
+    "source_marker": {
+      "audit_ids": [
+        "komdigi:59244@row-3015",
+        "komdigi:64714@row-438",
+        "komdigi:61030@row-2153",
+        "komdigi:60173@row-2550",
+        "komdigi:64172@row-681"
+      ],
+      "population": 86
+    },
+    "verdict_phrase": {
+      "audit_ids": [
+        "komdigi:59244@row-3015",
+        "komdigi:64714@row-438",
+        "komdigi:61030@row-2153",
+        "komdigi:60173@row-2550",
+        "komdigi:64172@row-681"
+      ],
+      "population": 86
+    }
+  },
+  "limit_per_stratum": 5,
+  "review_status": "pending_human_review",
+  "seed": "Q008-42",
+  "version": "q008-sampling-v1"
+}

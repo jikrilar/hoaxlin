@@ -1,0 +1,55 @@
+{
+  "counts": {
+    "approved_records": 0,
+    "benchmark_records": 0,
+    "duplicate_groups": 8,
+    "emitted_candidates": 3480,
+    "quarantined_records": 3480,
+    "text_source_counts": {
+      "claim": 3393,
+      "full": 87
+    }
+  },
+  "full_python": {
+    "exit_code": 1,
+    "failed": 5,
+    "failures": "unchanged test_api.py Windows-path failures listed in execution-log.md",
+    "passed": 158,
+    "seconds": 26.62,
+    "warnings": 2
+  },
+  "private_artifact_hashes": {
+    "benchmark.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidates.jsonl": "307a40aeede525d50f788de030be8114aa7280a1705eabde8da79948292e805c",
+    "provenance.jsonl": "370c71baa535ecd8cec5ed680786ab10174be13e8092b8c5230fbfaa427b571f",
+    "quarantine.jsonl": "fbc271ea9fa912cfbcf474b50b96bb38d69db529cc89a6db7d408fa7e5221b73"
+  },
+  "private_artifact_location": "/tmp/opencode/q010/komdigi-proposals-v0.1.1",
+  "private_manifest_sha256": "805db68ef218cbccd31b78941488324c3a314ed94941d0c1bccd0cdcc4a4266b",
+  "report_hashes": {
+    "reports/ai-quality/20261029-q010/execution-log.md": "fb754c551d7c060145fe24c8528b2254c5931a4e57fa33155589e6953ee830e2",
+    "reports/ai-quality/20261029-q010/run-staging.sh": "c6ce7610ac8d0e8cafe08c7ea1d54433b3903068686434ad8de474f6f05fa6ed"
+  },
+  "source_commit": "1c284963b85e3d529921464cce8f2cb79e4a9c38",
+  "source_csv_sha256": "32fc99f809a39ab6528430fb2966577ffdfbc0f6c2f6533bb420add0fb9face7",
+  "source_hashes": {
+    "bert-service/dataset/curation.py": "61c2ccf7c6c6cfb5dc01bab8f380772a7b6375e0635169ceed7ea35b332c4513",
+    "bert-service/tests/test_curation.py": "376f1341d9aef2a2fac453be6076ffa52b39d08aa3be1cc6f2b870eb27b11632"
+  },
+  "status": "BLOCKED_REVIEW_AND_MULTI_SOURCE",
+  "targeted": {
+    "exit_code": 0,
+    "passed": 33,
+    "seconds": 0.83
+  },
+  "task": "Q-010",
+  "validation": {
+    "actual_multi_source_corpus": "NOT_AVAILABLE",
+    "all_3480_spans_and_parent_hashes": "PASS",
+    "authenticated_human_review": "NOT_AVAILABLE",
+    "benchmark_empty": "PASS",
+    "private_directory_mode_0700": "PASS",
+    "schema_engine_validation": "NOT_RUN",
+    "source_owner_and_prior_q008_q009_evidence_preserved": "PASS"
+  }
+}

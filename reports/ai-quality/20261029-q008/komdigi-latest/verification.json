@@ -1,0 +1,69 @@
+{
+  "base_commit": "2e76f6336f3676d6c6c1052c67885081f2d1a2e9",
+  "dataset_sha256": "32fc99f809a39ab6528430fb2966577ffdfbc0f6c2f6533bb420add0fb9face7",
+  "full_python": {
+    "baseline_failures": "test_api.py Windows model-path tests listed in report.md",
+    "exit_code": 1,
+    "failed": 5,
+    "passed": 153,
+    "seconds": 27.54,
+    "warnings": 2
+  },
+  "historical_evidence_hashes": {
+    "reports/ai-quality/20261029-q008/data-quality-report.md": "a615c93460899ab00ab0846d22e63dcd68c1522c33510dbfe095079d7d3cbc7b",
+    "reports/ai-quality/20261029-q008/execution-log.md": "755e74f662e3ea08128d31ad0277d159fd185a0285cb3894aeabfdb967030397",
+    "reports/ai-quality/20261029-q008/quarantine.json": "34832a4aaabbb5d1e6d17ea86701ad147c2ecd391d39a76b308000ce45ab63f3",
+    "reports/ai-quality/20261029-q008/verification.json": "998fb7c27853ce931dc468a9146a844c46c3652ae8c088f8abdce7386cc851f7"
+  },
+  "invariants_verified": true,
+  "local_regenerable_outputs": {
+    "duplicates.json": "8bb1499e33fcdcb0d87b5f6e07069bfbdfbfc7d0d8788763822c18e2ea4b75b2",
+    "matrix.json": "e49c3a023ae040a9b55065bad29605156de1a8aa65a00a22a16063ccdab07029",
+    "quarantine-candidates.jsonl": "221e108ccb1d85d96b10bb7ea8877c982c41291bf349ee8886b4d467723af75d",
+    "records.jsonl": "f1e82fa267801bd18f0465dface313dec8668040737dd5cd1aae8718a4ea9fff",
+    "sampling.json": "8341e27b6860f15c249e4b92b7bae153889af518dd666ecc25fa15924e1ac5f7",
+    "statistics.json": "eeae3abcae086d7f136e7854b2e7c045573fad490cf4d500b430a8c26805f82a"
+  },
+  "owner_files_preserved": {
+    "HOAXLIN-BERT-RAG-AUDIT-TASKS.md": "922425f51bc248d235d5c696c100a672d801d6df05097ad8ea7d0d67d11004d7",
+    "tests/Feature/FilamentAuditObserverTest.php": "2446116cfdd2698609c54cd458e42211e4e4336f64057d5302fa776828f29650"
+  },
+  "raw_csv_tracked": false,
+  "remaining_blockers": [
+    "Historical Komdigi/training manifest and processed splits",
+    "Antara corpus and cross-label/source comparison",
+    "Human review and claim correctness",
+    "Near-duplicate semantic/event leakage assessment"
+  ],
+  "repeat_runs_byte_identical": true,
+  "report_artifact_hashes": {
+    "reports/ai-quality/20261029-q008/komdigi-latest/audit.py": "2bdce98836a5ed77cc9e365f81377e9249784193c21feb52e9201c327a37f065",
+    "reports/ai-quality/20261029-q008/komdigi-latest/duplicates.json": "8bb1499e33fcdcb0d87b5f6e07069bfbdfbfc7d0d8788763822c18e2ea4b75b2",
+    "reports/ai-quality/20261029-q008/komdigi-latest/execution-log.md": "76f086efe0de19acaae6406d7213a763c7036c6837f7dd3da7191d84d3ebde59",
+    "reports/ai-quality/20261029-q008/komdigi-latest/matrix.json": "e49c3a023ae040a9b55065bad29605156de1a8aa65a00a22a16063ccdab07029",
+    "reports/ai-quality/20261029-q008/komdigi-latest/quarantine-candidates.jsonl": "221e108ccb1d85d96b10bb7ea8877c982c41291bf349ee8886b4d467723af75d",
+    "reports/ai-quality/20261029-q008/komdigi-latest/report.md": "44d03854a24cdb6182201e82f1c63690a3dc369aea547130799ddb436d8005da",
+    "reports/ai-quality/20261029-q008/komdigi-latest/run-audit.sh": "e9dd45329d430bfb1ededaf24fcfb625022b5fad4e51db23f7e5ff75e69b77d8",
+    "reports/ai-quality/20261029-q008/komdigi-latest/sampling.json": "8341e27b6860f15c249e4b92b7bae153889af518dd666ecc25fa15924e1ac5f7",
+    "reports/ai-quality/20261029-q008/komdigi-latest/statistics.json": "eeae3abcae086d7f136e7854b2e7c045573fad490cf4d500b430a8c26805f82a"
+  },
+  "status": "LATEST_KOMDIGI_AUTOMATED_AUDIT_DONE_HISTORICAL_CORPUS_STILL_BLOCKED",
+  "targeted_tests": {
+    "exit_code": 0,
+    "passed": 42
+  },
+  "task": "Q-008 supplemental",
+  "test_source_hash": "49c02d078a2fafa36720d49fe44a7910015206d96349149f1c1eba5efc46128a",
+  "unchanged_existing_source_hashes": {
+    "bert-service/dataset/dedup.py": "0ba4419d21287d3ba81c4057f89cec179893e6dd8722ff78d3c0c47bf7a7aadd",
+    "bert-service/dataset/manifest.py": "042d4fc848f627201e54a9a92a02de231596a7ca24aed30c471c5e19d3be86ea",
+    "bert-service/dataset/normalize.py": "86d3064a91a3d5ac5cb9088ceac7e964886b0d24dba70ffa11a45bda9d023510",
+    "bert-service/dataset/prepare.py": "91f796ef4e06a279e95d58f998fb6dbbdc2d700ab642afa9e36c38f3e6a69b51",
+    "bert-service/dataset/reconcile.py": "4d00091a2feb76be9396fa79f22bd11d7abda1b6080dd5616e1dadc59944607c",
+    "bert-service/dataset/schema.py": "1b2dadb48ccfbaf5f55096cea1c82b28a0224e53b7b338a98411cb78d673a335",
+    "bert-service/dataset/sources/komdigi_csv.py": "f50e3daa6301dc8d32850bdb90477d7f671f42fbc39431b274d06187c2b09b81",
+    "bert-service/dataset/sources/labeled_csv.py": "2089fec67b6adfcf25b6f76b874d096cf75451ddce2dfe2fee0164389750bb11",
+    "bert-service/dataset/split.py": "26a66b9922d54b349b8c89408f868e26d95610a38833d8f4f2c0a17b0aee4e70",
+    "bert-service/scripts/build_valid_news.py": "5cc1780f0af44a8cfda46fea08dc3fee7dfc880d1a82c458a63f55534dc5aa9d"
+  }
+}

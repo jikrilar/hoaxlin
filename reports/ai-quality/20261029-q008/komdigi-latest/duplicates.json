@@ -1,0 +1,66 @@
+{
+  "cross_label_conflict_status": "NOT_ASSESSABLE_SINGLE_SOURCE_IMPLIED_LABEL",
+  "cross_label_conflicts": null,
+  "near_duplicate_status": "NOT_MEASURED_EXACT_NORMALIZED_ONLY",
+  "near_duplicates": null,
+  "normalized_raw_body": {
+    "1502dceff9f0d5cdb365b0833bec8cdd6558f1fe9cd2d932c390cd608f907404": [
+      "komdigi:59280@row-2995",
+      "komdigi:59281@row-2994"
+    ],
+    "443d7d8df7aeacfbca94af1ae90aafb90989a9462760a562db40bec24f565274": [
+      "komdigi:63238@row-1098",
+      "komdigi:63239@row-1097"
+    ],
+    "50fc80569b936cc1d1d264e5ca523e8876f848162c25879432f811b3f1dc8ae9": [
+      "komdigi:59683@row-2809",
+      "komdigi:59684@row-2808"
+    ],
+    "6741816cc21ebc4e6e0fd6ad216055fb3bc8d00c37e8ec3bb146444ebecd513a": [
+      "komdigi:65333@row-179",
+      "komdigi:65334@row-178"
+    ],
+    "ebbe9128f174e5862ba65d49e28ccca564ca41a0cbbb94112ad5803314a3e226": [
+      "komdigi:644@row-3240",
+      "komdigi:645@row-3239"
+    ],
+    "ed007e5bfb84cd584d1362093c148f3d97e202e9b934500894d740848493020e": [
+      "komdigi:60420@row-2440",
+      "komdigi:60421@row-2439"
+    ]
+  },
+  "normalized_selected": {
+    "3ffe9efdb0ecfb5ecba0d711ec874633356acaae13161a70aece12718f91931d": [
+      "komdigi:59280@row-2995",
+      "komdigi:59281@row-2994"
+    ],
+    "4fc22c9cb1c896c8b578f0fa397e193b050ca2e42da1aa1f589be71e46476c18": [
+      "komdigi:63238@row-1098",
+      "komdigi:63239@row-1097"
+    ],
+    "5edc0990db397587a5f8b4ea4c1d976eda959935c1862a19acdc61cad7f1068d": [
+      "komdigi:60420@row-2440",
+      "komdigi:60421@row-2439"
+    ],
+    "814605fe406e77d86a9ab712a5c336a38ba318855321ad0c0e7aa4b960bbd078": [
+      "komdigi:59683@row-2809",
+      "komdigi:59684@row-2808"
+    ],
+    "bf087e55897cc6d0fab90ad4a52c419ca9847f209f93df82193a3cf855abd67f": [
+      "komdigi:644@row-3240",
+      "komdigi:645@row-3239"
+    ],
+    "e90c4909ada5d4ef22a21abf2755454a728ad36498b2570d539a7f3ec188076e": [
+      "komdigi:59752@row-2763",
+      "komdigi:59774@row-2761"
+    ],
+    "f09c34ab54e0f323df1ec8ff7f3796220cc1547e72045ff188e505bf16f125af": [
+      "komdigi:65333@row-179",
+      "komdigi:65334@row-178"
+    ],
+    "f60e325140d450c157bfcce78b5f15e1ef624a8e5c1c8ce797b0eb3e820c6917": [
+      "komdigi:61233@row-2035",
+      "komdigi:61238@row-2032"
+    ]
+  }
+}
