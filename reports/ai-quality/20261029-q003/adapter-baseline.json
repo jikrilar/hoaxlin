@@ -1,0 +1,289 @@
+{
+  "task": "Q-003",
+  "status": "DONE",
+  "php": "8.4.11",
+  "laravel": "12.64.0",
+  "service_version": {
+    "service": "Hoax BERT Inference Service",
+    "service_version": "0.1.0",
+    "model_version": "v1.0.0",
+    "model_status": "ready",
+    "model_labels": [
+      "valid",
+      "hoax"
+    ],
+    "threshold": 0.99,
+    "temperature": 0.8706620666110391,
+    "evaluation_model_version": "v1.0.0",
+    "evaluation_accuracy": 1,
+    "evaluation_macro_f1": 1,
+    "evaluation_sample_count": 781,
+    "evaluation_dataset_name": "komdigi-antara",
+    "evaluation_dataset_version": "v1.0.0",
+    "evaluation_split": "held-out test",
+    "exported_at": "2026-08-21T01:03:52.509812+00:00"
+  },
+  "selection": "Fixed row indices 0,20,40,60,80,100 before adapter inference; one per historical source.",
+  "cache_store": "array isolated process",
+  "numeric_tolerance": 1e-06,
+  "source_sha256": {
+    "app/Services/Bert/BertClassifier.php": "3e4443833dac971ad5a3c43be09295c5201c865bd6e83153b489af47aec021b2",
+    "app/Services/Bert/CachedBertClassifier.php": "4d2528f7da4e0f15b2fb033b83d59af327bedb2bfb25f690a0b445a174c017b3",
+    "app/Services/Bert/CircuitBreakingClassifier.php": "ae48ef95d36ab9e6154adccc3214face91b05edf4b134b87167dc146c9039020",
+    "app/DataObjects/Classification.php": "1ba0f8c40bd4252c88ea2d07bbce04ddb738831741ccceb8fd7c83d3dfa1f47d",
+    "app/Enums/DetectionLabel.php": "ba82147bc39ba6b10ba7d16e0c5a9e4a9a87695695fc7f114fe684ec55637074",
+    "app/Support/TextNormalizer.php": "3ef8902ce2789ad78231ff7700b1da35e73684bcbfa60365547e1f53c4aea9c5",
+    "app/Providers/AppServiceProvider.php": "58f4bd933f537a193f6a0787bdc20ad09033b6636b2cf324ff32310f43b24b4e",
+    "config/services.php": "f9e87d04442fbc24b14e507f96347358ebff0b6d8d32ed048373a6c6993a0560",
+    "composer.lock": "676a084936b5299efc80be6cf6413061a4be357df02ad58a87604dfc2986ccd6"
+  },
+  "records": [
+    {
+      "id": "turnbackhoax-36648",
+      "text_sha256": "e0cc24a488852481cb01d56aa40f824d0654ef36b195fb072e50a368a1b75000",
+      "direct_service": {
+        "request_id": "74d60c51-1516-4bc8-bd42-3acbafc40431",
+        "label": "hoax",
+        "confidence_score": 0.9909815192222595,
+        "raw_scores": {
+          "valid": 0.009018493816256523,
+          "hoax": 0.9909815192222595
+        },
+        "model_version": "v1.0.0",
+        "inference_ms": 782.263
+      },
+      "cold": {
+        "label": "hoax",
+        "confidence_score": 0.9909815192222595,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.009018493816256523,
+          "hoax": 0.9909815192222595
+        },
+        "inference_ms": 194,
+        "cached": false
+      },
+      "warm": {
+        "label": "hoax",
+        "confidence_score": 0.9909815192222595,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.009018493816256523,
+          "hoax": 0.9909815192222595
+        },
+        "inference_ms": 194,
+        "cached": true
+      },
+      "cold_http_calls": 1,
+      "warm_http_calls": 0,
+      "cold_seconds": 0.21584796905517578,
+      "warm_seconds": 0.00015616416931152344
+    },
+    {
+      "id": "cekfakta-36763",
+      "text_sha256": "2db72895cc0f91e898d0cd0d30c907ff9901375b37eeaba48a80a243bcf3489f",
+      "direct_service": {
+        "request_id": "63d39b9f-9e87-4c94-90fc-fbb6a34af329",
+        "label": "hoax",
+        "confidence_score": 0.9974773526191711,
+        "raw_scores": {
+          "valid": 0.0025226790457963943,
+          "hoax": 0.9974773526191711
+        },
+        "model_version": "v1.0.0",
+        "inference_ms": 161.927
+      },
+      "cold": {
+        "label": "hoax",
+        "confidence_score": 0.9974773526191711,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.0025226790457963943,
+          "hoax": 0.9974773526191711
+        },
+        "inference_ms": 75,
+        "cached": false
+      },
+      "warm": {
+        "label": "hoax",
+        "confidence_score": 0.9974773526191711,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.0025226790457963943,
+          "hoax": 0.9974773526191711
+        },
+        "inference_ms": 75,
+        "cached": true
+      },
+      "cold_http_calls": 1,
+      "warm_http_calls": 0,
+      "cold_seconds": 0.08126282691955566,
+      "warm_seconds": 8.988380432128906e-05
+    },
+    {
+      "id": "afp-C3JA6TA",
+      "text_sha256": "00edee18cd379b864204c3f44edf9c3f32c841b0eedd1eed98528bae4078959e",
+      "direct_service": {
+        "request_id": "a8dad69b-eafc-425a-8865-28c52bb46a5d",
+        "label": "meragukan",
+        "confidence_score": 0.9383782744407654,
+        "raw_scores": {
+          "valid": 0.06162178888916969,
+          "hoax": 0.9383782744407654
+        },
+        "model_version": "v1.0.0",
+        "inference_ms": 237.372
+      },
+      "cold": {
+        "label": "meragukan",
+        "confidence_score": 0.9383782744407654,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.06162178888916969,
+          "hoax": 0.9383782744407654
+        },
+        "inference_ms": 110,
+        "cached": false
+      },
+      "warm": {
+        "label": "meragukan",
+        "confidence_score": 0.9383782744407654,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.06162178888916969,
+          "hoax": 0.9383782744407654
+        },
+        "inference_ms": 110,
+        "cached": true
+      },
+      "cold_http_calls": 1,
+      "warm_http_calls": 0,
+      "cold_seconds": 0.11878418922424316,
+      "warm_seconds": 9.703636169433594e-05
+    },
+    {
+      "id": "bank_indonesia-sp_2817126",
+      "text_sha256": "6bb37feb8a07473444c7374735660e3790b64cd9c47aef72067d79016676f41d",
+      "direct_service": {
+        "request_id": "17339db6-2e98-4f50-aea2-1a33dde30096",
+        "label": "hoax",
+        "confidence_score": 0.9978494644165039,
+        "raw_scores": {
+          "valid": 0.00215053278952837,
+          "hoax": 0.9978494644165039
+        },
+        "model_version": "v1.0.0",
+        "inference_ms": 234.734
+      },
+      "cold": {
+        "label": "hoax",
+        "confidence_score": 0.9978494644165039,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.00215053278952837,
+          "hoax": 0.9978494644165039
+        },
+        "inference_ms": 111,
+        "cached": false
+      },
+      "warm": {
+        "label": "hoax",
+        "confidence_score": 0.9978494644165039,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.00215053278952837,
+          "hoax": 0.9978494644165039
+        },
+        "inference_ms": 111,
+        "cached": true
+      },
+      "cold_http_calls": 1,
+      "warm_http_calls": 0,
+      "cold_seconds": 0.1157689094543457,
+      "warm_seconds": 5.7220458984375e-05
+    },
+    {
+      "id": "bmkg-bmkg-dan-bakamla-ri-berkolaborasi-dalam-mendukung-keselamatan-dan-keamanan-maritim",
+      "text_sha256": "228c20d3d413a608c143539256e1e8516f49601b63052f1f0ac386a0d66b82d1",
+      "direct_service": {
+        "request_id": "d30d0a1f-866b-43f1-9772-07095935da65",
+        "label": "hoax",
+        "confidence_score": 0.9987414479255676,
+        "raw_scores": {
+          "valid": 0.001258533331565559,
+          "hoax": 0.9987414479255676
+        },
+        "model_version": "v1.0.0",
+        "inference_ms": 99.551
+      },
+      "cold": {
+        "label": "hoax",
+        "confidence_score": 0.9987414479255676,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.001258533331565559,
+          "hoax": 0.9987414479255676
+        },
+        "inference_ms": 150,
+        "cached": false
+      },
+      "warm": {
+        "label": "hoax",
+        "confidence_score": 0.9987414479255676,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.001258533331565559,
+          "hoax": 0.9987414479255676
+        },
+        "inference_ms": 150,
+        "cached": true
+      },
+      "cold_http_calls": 1,
+      "warm_http_calls": 0,
+      "cold_seconds": 0.15369510650634766,
+      "warm_seconds": 0.0001590251922607422
+    },
+    {
+      "id": "kemkes-kesehatan-masyarakat-terancam-kemenkes-dan-komdigi-kolaborasi-dengan-mitra-strategis-membangun-ekosistem-penanganan-hoaks",
+      "text_sha256": "b80b766872f68fa848587ae38fecce2ad2ea0076472b6517395ec9ae36341177",
+      "direct_service": {
+        "request_id": "af3a238b-f6ff-4ea4-b962-d39213030476",
+        "label": "hoax",
+        "confidence_score": 0.9949467778205872,
+        "raw_scores": {
+          "valid": 0.00505323288962245,
+          "hoax": 0.9949467778205872
+        },
+        "model_version": "v1.0.0",
+        "inference_ms": 257.589
+      },
+      "cold": {
+        "label": "hoax",
+        "confidence_score": 0.9949467778205872,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.00505323288962245,
+          "hoax": 0.9949467778205872
+        },
+        "inference_ms": 164,
+        "cached": false
+      },
+      "warm": {
+        "label": "hoax",
+        "confidence_score": 0.9949467778205872,
+        "model_version": "v1.0.0",
+        "raw_scores": {
+          "valid": 0.00505323288962245,
+          "hoax": 0.9949467778205872
+        },
+        "inference_ms": 164,
+        "cached": true
+      },
+      "cold_http_calls": 1,
+      "warm_http_calls": 0,
+      "cold_seconds": 0.16862201690673828,
+      "warm_seconds": 6.580352783203125e-05
+    }
+  ],
+  "scope": "Real HTTP + bound Classifier decorators; no database, submission pipeline, Redis, OpenAI or production cache."
+}

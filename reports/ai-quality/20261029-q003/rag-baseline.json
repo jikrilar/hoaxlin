@@ -1,0 +1,815 @@
+{
+  "task": "Q-003",
+  "measurement": "real_pinned_sentence_transformer_cpu",
+  "status": "DONE_LIMITED_LEGACY_JUDGMENTS",
+  "effective_config": {
+    "seed": 42,
+    "threads": 2,
+    "top_k": [
+      3,
+      5
+    ],
+    "min_score": null,
+    "threshold_candidates": [],
+    "selection_performed": false
+  },
+  "legacy_corpus_evaluation": {
+    "schema_version": "1.0.0",
+    "evaluation_dataset": {
+      "name": "hoaxlin-rag-retrieval-evaluation",
+      "version": "1.0.0",
+      "schema_version": "1.0.0",
+      "script_version": "1.0.0",
+      "query_count": 20,
+      "queries_sha256": "0010336a9a3c1060cf0d12e5ddf6772448d74a46960eb049098378cffa3bc0de"
+    },
+    "corpus": {
+      "reference": "../knowledge-base-v1",
+      "version": "1.0.0",
+      "document_count": 24,
+      "documents_sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2"
+    },
+    "embedding": {
+      "model_id": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "revision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42",
+      "dimension": 384
+    },
+    "retrieval": {
+      "algorithm": "cosine_similarity",
+      "document_unit": "document_id",
+      "top_k": [
+        3,
+        5
+      ],
+      "min_score": null
+    },
+    "query_summary": {
+      "query_count": 20,
+      "valid_query_count": 20,
+      "query_hits": {
+        "@3": 20,
+        "@5": 20
+      }
+    },
+    "metrics": {
+      "hit_rate@3": 1.0,
+      "precision@3": 0.4,
+      "recall@3": 0.975,
+      "hit_rate@5": 1.0,
+      "precision@5": 0.25,
+      "recall@5": 1.0,
+      "mrr": 0.95
+    },
+    "threshold_evaluation": {
+      "status": "exploratory_candidates_not_selected",
+      "production_min_score": null,
+      "candidate_results": [],
+      "reason": "threshold production belum ditetapkan karena evaluation corpus belum cukup representatif."
+    },
+    "status": "complete"
+  },
+  "active_corpus_evaluation": {
+    "corpus": {
+      "version": "1.1.1",
+      "document_count": 61,
+      "sha256": "c937f0ac221b3d6fd5ce829a969c0712832e1c873959ed531ff8bc363366877d"
+    },
+    "judgment_scope": {
+      "version": "1.0.0",
+      "sha256": "1f275303f523be70c5f507b199eeb418f06b7d85a8f1dba449537b386a3ef1e2",
+      "query_count": 20,
+      "queries_sha256": "0010336a9a3c1060cf0d12e5ddf6772448d74a46960eb049098378cffa3bc0de"
+    },
+    "metrics_legacy_evaluator": {
+      "hit_rate@3": 1.0,
+      "precision@3": 0.383333,
+      "recall@3": 0.958333,
+      "hit_rate@5": 1.0,
+      "precision@5": 0.25,
+      "recall@5": 1.0,
+      "mrr": 0.95
+    },
+    "rankings": [
+      {
+        "query_id": "eval-001",
+        "query_sha256": "3c04f26bae455ec948d0a274eed07ae73f91cdbbbe9762afe45e3a532cce820b",
+        "legacy_judged_relevant_ids": [
+          "kb-bmkg-001"
+        ],
+        "results": [
+          {
+            "document_id": "kb-bmkg-001",
+            "score": 0.6802129745483398,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-komdigi-006",
+            "score": 0.6573200821876526,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-bmkg-005",
+            "score": 0.5456531643867493,
+            "rank": 3
+          },
+          {
+            "document_id": "kb-bmkg-003",
+            "score": 0.5364711284637451,
+            "rank": 4
+          },
+          {
+            "document_id": "tb-30467",
+            "score": 0.4658052921295166,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-002",
+        "query_sha256": "2078e8d0f2f09c7ccda5e9eb113395d4f86bedb1bd887075066474b691e5f97c",
+        "legacy_judged_relevant_ids": [
+          "kb-bmkg-003",
+          "kb-bmkg-004",
+          "kb-komdigi-006"
+        ],
+        "results": [
+          {
+            "document_id": "kb-bmkg-003",
+            "score": 0.8093934059143066,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-komdigi-006",
+            "score": 0.7835642099380493,
+            "rank": 2
+          },
+          {
+            "document_id": "tb-30467",
+            "score": 0.7738440036773682,
+            "rank": 3
+          },
+          {
+            "document_id": "kb-bmkg-004",
+            "score": 0.7084058523178101,
+            "rank": 4
+          },
+          {
+            "document_id": "kb-komdigi-007",
+            "score": 0.6171797513961792,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-003",
+        "query_sha256": "148cf8bc8cd19eaf216a64b6cd8a1220f984271f76330a1c7986d421a8cd94a7",
+        "legacy_judged_relevant_ids": [
+          "kb-bmkg-002"
+        ],
+        "results": [
+          {
+            "document_id": "kb-bmkg-002",
+            "score": 0.8273584842681885,
+            "rank": 1
+          },
+          {
+            "document_id": "bmkg-20250205-siklon",
+            "score": 0.5802685022354126,
+            "rank": 2
+          },
+          {
+            "document_id": "bmkg-20250508-air-pangan",
+            "score": 0.5125645995140076,
+            "rank": 3
+          },
+          {
+            "document_id": "bmkg-20251212-bakung",
+            "score": 0.5104559659957886,
+            "rank": 4
+          },
+          {
+            "document_id": "bmkg-20251115-bibit-siklon",
+            "score": 0.48887118697166443,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-004",
+        "query_sha256": "8e0846c2ba2a3ffb9050c6005f18ee96e615cff91c107246f823a0c81c1a185e",
+        "legacy_judged_relevant_ids": [
+          "kb-bmkg-005"
+        ],
+        "results": [
+          {
+            "document_id": "kb-bmkg-005",
+            "score": 0.6407383680343628,
+            "rank": 1
+          },
+          {
+            "document_id": "bmkg-20250924-diy",
+            "score": 0.6089468002319336,
+            "rank": 2
+          },
+          {
+            "document_id": "bmkg-20251115-bibit-siklon",
+            "score": 0.5837312936782837,
+            "rank": 3
+          },
+          {
+            "document_id": "bmkg-20250205-siklon",
+            "score": 0.5826815962791443,
+            "rank": 4
+          },
+          {
+            "document_id": "kb-komdigi-006",
+            "score": 0.5580085515975952,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-005",
+        "query_sha256": "421018229856f31135ca1647731a804374d47763305656c5d3f691c22ee79205",
+        "legacy_judged_relevant_ids": [
+          "kb-komdigi-007"
+        ],
+        "results": [
+          {
+            "document_id": "kb-komdigi-007",
+            "score": 0.7815398573875427,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-komdigi-006",
+            "score": 0.6580159664154053,
+            "rank": 2
+          },
+          {
+            "document_id": "tb-30467",
+            "score": 0.6469986438751221,
+            "rank": 3
+          },
+          {
+            "document_id": "kb-bmkg-004",
+            "score": 0.6426385641098022,
+            "rank": 4
+          },
+          {
+            "document_id": "bmkg-20250924-diy",
+            "score": 0.6240757703781128,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-006",
+        "query_sha256": "e972bc33d8bf1bc3400110e98abc4f986b6bcebc4393e0b414712aab9e982bd6",
+        "legacy_judged_relevant_ids": [
+          "kb-komdigi-008"
+        ],
+        "results": [
+          {
+            "document_id": "kb-komdigi-008",
+            "score": 0.8973003029823303,
+            "rank": 1
+          },
+          {
+            "document_id": "bmkg-20250708-kemarau",
+            "score": 0.7024685740470886,
+            "rank": 2
+          },
+          {
+            "document_id": "bmkg-20251102-musim-hujan",
+            "score": 0.6800171136856079,
+            "rank": 3
+          },
+          {
+            "document_id": "bmkg-20251115-bibit-siklon",
+            "score": 0.5479688048362732,
+            "rank": 4
+          },
+          {
+            "document_id": "bmkg-20250316-mudik",
+            "score": 0.5401432514190674,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-007",
+        "query_sha256": "a8b4fa1355d8e9d6a1a1d59e38d3b421f7322e9f338da01ebc393d4f8d7c8a0f",
+        "legacy_judged_relevant_ids": [
+          "kb-komdigi-009"
+        ],
+        "results": [
+          {
+            "document_id": "kb-komdigi-009",
+            "score": 0.8424018621444702,
+            "rank": 1
+          },
+          {
+            "document_id": "tb-26763",
+            "score": 0.5947669744491577,
+            "rank": 2
+          },
+          {
+            "document_id": "tb-27213",
+            "score": 0.5922892093658447,
+            "rank": 3
+          },
+          {
+            "document_id": "kemkes-20250325-tbc",
+            "score": 0.5147961378097534,
+            "rank": 4
+          },
+          {
+            "document_id": "kb-kemkes-018",
+            "score": 0.4851909875869751,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-008",
+        "query_sha256": "1626c633c374f9e784f89bc3f0195f1e4c86dd44ef19a0664576658ed466a08c",
+        "legacy_judged_relevant_ids": [
+          "kb-komdigi-010"
+        ],
+        "results": [
+          {
+            "document_id": "kb-komdigi-010",
+            "score": 0.8759543895721436,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-komdigi-011",
+            "score": 0.515436053276062,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-bi-015",
+            "score": 0.47778061032295227,
+            "rank": 3
+          },
+          {
+            "document_id": "tb-30261",
+            "score": 0.47173118591308594,
+            "rank": 4
+          },
+          {
+            "document_id": "kb-bi-012",
+            "score": 0.46011537313461304,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-009",
+        "query_sha256": "a0276b79db6354de613548eb5df3764a57f985eac27fa0c8a296291b5910fd0c",
+        "legacy_judged_relevant_ids": [
+          "kb-komdigi-011"
+        ],
+        "results": [
+          {
+            "document_id": "kb-komdigi-011",
+            "score": 0.7283450365066528,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-komdigi-010",
+            "score": 0.49863430857658386,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-bi-015",
+            "score": 0.4079822301864624,
+            "rank": 3
+          },
+          {
+            "document_id": "tb-30261",
+            "score": 0.38670027256011963,
+            "rank": 4
+          },
+          {
+            "document_id": "dikdasmen-20250929-spmb",
+            "score": 0.331603080034256,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-010",
+        "query_sha256": "d98789b6b1597a82a328bdb59e470ae0df74597fcd4fda2ab2051d6662199791",
+        "legacy_judged_relevant_ids": [
+          "kb-kemkes-016"
+        ],
+        "results": [
+          {
+            "document_id": "kb-kemkes-016",
+            "score": 0.716124415397644,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-kemkes-018",
+            "score": 0.40237152576446533,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-kemkes-017",
+            "score": 0.3510591983795166,
+            "rank": 3
+          },
+          {
+            "document_id": "tb-36479",
+            "score": 0.32811489701271057,
+            "rank": 4
+          },
+          {
+            "document_id": "kemkes-20250325-tbc",
+            "score": 0.31464681029319763,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-011",
+        "query_sha256": "f08d94dd6311ed861e0caddbcdc11460c24b25e641370cee3e9efefd31341c77",
+        "legacy_judged_relevant_ids": [
+          "kb-kemkes-017"
+        ],
+        "results": [
+          {
+            "document_id": "kb-kemkes-017",
+            "score": 0.6859067678451538,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-kemkes-016",
+            "score": 0.5174095630645752,
+            "rank": 2
+          },
+          {
+            "document_id": "tb-36479",
+            "score": 0.4902518391609192,
+            "rank": 3
+          },
+          {
+            "document_id": "kb-kemkes-018",
+            "score": 0.4347565472126007,
+            "rank": 4
+          },
+          {
+            "document_id": "kb-mafindo-021",
+            "score": 0.4131442904472351,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-012",
+        "query_sha256": "e55696745f44266a45c3640fe8c738f7d1d84e2b1f3424b7c5309534de73e390",
+        "legacy_judged_relevant_ids": [
+          "kb-kemkes-018"
+        ],
+        "results": [
+          {
+            "document_id": "kb-kemkes-018",
+            "score": 0.7826330661773682,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-mafindo-019",
+            "score": 0.6219742298126221,
+            "rank": 2
+          },
+          {
+            "document_id": "tb-27213",
+            "score": 0.5384060144424438,
+            "rank": 3
+          },
+          {
+            "document_id": "tb-26763",
+            "score": 0.5363059043884277,
+            "rank": 4
+          },
+          {
+            "document_id": "tb-30195",
+            "score": 0.5323393940925598,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-013",
+        "query_sha256": "5f2e4f28787b239575c07aaecbd3e7c8f0319f9684c0a3561c1fb87f8ec071a4",
+        "legacy_judged_relevant_ids": [
+          "kb-mafindo-019"
+        ],
+        "results": [
+          {
+            "document_id": "kb-mafindo-019",
+            "score": 0.7959211468696594,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-kemkes-018",
+            "score": 0.574776828289032,
+            "rank": 2
+          },
+          {
+            "document_id": "tb-30195",
+            "score": 0.47953546047210693,
+            "rank": 3
+          },
+          {
+            "document_id": "tb-30130",
+            "score": 0.4684188961982727,
+            "rank": 4
+          },
+          {
+            "document_id": "tb-27213",
+            "score": 0.44037753343582153,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-014",
+        "query_sha256": "0b4958f4dabcb28b59e48888eac68b37d4d14cc63077aa0336e8b8645b401928",
+        "legacy_judged_relevant_ids": [
+          "kb-mafindo-020"
+        ],
+        "results": [
+          {
+            "document_id": "kb-mafindo-020",
+            "score": 0.6935745477676392,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-bmkg-001",
+            "score": 0.4821098744869232,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-mafindo-022",
+            "score": 0.440368115901947,
+            "rank": 3
+          },
+          {
+            "document_id": "tb-26369",
+            "score": 0.41096460819244385,
+            "rank": 4
+          },
+          {
+            "document_id": "tb-36282",
+            "score": 0.37584882974624634,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-015",
+        "query_sha256": "cab3765f152d09523bdb1b38dabe2e12464729b1e895b742e66113b73c25f7cb",
+        "legacy_judged_relevant_ids": [
+          "kb-mafindo-021",
+          "kb-mafindo-022"
+        ],
+        "results": [
+          {
+            "document_id": "kb-mafindo-021",
+            "score": 0.6643269658088684,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-mafindo-022",
+            "score": 0.6382777094841003,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-kemkes-017",
+            "score": 0.6128839254379272,
+            "rank": 3
+          },
+          {
+            "document_id": "tb-31097",
+            "score": 0.5041801929473877,
+            "rank": 4
+          },
+          {
+            "document_id": "tb-36282",
+            "score": 0.4960564076900482,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-016",
+        "query_sha256": "5e9713f1d155352b2ad2b9111b87d7627fe606b0da819cfe6ab0fda5b1c34a21",
+        "legacy_judged_relevant_ids": [
+          "kb-mafindo-022"
+        ],
+        "results": [
+          {
+            "document_id": "kb-mafindo-022",
+            "score": 0.6738153696060181,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-kemkes-017",
+            "score": 0.5478168725967407,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-mafindo-021",
+            "score": 0.46249985694885254,
+            "rank": 3
+          },
+          {
+            "document_id": "kb-bi-013",
+            "score": 0.4473119080066681,
+            "rank": 4
+          },
+          {
+            "document_id": "kb-bi-015",
+            "score": 0.44258058071136475,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-017",
+        "query_sha256": "69cc2b946dbb43a07bee2979bcc0c8ffe07afb088366a07be1570f529ebbd73c",
+        "legacy_judged_relevant_ids": [
+          "kb-mafindo-023"
+        ],
+        "results": [
+          {
+            "document_id": "kb-mafindo-020",
+            "score": 0.5332204103469849,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-mafindo-023",
+            "score": 0.4849477708339691,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-mafindo-022",
+            "score": 0.4794217348098755,
+            "rank": 3
+          },
+          {
+            "document_id": "tb-26369",
+            "score": 0.4557313919067383,
+            "rank": 4
+          },
+          {
+            "document_id": "tb-36282",
+            "score": 0.43989846110343933,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-018",
+        "query_sha256": "a920e8e9740b842f1fcd638ea64c285afd464c334abb8e017ad0477880a9d551",
+        "legacy_judged_relevant_ids": [
+          "kb-mafindo-024"
+        ],
+        "results": [
+          {
+            "document_id": "kb-mafindo-024",
+            "score": 0.8518699407577515,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-mafindo-023",
+            "score": 0.45542943477630615,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-bi-014",
+            "score": 0.42804092168807983,
+            "rank": 3
+          },
+          {
+            "document_id": "kb-bi-012",
+            "score": 0.411954402923584,
+            "rank": 4
+          },
+          {
+            "document_id": "kb-bi-015",
+            "score": 0.4016205370426178,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-019",
+        "query_sha256": "682a6e34834aa7b68018aa679e9e1dd883e5f06ed10db70a4dea15cc51e00907",
+        "legacy_judged_relevant_ids": [
+          "kb-bi-012",
+          "kb-bi-014"
+        ],
+        "results": [
+          {
+            "document_id": "kb-bi-012",
+            "score": 0.6888988018035889,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-bi-014",
+            "score": 0.6255879402160645,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-bi-013",
+            "score": 0.5619297027587891,
+            "rank": 3
+          },
+          {
+            "document_id": "kb-bi-015",
+            "score": 0.48843318223953247,
+            "rank": 4
+          },
+          {
+            "document_id": "tb-31204",
+            "score": 0.39740684628486633,
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "query_id": "eval-020",
+        "query_sha256": "0047f8d24ee9e504ed4f7dc5f93951b4fd0ed90e2e9e15f742dc1b6e9a731076",
+        "legacy_judged_relevant_ids": [
+          "kb-bi-013",
+          "kb-bi-015"
+        ],
+        "results": [
+          {
+            "document_id": "kb-bi-012",
+            "score": 0.691030740737915,
+            "rank": 1
+          },
+          {
+            "document_id": "kb-bi-013",
+            "score": 0.6594997644424438,
+            "rank": 2
+          },
+          {
+            "document_id": "kb-bi-014",
+            "score": 0.6534601449966431,
+            "rank": 3
+          },
+          {
+            "document_id": "kb-bi-015",
+            "score": 0.5912641286849976,
+            "rank": 4
+          },
+          {
+            "document_id": "tb-31700",
+            "score": 0.4816134572029114,
+            "rank": 5
+          }
+        ]
+      }
+    ],
+    "interpretation": "PRELIMINARY: unlisted documents treated as non-relevant by legacy evaluator, not independently judged irrelevant; no no-answer queries."
+  },
+  "historical_comparison": {
+    "legacy_metrics_equal": true,
+    "active_metrics_equal": true,
+    "old_active_metrics": {
+      "hit_rate@3": 1.0,
+      "hit_rate@5": 1.0,
+      "mrr": 0.95,
+      "precision@3": 0.383333,
+      "precision@5": 0.25,
+      "recall@3": 0.958333,
+      "recall@5": 1.0
+    },
+    "old_legacy_metrics": {
+      "hit_rate@3": 1.0,
+      "hit_rate@5": 1.0,
+      "mrr": 0.95,
+      "precision@3": 0.4,
+      "precision@5": 0.25,
+      "recall@3": 0.975,
+      "recall@5": 1.0
+    }
+  },
+  "runtime": {
+    "seconds": 27.062991314996907,
+    "max_rss_kib": 1185700
+  },
+  "dependencies": {
+    "torch": "2.13.0+cpu",
+    "transformers": "5.18.0",
+    "tokenizers": "0.23.2",
+    "sentence-transformers": "5.7.0",
+    "numpy": "2.5.3",
+    "scikit-learn": "1.9.1"
+  }
+}
