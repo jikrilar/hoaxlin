@@ -26,6 +26,8 @@ from scripts.rag_retrieval_metrics import (  # noqa: E402
     MetricInputError,
     RetrievalCase,
     calculate_metrics,
+    GradedCase,
+    calculate_graded_metrics,
 )
 
 
@@ -112,6 +114,7 @@ def _check_sha256(value: object, location: str) -> str:
 def _load_queries(
     query_bytes: bytes,
     known_document_ids: set[str],
+    schema_version: str = '1.0.0',
 ) -> tuple[RetrievalCase, ...]:
     try:
         text = query_bytes.decode("utf-8")
@@ -127,6 +130,23 @@ def _load_queries(
         raw_record = _parse_json(line, location)
         if not isinstance(raw_record, dict):
             raise EvaluationError(f"{location}:expected_object")
+        if schema_version == '2.0.0':
+            required_v2 = frozenset({'id', 'query', 'answerable', 'judgments', 'judgments_complete'})
+            record = _exact_fields(raw_record, required_v2, location)
+            judgments = record['judgments']
+            if not isinstance(judgments, dict) or set(judgments) - known_document_ids:
+                raise EvaluationError(f'{location}:invalid_or_unknown_judgment_ids')
+            if record['judgments_complete'] is True and set(judgments) != known_document_ids:
+                raise EvaluationError(f'{location}:complete_scope_requires_all_corpus_documents')
+            case = GradedCase(record['id'], record['query'], record['answerable'], judgments, record['judgments_complete'])
+            try:
+                calculate_graded_metrics([case], {case.id: []})
+            except (MetricInputError, TypeError) as exc:
+                raise EvaluationError(f'{location}:invalid_graded_case') from exc
+            if case.id in seen_query_ids: raise EvaluationError(f'{location}:duplicate_id')
+            seen_query_ids.add(case.id)
+            queries.append(case)
+            continue
         allowed = frozenset({"id", "query", "relevant_document_ids", "topic"})
         required = frozenset({"id", "query", "relevant_document_ids"})
         missing = required - raw_record.keys()
@@ -200,11 +220,11 @@ def load_evaluation_dataset(
     )
     if manifest["dataset_name"] != EVALUATION_DATASET_NAME:
         raise EvaluationError("manifest.json:unexpected_dataset_name")
-    if manifest["version"] != EVALUATION_VERSION:
+    if manifest["version"] not in (EVALUATION_VERSION, '2.0.0'):
         raise EvaluationError("manifest.json:unsupported_version")
-    if manifest["schema_version"] != EVALUATION_SCHEMA_VERSION:
+    if manifest["schema_version"] not in (EVALUATION_SCHEMA_VERSION, '2.0.0'):
         raise EvaluationError("manifest.json:unsupported_schema_version")
-    if manifest["evaluation_script_version"] != EVALUATION_SCRIPT_VERSION:
+    if manifest["evaluation_script_version"] != manifest['schema_version'] or manifest['version'] != manifest['schema_version']:
         raise EvaluationError("manifest.json:unsupported_evaluation_script_version")
     if type(manifest["query_count"]) is not int or manifest["query_count"] < 0:
         raise EvaluationError("manifest.json:query_count_must_be_nonnegative_integer")
@@ -243,7 +263,7 @@ def load_evaluation_dataset(
     if expected_corpus_sha != knowledge_base.sha256:
         raise EvaluationError("manifest.json:corpus_checksum_mismatch")
 
-    queries = _load_queries(query_bytes, {document.id for document in knowledge_base.documents})
+    queries = _load_queries(query_bytes, {document.id for document in knowledge_base.documents}, manifest['schema_version'])
     if len(queries) != manifest["query_count"]:
         raise EvaluationError("manifest.json:query_count_mismatch")
 
@@ -273,12 +293,12 @@ def _base_result(
     embedding: dict[str, object],
 ) -> dict[str, object]:
     return {
-        "schema_version": EVALUATION_SCHEMA_VERSION,
+        "schema_version": evaluation_dataset.schema_version,
         "evaluation_dataset": {
             "name": EVALUATION_DATASET_NAME,
             "version": evaluation_dataset.version,
             "schema_version": evaluation_dataset.schema_version,
-            "script_version": EVALUATION_SCRIPT_VERSION,
+            "script_version": evaluation_dataset.schema_version,
             "query_count": evaluation_dataset.query_count,
             "queries_sha256": evaluation_dataset.queries_sha256,
         },
@@ -374,15 +394,20 @@ def run_evaluation(
             raise EvaluationError("retrieval_query_failed") from exc
 
     try:
-        baseline_metrics = calculate_metrics(dataset.queries, baseline_rankings)
+        metric_function = calculate_graded_metrics if dataset.schema_version == '2.0.0' else calculate_metrics
+        baseline_metrics = metric_function(dataset.queries, baseline_rankings)
     except MetricInputError as exc:
         raise EvaluationError("metric_calculation_failed") from exc
     result["metrics"] = baseline_metrics["metrics"]
     result["query_summary"] = {
         "query_count": dataset.query_count,
         "valid_query_count": len(dataset.queries),
-        "query_hits": baseline_metrics["query_hits"],
+        "query_hits": baseline_metrics.get("query_hits"),
     }
+    if dataset.schema_version == '2.0.0':
+        result['graded_evaluation'] = baseline_metrics
+    else:
+        result['legacy_metric_contract'] = 'v1 binary macro precision denominator = unique returned IDs up to K; unlisted corpus IDs treated irrelevant'
 
     candidate_results: list[dict[str, object]] = []
     for threshold in threshold_candidates:
@@ -396,7 +421,7 @@ def run_evaluation(
             except Exception as exc:
                 raise EvaluationError("threshold_retrieval_query_failed") from exc
         try:
-            candidate_metrics = calculate_metrics(dataset.queries, candidate_rankings)
+            candidate_metrics = metric_function(dataset.queries, candidate_rankings)
         except MetricInputError as exc:
             raise EvaluationError("threshold_metric_calculation_failed") from exc
         covered = sum(bool(ranking) for ranking in candidate_rankings.values())
@@ -406,6 +431,7 @@ def run_evaluation(
                 "coverage_count": covered,
                 "coverage": round(covered / len(dataset.queries), 6),
                 "metrics": candidate_metrics["metrics"],
+                **({'judgment_status': candidate_metrics['status']} if dataset.schema_version == '2.0.0' else {}),
             }
         )
 
@@ -415,7 +441,7 @@ def run_evaluation(
         "candidate_results": candidate_results,
         "reason": "threshold production belum ditetapkan karena evaluation corpus belum cukup representatif.",
     }
-    result["status"] = "complete"
+    result["status"] = baseline_metrics.get('status', 'complete')
     return result
 
 
