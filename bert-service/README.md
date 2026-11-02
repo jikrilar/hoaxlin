@@ -1,11 +1,13 @@
 # Hoax BERT Inference Service
 
-FastAPI service used by Laravel for IndoBERT inference. Training is in `dataset/` + `train/` (see below); the service hosts the exported artifact at `models/indobert-hoax/v1.0.0/`. The service starts without a model so liveness can be monitored; readiness returns `503` until `BERT_MODEL_PATH` points to a compatible fine-tuned Hugging Face sequence-classification model with verified `id2label` {0:valid,1:hoax}.
+FastAPI service used by Laravel for frozen `indobert-hoax v1.0.0` inference. The service starts without a model so liveness can be monitored; readiness returns `503` until the approved private release is configured. See the [main setup guide](../README.md#instalasi-docker) and [release contract](MODEL_RELEASE.md).
+
+**Current project policy:** no BERT retraining/fine-tuning in the active roadmap. Further classifier dataset curation and benchmarks are deferred; RAG quality evaluation is the priority. `dataset/` and `train/` documentation below is retained as historical tooling reference, not a setup prerequisite or authorization to run it. Never overwrite v1.0.0 or reconstruct missing historical training data from reports.
 
 ## Requirements
 
 - Python 3.10 or newer
-- Python 3.12 or newer is recommended; the pinned stack has also been verified on Python 3.14
+- Python 3.12 matches the Docker/CI reference; other interpreters require compatible wheels
 - Windows PowerShell examples are shown below
 
 ## Setup
@@ -14,27 +16,18 @@ From `bert-service/`:
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.13.0
+.\.venv\Scripts\python.exe -m pip install -r requirements-runtime.txt
 Copy-Item .env.example .env
 ```
 
 If PowerShell prevents activation, the environment can be used directly:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-runtime.txt
 ```
 
-Set the same secret in Laravel's `BERT_SERVICE_TOKEN` and this service's `.env`. Environment variables are read by the process; load `.env` before starting when necessary:
-
-```powershell
-Get-Content .env | ForEach-Object {
-    if ($_ -match '^\s*([^#][^=]*)=(.*)$') {
-        [Environment]::SetEnvironmentVariable($matches[1].Trim(), $matches[2].Trim().Trim('"'), 'Process')
-    }
-}
-```
+Set the same private random secret in Laravel's `BERT_SERVICE_TOKEN` and this service's `.env`. `app/config.py` loads service `.env` before root `.env`; process environment takes precedence. Replace the template's old machine-specific model path and placeholder token. For Linux/Fish, use `.venv/bin/python`; activation is optional. Never source a dotenv file as shell code.
 
 ## Start
 
@@ -70,7 +63,7 @@ Readiness confirms that the IndoBERT model is loaded:
 Invoke-WebRequest http://127.0.0.1:8001/health/ready -SkipHttpErrorCheck
 ```
 
-Before model training/configuration, the expected response is HTTP `503` with `model_unavailable`. After setting `BERT_MODEL_PATH` to a compatible local model, it should return HTTP `200`.
+Without the approved release/configuration, the expected response is HTTP `503` with `model_unavailable`. Configure the approved local v1.0.0 release rather than training or downloading a substitute.
 
 Version metadata remains available with or without a model:
 
@@ -84,6 +77,7 @@ Invoke-RestMethod http://127.0.0.1:8001/version
 .\.venv\Scripts\python.exe -m pip check
 .\.venv\Scripts\python.exe -c "import fastapi, pydantic, torch, transformers, uvicorn; print(fastapi.__version__, torch.__version__, transformers.__version__)"
 .\.venv\Scripts\python.exe -m compileall -q app
+.\.venv\Scripts\python.exe -m pip install -r requirements-test.txt
 .\.venv\Scripts\python.exe -m pytest -m 'not release'
 ```
 
@@ -94,14 +88,16 @@ The exported model `models/indobert-hoax/v1.0.0/` is wired via `BERT_MODEL_PATH`
 **Configuration (`bert-service/.env`):**
 
 ```ini
-BERT_MODEL_PATH=C:/xampp/htdocs/hoax-detector/models/indobert-hoax/v1.0.0
+BERT_MODEL_PATH=/absolute/private/path/indobert-hoax/v1.0.0
 BERT_MODEL_VERSION=v1.0.0
-BERT_SERVICE_TOKEN=local-dev-token-change-me
+BERT_SERVICE_TOKEN=<private-random-token-shared-with-laravel>
+BERT_LOCAL_FILES_ONLY=true
+BERT_REQUIRE_RELEASE_MANIFEST=true
 ```
 
-`BERT_MODEL_PATH` is resolved at startup; `app/config.py:13` loads `bert-service/.env` and project `.env` via a lightweight dotenv parser (no extra dependency). Keep `BERT_SERVICE_TOKEN` in sync with Laravel's `BERT_SERVICE_TOKEN` (`.env`).
+Use an absolute platform-appropriate path (on Windows, for example a private drive path). `BERT_MODEL_PATH` is resolved at startup; `app/config.py` loads dotenv via a lightweight parser. Keep the token in sync with Laravel; do not use the placeholder literally.
 
-**Label-map verification (`app/inference.py:111`):**
+**Label-map and release verification (`app/inference.py`):**
 
 On `ModelRuntime.load()` the service asserts:
 
@@ -109,9 +105,9 @@ On `ModelRuntime.load()` the service asserts:
 
 - Required files (`model.safetensors`, `config.json`, tokenizer) exist; weights and tokenizer are loaded with `local_files_only=true` by default.
 
-- Sidecars `threshold.json` (0.99) and `calibration.json` (T=0.87) are loaded if present; inference applies temperature scaling (`logits/T`) and threshold logic per `MODEL_CARD.md`: `label = id2label[argmax] if confidence >= threshold else "meragukan"`. Raw scores for `valid`/`hoax` are always returned.
+- The approved release requires `threshold.json` (0.99) and `calibration.json` (T=0.8706620666110391); inference applies temperature scaling (`logits/T`) and abstention. Raw scores for `valid`/`hoax` are always returned.
 
-- Checksum verification against `models/indobert-hoax/manifest.json` (SHA-256 per file) if manifest is present — mismatch fails startup.
+- Strict packaged-release mode (Docker default) requires an internal `manifest.json` and verifies file checksums, known v1.0.0 weight identity, architecture, calibration/threshold and sequence contract. Legacy source-export manifest handling is not a replacement for release qualification.
 
 **Health & version:**
 
@@ -125,15 +121,15 @@ Invoke-RestMethod http://127.0.0.1:8001/health -Headers @{Authorization="Bearer 
 **Predict (requires Bearer token):**
 
 ```powershell
-$headers = @{Authorization="Bearer local-dev-token-change-me"; "Content-Type"="application/json"}
+$headers = @{Authorization="Bearer $env:BERT_SERVICE_TOKEN"; "Content-Type"="application/json"}
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8001/predict -Headers $headers -Body '{"text":"Beredar unggahan di media sosial yang mengklaim bansos Rp 50 juta"}'
-# -> {"label":"hoax","confidence_score":0.999,"raw_scores":{"valid":0.0,"hoax":0.999}, "model_version":"v1.0.0", ...}
-# Short valid news below threshold returns "meragukan":
+# Inspect the real response; do not assume a label/confidence from an example.
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8001/predict -Headers $headers -Body '{"text":"Jakarta (ANTARA) - Bank Indonesia mencatat pertumbuhan ekonomi 5,2 persen"}'
-# -> {"label":"meragukan","confidence_score":0.974, ...}
 ```
 
-## Dataset Preparation (C2)
+## Dataset Preparation (historical tooling — deferred)
+
+Do not execute curation/crawling as part of installation. Original v1.0.0 raw and processed training data are unavailable from the checkout; retained code/defaults do not establish historical training provenance. Commands below describe tooling only and require a separate authorized task.
 
 The `dataset/` package turns raw fact-check exports into a versioned, deduplicated,
 leakage-safe training corpus. Pipeline stages: source adapters -> canonical
@@ -189,7 +185,7 @@ Combined run for fine-tuning:
   --out ..\datasets\processed\komdigi-antara-v1
 ```
 
-Current artifacts: `komdigi-hoaks-v1/` (3832 hoax) for inspection;
+Historical artifact descriptions (not files guaranteed present): `komdigi-hoaks-v1/` (3832 hoax) for inspection;
 `komdigi-antara-v1/` (7816 rows: 3832 hoax + 3984 valid, 6253/782/781 split,
 stratified) for training.
 
@@ -199,7 +195,9 @@ Tests:
 .\.venv\Scripts\python.exe -m pytest -m 'not release'
 ```
 
-## Fine-tuning (C3)
+## Fine-tuning (historical tooling — not active)
+
+**No execution is authorized by this section.** Training/calibration/export is not an active roadmap item. In particular, the historical export command below must never be used to overwrite the frozen v1.0.0 release.
 
 `train/` fine-tunes `indobenchmark/indobert-base-p1` with HuggingFace Trainer.
 The configured classes are binary (`valid`, `hoax`); `meragukan` is derived later
@@ -246,5 +244,5 @@ accuracy or a guarantee for every input. The known limitation remains: valid
 is long Antara news vs hoax is short claim
 (`"Beredar unggahan..."` vs `"Jakarta (ANTARA) -"`). The held-out score is
 inflated by style/length; short valid claims will score near the hoax side and
-may fall to `meragukan` under the 0.99 threshold. Future work: add short valid
-headlines and length-controlled hard negatives.
+may fall to `meragukan` under the 0.99 threshold. Earlier proposals for short-valid
+headlines and length-controlled hard negatives remain deferred, not active work.

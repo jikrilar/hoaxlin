@@ -1,9 +1,9 @@
 ---
 title: "Product Requirements Document (PRD) — Hoaxlin"
 subtitle: "Sistem Deteksi Hoaks Berbasis IndoBERT dengan Retrieval-Augmented Generation untuk Bukti/Rujukan"
-version: "2.1"
-status: "As-built - R1-R12 complete; R11 retrieval evaluation complete for approved v1.0.0 snapshots"
-date: "24 September 2026"
+version: "2.2"
+status: "As-built; IndoBERT v1.0.0 frozen, KB v1.1.1 baseline; fokus aktif evaluasi kualitas RAG"
+date: "2 November 2026"
 ---
 
 # 1. Ringkasan Eksekutif
@@ -15,6 +15,8 @@ Implementasi RAG menambahkan lapisan pencarian bukti/rujukan dari knowledge base
 Arah output utama mengikuti masukan dosen pembimbing:
 
 > **Status Verifikasi + Skor Keyakinan + Daftar Bukti/Rujukan**
+
+Istilah kebutuhan awal di atas kini dipresentasikan sebagai **prediksi model + skor keyakinan model + referensi terkait**, bukan putusan verifikasi faktual. Detail label UI aktual ada di bagian 11.
 
 Untuk label internal `meragukan`, tampilan pengguna diubah menjadi:
 
@@ -97,6 +99,8 @@ Hoaxlin bukan lembaga pemeriksa fakta resmi, keputusan hukum, atau sumber kebena
 
 # 5. Kondisi Sistem Saat Ini
 
+Keputusan proyek C-04: IndoBERT v1.0.0 tetap classifier utama; tidak ada retraining/fine-tuning dalam roadmap aktif. Kurasi dataset dan benchmark BERT lanjutan ditunda. Fokus berikutnya adalah evaluasi dan peningkatan kualitas RAG melalui perbandingan baseline vs improvement; KB v1.1.1 tetap baseline. Tooling/laporan lama dipertahankan untuk provenance, bukan instruksi menjalankan roadmap BERT lama. Panduan setup dan operasi utama ada di [README](README.md).
+
 R1-R11 telah diimplementasikan dan digabungkan ke `main`; setelah R12, snapshot corpus 24 dokumen dan 20 relevance judgment disiapkan, disetujui owner, lalu dievaluasi dengan framework R11. Report final terikat pada kedua checksum snapshot tersebut. Evaluasi classifier tetap terpisah.
 
 Pipeline aplikasi saat ini:
@@ -143,11 +147,11 @@ Input → Extraction → Translation → IndoBERT Classification
 |---|---|
 | Laravel | Authentication/authorization, validasi, persistence, pipeline, queue, dan UI |
 | `bert-service` | Inference classifier IndoBERT frozen dan metadata runtime |
-| `rag-service` | Embedding CPU, cosine retrieval lokal, serta top-k evidence dari KB v1 |
+| `rag-service` | Embedding CPU, cosine retrieval lokal, serta top-k evidence dari KB v1.1.1 |
 | OpenAI | Grounded explanation; juga OCR, transkripsi, dan EN→ID translation pada jalur input |
 | MySQL | Submission, detection result, evidence reference, processing events, dan data aplikasi |
 | Redis | Queue, cache, session, lock, dan limiter |
-| Knowledge base RAG | 24 dokumen lokal berversi dan metadata provenance pada snapshot data-preparation saat ini |
+| Knowledge base RAG | Runtime v1.1.1: 61 dokumen lokal berversi; v1.0.0 (24 dokumen) tetap snapshot evaluasi historis |
 
 Boundary metodologisnya tetap: **IndoBERT = classifier**, **RAG = evidence retrieval**, **OpenAI = explanation**. RAG tidak mengubah label atau confidence classifier. Similarity score mengukur relevansi retrieval, bukan kebenaran dokumen dan bukan confidence classifier.
 
@@ -207,7 +211,7 @@ Stage progres: `queued` → `extracting` → `translating` → `classifying` →
 - Evidence retrieval berbasis knowledge base terkurasi.
 - Penyimpanan evidence beserta provenance.
 - Grounded explanation.
-- Halaman hasil dengan Status Verifikasi, Skor Keyakinan, dan Bukti/Rujukan.
+- Halaman hasil dengan prediksi model, skor keyakinan model, dan referensi terkait (kebutuhan awal Status Verifikasi/Bukti-Rujukan).
 - Riwayat hasil pengguna.
 - Feedback hasil.
 - PDF/CSV sesuai kemampuan existing aplikasi.
@@ -251,7 +255,7 @@ User terautentikasi dapat menggunakan:
 - direct media URL yang didukung;
 - URL artikel.
 
-Riwayat dan hasil hanya dapat diakses oleh pemilik submission sesuai authorization aplikasi.
+Riwayat/CSV riwayat dan feedback memerlukan email terverifikasi sesuai middleware. Hasil, status, PDF, dan media memerlukan akses submission oleh pemilik/admin atau capability tamu sesuai authorization aplikasi; ID saja bukan izin berbagi publik.
 
 ---
 
@@ -275,13 +279,13 @@ Tampilan utama:
 
 | Internal | Tampilan |
 |---|---|
-| `valid` | Valid |
-| `hoax` | Hoax |
+| `valid` | Prediksi model: Valid |
+| `hoax` | Prediksi model: Hoaks |
 | `meragukan` | Informasi belum terverifikasi oleh sumber terpercaya |
 
-Heading utama halaman hasil:
+Istilah kebutuhan awal “Status Verifikasi” tidak boleh dibaca sebagai putusan resmi. Implementasi UI saat ini membingkai label sebagai prediksi model; heading hasil:
 
-> **Status Verifikasi**
+> **Hasil analisis**
 
 Status harus disertai konteks bahwa hasil merupakan keluaran sistem/model dan bukan keputusan resmi.
 
@@ -295,9 +299,9 @@ Skor tidak boleh dijelaskan sebagai “persentase kebenaran berita”.
 
 ## 11.4 Bukti/Rujukan
 
-Bagian hasil wajib mendukung:
+Kebutuhan bukti/rujukan pada UI saat ini disajikan sebagai:
 
-> **Bukti / Rujukan**
+> **Referensi terkait**
 
 Setiap item minimal berisi:
 
@@ -393,17 +397,17 @@ Prioritas: **Must / Should / Could**.
 | FR-11 | RAG mengembalikan top-k evidence dengan provenance | Must |
 | FR-12 | Evidence tidak boleh mengubah `DetectionResult.label` | Must |
 | FR-13 | Evidence disimpan per submission dan dapat diaudit | Must |
-| FR-14 | Halaman hasil menampilkan Status Verifikasi | Must |
+| FR-14 | Halaman hasil menampilkan status/prediksi model dengan batasan, bukan putusan verifikasi definitif | Must |
 | FR-15 | Halaman hasil menampilkan Skor Keyakinan Model | Must |
-| FR-16 | Halaman hasil menampilkan Daftar Bukti/Rujukan | Must |
+| FR-16 | Halaman hasil menampilkan daftar bukti/rujukan sebagai Referensi terkait | Must |
 | FR-17 | `meragukan` ditampilkan sebagai “Informasi belum terverifikasi oleh sumber terpercaya” | Must |
 | FR-18 | Explanation menggunakan classifier result + retrieved evidence | Must |
 | FR-19 | Explanation tidak boleh mengubah label model | Must |
 | FR-20 | Retrieval tanpa hasil memiliki empty state yang jujur | Must |
 | FR-21 | Failure RAG tidak menggagalkan classification yang sudah sukses | Must |
 | FR-22 | Failure explanation non-kritis tidak menggagalkan classification | Must |
-| FR-23 | User login dapat melihat riwayat submission miliknya | Should |
-| FR-24 | User dapat memberi feedback terhadap hasil | Should |
+| FR-23 | User login terverifikasi dapat melihat riwayat submission miliknya | Should |
+| FR-24 | User terverifikasi dapat memberi feedback sesuai aturan akses hasil | Should |
 | FR-25 | User dapat mengekspor hasil sesuai fitur existing | Should |
 | FR-26 | Admin dapat memantau metadata runtime/evaluation model | Should |
 | FR-27 | Sistem menyimpan processing events untuk audit pipeline | Must |
@@ -719,6 +723,8 @@ Setiap stage asynchronous harus aman terhadap:
   - internal provider response sensitif.
 - Guest access tetap menggunakan capability yang tidak dapat ditebak.
 - Account deletion dan retention behavior existing tetap dipertahankan.
+- Retensi media default 24 jam adalah cutoff eligibility setelah completed/failed; penghapusan aktual bergantung scheduler/storage, bukan deadline pasti. Teks/hasil/riwayat tidak dihapus oleh pruning media.
+- Writer audit baru memakai allowlist/redaksi sebelum persistence. Log historis/backup dapat tetap berisiko; penilaian/redaksi historis memerlukan tugas terotorisasi, tanpa menghapus jejak audit otomatis.
 
 ---
 
@@ -834,6 +840,18 @@ R14 menjalankan ulang evaluator R11 dengan 20 query v1.0.0 pada corpus runtime v
 
 R13 memperluas corpus melalui pemeriksaan otomatis atas provenance dan isi. Sebanyak 37 kandidat baru masuk snapshot runtime setelah melewati seluruh gate otomatis; 21 dikecualikan dan 16 tetap review-required. Pemeriksaan ini bukan human review dan bukan evaluasi retrieval formal. Evaluasi pada R14 menggunakan query lama, sehingga evaluasi yang lebih representatif memerlukan query dan relevance judgment independen yang mencakup topik serta dokumen baru. Jangan menetapkan `RAG_MIN_SCORE` tanpa dasar yang cukup. Questionnaire/usability testing untuk menilai kegunaan referensi masih merupakan pekerjaan lanjutan.
 
+## 24.5 Roadmap aktif setelah C-04
+
+| Status | Arah kerja |
+| --- | --- |
+| Baseline dipertahankan | IndoBERT v1.0.0 dan KB RAG v1.1.1; report historis tidak ditimpa |
+| Prioritas berikutnya | Query/judgment relevansi independen yang sesuai baseline runtime, lalu evaluasi baseline vs improvement yang sederhana |
+| Rencana, belum dijalankan | Bekukan corpus/query/model/code/parameter/resource, ukur baseline, uji satu perubahan yang disetujui pada kondisi sepadan, laporkan metrik retrieval dan failure analysis pada output berbeda |
+| Ditunda | Kurasi dataset dan benchmark BERT lanjutan |
+| Tidak aktif | Retraining/fine-tuning, perubahan threshold/calibration/model BERT |
+
+Evaluator yang ada tetap mengikat checksum corpus melalui manifest; default-nya R11 v1.0.0. Mengarahkan flag corpus ke v1.1.1 saja bukan evaluasi baru yang sah. Set/judgment yang cocok dan output versioned terpisah perlu disiapkan dalam tugas berikutnya. Tidak ada klaim peningkatan akurasi dari roadmap ini; promosi improvement memerlukan hasil evaluasi yang mendukung. RAG tidak mengubah classifier accuracy secara otomatis.
+
 ---
 
 # 25. Risks dan Mitigasi
@@ -849,7 +867,7 @@ R13 memperluas corpus melalui pemeriksaan otomatis atas provenance dan isi. Seba
 | Evidence hallucination | Kehilangan kepercayaan | Evidence hanya berasal dari retrieval result terverifikasi |
 | External challenge tercampur dengan KB | Evaluasi menjadi tidak valid | Boundary dataset eksplisit dan automated checks |
 | Dependency model embedding terlalu berat | Docker/laptop melambat | Pilih pretrained embedding model yang sesuai resource dan CPU-friendly |
-| Queue retrieval tidak dikonsumsi | Submission tertunda | Worker Docker dan Horizon telah mencakup queue `retrieval`; pantau backlog serta gunakan stale recovery |
+| Queue retrieval tidak dikonsumsi | Submission tertunda | Worker Docker dan konfigurasi Horizon yang tersedia mencakup queue `retrieval`; Compose memakai `queue:work`, bukan proses Horizon; pantau backlog serta gunakan stale recovery |
 | Referensi URL mati | UX buruk | Simpan provenance; lakukan maintenance KB terpisah |
 | Terminologi “Status Verifikasi” dianggap keputusan resmi | Overclaim | Tambahkan copy bahwa hasil adalah indikasi sistem dan verifikasi lanjutan tetap dianjurkan |
 
@@ -899,7 +917,7 @@ Implementasi RAG tidak menjadi alasan untuk:
 | M12 | Selesai - sinkronisasi dokumentasi dan catatan keterbatasan |
 | M13 | Selesai - pemeriksaan otomatis kandidat KB; snapshot v1.1.1 berisi 61 dokumen, tanpa klaim human approval |
 
-Detail scope historis dan acceptance per milestone tercatat pada `TASK-RAG-HOAXLIN.md`.
+Detail implementasi aktual dijelaskan pada bagian 24, [dokumentasi RAG](rag-service/README.md), dan [kontrak KB/evaluasi](datasets/rag/README.md). Laporan di `reports/` dipertahankan dengan cakupan historisnya; dokumen backlog lama yang sudah dihapus bukan sumber status aktif.
 
 ---
 
