@@ -120,6 +120,36 @@ class FixtureEmbedding:
         return np.asarray(vectors, dtype=np.float32)
 
 
+def test_v2_runner_loads_no_answer_and_preserves_unknown_judgments(tmp_path):
+    corpus = tmp_path / 'corpus'
+    evaluation = tmp_path / 'eval'
+    write_corpus(corpus, [document('a', 'alpha'), document('b', 'beta')])
+    write_evaluation(evaluation, corpus, [
+        {'id': 'yes', 'query': 'alpha', 'answerable': True, 'judgments': {'a': 3}, 'judgments_complete': False},
+        {'id': 'no', 'query': 'none', 'answerable': False, 'judgments': {'a': 0, 'b': 0}, 'judgments_complete': True},
+    ])
+    path = evaluation / 'manifest.json'
+    manifest = json.loads(path.read_text())
+    for key in ('version', 'schema_version', 'evaluation_script_version'): manifest[key] = '2.0.0'
+    path.write_text(json.dumps(manifest))
+    result = run_evaluation(evaluation, corpus, embedding_factory=FixtureEmbedding, threshold_candidates=())
+    assert result['status'] == 'preliminary'
+    assert result['graded_evaluation']['no_answer_count'] == 1
+    assert result['metrics']['returned_precision@3'] is None
+    assert result['metrics']['no_answer_false_reference_rate@3'] == 1
+
+
+def test_v2_loader_rejects_false_complete_scope(tmp_path):
+    corpus = tmp_path / 'corpus'; evaluation = tmp_path / 'eval'
+    write_corpus(corpus, [document('a', 'alpha'), document('b', 'beta')])
+    write_evaluation(evaluation, corpus, [{'id': 'q', 'query': 'x', 'answerable': False, 'judgments': {}, 'judgments_complete': True}])
+    path = evaluation / 'manifest.json'; manifest = json.loads(path.read_text())
+    for key in ('version', 'schema_version', 'evaluation_script_version'): manifest[key] = '2.0.0'
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(EvaluationError, match='complete_scope_requires_all'):
+        load_evaluation_dataset(evaluation, corpus, load_knowledge_base(corpus))
+
+
 def test_hit_precision_recall_and_mrr_cover_ranks_one_three_five_and_no_match() -> None:
     cases = (
         RetrievalCase("q1", "alpha", ("a",)),

@@ -1,0 +1,25 @@
+{
+  "task": "Q-017",
+  "status": "DONE_TOOLING_ONLY",
+  "base_commit": "59aa783ebdf89d93595c5718e83f6022a0dbb39c",
+  "branch": "quality/05-rag-evaluation",
+  "tests": {
+    "passed": 44,
+    "warnings": 1,
+    "exit_code": 0,
+    "seconds": 1.62
+  },
+  "historical_artifacts_preserved": 13,
+  "source_hashes": {
+    "scripts/rag_retrieval_metrics.py": "2e0783c10138d709020719377aa85a6356d79b982db16bad322d301fcdafde92",
+    "scripts/evaluate_rag_retrieval.py": "42b7137f75bf6bdb6798055d83a83006079e5c666348e44bc538ec4bc0033f99",
+    "rag-service/tests/test_evaluation.py": "5b097653209cd75f817a8c739d512ebd76bf672d2d0d654ba8f34059b0478a99",
+    "rag-service/tests/test_graded_evaluation.py": "3af26db22bb9a1b770859caabbf03084619cb31ce0f17ff0336e118cd186296d"
+  },
+  "limits": [
+    "No reviewed v2 benchmark",
+    "No real retrieval quality measurement",
+    "Q018/Q019 not started",
+    "No production threshold selected"
+  ]
+}
