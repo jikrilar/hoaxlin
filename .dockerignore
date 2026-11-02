@@ -77,3 +77,5 @@ artifacts/indobert-hoax/**
 # Never carry host interpreter bytecode into the Python 3.12 image.
 **/__pycache__/
 **/*.py[cod]
+**/.pytest_cache/
+**/.venv/
