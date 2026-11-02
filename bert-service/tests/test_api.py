@@ -7,6 +7,8 @@ threshold-derived meragukan per the exported MODEL_CARD contract.
 
 from __future__ import annotations
 
+import os
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -18,7 +20,7 @@ def _settings_with_model() -> Settings:
     return Settings(
         service_name="Hoax BERT Inference Service",
         service_version="0.1.0",
-        model_path="C:/xampp/htdocs/hoax-detector/models/indobert-hoax/v1.0.0",
+        model_path=os.environ.get("BERT_RELEASE_PATH", "/app/models/indobert-hoax/v1.0.0"),
         model_version="v1.0.0",
         internal_api_token="test-token-c5",
         max_concurrency=2,
@@ -72,6 +74,7 @@ def test_version_unavailable_does_not_invent_evaluation_metadata() -> None:
         assert body["evaluation_sample_count"] is None
 
 
+@pytest.mark.release
 def test_readiness_200_when_ready() -> None:
     app = create_app(_settings_with_model())
     with TestClient(app) as client:
@@ -83,6 +86,7 @@ def test_readiness_200_when_ready() -> None:
         assert body["model_version"] == "v1.0.0"
 
 
+@pytest.mark.release
 def test_version_exposes_labels_and_threshold() -> None:
     app = create_app(_settings_with_model())
     with TestClient(app) as client:
@@ -134,7 +138,7 @@ def test_predict_text_too_long() -> None:
     settings = Settings(
         service_name="test",
         service_version="0.1.0",
-        model_path="C:/xampp/htdocs/hoax-detector/models/indobert-hoax/v1.0.0",
+        model_path=None,
         model_version="v1.0.0",
         internal_api_token="test-token-c5",
         max_concurrency=2,
@@ -159,6 +163,7 @@ def test_predict_503_when_not_ready() -> None:
         assert resp.json()["error"]["code"] == "model_unavailable"
 
 
+@pytest.mark.release
 def test_predict_happy_path_hoax_and_valid() -> None:
     app = create_app(_settings_with_model())
     with TestClient(app) as client:
@@ -194,6 +199,7 @@ def test_predict_happy_path_hoax_and_valid() -> None:
         assert "valid" in body["raw_scores"]
 
 
+@pytest.mark.release
 def test_predict_threshold_meragukan() -> None:
     app = create_app(_settings_with_model())
     with TestClient(app) as client:
@@ -215,6 +221,7 @@ def test_predict_threshold_meragukan() -> None:
         assert set(body["raw_scores"].keys()) == {"valid", "hoax"}
 
 
+@pytest.mark.release
 def test_request_id_propagation() -> None:
     app = create_app(_settings_with_model())
     with TestClient(app) as client:

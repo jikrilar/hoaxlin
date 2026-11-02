@@ -84,7 +84,7 @@ Invoke-RestMethod http://127.0.0.1:8001/version
 .\.venv\Scripts\python.exe -m pip check
 .\.venv\Scripts\python.exe -c "import fastapi, pydantic, torch, transformers, uvicorn; print(fastapi.__version__, torch.__version__, transformers.__version__)"
 .\.venv\Scripts\python.exe -m compileall -q app
-.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m pytest -m 'not release'
 ```
 
 ## Model Serving (C4)
@@ -196,7 +196,7 @@ stratified) for training.
 Tests:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m pytest -m 'not release'
 ```
 
 ## Fine-tuning (C3)

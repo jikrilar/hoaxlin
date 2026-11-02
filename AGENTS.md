@@ -29,9 +29,9 @@ Gunakan `composer.lock` dan `package-lock.json` untuk versi dependency yang bena
 Baca sumber berikut sesuai area tugas:
 
 - `README.md`, `PRD.md`: fungsi produk dan kontrak pipeline.
-- `DOCKER-SETUP.md`, `RUNBOOK.md`, `Dockerfile`, `docker-compose.yml`: cara menjalankan dan memverifikasi sistem.
+- `README.md`, `Dockerfile`, `docker-compose.yml`: cara menjalankan dan memverifikasi sistem.
 - `routes/web.php`, controller, request, service, enum, dan test terkait: perilaku aktual.
-- `TASK.md`, `TASK-RAG-HOAXLIN.md`, `TASK-RAG-POST-MVP.md`: konteks tugas, bukan bukti bahwa semua item sudah diimplementasikan.
+- `TASK-RAG-HOAXLIN.md`, `TASK-RAG-POST-MVP.md`: konteks tugas, bukan bukti bahwa semua item sudah diimplementasikan.
 
 Jika dokumen lama bertentangan dengan kode, periksa test dan jelaskan perbedaannya. Jangan diam-diam mengubah perilaku agar cocok dengan dokumen lama. Arah visual di dokumen ini menggantikan pola visual lama; kontrak fungsional tetap berlaku.
 

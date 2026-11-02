@@ -157,7 +157,7 @@ Model aktif dan threshold pada UI berasal dari runtime BERT `/version`, bukan hi
 php artisan test
 
 Set-Location bert-service
-.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m pytest -m 'not release'
 Set-Location ..
 
 Set-Location rag-service
@@ -175,11 +175,20 @@ docker compose config --quiet
 ```
 
 Test real-BERT membutuhkan service dan artifact yang tersedia; test tersebut skip secara eksplisit jika dependency tidak tersedia.
+Test Python bertanda `release` dipisahkan dari unit test publik dan gagal jika artefak release tidak tersedia (lihat [kontrak release BERT](bert-service/MODEL_RELEASE.md)).
 Artifact evaluasi R11 untuk snapshot yang disetujui tersedia di `reports/rag-retrieval-evaluation-v1.json`. Ia terikat pada checksum corpus dan query yang tercatat pada manifest. Jalankan ulang hanya ketika snapshot yang dievaluasi berubah dan telah melalui review.
+
+### CI publik dan validasi release privat
+
+`.github/workflows/ci.yml` menjalankan Laravel dalam target Docker `test` (SQLite in-memory, tanpa jaringan runtime), build frontend melalui `npm ci`/Vite, build target production Laravel, unit JavaScript, unit BERT CPU-only dengan `-m 'not release'`, unit RAG dengan embedding fixture, validasi Compose, dan actionlint. CI tidak menjalankan training, mengunduh bobot BERT, memanggil OpenAI, atau membangun image BERT production. Tidak ada push image maupun deployment otomatis.
+
+Untuk unit Python, gunakan environment terpisah per service (keduanya memiliki package bernama `app`). BERT memakai `requirements-test.txt` setelah instalasi `torch==2.13.0` dari index CPU PyTorch; RAG memakai `requirements-test.txt` tanpa dependency embedding model. Runtime production dan dependency training tetap terpisah/tidak berubah.
+
+`checksum.yml` hanya dipicu manual pada default branch dan memakai environment `bert-release`. Maintainer perlu mengatur required reviewers dan pembatasan branch pada environment tersebut, variable `BERT_REGISTRY`, variable `BERT_RELEASE_IMAGE` (referensi image privat berformat `registry/path@sha256:...`), serta secret `BERT_REGISTRY_USERNAME`/`BERT_REGISTRY_PASSWORD` dengan akses pull saja. Workflow memvalidasi manifest internal dan checksum release v1.0.0 memakai validator yang ada, lalu menjalankan smoke test inference offline. Artefak privat tidak diunggah atau dipublikasikan. Tanpa konfigurasi tersebut, validasi privat belum dapat dijalankan; CI publik tidak bergantung padanya.
 
 ## Docker
 
-Docker adalah referensi deployment lokal utama. Lihat [DOCKER-SETUP.md](DOCKER-SETUP.md) untuk bootstrap dan [RUNBOOK.md](RUNBOOK.md) untuk operasi.
+Docker adalah referensi deployment lokal utama. Konfigurasi runtime ada di `docker-compose.yml`; perintah pemeriksaan dasar ada di bagian Testing dan Queue, recovery, dan retensi di atas. Dokumentasi operasional lengkap akan dikonsolidasikan ke README pada C-04.
 
 ```console
 docker compose up -d
@@ -200,10 +209,7 @@ Compose menjalankan `app`, `queue`, `scheduler`, `mysql`, `redis`, `bert`, dan `
 ## Referensi
 
 - [PRD.md](PRD.md) — ruang lingkup produk dan akademik
-- [DOCKER-SETUP.md](DOCKER-SETUP.md) — bootstrap Docker
-- [RUNBOOK.md](RUNBOOK.md) — operasi, recovery, dan retensi
 - [datasets/rag/README.md](datasets/rag/README.md) — schema KB dan evaluasi retrieval
 - [rag-service/README.md](rag-service/README.md) — service retrieval lokal
 - [TASK-RAG-HOAXLIN.md](TASK-RAG-HOAXLIN.md) — status implementasi R1–R12
 - [bert-service/README.md](bert-service/README.md) — serving, dataset, training, dan release BERT
-- [TASK.md](TASK.md) — backlog dan hasil verifikasi historis
