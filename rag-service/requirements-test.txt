@@ -5,5 +5,5 @@ numpy>=2.0,<3
 httpx>=0.27,<1
 pytest>=8,<10
 
-# Patch the installer within its existing major; residual advisories remain.
-pip==25.3
+# Owner-approved C-06 installer security upgrade, tested in isolated Docker.
+pip==26.3
