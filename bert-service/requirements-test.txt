@@ -1,5 +1,6 @@
 # Public offline tests: runtime libraries, but no weights or training stack.
 # Install torch==2.13.0 separately from https://download.pytorch.org/whl/cpu.
+-c constraints-test.txt
 -r requirements-runtime.txt
 pytest>=8,<10
 httpx>=0.27,<1

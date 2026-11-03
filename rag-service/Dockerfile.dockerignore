@@ -5,6 +5,7 @@
 !rag-service/
 !rag-service/Dockerfile
 !rag-service/requirements.txt
+!rag-service/constraints-runtime.txt
 !rag-service/app/
 !rag-service/app/**
 

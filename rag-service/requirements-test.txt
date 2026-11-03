@@ -1,5 +1,9 @@
 # Tests inject an embedding backend; no torch, model download, or live API.
+-c constraints-test.txt
 fastapi>=0.115,<1
 numpy>=2.0,<3
 httpx>=0.27,<1
 pytest>=8,<10
+
+# Patch the installer within its existing major; residual advisories remain.
+pip==25.3

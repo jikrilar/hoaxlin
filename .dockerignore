@@ -61,6 +61,7 @@ bert-service/**
 !bert-service/Dockerfile
 !bert-service/README.md
 !bert-service/requirements-runtime.txt
+!bert-service/constraints-runtime.txt
 !bert-service/app/
 !bert-service/app/**
 !bert-service/scripts/
