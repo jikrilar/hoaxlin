@@ -14,15 +14,15 @@
 docker/**
 !docker/php/
 !docker/php/uploads.ini
+!docker/php/testing.ini
 !package.json
 !package-lock.json
 !phpunit.xml
+!.env.example
+!.env.docker.example
 !vite.config.js
 !README.md
 !PRD.md
-!DOCKER-SETUP.md
-!RUNBOOK.md
-!TASK.md
 !scripts/
 !scripts/docker-setup.ps1
 !scripts/docker-setup.sh
@@ -61,6 +61,7 @@ bert-service/**
 !bert-service/Dockerfile
 !bert-service/README.md
 !bert-service/requirements-runtime.txt
+!bert-service/constraints-runtime.txt
 !bert-service/app/
 !bert-service/app/**
 !bert-service/scripts/
@@ -77,3 +78,5 @@ artifacts/indobert-hoax/**
 # Never carry host interpreter bytecode into the Python 3.12 image.
 **/__pycache__/
 **/*.py[cod]
+**/.pytest_cache/
+**/.venv/

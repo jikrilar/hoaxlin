@@ -6,7 +6,7 @@
 /storage/*.key
 /storage/pail
 /vendor
-/bert-service/.venv
+.venv/
 .env
 .env.backup
 .env.production
@@ -38,7 +38,6 @@ yarn-error.log
 /bert-service/uvicorn.log
 /bert-service/uvicorn.err
 /bert-service/*.log
-/bert-service/.pytest_cache/
 /storage/logs/
 /storage/framework/cache/
 /storage/framework/sessions/
@@ -49,4 +48,4 @@ yarn-error.log
 **/__pycache__/
 *.pyc
 *.pyo
-
+.pytest_cache/

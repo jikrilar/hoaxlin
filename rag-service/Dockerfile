@@ -24,14 +24,17 @@ RUN groupadd --system --gid 10001 rag \
     && mkdir -p /opt/huggingface /app/scripts /app/datasets/rag/knowledge-base-v1.1.1
 
 COPY rag-service/requirements.txt /tmp/requirements.txt
+COPY rag-service/constraints-runtime.txt /tmp/constraints-runtime.txt
 
 # Install a CPU-only torch wheel before the service requirements so pip does
 # not resolve a CUDA-enabled wheel for this CPU runtime.
 RUN python -m pip install \
+        -c /tmp/constraints-runtime.txt \
         --index-url https://download.pytorch.org/whl/cpu \
         "torch==${TORCH_VERSION}" \
-    && python -m pip install -r /tmp/requirements.txt \
-    && rm -f /tmp/requirements.txt
+    && python -m pip install -c /tmp/constraints-runtime.txt -r /tmp/requirements.txt \
+    && python -m pip check \
+    && rm -f /tmp/requirements.txt /tmp/constraints-runtime.txt
 
 COPY --chown=10001:10001 rag-service/app/ ./app/
 COPY --chown=10001:10001 scripts/validate_rag_knowledge_base.py /app/scripts/validate_rag_knowledge_base.py

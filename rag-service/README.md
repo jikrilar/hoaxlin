@@ -1,5 +1,10 @@
 # Hoaxlin local RAG retrieval service
 
+Setup/operations for Docker, Linux/Fish and Windows are consolidated in the
+[main README](../README.md). Active direction: keep KB v1.1.1 as baseline and
+evaluate baseline vs improvement before promotion; no new experiment or accuracy
+improvement is established by this roadmap.
+
 This service reads only `../datasets/rag/knowledge-base-v1.1.1/` by default. It validates the
 R2 manifest and document schema before building an in-memory index. It does
 not classify claims, change IndoBERT results, fetch evidence from the web, or
@@ -35,9 +40,11 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8002
 ```
 
-The model preparation step requires internet access once. Runtime startup and
-`/retrieve` use cached files only. `requirements-dev.txt` adds only the test
-client and test runner; all dependencies remain local to this service.
+For Linux use `.venv/bin/python` in place of the Windows interpreter. No virtualenv
+activation is required. The model preparation step requires internet access once. Runtime startup and
+`/retrieve` use cached files only. `requirements-dev.txt` adds the test
+client and runner on top of runtime requirements; all dependencies remain local
+to this service. The root guide installs CPU torch first for runtime development.
 
 ## Docker image
 
@@ -97,10 +104,14 @@ Each result contains `document_id`, `title`, `source`, `source_url`,
 An empty `results` array means no document met the requested filter or the
 knowledge base is empty.
 
+There is currently no enforced bearer authentication in this service. Docker
+network isolation / loopback binding is required; Laravel's `RAG_SERVICE_TOKEN`
+header does not make a publicly exposed RAG endpoint safe.
+
 ## Test
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-test.txt
 .\.venv\Scripts\python.exe -m pytest tests
 python ..\scripts\validate_rag_knowledge_base.py
 python -m unittest discover -s ..\tests\rag -p 'test_*.py'
@@ -108,6 +119,8 @@ python -m unittest discover -s ..\tests\rag -p 'test_*.py'
 
 Tests use synthetic fixtures in temporary directories and a deterministic
 test embedding backend. No test record is added to the production corpus.
+`requirements-test.txt` is sufficient for offline unit tests without torch or
+embedding downloads; `requirements-dev.txt` also includes the runtime stack.
 
 ## Retrieval evaluation
 
@@ -117,10 +130,14 @@ and current production status are documented in
 the repository root with:
 
 ```powershell
-.\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py
+.\rag-service\.venv\Scripts\python.exe scripts\evaluate_rag_retrieval.py --evaluation-directory datasets/rag/evaluation-v1 --corpus-directory datasets/rag/knowledge-base-v1 --output "$env:TEMP/hoaxlin-rag-r11-reproduction.json"
 ```
 
-The artifact is `reports/rag-retrieval-evaluation-v1.json`. Its approved run is
+Choose a fresh output path; the evaluator writes its destination and must not
+overwrite retained reports. Defaults still bind R11 v1.0.0, not runtime v1.1.1.
+Changing only the corpus flag to v1.1.1 is rejected by the manifest checksum
+binding. A representative new relevance set/manifest is future work, not supplied
+by this command. The historical artifact is `reports/rag-retrieval-evaluation-v1.json`. Its approved run is
 bound to the approved v1.0.0 evaluation snapshot (20 queries) and the
 knowledge-base v1.0.0 corpus (24 documents) by manifest checksums. It reports
 Hit Rate@3/@5 1.0, Precision@3 0.4, Precision@5 0.25, Recall@3 0.975,

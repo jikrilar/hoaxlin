@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -21,12 +22,13 @@ from train.sequence_policy import (
 @pytest.fixture(scope="module")
 def tokenizer():
     # Use frozen v1.0.0 release tokenizer from Docker image or repo
-    release_path = Path("/app/models/indobert-hoax/v1.0.0")
+    release_path = Path(os.environ.get("BERT_RELEASE_PATH", "/app/models/indobert-hoax/v1.0.0"))
     if release_path.is_dir():
         return AutoTokenizer.from_pretrained(str(release_path), local_files_only=True)
-    pytest.skip("Frozen release tokenizer unavailable; never download a substitute")
+    pytest.fail("Frozen v1.0.0 release unavailable; set BERT_RELEASE_PATH or select -m 'not release'")
 
 
+@pytest.mark.release
 def test_token_ids_train_eval_serve_parity_on_short_text(tokenizer):
     text = "Menteri Kesehatan menegaskan vaksin booster flu burung gratis bagi warga."
     result = compare_tokenization(text, tokenizer, train_max_len=256, serve_max_len=512)
@@ -38,6 +40,7 @@ def test_token_ids_train_eval_serve_parity_on_short_text(tokenizer):
     assert result["train_tokens_count"] == result["serve_tokens_count"]
 
 
+@pytest.mark.release
 def test_token_ids_divergence_on_long_text_between_256_and_512(tokenizer):
     fixtures = get_standard_fixtures()
     # 'long' fixture exceeds 512 tokens
@@ -54,6 +57,7 @@ def test_token_ids_divergence_on_long_text_between_256_and_512(tokenizer):
     assert result["train_serve_prefix_parity"] is True
 
 
+@pytest.mark.release
 def test_claim_at_end_is_dropped_by_head_only_but_kept_by_claim_selection(tokenizer):
     fixtures = get_standard_fixtures()
     claim_text = fixtures["claim_at_end"]
@@ -68,6 +72,7 @@ def test_claim_at_end_is_dropped_by_head_only_but_kept_by_claim_selection(tokeni
     assert "100 juta" in claim_sel["selected_text"]
 
 
+@pytest.mark.release
 def test_negation_and_code_switching_preserved_under_tokenization(tokenizer):
     fixtures = get_standard_fixtures()
 
@@ -84,6 +89,7 @@ def test_negation_and_code_switching_preserved_under_tokenization(tokenizer):
         assert term in cs_decoded
 
 
+@pytest.mark.release
 def test_contradicting_claims_hazard_under_window_pooling(tokenizer):
     text = ("Beredar klaim bantuan 50 juta. " + "pengantar " * 160
             + "Kementerian menegaskan informasi tersebut hoaks dan tidak benar.")
@@ -97,10 +103,11 @@ def test_contradicting_claims_hazard_under_window_pooling(tokenizer):
     assert "tidak benar" in tokenizer.decode(windows[-1]["input_ids"])
 
 
+@pytest.mark.release
 def test_external_challenge_truncation_rate_is_strictly_zero(tokenizer):
     challenge_csv = Path("/workspace/datasets/challenge/external-challenge-v1/challenge.csv")
     if not challenge_csv.is_file():
-        challenge_csv = Path("datasets/challenge/external-challenge-v1/challenge.csv")
+        challenge_csv = Path(__file__).resolve().parents[2] / "datasets/challenge/external-challenge-v1/challenge.csv"
 
     stats = measure_dataset_truncation(challenge_csv, tokenizer, text_column="text")
     assert stats["total_samples"] == 120
@@ -274,12 +281,13 @@ def test_environment_default_defers_to_release_contract(monkeypatch):
     assert runtime.max_sequence_length == 256
 
 
-def test_training_rejects_unimplemented_preprocessing_instead_of_exporting_a_lie(tokenizer):
+def test_training_rejects_unimplemented_preprocessing_instead_of_exporting_a_lie():
     from train.config import FineTuneConfig
     with pytest.raises(ValueError):
         FineTuneConfig(truncation_strategy="claim-selection")
 
 
+@pytest.mark.release
 def test_runtime_forces_right_truncation_for_head_only(tokenizer):
     from app.config import Settings
     from app.inference import ModelRuntime
@@ -298,12 +306,14 @@ def test_runtime_forces_right_truncation_for_head_only(tokenizer):
 
 
 @pytest.mark.parametrize("fixture", list(get_standard_fixtures()))
+@pytest.mark.release
 def test_actual_train_evaluation_serving_paths_match_with_same_budget(tokenizer, fixture):
     result = compare_tokenization(get_standard_fixtures()[fixture], tokenizer, 256, 256)
     assert result["train_eval_parity"]
     assert result["train_serve_prefix_parity"]
 
 
+@pytest.mark.release
 def test_overlapping_windows_keep_a_claim_across_a_token_boundary(tokenizer):
     # 'pengantar' occupies exactly one release token; place negation at boundary.
     assert len(tokenizer("pengantar", add_special_tokens=False)["input_ids"]) == 1
@@ -315,12 +325,13 @@ def test_overlapping_windows_keep_a_claim_across_a_token_boundary(tokenizer):
     assert "tidak pernah membagikan emas" in second
 
 
+@pytest.mark.release
 def test_real_predict_endpoint_reports_observed_tokens_and_truncation(tokenizer):
     from app.config import Settings
     from app.main import create_app
     from fastapi.testclient import TestClient
 
-    settings = Settings("Test", "test", "/app/models/indobert-hoax/v1.0.0",
+    settings = Settings("Test", "test", str(tokenizer.name_or_path),
                         "v1.0.0", "q006-test-fixture", 1, 20000, 512, True, True)
     with TestClient(create_app(settings)) as client:
         version = client.get("/version").json()

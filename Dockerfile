@@ -109,10 +109,13 @@ RUN npm run build
 # Laravel test suite. Build explicitly with: docker build --target test ...
 FROM composer-production AS test
 
+COPY docker/php/testing.ini /usr/local/etc/php/conf.d/zz-hoaxlin-testing.ini
 COPY --from=frontend-build /build/public/build/ ./public/build/
 COPY phpunit.xml ./
+COPY .env.example .env.docker.example ./
+COPY docker/php/uploads.ini ./docker/php/uploads.ini
 COPY docker-compose.yml ./
-COPY README.md PRD.md DOCKER-SETUP.md RUNBOOK.md TASK.md ./
+COPY README.md PRD.md ./
 COPY bert-service/README.md ./bert-service/README.md
 COPY scripts/ ./scripts/
 COPY tests/ ./tests/
