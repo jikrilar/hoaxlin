@@ -13,7 +13,6 @@ docker run --rm --pull=never --network none --read-only \
   -v "$PWD/config":/var/www/html/config:ro -v "$PWD/tests":/var/www/html/tests:ro \
   -v "$PWD/database":/var/www/html/database:ro -v "$PWD/resources":/var/www/html/resources:ro \
   -v "$PWD/routes":/var/www/html/routes:ro \
-  -v "$PWD/TASK.md":/var/www/html/TASK.md:ro \
   -v "$PWD/phpunit.xml":/var/www/html/phpunit.xml:ro \
   -v "$PWD/bootstrap/app.php":/var/www/html/bootstrap/app.php:ro \
   -v "$PWD/bootstrap/providers.php":/var/www/html/bootstrap/providers.php:ro \

@@ -30,14 +30,17 @@ RUN groupadd --system --gid 10001 hoaxlin \
         --shell /usr/sbin/nologin hoaxlin
 
 COPY bert-service/requirements-runtime.txt /tmp/requirements-runtime.txt
+COPY bert-service/constraints-runtime.txt /tmp/constraints-runtime.txt
 
 # The dedicated index guarantees a CPU wheel. The second install sees that
 # torch requirement as already satisfied and resolves only API/runtime packages.
 RUN python -m pip install \
+        -c /tmp/constraints-runtime.txt \
         --index-url https://download.pytorch.org/whl/cpu \
         "torch==${TORCH_VERSION}" \
-    && python -m pip install -r /tmp/requirements-runtime.txt \
-    && rm -f /tmp/requirements-runtime.txt
+    && python -m pip install -c /tmp/constraints-runtime.txt -r /tmp/requirements-runtime.txt \
+    && python -m pip check \
+    && rm -f /tmp/requirements-runtime.txt /tmp/constraints-runtime.txt
 
 COPY --chown=10001:10001 bert-service/app/ /app/app/
 COPY --chown=10001:10001 bert-service/scripts/runtime_smoke_test.py /app/runtime_smoke_test.py

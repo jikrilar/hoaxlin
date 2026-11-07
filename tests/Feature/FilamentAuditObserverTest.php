@@ -12,6 +12,7 @@ use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class FilamentAuditObserverTest extends TestCase
@@ -152,6 +153,167 @@ class FilamentAuditObserverTest extends TestCase
         $this->assertStringNotContainsString($secret, $encoded);
         $this->assertStringNotContainsString($guestHash, $encoded);
         $this->assertStringNotContainsString($contentHash, $encoded);
+    }
+
+    public function test_creation_redacts_hidden_attributes_before_persistence_and_preserves_audit_identity(): void
+    {
+        $admin = $this->adminFor('/admin/users');
+        AdminLog::query()->delete();
+        $secret = 'PRIVATE_CREATE_SECRET_'.Str::random(16);
+        $target = User::factory()->create([
+            'name' => $secret,
+            'email' => 'private-create@example.test',
+            'password' => $secret,
+            'remember_token' => $secret,
+            'is_admin' => false,
+        ]);
+
+        $log = AdminLog::query()->sole();
+        $changes = $log->metadata['changes'];
+        $this->assertSame('create', $log->action);
+        $this->assertSame($admin->id, $log->admin_id);
+        $this->assertSame('users', $log->target_table);
+        $this->assertSame($target->id, $log->target_id);
+        $this->assertSame($target->id, $changes['id']);
+        $this->assertSame($target->getRawOriginal('created_at'), $changes['created_at']);
+        $this->assertFalse($changes['is_admin']);
+        foreach (['name', 'email', 'password', 'remember_token'] as $field) {
+            $this->assertSame(self::REDACTED, $changes[$field]);
+        }
+        // Inspect stored JSON, not only an accessor or the UI projection.
+        $stored = (string) AdminLog::query()->toBase()->value('metadata');
+        $this->assertStringNotContainsString($secret, $stored);
+        $this->assertStringNotContainsString($target->getRawOriginal('password'), $stored);
+        $this->assertSame($secret, $target->fresh()->name);
+        $this->assertSame($secret, $target->fresh()->remember_token);
+    }
+
+    public function test_deletion_records_action_and_target_without_copying_the_record_or_previous_changes(): void
+    {
+        $target = User::factory()->create(['name' => 'PRIVATE_DELETE_SECRET']);
+        $this->adminFor('/admin/users');
+        $target->update(['name' => 'PRIVATE_OLD_UPDATE_SECRET']);
+        AdminLog::query()->delete();
+
+        $target->delete();
+
+        $log = AdminLog::query()->sole();
+        $this->assertSame('delete', $log->action);
+        $this->assertSame($target->id, $log->target_id);
+        $this->assertSame(['model' => User::class, 'changes' => null], $log->metadata);
+    }
+
+    public function test_update_retains_only_current_changes_and_does_not_mutate_the_target(): void
+    {
+        $target = User::factory()->create();
+        $this->adminFor('/admin/users');
+        $target->update(['email' => 'previous-private@example.test']);
+        AdminLog::query()->delete();
+
+        $target->update(['is_admin' => true]);
+
+        $changes = AdminLog::query()->sole()->metadata['changes'];
+        $this->assertTrue($changes['is_admin']);
+        $this->assertArrayNotHasKey('email', $changes);
+        $this->assertSame('previous-private@example.test', $target->fresh()->email);
+    }
+
+    public function test_operational_allowlist_rejects_malformed_values_and_does_not_accept_nested_payloads(): void
+    {
+        $target = Submission::factory()->create();
+        $this->adminFor('/admin/submissions');
+        AdminLog::query()->delete();
+        $secret = 'PRIVATE_MALFORMED_SECRET';
+        // Exercise the observer boundary without persisting invalid domain data.
+        $target->setRawAttributes(array_replace($target->getAttributes(), [
+            'status' => $secret, 'input_type' => [$secret], 'processing_stage' => $secret,
+            'attempt_count' => $secret, 'translation_cached' => $secret,
+            'processing_started_at' => $secret."\0", 'pipeline_version' => $secret,
+            'translation_model' => $secret, 'media_path' => $secret,
+            'translation_input_tokens' => 0, 'translation_output_tokens' => 12,
+            'user_id' => null, 'translation_provider' => [$secret],
+            'raw_input' => [$secret], 'unknown_payload' => [$secret],
+        ]));
+
+        app(FilamentAuditObserver::class)->updated($target);
+
+        $changes = AdminLog::query()->sole()->metadata['changes'];
+        foreach (['status', 'input_type', 'processing_stage', 'attempt_count', 'translation_cached', 'processing_started_at', 'pipeline_version', 'translation_model', 'media_path', 'translation_provider', 'raw_input'] as $field) {
+            $this->assertSame(self::REDACTED, $changes[$field], $field);
+        }
+        $this->assertSame(0, $changes['translation_input_tokens']);
+        $this->assertSame(12, $changes['translation_output_tokens']);
+        $this->assertNull($changes['user_id']);
+        $this->assertArrayNotHasKey('unknown_payload', $changes);
+        $this->assertStringNotContainsString($secret, (string) AdminLog::query()->toBase()->value('metadata'));
+    }
+
+    public function test_submission_preserves_valid_operational_metadata_without_copying_translation_or_media_payloads(): void
+    {
+        $target = Submission::factory()->create();
+        $this->adminFor('/admin/submissions');
+        AdminLog::query()->delete();
+        $target->forceFill([
+            'source_language' => 'en', 'translation_cached' => false,
+            'translation_input_tokens' => 17, 'translation_output_tokens' => 0,
+            'attempt_count' => 3, 'processing_started_at' => '2026-11-02 10:00:00',
+            'processing_completed_at' => null, 'pipeline_version' => 'indobert-hoax-v1.0.0',
+            'translation_model' => 'PRIVATE_MODEL_METADATA', 'media_path' => 'private/submissions/PRIVATE_PATH',
+        ])->save();
+
+        $changes = AdminLog::query()->sole()->metadata['changes'];
+        foreach ([
+            'source_language' => 'en', 'translation_cached' => false,
+            'translation_input_tokens' => 17, 'translation_output_tokens' => 0,
+            'attempt_count' => 3, 'processing_started_at' => '2026-11-02 10:00:00',
+            'pipeline_version' => 'indobert-hoax-v1.0.0',
+            'translation_model' => self::REDACTED, 'media_path' => self::REDACTED,
+        ] as $field => $expected) {
+            $this->assertSame($expected, $changes[$field], $field);
+        }
+        $this->assertSame('private/submissions/PRIVATE_PATH', $target->fresh()->media_path);
+    }
+
+    public function test_historical_raw_credentials_are_not_exposed_by_admin_detail_and_are_not_rewritten(): void
+    {
+        $admin = $this->adminFor('/admin/admin-logs');
+        $secret = 'PRIVATE_HISTORICAL_FIXTURE';
+        $metadata = ['model' => User::class, 'changes' => [
+            'name' => $secret, 'email' => $secret, 'password' => $secret,
+            'remember_token' => $secret, 'is_admin' => true, 'unexpected' => ['token' => $secret],
+        ]];
+        $log = AdminLog::factory()->create([
+            'admin_id' => $admin->id, 'target_table' => 'users', 'metadata' => $metadata,
+        ]);
+
+        $this->get(AdminLogResource::getUrl('view', ['record' => $log]))->assertOk()
+            ->assertSee(self::REDACTED)->assertDontSee($secret)->assertDontSee('unexpected');
+
+        $this->assertSame($metadata, $log->fresh()->metadata);
+    }
+
+    #[DataProvider('nonAdminContexts')]
+    public function test_non_admin_contexts_do_not_write_audit_logs(?bool $admin, string $path): void
+    {
+        $target = User::factory()->create();
+        if ($admin !== null) {
+            $this->actingAs(User::factory()->create(['is_admin' => $admin]));
+        }
+        app()->instance('request', Request::create($path));
+        AdminLog::query()->delete();
+
+        $target->update(['name' => 'Not an admin panel operation']);
+
+        $this->assertSame(0, AdminLog::count());
+    }
+
+    public static function nonAdminContexts(): array
+    {
+        return [
+            'guest' => [null, '/admin/users'],
+            'regular user' => [false, '/admin/users'],
+            'admin outside panel' => [true, '/profile'],
+        ];
     }
 
     private function adminFor(string $path): User

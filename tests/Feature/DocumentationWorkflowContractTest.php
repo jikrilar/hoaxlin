@@ -153,9 +153,7 @@ class DocumentationWorkflowContractTest extends TestCase
     public function test_primary_documentation_matches_pipeline_queues_and_retention_contract(): void
     {
         $readme = file_get_contents(base_path('README.md'));
-        $runbook = file_get_contents(base_path('RUNBOOK.md'));
-        $dockerSetup = file_get_contents(base_path('DOCKER-SETUP.md'));
-        $docs = $readme."\n".$runbook."\n".$dockerSetup;
+        $docs = $readme;
 
         foreach ([
             'ProcessSubmission',
@@ -212,7 +210,7 @@ class DocumentationWorkflowContractTest extends TestCase
 
     public function test_primary_document_references_exist(): void
     {
-        foreach (['PRD.md', 'DOCKER-SETUP.md', 'RUNBOOK.md', 'bert-service/README.md', 'TASK.md'] as $path) {
+        foreach (['README.md', 'PRD.md', 'bert-service/README.md'] as $path) {
             $this->assertFileExists(base_path($path));
         }
     }

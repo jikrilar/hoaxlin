@@ -33,4 +33,7 @@ entrypoint = "app.main:app"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q --strict-markers"
+markers = [
+    "release: requires the private frozen BERT v1.0.0 release (excluded from public CI)",
+]

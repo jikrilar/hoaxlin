@@ -30,6 +30,26 @@ stage the model weights or a portable archive in normal Git history.
 
 ## Validate a release
 
+Public CI tests checksum/corruption handling with temporary synthetic fixtures;
+it never requires the private `models/indobert-hoax/manifest.json`. Actual
+v1.0.0 validation is separate: manually dispatch `checksum.yml` on the default
+branch using the protected `bert-release` environment and a private image pinned
+by digest (configuration in the root README). This checks both the embedded
+release contract and the existing offline runtime smoke fixtures. It does not
+build, publish, retrain, or modify a release.
+
+Python tests requiring the real tokenizer/weights have the `release` marker.
+Run public tests from `bert-service` with `python -m pytest -m 'not release'`.
+For the additional release tests, install the same test dependencies, provide
+the frozen release directory, and run:
+
+```bash
+BERT_RELEASE_PATH=/secure/indobert-hoax/v1.0.0 python -m pytest -m release
+```
+
+Missing artifacts fail these explicitly selected tests, rather than silently
+passing a release gate. No replacement tokenizer or weights are downloaded.
+
 ```powershell
 bert-service\.venv\Scripts\python.exe bert-service\scripts\package_model_release.py `
   --validate-only artifacts\indobert-hoax\v1.0.0

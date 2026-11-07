@@ -12,6 +12,15 @@ full-page HTML. Training data in `datasets/processed/`, classifier splits,
 and evaluation data in `datasets/challenge/` must never be used as
 knowledge-base input.
 
+## Active direction
+
+KB v1.1.1 remains the baseline. Next work prioritizes a small, reproducible
+baseline-vs-improvement evaluation with independently reviewed relevance judgments
+for that corpus. This is a plan, not a completed experiment or evidence of improved
+accuracy. See the [main README](../../README.md#rag-knowledge-base-dan-retrieval).
+Do not change existing snapshots or overwrite historical evaluation reports;
+prepare reviewed/versioned successors only in an explicitly scoped task.
+
 ## Document contract (schema 1.0.0)
 
 Each line is exactly one UTF-8 JSON object with these seven fields. Blank lines
@@ -43,8 +52,9 @@ original publication URLs, not local dataset files. The
 validator rejects additional manifest fields and document fields; local files
 cannot be declared as sanctioned inputs in this contract.
 
-To add reviewed documents, write one object per line, update `document_count`
-and `documents.sha256`, then run:
+For an explicitly authorized new snapshot, write one object per line and set its
+own `document_count`/`documents.sha256`; do not edit baseline v1.1.1 in place.
+From the repository root, validate the selected snapshot and tooling with:
 
 ```powershell
 python scripts/validate_rag_knowledge_base.py
