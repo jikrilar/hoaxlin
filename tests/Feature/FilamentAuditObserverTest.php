@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Filament\Resources\AdminLogs\AdminLogResource;
 use App\Models\AdminLog;
 use App\Models\Dataset;
+use App\Models\ModelVersion;
 use App\Models\Submission;
 use App\Models\User;
 use App\Observers\FilamentAuditObserver;
@@ -314,6 +315,81 @@ class FilamentAuditObserverTest extends TestCase
             'regular user' => [false, '/admin/users'],
             'admin outside panel' => [true, '/profile'],
         ];
+    }
+
+    public function test_model_version_audit_allows_operational_fields_and_redacts_dataset_path_and_error_message(): void
+    {
+        $admin = $this->adminFor('/admin/model-versions');
+        AdminLog::query()->delete();
+
+        $secretPath = 'batches/PRIVATE_DATASET_'.Str::random(12).'.csv';
+        $secretError = 'PRIVATE_TRACEBACK_'.Str::random(12);
+
+        $version = ModelVersion::factory()->create([
+            'version_name' => 'v1.1.0',
+            'dataset_path' => $secretPath,
+            'total_rows' => 42,
+            'status' => ModelVersion::STATUS_TRAINING,
+            'is_active' => false,
+        ]);
+
+        $version->forceFill([
+            'status' => ModelVersion::STATUS_FAILED,
+            'accuracy' => 0.9123456,
+            'f1_score' => 0.9012344,
+            'training_duration' => 75,
+            'error_message' => $secretError,
+            'is_active' => true,
+        ])->save();
+
+        $logs = AdminLog::forTarget('model_versions', $version->id)->orderBy('id')->get();
+        $this->assertSame(['create', 'update'], $logs->pluck('action')->all());
+        $this->assertSame([$admin->id], $logs->pluck('admin_id')->unique()->values()->all());
+
+        $createChanges = $logs[0]->metadata['changes'];
+        $this->assertSame('v1.1.0', $createChanges['version_name']);
+        $this->assertSame(42, $createChanges['total_rows']);
+        $this->assertSame(ModelVersion::STATUS_TRAINING, $createChanges['status']);
+        $this->assertArrayNotHasKey('is_active', $createChanges);
+        $this->assertSame(self::REDACTED, $createChanges['dataset_path']);
+
+        $updateChanges = $logs[1]->metadata['changes'];
+        $this->assertSame(ModelVersion::STATUS_FAILED, $updateChanges['status']);
+        $this->assertEqualsWithDelta(0.912346, $updateChanges['accuracy'], 0.000001);
+        $this->assertEqualsWithDelta(0.901234, $updateChanges['f1_score'], 0.000001);
+        $this->assertSame(75, $updateChanges['training_duration']);
+        $this->assertTrue($updateChanges['is_active']);
+        $this->assertSame(self::REDACTED, $updateChanges['error_message']);
+
+        $version->update(['is_active' => false]);
+        $deactivateChanges = AdminLog::forTarget('model_versions', $version->id)->latest('id')->firstOrFail()->metadata['changes'];
+        $this->assertFalse($deactivateChanges['is_active']);
+
+        $stored = AdminLog::query()->toBase()->pluck('metadata')->implode("\n");
+        $this->assertStringNotContainsString($secretPath, $stored);
+        $this->assertStringNotContainsString($secretError, $stored);
+
+        $this->get(AdminLogResource::getUrl('view', ['record' => $logs[1]]))->assertOk()
+            ->assertSee('model_versions')
+            ->assertSee(self::REDACTED)
+            ->assertDontSee($secretPath)
+            ->assertDontSee($secretError);
+
+        AdminLog::query()->delete();
+        $version->setRawAttributes(array_replace($version->getAttributes(), [
+            'version_name' => '../escape',
+            'status' => 'unknown_status',
+            'total_rows' => -5,
+            'accuracy' => 1.5,
+            'f1_score' => -0.1,
+            'training_duration' => 'invalid',
+        ]));
+        app(FilamentAuditObserver::class)->updated($version);
+
+        $malformedChanges = AdminLog::query()->sole()->metadata['changes'];
+        foreach (['version_name', 'status', 'total_rows', 'accuracy', 'f1_score', 'training_duration'] as $field) {
+            $this->assertSame(self::REDACTED, $malformedChanges[$field], $field);
+        }
     }
 
     private function adminFor(string $path): User

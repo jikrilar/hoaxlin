@@ -8,6 +8,7 @@ use App\Contracts\Explainer;
 use App\Contracts\HostResolver;
 use App\Contracts\Translator;
 use App\Models\Dataset;
+use App\Models\ModelVersion;
 use App\Models\Submission;
 use App\Models\User;
 use App\Observers\FilamentAuditObserver;
@@ -115,5 +116,6 @@ class AppServiceProvider extends ServiceProvider
         User::observe(FilamentAuditObserver::class);
         Dataset::observe(FilamentAuditObserver::class);
         Submission::observe(FilamentAuditObserver::class);
+        ModelVersion::observe(FilamentAuditObserver::class);
     }
 }
