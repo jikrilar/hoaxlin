@@ -41,6 +41,7 @@ Pygments==2.21.0
 pyparsing==3.3.3
 pytest==9.2.0
 python-dateutil==4.0.0
+python-multipart==0.0.33
 PyYAML==6.0.3
 regex==2026.9.29
 rich==15.0.0

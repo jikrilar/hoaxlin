@@ -51,6 +51,32 @@ def _positive_int(name: str, default: int) -> int:
     return value
 
 
+def _int_in_range(name: str, default: int, minimum: int, maximum: int) -> int:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be an integer") from exc
+    if not minimum <= value <= maximum:
+        raise ValueError(f"{name} must be between {minimum} and {maximum}")
+    return value
+
+
+def _positive_float(name: str, default: float) -> float:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    try:
+        value = float(raw)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a number") from exc
+    if value <= 0.0:
+        raise ValueError(f"{name} must be positive")
+    return value
+
+
 def _boolean(name: str, default: bool) -> bool:
     raw = os.getenv(name)
     if raw is None:
@@ -77,6 +103,14 @@ class Settings:
     require_release_manifest: bool = False
     # Direct Settings construction is explicit; env defaults defer to the release.
     sequence_length_explicit: bool = True
+    models_dir: str = "/app/models"
+    datasets_dir: str = "/app/datasets"
+    replay_buffer_path: str | None = None
+    train_epochs: int = 3
+    train_batch_size: int = 8
+    train_learning_rate: float = 2e-5
+    train_seed: int = 42
+    max_train_csv_bytes: int = 50 * 1024 * 1024
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -87,6 +121,7 @@ class Settings:
             or None
         )
         model_version = os.getenv("BERT_MODEL_VERSION", "").strip() or None
+        replay_buffer_path = os.getenv("BERT_REPLAY_BUFFER_PATH", "").strip() or None
         return cls(
             service_name=os.getenv("BERT_SERVICE_NAME", "Hoax BERT Inference Service"),
             service_version=os.getenv("BERT_SERVICE_VERSION", "0.1.0"),
@@ -101,4 +136,12 @@ class Settings:
             require_release_manifest=_boolean(
                 "BERT_REQUIRE_RELEASE_MANIFEST", False
             ),
+            models_dir=os.getenv("BERT_MODELS_DIR", "/app/models").strip() or "/app/models",
+            datasets_dir=os.getenv("BERT_DATASETS_DIR", "/app/datasets").strip() or "/app/datasets",
+            replay_buffer_path=replay_buffer_path,
+            train_epochs=_int_in_range("BERT_TRAIN_EPOCHS", 3, 2, 3),
+            train_batch_size=_positive_int("BERT_TRAIN_BATCH_SIZE", 8),
+            train_learning_rate=_positive_float("BERT_TRAIN_LEARNING_RATE", 2e-5),
+            train_seed=_int_in_range("BERT_TRAIN_SEED", 42, 0, 2**31 - 1),
+            max_train_csv_bytes=_positive_int("BERT_MAX_TRAIN_CSV_BYTES", 50 * 1024 * 1024),
         )

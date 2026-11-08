@@ -4,6 +4,8 @@ uvicorn==0.52.0
 pydantic==2.13.4
 transformers==5.14.1
 numpy==2.5.1
+httpx==0.28.1
+python-multipart==0.0.33
 
 # C-06 security pins, including owner-approved and Docker-tested major upgrades.
 certifi==2026.10.23

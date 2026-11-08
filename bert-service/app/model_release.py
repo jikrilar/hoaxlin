@@ -289,3 +289,158 @@ def validate_release(
         **sequence,
         **contract,
     }
+
+
+def _validate_config_labels(directory: Path) -> tuple[dict[int, str], dict[str, int]]:
+    config = load_json(directory / "config.json")
+    if not isinstance(config, dict):
+        raise PackagingError("config.json must contain an object")
+    architectures = config.get("architectures")
+    if not isinstance(architectures, list) or ARCHITECTURE not in architectures:
+        raise PackagingError(
+            f"Expected architecture {ARCHITECTURE}, got {architectures!r}"
+        )
+    if config.get("num_labels") != EXPECTED_NUM_LABELS:
+        raise PackagingError(
+            f"Expected num_labels={EXPECTED_NUM_LABELS}, "
+            f"got {config.get('num_labels')!r}"
+        )
+
+    raw_id2label = config.get("id2label")
+    if not isinstance(raw_id2label, dict):
+        raise PackagingError("config.json id2label must be an object")
+    try:
+        id2label = {int(key): str(value) for key, value in raw_id2label.items()}
+    except (TypeError, ValueError) as exc:
+        raise PackagingError("config.json id2label has invalid entries") from exc
+    if id2label != EXPECTED_ID2LABEL:
+        raise PackagingError(
+            f"Expected id2label={EXPECTED_ID2LABEL}, got {id2label}"
+        )
+
+    raw_label2id = config.get("label2id")
+    if not isinstance(raw_label2id, dict):
+        raise PackagingError("config.json label2id must be an object")
+    try:
+        label2id = {str(key): int(value) for key, value in raw_label2id.items()}
+    except (TypeError, ValueError) as exc:
+        raise PackagingError("config.json label2id has invalid entries") from exc
+    if label2id != EXPECTED_LABEL2ID:
+        raise PackagingError(
+            f"Expected label2id={EXPECTED_LABEL2ID}, got {label2id}"
+        )
+    return id2label, label2id
+
+
+def validate_incremental_release(
+    release: Path,
+    *,
+    expected_version: str | None = None,
+) -> dict[str, Any]:
+    """Validate an incrementally fine-tuned model directory and its manifest."""
+    if not release.is_dir() or release.is_symlink():
+        raise PackagingError(f"Model directory does not exist: {release}")
+    manifest_path = require_regular_file(release, "manifest.json")
+    manifest = load_json(manifest_path)
+    if not isinstance(manifest, dict):
+        raise PackagingError("Release manifest must contain an object")
+    if contains_absolute_path(manifest):
+        raise PackagingError("Release manifest must not contain absolute paths")
+    if manifest.get("schema_version") not in ("1.0", "1.1"):
+        raise PackagingError("Release manifest schema_version must be '1.0' or '1.1'")
+    if manifest.get("kind") != "incremental-finetune":
+        raise PackagingError("Incremental release manifest must declare kind='incremental-finetune'")
+
+    for key, expected in (
+        ("model", MODEL_IDENTIFIER),
+        ("task", TASK),
+        ("architecture", ARCHITECTURE),
+        ("labels", EXPECTED_LABELS),
+        ("num_labels", EXPECTED_NUM_LABELS),
+        ("local_files_only", True),
+    ):
+        if manifest.get(key) != expected:
+            raise PackagingError(
+                f"Release manifest {key} must be {expected!r}, got {manifest.get(key)!r}"
+            )
+
+    version = manifest.get("version")
+    if not isinstance(version, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", version) or ".." in version:
+        raise PackagingError("Incremental release manifest version is invalid")
+    if version.lower() == "v1.0.0":
+        raise PackagingError("Incremental release manifest cannot use reserved baseline version 'v1.0.0'")
+    if expected_version is not None and version != expected_version:
+        raise PackagingError(
+            f"Release manifest version must be {expected_version!r}, got {version!r}"
+        )
+
+    for name in CRITICAL_FILES:
+        require_regular_file(release, name)
+
+    threshold = _required_number(load_json(release / "threshold.json"), "threshold", "threshold.json")
+    if not 0.0 < threshold < 1.0:
+        raise PackagingError(f"threshold must be in (0, 1), got {threshold!r}")
+    manifest_threshold = _required_number(manifest, "threshold", "Release manifest")
+    if not math.isclose(threshold, manifest_threshold, rel_tol=0.0, abs_tol=1e-12):
+        raise PackagingError("Release manifest threshold does not match threshold.json")
+
+    temperature = _required_number(load_json(release / "calibration.json"), "temperature", "calibration.json")
+    if not 0.05 <= temperature <= 20.0:
+        raise PackagingError(f"temperature out of range: {temperature!r}")
+    calibration = manifest.get("calibration")
+    if not isinstance(calibration, dict) or calibration.get("method") != "temperature_scaling":
+        raise PackagingError("Release manifest calibration method is invalid")
+    manifest_temp = _required_number(calibration, "temperature", "Release manifest calibration")
+    if not math.isclose(temperature, manifest_temp, rel_tol=0.0, abs_tol=1e-12):
+        raise PackagingError("Release manifest calibration temperature does not match calibration.json")
+
+    contents = list(release.iterdir())
+    if any(path.is_dir() or path.is_symlink() for path in contents):
+        raise PackagingError("Model directory must not contain subdirectories or symlinks")
+
+    if manifest.get("critical_files") != list(CRITICAL_FILES):
+        raise PackagingError("Release manifest critical_files contract is invalid")
+    file_entries = manifest.get("files")
+    if not isinstance(file_entries, dict) or not set(CRITICAL_FILES).issubset(set(file_entries)):
+        raise PackagingError("Release manifest files missing critical files")
+
+    actual_non_manifest = {path.name for path in contents if path.is_file() and path.name != "manifest.json"}
+    if set(file_entries) != actual_non_manifest:
+        raise PackagingError(
+            f"Release files mismatch: expected {sorted(file_entries)}, got {sorted(actual_non_manifest)}"
+        )
+
+    for name, metadata in file_entries.items():
+        path = require_regular_file(release, name)
+        if not isinstance(metadata, dict):
+            raise PackagingError(f"Release manifest metadata for {name} is invalid")
+        if metadata.get("size") != path.stat().st_size:
+            raise PackagingError(f"Size mismatch for {name}")
+        expected_hash = metadata.get("sha256")
+        actual_hash = sha256(path)
+        if not isinstance(expected_hash, str) or actual_hash != expected_hash.lower():
+            raise PackagingError(f"Checksum mismatch for {name}")
+
+    sequence = sequence_contract(manifest, legacy=False)
+    for field, filename in (
+        ("tokenizer_hash", "tokenizer.json"),
+        ("tokenizer_config_hash", "tokenizer_config.json"),
+    ):
+        if manifest.get(field) != file_entries[filename]["sha256"]:
+            raise PackagingError(f"Release manifest {field} does not match {filename} hash")
+
+    id2label, label2id = _validate_config_labels(release)
+    return {
+        "path": str(release.resolve()),
+        "version": version,
+        "files": len(file_entries),
+        "payload_size": sum((release / name).stat().st_size for name in file_entries),
+        "model_sha256": file_entries["model.safetensors"]["sha256"],
+        "architecture": ARCHITECTURE,
+        "num_labels": EXPECTED_NUM_LABELS,
+        "id2label": id2label,
+        "label2id": label2id,
+        "threshold": threshold,
+        "temperature": temperature,
+        **sequence,
+    }
