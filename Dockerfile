@@ -150,6 +150,7 @@ COPY --from=frontend-build --chown=www-data:www-data /build/public/build/ /var/w
 
 RUN set -eux; \
     mkdir -p \
+        storage/app/datasets \
         storage/app/private/submissions \
         storage/app/public \
         storage/framework/cache/data \

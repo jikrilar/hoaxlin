@@ -106,6 +106,7 @@ services:
       MAIL_FROM_NAME: "${MAIL_FROM_NAME:-hoaxlin.id}"
     volumes:
       - laravel_storage:/var/www/html/storage
+      - training_datasets:/var/www/html/storage/app/datasets
     depends_on:
       mysql:
         condition: service_healthy
@@ -127,6 +128,7 @@ services:
     environment: *laravel-environment
     volumes:
       - laravel_storage:/var/www/html/storage
+      - training_datasets:/var/www/html/storage/app/datasets
     depends_on:
       mysql:
         condition: service_healthy
@@ -158,6 +160,7 @@ services:
     environment: *laravel-environment
     volumes:
       - laravel_storage:/var/www/html/storage
+      - training_datasets:/var/www/html/storage/app/datasets
     depends_on:
       mysql:
         condition: service_healthy
@@ -215,11 +218,16 @@ services:
     environment:
       BERT_INTERNAL_API_TOKEN: "${BERT_SERVICE_TOKEN:?BERT_SERVICE_TOKEN must be set}"
       BERT_MODEL_PATH: "/app/models/indobert-hoax/v1.0.0"
+      BERT_MODELS_DIR: "/app/models"
+      BERT_DATASETS_DIR: "/app/datasets"
       BERT_MODEL_VERSION: "v1.0.0"
       BERT_LOCAL_FILES_ONLY: "true"
       BERT_REQUIRE_RELEASE_MANIFEST: "true"
       HF_HUB_OFFLINE: "1"
       TRANSFORMERS_OFFLINE: "1"
+    volumes:
+      - ai_models:/app/models
+      - training_datasets:/app/datasets:ro
     networks:
       - hoaxlin
 
@@ -244,6 +252,8 @@ services:
 volumes:
   mysql_data:
   laravel_storage:
+  ai_models:
+  training_datasets:
 
 networks:
   hoaxlin:
