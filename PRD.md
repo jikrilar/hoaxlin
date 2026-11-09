@@ -414,6 +414,8 @@ Prioritas: **Must / Should / Could**.
 | FR-28 | Sistem mendukung stale-processing recovery dan retry secara idempotent | Must |
 | FR-29 | Email verification tersedia untuk akun pengguna | Should |
 | FR-30 | Admin dapat melihat informasi versi knowledge base RAG | Should |
+| FR-31 | Admin dapat menjalankan incremental fine-tuning IndoBERT secara asynchronous dan melihat perbandingan metrik (`Accuracy` & `Macro F1 Score`) terhadap baseline `v1.0.0` sebelum aktivasi | Should |
+| FR-32 | Admin dapat mengaktifkan versi model yang telah selesai dilatih (*hot-swap*) atau melakukan rollback ke baseline `v1.0.0` tanpa me-restart container | Should |
 
 ---
 
@@ -597,6 +599,7 @@ submissions
 detection_results
 feedback
 datasets
+model_versions
 admin_logs
 submission_processing_events
 openai usage/accounting tables
@@ -772,7 +775,7 @@ default,extract-text,extract-media,inference,retrieval,explanation
 
 # 22. Evaluasi
 
-## 22.1 Evaluasi classifier
+## 22.1 Evaluasi classifier dan validasi mutu pra-aktivasi (*hot-swap*)
 
 IndoBERT dievaluasi secara terpisah menggunakan:
 
@@ -783,6 +786,12 @@ IndoBERT dievaluasi secara terpisah menggunakan:
 - confusion matrix.
 
 Frozen external challenge tetap merupakan evaluation-only artifact dan tidak boleh dijadikan knowledge base.
+
+Untuk fitur **Incremental Fine-Tuning & Model Versioning** pada panel `/admin/model-versions`, sistem menerapkan mekanisme **perbandingan metrik otomatis terhadap baseline `v1.0.0` sebelum aktivasi model (*hot-swap*)** sebagai bagian dari validasi mutu:
+
+- Setiap proses pelatihan bertahap mengevaluasi model baseline `v1.0.0` (`baseline_accuracy`, `baseline_f1_score`) dan model kandidat baru (`accuracy`, `f1_score`) pada **split validasi deterministik yang sama**.
+- Metrik kandidat beserta metrik pembanding baseline disimpan ke `evaluation.json` pada artefak model baru dan dikirim melalui callback internal ke tabel `model_versions`.
+- Selesainya pelatihan (`status = completed`) **tidak** langsung mengaktifkan model kandidat untuk trafik publik. Halaman daftar dan detail `/admin/model-versions` menampilkan kolom **Perbandingan vs Baseline** (selisih/*delta* Accuracy dan Macro F1 terhadap `v1.0.0`) agar administrator dapat memvalidasi mutu model baru terlebih dahulu sebelum mengeksekusi **Aktifkan Model** (*hot-swap* via `POST /activate-model`) atau mengembalikan runtime ke **Aktifkan Baseline v1.0.0**.
 
 ## 22.2 Evaluasi retrieval
 
@@ -851,6 +860,14 @@ R13 memperluas corpus melalui pemeriksaan otomatis atas provenance dan isi. Seba
 | Tidak aktif | Retraining/fine-tuning, perubahan threshold/calibration/model BERT |
 
 Evaluator yang ada tetap mengikat checksum corpus melalui manifest; default-nya R11 v1.0.0. Mengarahkan flag corpus ke v1.1.1 saja bukan evaluasi baru yang sah. Set/judgment yang cocok dan output versioned terpisah perlu disiapkan dalam tugas berikutnya. Tidak ada klaim peningkatan akurasi dari roadmap ini; promosi improvement memerlukan hasil evaluasi yang mendukung. RAG tidak mengubah classifier accuracy secara otomatis.
+
+## 24.6 Incremental Fine-Tuning, Model Versioning, dan Validasi Mutu Pra-Aktivasi (*Hot-Swap*)
+
+Dukungan pelatihan bertahap (*incremental fine-tuning*) dan manajemen versi model IndoBERT telah diimplementasikan pada `bert-service` dan panel Filament `/admin/model-versions` dengan pengamanan staging berikut:
+
+- **Perlindungan artefak baseline `v1.0.0` & auto-seed volume**: artefak `indobert-hoax v1.0.0` tidak pernah ditimpa; image `bert` menyimpan salinan fallback di `/opt/hoaxlin/baseline/indobert-hoax/v1.0.0` yang otomatis di-*seed* ke volume `ai_models` (`/app/models/indobert-hoax/v1.0.0`) bila direktori belum ada atau kosong. `ModelVersionSeeder` pada `DatabaseSeeder` memastikan baris acuan `v1.0.0` tampil dan aktif di `/admin/model-versions`.
+- **Validasi mutu berbasis perbandingan metrik otomatis (Accuracy & F1 Score) terhadap baseline**: sebelum model baru diaktifkan, `trainer.py` menghitung `baseline_accuracy` dan `baseline_f1_score` dari `v1.0.0` pada split validasi yang sama dengan model kandidat, lalu menampilkannya beserta selisih (*delta*) di `/admin/model-versions`.
+- **Aktivasi eksplisit (*hot-swap*) dan rollback**: model yang selesai dilatih (`completed`) tetap nonaktif sampai admin menekan **Aktifkan Model** (`POST /activate-model` dengan `threading.RLock()` tanpa me-restart container) setelah meninjau perbandingan metrik, dengan opsi rollback instan melalui **Aktifkan Baseline v1.0.0**.
 
 ---
 

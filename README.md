@@ -16,6 +16,7 @@ Hoaxlin membantu pengguna membaca **prediksi model dan referensi terkait**, buka
 - [Menjalankan dan mengoperasikan aplikasi](#operasi-aplikasi)
 - [Testing dan CI](#testing-dan-ci)
 - [IndoBERT v1.0.0](#indobert-v100)
+- [Incremental Fine-Tuning & Model Versioning](#incremental-fine-tuning-dan-model-versioning)
 - [RAG knowledge base dan retrieval](#rag-knowledge-base-dan-retrieval)
 - [Troubleshooting](#troubleshooting)
 - [Security dan privacy](#security-dan-privacy)
@@ -27,7 +28,7 @@ Hoaxlin membantu pengguna membaca **prediksi model dan referensi terkait**, buka
 - Pengguna login: teks, gambar, video unggahan, URL langsung media, dan URL artikel sesuai validasi backend.
 - Pipeline asynchronous dengan progress, hasil, provenance terjemahan, rujukan, dan penjelasan bila tersedia.
 - Riwayat, ekspor CSV riwayat, dan feedback memerlukan akun **terverifikasi**. Hasil/PDF/media tetap memerlukan hak akses submission.
-- Panel admin Filament untuk akun, katalog dataset, monitoring, dan audit. Katalog bukan corpus training aktif.
+- Panel admin Filament untuk akun, katalog dataset, versi model IndoBERT (incremental fine-tuning, perbandingan metrik vs baseline, dan aktivasi *hot-swap*), monitoring, dan audit. Katalog dataset bukan corpus training otomatis.
 - PDF hasil, statistik dengan konteks versi, CAPTCHA one-time, kuota, rate limiting, dan recovery submission.
 
 URL media harus menunjuk langsung ke file, bukan halaman YouTube/TikTok/Instagram/Facebook atau player HTML/JSON. Video unggahan mendukung MP4/MPEG/WEBM; direct media mendukung FLAC, MP3, MP4, MPEG/MPGA, M4A, OGG, WAV, WEBM dengan extension, MIME, dan signature yang sesuai. Batas default media transkripsi 24 MiB dan 300 detik; gambar memiliki kontrak tersendiri di `StoreSubmissionRequest`. Jangan menyamakan batas request web dengan batas teks inference BERT.
@@ -392,11 +393,35 @@ Compose membutuhkan required secret pada `.env`; alternatif validasi lokal tanpa
 <a id="indobert-v100"></a>
 ## IndoBERT v1.0.0
 
-`indobert-hoax v1.0.0` **tetap classifier utama dan frozen**. Kelas training `valid`/`hoax`; `meragukan` adalah abstention ketika calibrated confidence di bawah threshold release `0.99`. UI menampilkan **“Informasi belum terverifikasi oleh sumber terpercaya”**; ini bukan bukti benar/palsu atau hasil pemeriksaan semua sumber. Release memuat calibration temperature `0.8706620666110391` dan kontrak tokenizer/preprocessing yang harus dipertahankan.
+`indobert-hoax v1.0.0` **tetap classifier acuan utama dan artefak baseline-nya frozen (tidak pernah ditimpa)**. Kelas training `valid`/`hoax`; `meragukan` adalah abstention ketika calibrated confidence di bawah threshold release `0.99`. UI menampilkan **“Informasi belum terverifikasi oleh sumber terpercaya”**; ini bukan bukti benar/palsu atau hasil pemeriksaan semua sumber. Release memuat calibration temperature `0.8706620666110391` dan kontrak tokenizer/preprocessing yang harus dipertahankan.
 
-Tidak ada retraining/fine-tuning BERT dalam roadmap aktif. Kurasi dataset dan benchmark classifier lanjutan **ditunda**. Tooling historis di `bert-service/dataset/` dan `train/` disimpan untuk provenance, bukan langkah instalasi atau instruksi menjalankan training. Dataset asli training historis tidak tersedia dari clone; jangan merekonstruksinya dari prediction report atau menganggap file baru sebagai corpus lama.
+Kurasi dataset skala penuh dan benchmark classifier eksternal lanjutan **ditunda**. Tooling historis di `bert-service/dataset/` dan `train/` disimpan untuk provenance, bukan langkah instalasi. Dataset asli training historis tidak tersedia dari clone; jangan merekonstruksinya dari prediction report atau menganggap file baru sebagai corpus lama. Untuk pelatihan bertahap (*incremental fine-tuning*) yang dikelola admin tanpa mengubah artefak `v1.0.0`, lihat bagian di bawah.
 
 Metrik internal dan external challenge historis tidak menjamin kualitas runtime. External challenge menunjukkan generalization gap; jangan mengiklankan akurasi internal sebagai akurasi produk. Metadata aktif berasal dari `/version`; data tanpa provenance cocok ditampilkan `n/a`. Detail: [BERT teknis](bert-service/README.md), [kontrak release](bert-service/MODEL_RELEASE.md), dan [PRD](PRD.md).
+
+<a id="incremental-fine-tuning-dan-model-versioning"></a>
+## Incremental Fine-Tuning & Model Versioning
+
+Administrator dapat melatih versi baru model IndoBERT secara bertahap (*incremental fine-tuning*) dan mengelola versi model aktif dari panel `/admin/model-versions` (**Versi Model**) tanpa me-restart container dan tanpa menimpa artefak baseline `v1.0.0`:
+
+- **Alur pelatihan bertahap & aktivasi (*hot-swap*)**:
+  - Admin mengunggah file CSV berkolom `text` dan `label` (`valid` atau `hoax`) dan menentukan nama versi baru (misalnya `v1.1.0`).
+  - `StartBertTrainingJob` mengirimkan dataset ke `POST /train` pada `bert-service` (`202 Accepted`, berjalan di background). Pelatihan membekukan embedding serta lapisan encoder bawah (`0..10`) dan hanya memperbarui lapisan teratas (`encoder.layer.11`, pooler, dan classifier) dengan *replay buffer* dari dataset yang telah terverifikasi guna menekan *catastrophic forgetting*.
+  - Artefak versi baru disimpan secara terpisah di `/app/models/indobert-hoax/<version_name>/` (mewarisi `threshold.json` dan `calibration.json` dari model dasar), lalu `bert-service` mengirimkan hasil evaluasi ke callback internal `/api/internal/bert/callback`.
+  - Selesainya pelatihan (`completed`) **tidak** langsung mengubah model yang melayani trafik publik. Admin meninjau kolom **Perbandingan vs Baseline** (selisih *Accuracy* dan *Macro F1* terhadap `v1.0.0` pada split validasi yang sama) sebelum menekan **Aktifkan Model** (`POST /activate-model`) atau mengembalikan runtime ke acuan lewat **Aktifkan Baseline v1.0.0**.
+- **File CSV sampel siap pakai**:
+  - Untuk menguji alur pelatihan dan perbandingan metrik di `/admin/model-versions`, gunakan file sampel `datasets/samples/incremental-training-sample.csv` (24 baris berbahasa Indonesia yang seimbang: 12 `valid` dan 12 `hoax`).
+- **Mekanisme auto-seed & fallback pada Docker volume `ai_models`**:
+  - Container `bert` memasang named volume `ai_models` ke `/app/models`. Karena Docker tidak otomatis menyalin isi image ke volume yang sudah ada sebelumnya, image `hoaxlin-bert:v1.0.0` menyimpan salinan baseline di `/opt/hoaxlin/baseline/indobert-hoax/v1.0.0` (`BERT_BASELINE_FALLBACK_PATH`).
+  - Saat startup atau aktivasi baseline, `ModelRuntime.ensure_baseline_available()` otomatis menyalin (*auto-seed*) artefak `v1.0.0` secara atomik ke `/app/models/indobert-hoax/v1.0.0` apabila direktori tersebut belum ada atau kosong pada volume `ai_models` (serta menggunakan path fallback bila volume tidak dapat ditulisi). Direktori versi yang tidak kosong namun korup tetap gagal tertutup (*fail-closed*).
+- **Memuat data awal baseline `v1.0.0` di `/admin`**:
+  - Script bootstrap Docker hanya menjalankan migrasi (`migrate --force`) dan tidak menjalankan seeder secara otomatis. Agar model baseline `v1.0.0` tampil sebagai baris awal berstatus `completed` dan `Aktif` di tabel `/admin/model-versions`, jalankan `DatabaseSeeder` (yang memanggil `ModelVersionSeeder` secara idempoten):
+
+```sh
+docker compose exec app php artisan db:seed --class=DatabaseSeeder --force
+```
+
+  - Pada environment manual/lokal: `php artisan db:seed --class=DatabaseSeeder`. Jika hanya ingin memuat rekaman baseline `v1.0.0` tanpa data contoh lainnya, jalankan `php artisan db:seed --class=ModelVersionSeeder --force`.
 
 ## RAG knowledge base dan retrieval
 
@@ -463,11 +488,11 @@ PowerShell gunakan interpreter RAG Windows dan `--output "$env:TEMP/hoaxlin-rag-
 
 | Status | Pekerjaan |
 | --- | --- |
-| Tersedia | Pipeline multi-input, IndoBERT frozen, retrieval lokal KB v1.1.1, explanation grounded, hasil/riwayat/export/admin, CI publik tanpa bobot privat |
+| Tersedia | Pipeline multi-input, IndoBERT baseline `v1.0.0` (dengan dukungan incremental fine-tuning, perbandingan metrik vs baseline, dan aktivasi *hot-swap* di `/admin`), retrieval lokal KB v1.1.1, explanation grounded, hasil/riwayat/export/admin, CI publik tanpa bobot privat |
 | Selesai pada cleanup | C-01 konfigurasi tak terpakai; C-02 Docker/CI; C-02A writer audit; C-03 bytecode/cache; C-04 konsolidasi dokumentasi pada commit ini |
 | Prioritas berikutnya | Evaluasi dan peningkatan kualitas RAG dengan baseline vs improvement yang sederhana dan terukur |
-| Ditunda | Kurasi dataset dan benchmark BERT lanjutan; bukan jalur aktif untuk menutup keterbatasan classifier |
-| Tidak dalam roadmap aktif | Retraining/fine-tuning atau perubahan artefak IndoBERT v1.0.0 |
+| Ditunda | Kurasi dataset skala penuh dan benchmark BERT eksternal lanjutan |
+| Tidak dalam roadmap aktif | Penimpaan artefak baseline IndoBERT `v1.0.0` atau kalibrasi ulang threshold/temperature tanpa persetujuan eksplisit |
 | Belum tuntas | Judgment representatif KB v1.1.1, pemilihan threshold retrieval berbasis bukti, usability, patch npm terpisah, penilaian log historis, konfigurasi workflow privat oleh maintainer |
 
 Build/test sukses tidak membuktikan kualitas prediksi atau peningkatan akurasi. Laporan historis dipertahankan sebagai bukti dengan cakupan/waktu aslinya, bukan instruksi roadmap aktif. Lihat [PRD](PRD.md) untuk kontrak produk, [AGENTS.md](AGENTS.md) untuk aturan kontribusi agent, dan [laporan cleanup](reports/repository-cleanup/c03.md) untuk batas verifikasi tahap sebelumnya. C-05 tidak dijalankan otomatis.
