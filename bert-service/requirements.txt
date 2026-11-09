@@ -1,5 +1,7 @@
 # Keep this file synchronized with pyproject.toml for pip-based environments.
 fastapi[standard]>=0.136.1,<0.137.0
+httpx>=0.27,<1
+python-multipart>=0.0.18
 transformers==5.14.1
 torch==2.13.0
 numpy>=2.0

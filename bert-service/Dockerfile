@@ -35,16 +35,25 @@ COPY bert-service/constraints-runtime.txt /tmp/constraints-runtime.txt
 # The dedicated index guarantees a CPU wheel. The second install sees that
 # torch requirement as already satisfied and resolves only API/runtime packages.
 RUN python -m pip install \
+        --default-timeout=120 \
+        --retries 10 \
         -c /tmp/constraints-runtime.txt \
         --index-url https://download.pytorch.org/whl/cpu \
-        "torch==${TORCH_VERSION}" \
-    && python -m pip install -c /tmp/constraints-runtime.txt -r /tmp/requirements-runtime.txt \
+        --extra-index-url https://pypi.org/simple \
+        "torch==${TORCH_VERSION}+cpu" \
+    && python -m pip install --default-timeout=120 --retries 10 -c /tmp/constraints-runtime.txt -r /tmp/requirements-runtime.txt \
     && python -m pip check \
     && rm -f /tmp/requirements-runtime.txt /tmp/constraints-runtime.txt
+
+ENV BERT_BASELINE_FALLBACK_PATH=/opt/hoaxlin/baseline/indobert-hoax/${MODEL_VERSION}
 
 COPY --chown=10001:10001 bert-service/app/ /app/app/
 COPY --chown=10001:10001 bert-service/scripts/runtime_smoke_test.py /app/runtime_smoke_test.py
 COPY --chown=10001:10001 ${MODEL_RELEASE_PATH}/ /app/models/indobert-hoax/${MODEL_VERSION}/
+RUN mkdir -p /opt/hoaxlin/baseline/indobert-hoax \
+    && (cp -al /app/models/indobert-hoax/${MODEL_VERSION} /opt/hoaxlin/baseline/indobert-hoax/${MODEL_VERSION} 2>/dev/null \
+        || cp -Rp /app/models/indobert-hoax/${MODEL_VERSION} /opt/hoaxlin/baseline/indobert-hoax/${MODEL_VERSION}) \
+    && chown -R 10001:10001 /app/models /opt/hoaxlin/baseline
 
 USER 10001:10001
 

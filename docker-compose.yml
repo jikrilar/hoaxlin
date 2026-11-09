@@ -55,9 +55,13 @@ services:
       SUBMISSION_ACCOUNT_DAILY_LIMIT: "${SUBMISSION_ACCOUNT_DAILY_LIMIT:-100}"
       BERT_SERVICE_URL: "http://bert:8001"
       BERT_SERVICE_TOKEN: "${BERT_SERVICE_TOKEN:?BERT_SERVICE_TOKEN must be set}"
+      BERT_CALLBACK_URL: "${BERT_CALLBACK_URL:-http://app:8000/api/internal/bert/callback}"
       BERT_MODEL_VERSION: "v1.0.0"
       BERT_SERVICE_CONNECT_TIMEOUT: "${BERT_SERVICE_CONNECT_TIMEOUT:-3}"
       BERT_SERVICE_TIMEOUT: "${BERT_SERVICE_TIMEOUT:-30}"
+      BERT_TRAIN_TIMEOUT: "${BERT_TRAIN_TIMEOUT:-15}"
+      BERT_ACTIVATE_TIMEOUT: "${BERT_ACTIVATE_TIMEOUT:-60}"
+      BERT_MAX_TRAIN_CSV_BYTES: "${BERT_MAX_TRAIN_CSV_BYTES:-26214400}"
       BERT_SERVICE_TRIES: "${BERT_SERVICE_TRIES:-5}"
       BERT_BREAKER_FAILURES: "${BERT_BREAKER_FAILURES:-5}"
       BERT_BREAKER_WINDOW: "${BERT_BREAKER_WINDOW:-60}"
@@ -106,6 +110,7 @@ services:
       MAIL_FROM_NAME: "${MAIL_FROM_NAME:-hoaxlin.id}"
     volumes:
       - laravel_storage:/var/www/html/storage
+      - training_datasets:/var/www/html/storage/app/datasets
     depends_on:
       mysql:
         condition: service_healthy
@@ -127,6 +132,7 @@ services:
     environment: *laravel-environment
     volumes:
       - laravel_storage:/var/www/html/storage
+      - training_datasets:/var/www/html/storage/app/datasets
     depends_on:
       mysql:
         condition: service_healthy
@@ -158,6 +164,7 @@ services:
     environment: *laravel-environment
     volumes:
       - laravel_storage:/var/www/html/storage
+      - training_datasets:/var/www/html/storage/app/datasets
     depends_on:
       mysql:
         condition: service_healthy
@@ -215,11 +222,17 @@ services:
     environment:
       BERT_INTERNAL_API_TOKEN: "${BERT_SERVICE_TOKEN:?BERT_SERVICE_TOKEN must be set}"
       BERT_MODEL_PATH: "/app/models/indobert-hoax/v1.0.0"
+      BERT_BASELINE_FALLBACK_PATH: "/opt/hoaxlin/baseline/indobert-hoax/v1.0.0"
+      BERT_MODELS_DIR: "/app/models"
+      BERT_DATASETS_DIR: "/app/datasets"
       BERT_MODEL_VERSION: "v1.0.0"
       BERT_LOCAL_FILES_ONLY: "true"
       BERT_REQUIRE_RELEASE_MANIFEST: "true"
       HF_HUB_OFFLINE: "1"
       TRANSFORMERS_OFFLINE: "1"
+    volumes:
+      - ai_models:/app/models
+      - training_datasets:/app/datasets:ro
     networks:
       - hoaxlin
 
@@ -244,6 +257,8 @@ services:
 volumes:
   mysql_data:
   laravel_storage:
+  ai_models:
+  training_datasets:
 
 networks:
   hoaxlin:

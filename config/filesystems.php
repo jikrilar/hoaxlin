@@ -86,6 +86,26 @@ return [
             'root' => storage_path('app/private/submissions'),
         ],
 
+        // Internal dataset storage shared read-only with the BERT container via training_datasets.
+        'datasets' => [
+            'driver' => 'local',
+            'root' => storage_path('app/datasets'),
+            'visibility' => 'public',
+            'permissions' => [
+                'file' => [
+                    'public' => 0644,
+                    'private' => 0600,
+                ],
+                'dir' => [
+                    'public' => 0755,
+                    'private' => 0700,
+                ],
+            ],
+            'serve' => false,
+            'throw' => true,
+            'report' => false,
+        ],
+
     ],
 
     /*

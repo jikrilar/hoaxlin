@@ -33,6 +33,7 @@ yarn-error.log
 
 # D1: generated self-contained BERT release artifacts stay outside normal Git.
 /artifacts/
+/storage/ai_models/
 
 # bert-service logs
 /bert-service/uvicorn.log

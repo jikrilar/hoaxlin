@@ -9,6 +9,7 @@ use App\Enums\ProcessingStage;
 use App\Enums\SubmissionStatus;
 use App\Models\AdminLog;
 use App\Models\Dataset;
+use App\Models\ModelVersion;
 use App\Models\Submission;
 use App\Models\SubmissionProcessingEvent;
 use App\Models\User;
@@ -47,7 +48,7 @@ final class MonitoringPresentation
 
     public static function target(?string $state): string
     {
-        return in_array($state, ['users', 'datasets', 'submissions', 'system'], true) ? $state : 'Target tidak dikenali';
+        return in_array($state, ['users', 'datasets', 'submissions', 'model_versions', 'system'], true) ? $state : 'Target tidak dikenali';
     }
 
     public static function service(?string $state): string
@@ -101,7 +102,7 @@ final class MonitoringPresentation
         $metadata = $record->metadata;
         $safe = [];
         if (is_array($metadata) && array_key_exists('model', $metadata)) {
-            $safe['model'] = in_array($metadata['model'], [User::class, Dataset::class, Submission::class], true) ? $metadata['model'] : self::HIDDEN;
+            $safe['model'] = in_array($metadata['model'], [User::class, Dataset::class, Submission::class, ModelVersion::class], true) ? $metadata['model'] : self::HIDDEN;
         }
         if (is_array($metadata) && array_key_exists('source', $metadata)) {
             $safe['source'] = $metadata['source'] === 'seeder' ? 'seeder' : self::HIDDEN;
@@ -125,6 +126,7 @@ final class MonitoringPresentation
             'users' => ['id', 'name', 'email', 'is_admin', 'email_verified_at', 'created_at', 'updated_at'],
             'datasets' => ['id', 'text', 'label', 'source', 'verified_by', 'created_at', 'updated_at'],
             'submissions' => ['id', 'user_id', 'input_type', 'raw_input', 'extracted_text', 'source_language', 'translated_text', 'translation_provider', 'translation_model', 'translation_cached', 'translation_input_tokens', 'translation_output_tokens', 'translation_estimated_cost_usd', 'media_path', 'source_url', 'status', 'failure_reason', 'processing_stage', 'processing_started_at', 'processing_completed_at', 'last_error_service', 'last_error_code', 'attempt_count', 'pipeline_version', 'created_at', 'updated_at'],
+            'model_versions' => ['id', 'version_name', 'dataset_path', 'total_rows', 'status', 'accuracy', 'f1_score', 'baseline_accuracy', 'baseline_f1_score', 'training_duration', 'error_message', 'is_active', 'created_at', 'updated_at'],
             default => [],
         };
         $safe = [];
@@ -134,12 +136,16 @@ final class MonitoringPresentation
             }
             $value = $changes[$field];
             $safe[$field] = match ($field) {
-                'id', 'user_id', 'verified_by', 'attempt_count', 'translation_input_tokens', 'translation_output_tokens' => $value === null ? null : (self::unsignedInteger($value) ?? self::HIDDEN),
-                'is_admin', 'translation_cached' => in_array($value, [true, false, 0, 1, '0', '1'], true) ? (bool) $value : self::HIDDEN,
+                'id', 'user_id', 'verified_by', 'attempt_count', 'translation_input_tokens', 'translation_output_tokens', 'total_rows', 'training_duration' => $value === null ? null : (self::unsignedInteger($value) ?? self::HIDDEN),
+                'is_admin', 'translation_cached', 'is_active' => in_array($value, [true, false, 0, 1, '0', '1'], true) ? (bool) $value : self::HIDDEN,
                 'label' => is_string($value) ? (DetectionLabel::tryFrom($value)?->value ?? self::HIDDEN) : self::HIDDEN,
                 'input_type' => is_string($value) ? (InputType::tryFrom($value)?->value ?? self::HIDDEN) : self::HIDDEN,
-                'status' => is_string($value) ? (SubmissionStatus::tryFrom($value)?->value ?? self::HIDDEN) : self::HIDDEN,
+                'status' => $table === 'model_versions'
+                    ? (is_string($value) && in_array($value, ModelVersion::STATUSES, true) ? $value : self::HIDDEN)
+                    : (is_string($value) ? (SubmissionStatus::tryFrom($value)?->value ?? self::HIDDEN) : self::HIDDEN),
                 'processing_stage' => is_string($value) ? (ProcessingStage::tryFrom($value)?->value ?? self::HIDDEN) : self::HIDDEN,
+                'version_name' => is_string($value) && ! str_contains($value, '..') && preg_match('/\A[A-Za-z0-9][A-Za-z0-9._-]{0,63}\z/', $value) ? $value : self::HIDDEN,
+                'accuracy', 'f1_score', 'baseline_accuracy', 'baseline_f1_score' => $value === null ? null : (self::unitFloat($value) ?? self::HIDDEN),
                 default => self::HIDDEN,
             };
         }
@@ -155,6 +161,19 @@ final class MonitoringPresentation
         $integer = filter_var($value, FILTER_VALIDATE_INT);
 
         return $integer !== false && $integer >= 0 ? $integer : null;
+    }
+
+    private static function unitFloat(mixed $value): ?float
+    {
+        if (is_bool($value) || (! is_int($value) && ! is_float($value) && ! is_string($value))) {
+            return null;
+        }
+        $float = filter_var($value, FILTER_VALIDATE_FLOAT);
+        if ($float === false || ! is_finite($float) || $float < 0.0 || $float > 1.0) {
+            return null;
+        }
+
+        return round($float, 6);
     }
 
     private static function metadataText(mixed $metadata, array $safe): string
