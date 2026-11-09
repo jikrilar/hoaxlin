@@ -105,6 +105,7 @@ class Settings:
     sequence_length_explicit: bool = True
     models_dir: str = "/app/models"
     datasets_dir: str = "/app/datasets"
+    baseline_fallback_path: str | None = "/opt/hoaxlin/baseline/indobert-hoax/v1.0.0"
     replay_buffer_path: str | None = None
     train_epochs: int = 3
     train_batch_size: int = 8
@@ -121,6 +122,12 @@ class Settings:
             or None
         )
         model_version = os.getenv("BERT_MODEL_VERSION", "").strip() or None
+        raw_fallback = os.getenv("BERT_BASELINE_FALLBACK_PATH")
+        baseline_fallback_path = (
+            "/opt/hoaxlin/baseline/indobert-hoax/v1.0.0"
+            if raw_fallback is None
+            else (raw_fallback.strip() or None)
+        )
         replay_buffer_path = os.getenv("BERT_REPLAY_BUFFER_PATH", "").strip() or None
         return cls(
             service_name=os.getenv("BERT_SERVICE_NAME", "Hoax BERT Inference Service"),
@@ -138,6 +145,7 @@ class Settings:
             ),
             models_dir=os.getenv("BERT_MODELS_DIR", "/app/models").strip() or "/app/models",
             datasets_dir=os.getenv("BERT_DATASETS_DIR", "/app/datasets").strip() or "/app/datasets",
+            baseline_fallback_path=baseline_fallback_path,
             replay_buffer_path=replay_buffer_path,
             train_epochs=_int_in_range("BERT_TRAIN_EPOCHS", 3, 2, 3),
             train_batch_size=_positive_int("BERT_TRAIN_BATCH_SIZE", 8),

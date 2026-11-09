@@ -222,6 +222,7 @@ services:
     environment:
       BERT_INTERNAL_API_TOKEN: "${BERT_SERVICE_TOKEN:?BERT_SERVICE_TOKEN must be set}"
       BERT_MODEL_PATH: "/app/models/indobert-hoax/v1.0.0"
+      BERT_BASELINE_FALLBACK_PATH: "/opt/hoaxlin/baseline/indobert-hoax/v1.0.0"
       BERT_MODELS_DIR: "/app/models"
       BERT_DATASETS_DIR: "/app/datasets"
       BERT_MODEL_VERSION: "v1.0.0"

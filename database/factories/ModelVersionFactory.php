@@ -19,6 +19,8 @@ class ModelVersionFactory extends Factory
             'status' => ModelVersion::STATUS_PENDING,
             'accuracy' => null,
             'f1_score' => null,
+            'baseline_accuracy' => null,
+            'baseline_f1_score' => null,
             'training_duration' => null,
             'error_message' => null,
             'is_active' => false,
@@ -38,6 +40,8 @@ class ModelVersionFactory extends Factory
             'status' => ModelVersion::STATUS_COMPLETED,
             'accuracy' => 0.9425,
             'f1_score' => 0.9410,
+            'baseline_accuracy' => 0.9100,
+            'baseline_f1_score' => 0.9080,
             'training_duration' => 185,
         ]);
     }

@@ -105,6 +105,8 @@ class BertCallbackControllerTest extends TestCase
                 'status' => ModelVersion::STATUS_COMPLETED,
                 'accuracy' => 0.94123456,
                 'f1_score' => 0.93123456,
+                'baseline_accuracy' => 0.9100001,
+                'baseline_f1_score' => 0.9050001,
                 'training_duration' => 185,
                 'error_message' => null,
             ])
@@ -119,6 +121,8 @@ class BertCallbackControllerTest extends TestCase
         $this->assertSame(ModelVersion::STATUS_COMPLETED, $version->status);
         $this->assertEqualsWithDelta(0.941235, $version->accuracy, 0.000001);
         $this->assertEqualsWithDelta(0.931235, $version->f1_score, 0.000001);
+        $this->assertEqualsWithDelta(0.910000, $version->baseline_accuracy, 0.000001);
+        $this->assertEqualsWithDelta(0.905000, $version->baseline_f1_score, 0.000001);
         $this->assertSame(185, $version->training_duration);
         $this->assertNull($version->error_message);
         $this->assertFalse($version->is_active);

@@ -239,6 +239,7 @@ def _make_settings(
 def test_config_from_env_parses_training_and_volume_settings(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("BERT_MODELS_DIR", "/tmp/models")
     monkeypatch.setenv("BERT_DATASETS_DIR", "/tmp/datasets")
+    monkeypatch.setenv("BERT_BASELINE_FALLBACK_PATH", "/opt/hoaxlin/baseline/indobert-hoax/v1.0.0")
     monkeypatch.setenv("BERT_REPLAY_BUFFER_PATH", "/tmp/datasets/replay.csv")
     monkeypatch.setenv("BERT_TRAIN_EPOCHS", "2")
     monkeypatch.setenv("BERT_TRAIN_BATCH_SIZE", "16")
@@ -249,6 +250,7 @@ def test_config_from_env_parses_training_and_volume_settings(monkeypatch: pytest
     settings = Settings.from_env()
     assert settings.models_dir == "/tmp/models"
     assert settings.datasets_dir == "/tmp/datasets"
+    assert settings.baseline_fallback_path == "/opt/hoaxlin/baseline/indobert-hoax/v1.0.0"
     assert settings.replay_buffer_path == "/tmp/datasets/replay.csv"
     assert settings.train_epochs == 2
     assert settings.train_batch_size == 16
@@ -804,3 +806,208 @@ def test_concurrent_predict_and_hot_swap_is_thread_safe(tmp_path: Path) -> None:
             for model_version, fp in future.result():
                 assert model_version in expected_fp_by_version
                 assert fp == expected_fp_by_version[model_version]
+
+
+def test_baseline_auto_seeds_into_empty_models_volume_on_load_and_resolve(tmp_path: Path) -> None:
+    models_dir = tmp_path / "models_volume"
+    models_dir.mkdir()
+    datasets_dir = tmp_path / "datasets"
+    datasets_dir.mkdir()
+    fallback_dir = _create_synthetic_bert_dir(
+        tmp_path / "opt" / "baseline" / "indobert-hoax" / "v1.0.0",
+        version="v1.0.0",
+        seed=7,
+    )
+
+    volume_baseline_dir = models_dir / "indobert-hoax" / "v1.0.0"
+    assert not volume_baseline_dir.exists()
+
+    settings = Settings(
+        service_name="Hoax BERT Inference Service",
+        service_version="0.1.0",
+        model_path=str(volume_baseline_dir),
+        model_version="v1.0.0",
+        internal_api_token="test-token-stage2",
+        max_concurrency=2,
+        max_text_length=20_000,
+        max_sequence_length=512,
+        local_files_only=True,
+        require_release_manifest=False,
+        sequence_length_explicit=False,
+        models_dir=str(models_dir),
+        datasets_dir=str(datasets_dir),
+        baseline_fallback_path=str(fallback_dir),
+    )
+    runtime = ModelRuntime(settings)
+    runtime.load()
+
+    assert runtime.ready is True
+    assert runtime.model_version == "v1.0.0"
+    assert volume_baseline_dir.is_dir()
+    assert (volume_baseline_dir / "model.safetensors").is_file()
+    assert runtime.resolve_model_directory("v1.0.0") == volume_baseline_dir.resolve()
+
+
+def test_baseline_fallback_works_when_models_volume_cannot_be_seeded(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    models_dir = tmp_path / "models_readonly"
+    models_dir.mkdir()
+    datasets_dir = tmp_path / "datasets"
+    datasets_dir.mkdir()
+    fallback_dir = _create_synthetic_bert_dir(
+        tmp_path / "opt" / "baseline" / "indobert-hoax" / "v1.0.0",
+        version="v1.0.0",
+        seed=7,
+    )
+    volume_baseline_dir = models_dir / "indobert-hoax" / "v1.0.0"
+
+    import tempfile as _tempfile
+
+    def fail_mkdtemp(*args: Any, **kwargs: Any) -> str:
+        raise PermissionError("Read-only file system")
+
+    monkeypatch.setattr(_tempfile, "mkdtemp", fail_mkdtemp)
+
+    settings = Settings(
+        service_name="Hoax BERT Inference Service",
+        service_version="0.1.0",
+        model_path=str(volume_baseline_dir),
+        model_version="v1.0.0",
+        internal_api_token="test-token-stage2",
+        max_concurrency=2,
+        max_text_length=20_000,
+        max_sequence_length=512,
+        local_files_only=True,
+        require_release_manifest=False,
+        sequence_length_explicit=False,
+        models_dir=str(models_dir),
+        datasets_dir=str(datasets_dir),
+        baseline_fallback_path=str(fallback_dir),
+    )
+    runtime = ModelRuntime(settings)
+    runtime.load()
+
+    assert runtime.ready is True
+    assert runtime.model_version == "v1.0.0"
+    assert not volume_baseline_dir.exists()
+    assert runtime.resolve_model_directory("v1.0.0") == fallback_dir.resolve()
+
+
+def test_corrupted_existing_baseline_in_models_dir_is_not_masked_by_fallback(tmp_path: Path) -> None:
+    models_dir = tmp_path / "models"
+    datasets_dir = tmp_path / "datasets"
+    datasets_dir.mkdir()
+    fallback_dir = _create_synthetic_bert_dir(
+        tmp_path / "opt" / "baseline" / "indobert-hoax" / "v1.0.0",
+        version="v1.0.0",
+        seed=7,
+    )
+    corrupted_dir = _create_synthetic_bert_dir(
+        models_dir / "indobert-hoax" / "v1.0.0",
+        version="v1.0.0",
+        seed=7,
+    )
+    # Remove model.safetensors in the existing non-empty volume directory: must fail, not fall back.
+    (corrupted_dir / "model.safetensors").unlink()
+
+    settings = Settings(
+        service_name="Hoax BERT Inference Service",
+        service_version="0.1.0",
+        model_path=str(corrupted_dir),
+        model_version="v1.0.0",
+        internal_api_token="test-token-stage2",
+        max_concurrency=2,
+        max_text_length=20_000,
+        max_sequence_length=512,
+        local_files_only=True,
+        require_release_manifest=False,
+        sequence_length_explicit=False,
+        models_dir=str(models_dir),
+        datasets_dir=str(datasets_dir),
+        baseline_fallback_path=str(fallback_dir),
+    )
+    runtime = ModelRuntime(settings)
+    runtime.load()
+
+    assert runtime.ready is False
+    assert runtime.status == "failed"
+
+
+def test_train_incremental_model_computes_baseline_comparison_and_sends_in_callback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    models_dir = tmp_path / "models"
+    datasets_dir = tmp_path / "datasets"
+    datasets_dir.mkdir()
+    base_dir = _create_synthetic_bert_dir(models_dir / "indobert-hoax" / "v1.0.0", version="v1.0.0", seed=11)
+    csv_path = _write_csv(datasets_dir / "batch.csv", _sample_rows(12))
+
+    settings = _make_settings(
+        models_dir=models_dir,
+        datasets_dir=datasets_dir,
+        model_path=base_dir,
+        train_epochs=2,
+    )
+    result = train_incremental_model(
+        csv_path=csv_path,
+        version_name="v1.1.0",
+        base_model_path=base_dir,
+        settings=settings,
+        base_version="v1.0.0",
+    )
+
+    assert 0.0 <= result.baseline_accuracy <= 1.0
+    assert 0.0 <= result.baseline_f1_score <= 1.0
+    assert result.eval_split == "validation (20%)"
+
+    eval_payload = json.loads((result.output_dir / "evaluation.json").read_text(encoding="utf-8"))
+    assert "baseline_comparison" in eval_payload
+    comparison = eval_payload["baseline_comparison"]
+    assert comparison["base_version"] == "v1.0.0"
+    assert comparison["split"] == "validation (20%)"
+    assert comparison["sample_count"] == result.eval_sample_count
+    assert comparison["baseline_accuracy"] == pytest.approx(result.baseline_accuracy)
+    assert comparison["baseline_macro_f1"] == pytest.approx(result.baseline_f1_score)
+    assert comparison["accuracy_delta"] == pytest.approx(result.accuracy - result.baseline_accuracy)
+    assert comparison["macro_f1_delta"] == pytest.approx(result.f1_score - result.baseline_f1_score)
+
+    callbacks: list[dict[str, Any]] = []
+
+    def capture_callback(
+        callback_url: str,
+        payload: TrainCallbackPayload,
+        *,
+        internal_api_token: str | None,
+        timeout_seconds: float = 15.0,
+    ) -> bool:
+        callbacks.append(payload.model_dump())
+        return True
+
+    import app.main as main_mod
+
+    monkeypatch.setattr(main_mod, "send_training_callback", capture_callback)
+
+    app = create_app(settings=settings)
+    headers = {"Authorization": f"Bearer {settings.internal_api_token}"}
+    with TestClient(app) as client:
+        resp = client.post(
+            "/train",
+            headers=headers,
+            data={
+                "version_id": "77",
+                "version_name": "v1.2.0",
+                "callback_url": "http://app:8000/api/internal/bert/callback",
+                "dataset_path": "batch.csv",
+            },
+        )
+        assert resp.status_code == 202
+
+    assert len(callbacks) == 1
+    assert callbacks[0]["status"] == "completed"
+    assert callbacks[0]["baseline_accuracy"] is not None
+    assert callbacks[0]["baseline_f1_score"] is not None
+    assert 0.0 <= callbacks[0]["baseline_accuracy"] <= 1.0
+    assert 0.0 <= callbacks[0]["baseline_f1_score"] <= 1.0

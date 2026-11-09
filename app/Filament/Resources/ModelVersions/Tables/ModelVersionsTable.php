@@ -40,6 +40,10 @@ class ModelVersionsTable
                     ->formatStateUsing(ModelVersionResource::formatPercentage(...))
                     ->placeholder('Belum tersedia')
                     ->sortable(),
+                TextColumn::make('baseline_accuracy')
+                    ->label('Perbandingan vs Baseline')
+                    ->state(static fn (ModelVersion $record): ?string => ModelVersionResource::formatBaselineSummary($record))
+                    ->placeholder('Belum tersedia'),
                 TextColumn::make('training_duration')
                     ->label('Durasi')
                     ->formatStateUsing(ModelVersionResource::formatDuration(...))

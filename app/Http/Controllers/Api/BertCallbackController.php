@@ -66,6 +66,12 @@ class BertCallbackController extends Controller
                     'status' => ModelVersion::STATUS_COMPLETED,
                     'accuracy' => round((float) $validated['accuracy'], 6),
                     'f1_score' => round((float) $validated['f1_score'], 6),
+                    'baseline_accuracy' => isset($validated['baseline_accuracy'])
+                        ? round((float) $validated['baseline_accuracy'], 6)
+                        : null,
+                    'baseline_f1_score' => isset($validated['baseline_f1_score'])
+                        ? round((float) $validated['baseline_f1_score'], 6)
+                        : null,
                     'training_duration' => isset($validated['training_duration'])
                         ? (int) $validated['training_duration']
                         : null,
@@ -81,6 +87,8 @@ class BertCallbackController extends Controller
                     'status' => ModelVersion::STATUS_FAILED,
                     'accuracy' => null,
                     'f1_score' => null,
+                    'baseline_accuracy' => null,
+                    'baseline_f1_score' => null,
                     'training_duration' => isset($validated['training_duration'])
                         ? (int) $validated['training_duration']
                         : null,

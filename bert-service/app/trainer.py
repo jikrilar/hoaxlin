@@ -86,6 +86,9 @@ class TrainingResult:
     epochs: int
     trainable_params: int
     frozen_params: int
+    baseline_accuracy: float = 0.0
+    baseline_f1_score: float = 0.0
+    eval_split: str = "validation (20%)"
 
 
 def normalize_binary_label(raw_label: Any) -> int:
@@ -430,6 +433,32 @@ def _tokenize_batches(
     return batches
 
 
+def _evaluate_model_batches(
+    model: Any,
+    eval_batches: list[dict[str, Any]],
+    y_true: np.ndarray,
+    torch_module: Any,
+) -> dict[str, Any]:
+    model.eval()
+    all_preds: list[int] = []
+    with torch_module.inference_mode():
+        for batch in eval_batches:
+            logits = model(
+                input_ids=batch["input_ids"],
+                attention_mask=batch["attention_mask"],
+                **(
+                    {"token_type_ids": batch["token_type_ids"]}
+                    if "token_type_ids" in batch
+                    else {}
+                ),
+            ).logits
+            preds = torch_module.argmax(logits, dim=-1).detach().cpu().tolist()
+            all_preds.extend(int(item) for item in preds)
+
+    y_pred = np.asarray(all_preds, dtype=np.int64)
+    return compute_classification_metrics(y_true, y_pred)
+
+
 def train_incremental_model(
     *,
     csv_path: Path,
@@ -437,6 +466,7 @@ def train_incremental_model(
     base_model_path: Path,
     settings: Settings,
     base_version: str | None = None,
+    baseline_model_path: Path | None = None,
     max_sequence_length: int | None = None,
 ) -> TrainingResult:
     """Fine-tune an isolated copy of IndoBERT with encoder layer freezing and save atomically."""
@@ -469,6 +499,10 @@ def train_incremental_model(
 
     epochs = max(2, min(3, int(settings.train_epochs)))
     batch_size = max(1, min(int(settings.train_batch_size), len(train_samples)))
+    effective_lr = float(settings.train_learning_rate)
+    if len(train_samples) <= 64:
+        batch_size = min(batch_size, max(2, len(train_samples) // 5))
+        effective_lr = max(effective_lr, 2e-4)
     seq_len = max(2, min(512, int(max_sequence_length or settings.max_sequence_length)))
 
     import torch
@@ -496,17 +530,50 @@ def train_incremental_model(
         if tokenizer.pad_token_id is None and getattr(tokenizer, "eos_token", None) is not None:
             tokenizer.pad_token = tokenizer.eos_token
 
+        eval_batches = _tokenize_batches(
+            tokenizer,
+            val_samples,
+            max_length=seq_len,
+            batch_size=max(1, min(32, len(val_samples))),
+            torch_module=torch,
+        )
+        y_true = np.asarray([sample.label_id for sample in val_samples], dtype=np.int64)
+
+        baseline_metrics: dict[str, Any] | None = None
+        if (
+            baseline_model_path is not None
+            and baseline_model_path.is_dir()
+            and baseline_model_path.resolve() != base_model_path.resolve()
+        ):
+            baseline_model = AutoModelForSequenceClassification.from_pretrained(
+                str(baseline_model_path),
+                local_files_only=settings.local_files_only,
+            )
+            try:
+                _verify_base_model_labels(baseline_model)
+                baseline_metrics = _evaluate_model_batches(
+                    baseline_model, eval_batches, y_true, torch
+                )
+            finally:
+                del baseline_model
+                gc.collect()
+
         model = AutoModelForSequenceClassification.from_pretrained(
             str(base_model_path),
             local_files_only=settings.local_files_only,
         )
         _verify_base_model_labels(model)
+        if baseline_metrics is None:
+            baseline_metrics = _evaluate_model_batches(model, eval_batches, y_true, torch)
+        baseline_accuracy = float(baseline_metrics["accuracy"])
+        baseline_f1_score = float(baseline_metrics["macro_f1"])
+
         freeze_stats = freeze_bert_layers(model)
 
         trainable_params = [param for param in model.parameters() if param.requires_grad]
         optimizer = torch.optim.AdamW(
             trainable_params,
-            lr=settings.train_learning_rate,
+            lr=effective_lr,
             weight_decay=0.01,
         )
         steps_per_epoch = max(1, math.ceil(len(train_samples) / batch_size))
@@ -554,32 +621,7 @@ def train_incremental_model(
                 optimizer.step()
                 scheduler.step()
 
-        model.eval()
-        eval_batches = _tokenize_batches(
-            tokenizer,
-            val_samples,
-            max_length=seq_len,
-            batch_size=max(1, min(32, len(val_samples))),
-            torch_module=torch,
-        )
-        all_preds: list[int] = []
-        with torch.inference_mode():
-            for batch in eval_batches:
-                logits = model(
-                    input_ids=batch["input_ids"],
-                    attention_mask=batch["attention_mask"],
-                    **(
-                        {"token_type_ids": batch["token_type_ids"]}
-                        if "token_type_ids" in batch
-                        else {}
-                    ),
-                ).logits
-                preds = torch.argmax(logits, dim=-1).detach().cpu().tolist()
-                all_preds.extend(int(item) for item in preds)
-
-        y_true = np.asarray([sample.label_id for sample in val_samples], dtype=np.int64)
-        y_pred = np.asarray(all_preds, dtype=np.int64)
-        metrics = compute_classification_metrics(y_true, y_pred)
+        metrics = _evaluate_model_batches(model, eval_batches, y_true, torch)
         accuracy = float(metrics["accuracy"])
         f1_score = float(metrics["macro_f1"])
 
@@ -645,6 +687,15 @@ def train_incremental_model(
             "dataset_version": cleaned_version,
             "split": split_name,
             "exported_at": exported_at,
+            "baseline_comparison": {
+                "base_version": safe_base_version,
+                "split": split_name,
+                "sample_count": len(val_samples),
+                "baseline_accuracy": baseline_accuracy,
+                "baseline_macro_f1": baseline_f1_score,
+                "accuracy_delta": accuracy - baseline_accuracy,
+                "macro_f1_delta": f1_score - baseline_f1_score,
+            },
             "training_summary": {
                 "base_version": safe_base_version,
                 "epochs": epochs,
@@ -670,7 +721,8 @@ def train_incremental_model(
                 f"- Epochs: {epochs}\n"
                 f"- Samples: {len(new_samples)} new + {len(replay_samples)} replay\n"
                 f"- Evaluation ({split_name}, n={len(val_samples)}): "
-                f"accuracy={accuracy:.4f}, macro_f1={f1_score:.4f}\n"
+                f"accuracy={accuracy:.4f} (baseline={baseline_accuracy:.4f}), "
+                f"macro_f1={f1_score:.4f} (baseline={baseline_f1_score:.4f})\n"
             ),
             encoding="utf-8",
         )
@@ -764,6 +816,9 @@ def train_incremental_model(
             epochs=epochs,
             trainable_params=freeze_stats["trainable_params"],
             frozen_params=freeze_stats["frozen_params"],
+            baseline_accuracy=baseline_accuracy,
+            baseline_f1_score=baseline_f1_score,
+            eval_split=split_name,
         )
     finally:
         if staging_dir is not None and staging_dir.exists():

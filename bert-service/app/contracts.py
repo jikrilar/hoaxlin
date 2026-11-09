@@ -139,5 +139,7 @@ class TrainCallbackPayload(BaseModel):
     status: Literal["completed", "failed"]
     accuracy: float = Field(ge=0.0, le=1.0)
     f1_score: float = Field(ge=0.0, le=1.0)
+    baseline_accuracy: float | None = Field(default=None, ge=0.0, le=1.0)
+    baseline_f1_score: float | None = Field(default=None, ge=0.0, le=1.0)
     training_duration: int = Field(ge=0)
     error_message: str | None = None

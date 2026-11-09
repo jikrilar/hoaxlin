@@ -117,6 +117,7 @@ COPY docker/php/uploads.ini ./docker/php/uploads.ini
 COPY docker-compose.yml ./
 COPY README.md PRD.md ./
 COPY bert-service/README.md ./bert-service/README.md
+COPY datasets/samples/incremental-training-sample.csv ./datasets/samples/incremental-training-sample.csv
 COPY scripts/ ./scripts/
 COPY tests/ ./tests/
 
@@ -147,6 +148,7 @@ ENV APP_ENV=production \
 
 COPY --from=composer-production --chown=www-data:www-data /var/www/html/ /var/www/html/
 COPY --from=frontend-build --chown=www-data:www-data /build/public/build/ /var/www/html/public/build/
+COPY --chown=www-data:www-data datasets/samples/incremental-training-sample.csv /var/www/html/datasets/samples/incremental-training-sample.csv
 
 RUN set -eux; \
     mkdir -p \

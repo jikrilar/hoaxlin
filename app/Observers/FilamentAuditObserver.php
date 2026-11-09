@@ -66,7 +66,7 @@ class FilamentAuditObserver
             User::class => ['id', 'name', 'email', 'password', 'remember_token', 'is_admin', 'email_verified_at', 'created_at', 'updated_at'],
             Dataset::class => ['id', 'text', 'label', 'source', 'verified_by', 'created_at', 'updated_at'],
             Submission::class => ['id', 'user_id', 'guest_access_token_hash', 'input_type', 'raw_input', 'extracted_text', 'source_language', 'translated_text', 'translation_provider', 'translation_model', 'translation_cached', 'translation_input_tokens', 'translation_output_tokens', 'translation_estimated_cost_usd', 'media_path', 'source_url', 'status', 'failure_reason', 'processing_stage', 'content_hash', 'processing_started_at', 'processing_completed_at', 'last_error_service', 'last_error_code', 'attempt_count', 'pipeline_version', 'created_at', 'updated_at'],
-            ModelVersion::class => ['id', 'version_name', 'dataset_path', 'total_rows', 'status', 'accuracy', 'f1_score', 'training_duration', 'error_message', 'is_active', 'created_at', 'updated_at'],
+            ModelVersion::class => ['id', 'version_name', 'dataset_path', 'total_rows', 'status', 'accuracy', 'f1_score', 'baseline_accuracy', 'baseline_f1_score', 'training_duration', 'error_message', 'is_active', 'created_at', 'updated_at'],
             default => [],
         };
         $safe = [];
@@ -81,7 +81,7 @@ class FilamentAuditObserver
                     : (is_string($value) ? (SubmissionStatus::tryFrom($value)?->value ?? self::REDACTED) : self::REDACTED),
                 'processing_stage' => is_string($value) ? (ProcessingStage::tryFrom($value)?->value ?? self::REDACTED) : self::REDACTED,
                 'version_name' => $this->safeVersionName($value),
-                'accuracy', 'f1_score' => $this->unitFloat($value),
+                'accuracy', 'f1_score', 'baseline_accuracy', 'baseline_f1_score' => $this->unitFloat($value),
                 'email_verified_at', 'processing_started_at', 'processing_completed_at', 'created_at', 'updated_at' => $this->timestamp($value),
                 'source_language' => $value === null ? null : (is_string($value) && preg_match('/\A[a-z]{2,3}(?:-[A-Z]{2})?\z/', $value) ? $value : self::REDACTED),
                 'pipeline_version' => $value === null ? null : (is_string($value) && preg_match('/\Aindobert-hoax-v\d{1,5}\.\d{1,5}\.\d{1,5}\z/', $value) ? $value : self::REDACTED),

@@ -26,6 +26,10 @@ docker/**
 !scripts/
 !scripts/docker-setup.ps1
 !scripts/docker-setup.sh
+!datasets/
+datasets/**
+!datasets/samples/
+!datasets/samples/incremental-training-sample.csv
 
 !app/
 !app/**

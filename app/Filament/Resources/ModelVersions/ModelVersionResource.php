@@ -85,6 +85,61 @@ class ModelVersionResource extends Resource
         return number_format($state, 0, ',', '.').' detik';
     }
 
+    public static function formatDelta(?float $candidate, ?float $baseline): ?string
+    {
+        if ($candidate === null || $baseline === null) {
+            return null;
+        }
+
+        $diff = ($candidate - $baseline) * 100;
+        $sign = $diff > 0.0001 ? '+' : '';
+
+        return sprintf(
+            '%s%s%% (%s vs baseline %s)',
+            $sign,
+            number_format($diff, 2, '.', ''),
+            static::formatPercentage($candidate),
+            static::formatPercentage($baseline),
+        );
+    }
+
+    public static function formatBaselineSummary(?ModelVersion $record): ?string
+    {
+        if ($record === null) {
+            return null;
+        }
+
+        if (strtolower($record->version_name) === strtolower(BertTrainingService::BASELINE_VERSION)) {
+            return 'Acuan baseline v1.0.0';
+        }
+
+        if ($record->accuracy === null || $record->baseline_accuracy === null) {
+            return null;
+        }
+
+        $accDelta = ($record->accuracy - $record->baseline_accuracy) * 100;
+        $accSign = $accDelta > 0.0001 ? '+' : '';
+        $summary = sprintf(
+            'Akurasi %s%s%% (baseline %s)',
+            $accSign,
+            number_format($accDelta, 2, '.', ''),
+            static::formatPercentage($record->baseline_accuracy),
+        );
+
+        if ($record->f1_score !== null && $record->baseline_f1_score !== null) {
+            $f1Delta = ($record->f1_score - $record->baseline_f1_score) * 100;
+            $f1Sign = $f1Delta > 0.0001 ? '+' : '';
+            $summary .= sprintf(
+                ' · F1 %s%s%% (baseline %s)',
+                $f1Sign,
+                number_format($f1Delta, 2, '.', ''),
+                static::formatPercentage($record->baseline_f1_score),
+            );
+        }
+
+        return $summary;
+    }
+
     public static function makeActivateAction(): Action
     {
         return Action::make('activate')
@@ -95,7 +150,14 @@ class ModelVersionResource extends Resource
             ->visible(static fn (ModelVersion $record): bool => $record->isCompleted() && ! $record->is_active)
             ->requiresConfirmation()
             ->modalHeading(static fn (ModelVersion $record): string => "Aktifkan model {$record->version_name}?")
-            ->modalDescription(static fn (ModelVersion $record): string => "Layanan BERT akan melakukan hot-swap ke artefak {$record->version_name}. Status aktif di database hanya diperbarui jika layanan BERT mengonfirmasi pemuatan model berhasil.")
+            ->modalDescription(static function (ModelVersion $record): string {
+                $baseText = "Layanan BERT akan melakukan hot-swap ke artefak {$record->version_name}. Status aktif di database hanya diperbarui jika layanan BERT mengonfirmasi pemuatan model berhasil.";
+                $comparison = static::formatBaselineSummary($record);
+
+                return $comparison !== null && $comparison !== 'Acuan baseline v1.0.0'
+                    ? "{$baseText} Perbandingan validasi: {$comparison}."
+                    : $baseText;
+            })
             ->modalSubmitActionLabel('Aktifkan Model')
             ->action(static function (ModelVersion $record): void {
                 try {

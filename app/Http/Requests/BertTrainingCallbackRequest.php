@@ -39,6 +39,18 @@ class BertTrainingCallbackRequest extends FormRequest
                 'min:0',
                 'max:1',
             ],
+            'baseline_accuracy' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                'max:1',
+            ],
+            'baseline_f1_score' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                'max:1',
+            ],
             'training_duration' => [
                 'required_if:status,'.ModelVersion::STATUS_COMPLETED,
                 'nullable',

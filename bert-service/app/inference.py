@@ -5,7 +5,10 @@ import hashlib
 import json
 import logging
 import math
+import os
 import re
+import shutil
+import tempfile
 import threading
 import time
 from dataclasses import dataclass, field
@@ -129,6 +132,72 @@ class ModelRuntime:
                 "active_model_path": self._state.model_path if self._state is not None else self._active_model_path,
             }
 
+    def ensure_baseline_available(self, version_name: str = "v1.0.0") -> Path | None:
+        cleaned = validate_version_name(version_name, allow_baseline=True)
+        if cleaned.lower() not in FROZEN_BASELINE_VERSIONS:
+            return None
+
+        models_root = Path(self.settings.models_dir).resolve()
+        preferred_target = models_root / "indobert-hoax" / cleaned
+        if self.settings.model_path:
+            configured = Path(self.settings.model_path)
+            try:
+                resolved_cfg = configured.resolve()
+                if resolved_cfg.is_relative_to(models_root) and configured.name.lower() == cleaned.lower():
+                    preferred_target = resolved_cfg
+            except OSError:
+                pass
+
+        for existing in (preferred_target, models_root / "indobert-hoax" / cleaned, models_root / cleaned):
+            if existing.is_dir() and any(existing.iterdir()):
+                return existing.resolve()
+
+        raw_fallback = (self.settings.baseline_fallback_path or "").strip()
+        if not raw_fallback:
+            return None
+        fallback = Path(raw_fallback)
+        if not fallback.is_dir() or not any(fallback.iterdir()):
+            return None
+
+        staging_dir: Path | None = None
+        try:
+            preferred_target.parent.mkdir(parents=True, exist_ok=True)
+            staging_dir = Path(
+                tempfile.mkdtemp(prefix=f".seed-{cleaned}-", dir=preferred_target.parent)
+            )
+            os.chmod(staging_dir, 0o755)
+            for item in sorted(fallback.iterdir(), key=lambda p: p.name):
+                if item.is_file() and not item.is_symlink():
+                    dest = staging_dir / item.name
+                    shutil.copy2(item, dest)
+                    os.chmod(dest, 0o644)
+
+            if preferred_target.is_dir() and not any(preferred_target.iterdir()):
+                preferred_target.rmdir()
+            if not preferred_target.exists():
+                staging_dir.rename(preferred_target)
+                staging_dir = None
+                logger.info(
+                    "Auto-seeded baseline model %s from %s into %s",
+                    cleaned,
+                    fallback,
+                    preferred_target,
+                )
+                return preferred_target.resolve()
+        except OSError as exc:
+            logger.warning(
+                "Could not auto-seed baseline %s into %s (%s); falling back to %s",
+                cleaned,
+                preferred_target,
+                exc,
+                fallback,
+            )
+        finally:
+            if staging_dir is not None and staging_dir.exists():
+                shutil.rmtree(staging_dir, ignore_errors=True)
+
+        return fallback.resolve()
+
     def load(self) -> None:
         if not self.settings.model_path:
             logger.info("BERT_MODEL_PATH not set — model will stay not_configured (readiness 503)")
@@ -138,8 +207,18 @@ class ModelRuntime:
             with self._state_lock:
                 self.status = "loading"
             try:
+                source_path = Path(self.settings.model_path)
+                configured_ver = (self.settings.model_version or source_path.name).strip()
+                if (
+                    configured_ver.lower() in FROZEN_BASELINE_VERSIONS
+                    and (not source_path.is_dir() or not any(source_path.iterdir()))
+                ):
+                    seeded_or_fallback = self.ensure_baseline_available(configured_ver)
+                    if seeded_or_fallback is not None:
+                        source_path = seeded_or_fallback
+
                 state = self._build_state_from_directory(
-                    Path(self.settings.model_path),
+                    source_path,
                     expected_version=self.settings.model_version,
                 )
                 self._commit_state(state)
@@ -163,11 +242,14 @@ class ModelRuntime:
         models_root = Path(self.settings.models_dir).resolve()
         candidates: list[tuple[Path, bool]] = [(models_root / cleaned, True)]
         if cleaned.lower() in FROZEN_BASELINE_VERSIONS:
+            self.ensure_baseline_available(cleaned)
             candidates.append((models_root / "indobert-hoax" / cleaned, True))
             if self._initial_model_path:
                 initial = Path(self._initial_model_path)
                 if self._initial_model_version == cleaned or initial.name == cleaned:
                     candidates.append((initial, False))
+            if self.settings.baseline_fallback_path:
+                candidates.append((Path(self.settings.baseline_fallback_path), False))
 
         for candidate, require_under_root in candidates:
             if not candidate.exists():
@@ -175,7 +257,7 @@ class ModelRuntime:
             resolved = candidate.resolve()
             if require_under_root and not resolved.is_relative_to(models_root):
                 continue
-            if resolved.is_dir():
+            if resolved.is_dir() and any(resolved.iterdir()):
                 return resolved
 
         raise ModelVersionNotFoundError(

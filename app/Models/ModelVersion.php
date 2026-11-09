@@ -39,6 +39,8 @@ class ModelVersion extends Model
         'status',
         'accuracy',
         'f1_score',
+        'baseline_accuracy',
+        'baseline_f1_score',
         'training_duration',
         'error_message',
         'is_active',
@@ -63,6 +65,8 @@ class ModelVersion extends Model
             'total_rows' => 'integer',
             'accuracy' => 'float',
             'f1_score' => 'float',
+            'baseline_accuracy' => 'float',
+            'baseline_f1_score' => 'float',
             'training_duration' => 'integer',
             'is_active' => 'boolean',
         ];

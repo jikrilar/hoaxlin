@@ -266,14 +266,55 @@ class AdminModelVersionsResourceTest extends TestCase
             'status' => ModelVersion::STATUS_COMPLETED,
             'accuracy' => 0.91,
             'f1_score' => 0.90,
+            'baseline_accuracy' => 0.86,
+            'baseline_f1_score' => 0.85,
             'training_duration' => 88,
         ])->save();
 
         $viewComponent->call('$refresh')
             ->assertSee('Selesai')
             ->assertSee('91.00%')
+            ->assertSee('+5.00% (91.00% vs baseline 86.00%)')
+            ->assertSee('+5.00% (90.00% vs baseline 85.00%)')
             ->assertActionVisible('activate')
             ->assertDontSee('wire:poll.5s');
+    }
+
+    public function test_sample_incremental_training_csv_exists_and_can_be_submitted_via_admin(): void
+    {
+        Storage::fake('datasets');
+        $this->admin();
+
+        $samplePath = base_path('datasets/samples/incremental-training-sample.csv');
+        $this->assertFileExists($samplePath);
+
+        Http::fake([
+            'http://bert.test/train' => Http::response([
+                'request_id' => 'req-sample-1',
+                'status' => 'accepted',
+                'version_id' => 1,
+                'version_name' => 'v1.1.0-sample',
+                'message' => 'Accepted',
+            ], 202),
+        ]);
+
+        $file = UploadedFile::fake()->createWithContent(
+            'incremental-training-sample.csv',
+            (string) file_get_contents($samplePath),
+        );
+
+        Livewire::test(CreateModelVersion::class)
+            ->fillForm([
+                'version_name' => 'v1.1.0-sample',
+                'dataset_path' => $file,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors()
+            ->assertNotified('Pelatihan versi model dimasukkan ke antrean.');
+
+        $version = ModelVersion::where('version_name', 'v1.1.0-sample')->firstOrFail();
+        $this->assertSame(24, $version->total_rows);
+        $this->assertSame(ModelVersion::STATUS_TRAINING, $version->status);
     }
 
     public function test_activate_model_and_activate_baseline_actions_handle_remote_errors_and_success(): void

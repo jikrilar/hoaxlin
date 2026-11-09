@@ -9,8 +9,11 @@ import threading
 import time
 import uuid
 from contextlib import asynccontextmanager
+from email.parser import BytesParser
+from email.policy import HTTP as EMAIL_HTTP_POLICY
 from pathlib import Path
 from typing import Any, AsyncIterator
+from urllib.parse import parse_qs
 
 import httpx
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request, status
@@ -201,6 +204,60 @@ async def _write_upload_to_temp_csv(upload: Any, max_bytes: int) -> Path:
                 await close_fn()
             except Exception:
                 pass
+
+
+class _InMemoryUpload:
+    def __init__(self, data: bytes) -> None:
+        self._data = data
+        self._offset = 0
+
+    async def read(self, size: int = -1) -> bytes:
+        if self._offset >= len(self._data):
+            return b""
+        if size is None or size < 0:
+            chunk = self._data[self._offset :]
+            self._offset = len(self._data)
+            return chunk
+        chunk = self._data[self._offset : self._offset + size]
+        self._offset += len(chunk)
+        return chunk
+
+    async def close(self) -> None:
+        self._data = b""
+
+
+def _parse_form_fallback(raw_body: bytes, content_type_header: str) -> dict[str, Any]:
+    lowered = content_type_header.lower()
+    if "application/x-www-form-urlencoded" in lowered:
+        parsed = parse_qs(raw_body.decode("utf-8", errors="replace"), keep_blank_values=True)
+        return {key: values[-1] for key, values in parsed.items() if values}
+
+    if "multipart/form-data" not in lowered or "boundary=" not in lowered:
+        raise ValueError("Missing multipart boundary")
+
+    header_bytes = (
+        f"Content-Type: {content_type_header}\r\nMIME-Version: 1.0\r\n\r\n".encode("latin-1")
+    )
+    msg = BytesParser(policy=EMAIL_HTTP_POLICY).parsebytes(header_bytes + raw_body)
+    if not msg.is_multipart():
+        raise ValueError("Malformed multipart payload")
+
+    fields: dict[str, Any] = {}
+    for part in msg.iter_parts():
+        if part.get_content_disposition() != "form-data":
+            continue
+        name = part.get_param("name", header="content-disposition")
+        if not isinstance(name, str) or not name:
+            continue
+        filename = part.get_filename()
+        payload = part.get_payload(decode=True)
+        payload_bytes = payload if isinstance(payload, (bytes, bytearray)) else b""
+        if filename is not None or name in {"csv_file", "dataset", "file"}:
+            fields[name] = _InMemoryUpload(bytes(payload_bytes))
+        else:
+            charset = part.get_content_charset() or "utf-8"
+            fields[name] = bytes(payload_bytes).decode(charset, errors="replace")
+    return fields
 
 
 def _write_text_to_temp_csv(content: str, max_bytes: int) -> Path:
@@ -454,12 +511,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ) -> None:
         started = time.perf_counter()
         try:
+            baseline_model_path: Path | None = None
+            try:
+                baseline_model_path = runtime.resolve_model_directory("v1.0.0")
+            except Exception:
+                baseline_model_path = None
+
             result = train_incremental_model(
                 csv_path=csv_path,
                 version_name=version_name,
                 base_model_path=base_model_path,
                 settings=configured_settings,
                 base_version=base_version,
+                baseline_model_path=baseline_model_path,
                 max_sequence_length=max_sequence_length,
             )
             callback_payload = TrainCallbackPayload(
@@ -467,6 +531,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 status="completed",
                 accuracy=round(result.accuracy, 6),
                 f1_score=round(result.f1_score, 6),
+                baseline_accuracy=round(result.baseline_accuracy, 6),
+                baseline_f1_score=round(result.baseline_f1_score, 6),
                 training_duration=result.training_duration,
                 error_message=None,
             )
@@ -512,8 +578,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
         try:
             if "multipart/form-data" in content_type or "application/x-www-form-urlencoded" in content_type:
+                raw_header_ct = request.headers.get("content-type", "")
                 try:
-                    form = await request.form()
+                    form: Any = await request.form()
+                except AssertionError:
+                    try:
+                        raw_body = await request.body()
+                        form = _parse_form_fallback(raw_body, raw_header_ct)
+                    except Exception as exc:
+                        raise HTTPException(
+                            status_code=422,
+                            detail={"code": "validation_error", "message": f"Invalid multipart payload: {exc}"},
+                        ) from exc
                 except Exception as exc:
                     raise HTTPException(
                         status_code=422,

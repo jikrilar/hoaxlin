@@ -63,6 +63,14 @@ class ModelVersionInfolist
                             ->label('Durasi pelatihan')
                             ->formatStateUsing(ModelVersionResource::formatDuration(...))
                             ->placeholder('Belum tersedia'),
+                        TextEntry::make('baseline_accuracy')
+                            ->label('Perbandingan akurasi vs baseline')
+                            ->formatStateUsing(static fn (?float $state, ModelVersion $record): ?string => ModelVersionResource::formatDelta($record->accuracy, $state))
+                            ->placeholder('Belum tersedia'),
+                        TextEntry::make('baseline_f1_score')
+                            ->label('Perbandingan Macro F1 vs baseline')
+                            ->formatStateUsing(static fn (?float $state, ModelVersion $record): ?string => ModelVersionResource::formatDelta($record->f1_score, $state))
+                            ->placeholder('Belum tersedia'),
                     ])
                     ->columns(3)
                     ->columnSpanFull(),

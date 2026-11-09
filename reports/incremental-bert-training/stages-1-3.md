@@ -150,9 +150,33 @@ masih berlaku untuk `51d4ae9`.
 - Warning Laravel berasal dari parser `DOMDocument` pada tes progress yang sudah
   ada sebelumnya.
 
-## Langkah berikutnya (belum dikerjakan)
+## Langkah berikutnya (belum dikerjakan pada komit `51d4ae9`)
 
 1. Tinjauan manual UI `/admin` di browser desktop/mobile.
 2. Uji alur penuh di staging dengan artefak v1.0.0 asli dan dataset kecil.
 3. Evaluasi baseline vs versi baru pada set uji independen sebelum aktivasi.
 4. Pembaruan README/PRD, lalu push/PR atas persetujuan.
+
+## Pengamanan Staging & Verifikasi Alur Penuh Kontainer
+
+Menindaklanjuti poin pengamanan staging sebelum pembaruan README/PRD:
+
+1. **Fallback dan Auto-Seed Baseline `v1.0.0` pada Volume `ai_models` + Seeder Laravel**:
+   - `bert-service/Dockerfile` dan `docker-compose.yml` menyertakan salinan fallback baseline di `/opt/hoaxlin/baseline/indobert-hoax/v1.0.0` (`BERT_BASELINE_FALLBACK_PATH`).
+   - `ModelRuntime.ensure_baseline_available()` (`bert-service/app/inference.py`) menyalin baseline secara atomik ke `/app/models/indobert-hoax/v1.0.0` bila direktori target belum ada atau kosong pada volume `ai_models`, serta menggunakan fallback bila volume tidak dapat ditulisi. Direktori versi yang sudah berisi berkas korup/tidak lengkap tetap gagal tertutup (`fail-closed`).
+   - `Database\Seeders\ModelVersionSeeder` (`database/seeders/ModelVersionSeeder.php`, dipanggil dari `DatabaseSeeder`) mengisi baris awal `v1.0.0` (`status=completed`, `total_rows=781`, `accuracy=1.0`, `f1_score=1.0`, `baseline_accuracy=1.0`, `baseline_f1_score=1.0`, `is_active=true` bila belum ada versi aktif) secara idempoten agar langsung tampil di `/admin/model-versions`.
+2. **Evaluasi Kandidat vs Baseline `v1.0.0` & Sampel CSV Siap Pakai**:
+   - `bert-service/app/trainer.py` mengevaluasi model baseline `v1.0.0` dan model kandidat hasil fine-tuning pada split validasi yang sama dan deterministik, lalu mengirimkan `baseline_accuracy` dan `baseline_f1_score` melalui callback `/api/internal/bert/callback` dan menyimpannya di `evaluation.json`.
+   - Migrasi `2026_11_08_000002_add_baseline_metrics_to_model_versions_table.php` menambahkan kolom `baseline_accuracy` dan `baseline_f1_score` pada `model_versions`.
+   - Tabel dan halaman detail `/admin/model-versions` menampilkan kolom `Perbandingan vs Baseline` serta selisih (`delta`) akurasi dan Macro F1 terhadap baseline `v1.0.0` sebelum admin menekan `Aktifkan Model`.
+   - Berkas sampel siap pakai disediakan di `datasets/samples/incremental-training-sample.csv` (24 baris seimbang: 12 `valid`, 12 `hoax`).
+3. **Build Ulang Image & Verifikasi Kontainer End-to-End**:
+   - Image `hoaxlin-app:test`, `hoaxlin-app:local`, dan `hoaxlin-bert:v1.0.0` telah dibangun ulang.
+   - `bert-service` pytest (`-m "not release"`): **161 passed, 22 deselected**.
+   - Laravel Pint (`vendor/bin/pint --test`): **PASS (308 files)**.
+   - PHPUnit penuh (`hoaxlin-app:test`): **834 passed (5.978 assertions), 4 skipped**.
+   - Verifikasi multi-kontainer (`mysql`, `redis`, `bert`, `app`, `queue` dengan volume `ai_models` yang sudah ada namun tanpa `v1.0.0`) membuktikan:
+     - Auto-seed baseline `v1.0.0` ke volume `ai_models` dan kelulusan `runtime_smoke_test.py` (D1 equivalence `PASS`).
+     - `DatabaseSeeder` membuat rekaman `v1.0.0` aktif (`Acuan baseline v1.0.0`).
+     - Pelatihan asinkron `v1.1.0-staging` dengan `datasets/samples/incremental-training-sample.csv` selesai (`status=completed`, durasi ~10 detik di CPU) dengan metrik validasi: kandidat `accuracy=1.0000`, `f1_score=1.0000` vs baseline `baseline_accuracy=0.5000`, `baseline_f1_score=0.3333` (`Akurasi +50.00% (baseline 50.00%) · F1 +66.67% (baseline 33.33%)`), tanpa mengubah model aktif (`v1.0.0` tetap aktif).
+     - Aktivasi eksplisit (`activateModelVersion`) memindahkan `/health/ready` dan `/predict` ke `v1.1.0-staging`, lalu rollback (`activateBaseline`) mengembalikan runtime dan status database ke `v1.0.0`.
