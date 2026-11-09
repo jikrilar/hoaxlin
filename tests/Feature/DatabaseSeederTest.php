@@ -35,7 +35,7 @@ class DatabaseSeederTest extends TestCase
         $baseline = ModelVersion::where('version_name', 'v1.0.0')->firstOrFail();
         $this->assertTrue($baseline->isCompleted());
         $this->assertTrue($baseline->is_active);
-        $this->assertSame(ModelVersionSeeder::BASELINE_EVALUATION_SAMPLES, $baseline->total_rows);
+        $this->assertSame(ModelVersionSeeder::BASELINE_TOTAL_ROWS, $baseline->total_rows);
         $this->assertEqualsWithDelta(1.0, $baseline->accuracy, 0.0001);
         $this->assertEqualsWithDelta(1.0, $baseline->f1_score, 0.0001);
 

@@ -8,6 +8,8 @@ use Illuminate\Database\Seeder;
 
 class ModelVersionSeeder extends Seeder
 {
+    public const BASELINE_TOTAL_ROWS = 7816;
+
     public const BASELINE_EVALUATION_SAMPLES = 781;
 
     public function run(): void
@@ -21,7 +23,7 @@ class ModelVersionSeeder extends Seeder
             ['version_name' => BertTrainingService::BASELINE_VERSION],
             [
                 'dataset_path' => null,
-                'total_rows' => self::BASELINE_EVALUATION_SAMPLES,
+                'total_rows' => self::BASELINE_TOTAL_ROWS,
                 'status' => ModelVersion::STATUS_COMPLETED,
                 'accuracy' => 1.0,
                 'f1_score' => 1.0,
