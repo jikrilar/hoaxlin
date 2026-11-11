@@ -70,6 +70,19 @@ class PublicHeadTest extends TestCase
         parent::tearDown();
     }
 
+    public function test_favicon_is_a_self_hosted_svg_instead_of_an_emoji_data_uri(): void
+    {
+        $dom = $this->render('@include("partials.head")', []);
+
+        $href = $dom->evaluate('string(//link[@rel="icon"]/@href)');
+        $this->assertSame('image/svg+xml', $dom->evaluate('string(//link[@rel="icon"]/@type)'));
+        $this->assertSame('/favicon.svg', $href);
+        $this->assertStringNotContainsString('data:image/svg+xml', $href);
+        $this->assertStringNotContainsString('🔍', $dom->document->saveHTML());
+        $this->assertFileExists(public_path('favicon.svg'));
+        $this->assertStringContainsString('<svg', (string) file_get_contents(public_path('favicon.svg')));
+    }
+
     public function test_default_metadata_does_not_derive_from_submission_data(): void
     {
         $private = 'Private-input-marker-123';

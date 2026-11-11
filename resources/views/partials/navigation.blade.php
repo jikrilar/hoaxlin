@@ -1,8 +1,9 @@
 @php
     $navigationUser = auth()->user();
     $primaryLinks = [
-        ['route' => 'home', 'label' => 'Beranda'],
+        ['route' => 'home', 'label' => 'Periksa'],
         ['route' => 'cara-kerja', 'label' => 'Cara kerja'],
+        ['route' => 'statistik', 'label' => 'Statistik'],
         ['route' => 'tentang', 'label' => 'Tentang'],
     ];
 @endphp

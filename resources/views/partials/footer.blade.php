@@ -12,7 +12,7 @@
         <div>
             <a href="{{ route('home') }}" class="hl-wordmark">hoaxlin.id</a>
             <p class="hl-footer__description">Analisis informasi dengan bantuan AI. Periksa kembali temuan model dengan sumber terpercaya.</p>
-            <p class="hl-footer__credit">© {{ date('Y') }} hoaxlin.id · Tugas Akhir D3 Teknik Komputer, Abdan Dzul Ghaffa.</p>
+            <p class="hl-footer__credit">© {{ date('Y') }} hoaxlin.id · Tugas Akhir D3 Teknik Komputer, Abdan Dzul Ghaffa.{{-- TODO(E-1): owner decision pending; align with meta author. --}}</p>
         </div>
         <nav aria-label="Informasi">
             <ul class="hl-footer__links">

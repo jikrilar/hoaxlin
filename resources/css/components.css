@@ -28,10 +28,6 @@
     .hl-submission-help { margin-block: var(--ds-space-8); }
     .hl-submission-help ol { padding-inline-start: var(--ds-space-5); list-style: decimal; margin-block: var(--ds-space-4); }
     .hl-submission-help li + li { margin-block-start: var(--ds-space-2); }
-    .hl-submission-statistics { margin-block: var(--ds-space-4); }
-    .hl-submission-statistics > div + div { margin-block-start: var(--ds-space-4); }
-    .hl-submission-statistics dt { font-weight: var(--ds-font-weight-medium); }
-    .hl-submission-statistics dd span { display: block; color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
     .hl-auth-shell { display: flex; flex-direction: column; min-block-size: 100svh; }
     .hl-auth-header { display: flex; justify-content: center; padding: var(--ds-space-8) var(--ds-space-4); }
     .hl-auth-header .hl-wordmark { display: inline-flex; align-items: center; min-block-size: 2.75rem; }

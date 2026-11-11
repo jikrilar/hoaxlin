@@ -150,6 +150,19 @@ class PublicNavigationTest extends TestCase
         ];
     }
 
+    public function test_primary_navigation_lists_statistics_between_how_it_works_and_about(): void
+    {
+        $dom = $this->render('@include("partials.navigation")');
+
+        $labels = [];
+        foreach ($dom->query('//nav[@id="public-navigation"]//ul[contains(@class,"hl-nav-links")]/li/a') as $link) {
+            $labels[] = trim($link->textContent);
+        }
+
+        $this->assertSame(['Periksa', 'Cara kerja', 'Statistik', 'Tentang'], $labels);
+        $this->assertSame(1, $dom->query('//nav[@id="public-navigation"]//a[@href="http://localhost/statistik"]')->length);
+    }
+
     #[DataProvider('activeRoutes')]
     public function test_active_links_follow_named_routes(string $path, string $target): void
     {
@@ -169,6 +182,7 @@ class PublicNavigationTest extends TestCase
     {
         return [
             'home' => ['/', '/'],
+            'statistics' => ['/statistik', '/statistik'],
             'how it works' => ['/cara-kerja', '/cara-kerja'],
             'about' => ['/tentang', '/tentang'],
             'profile' => ['/profil', '/profil'],

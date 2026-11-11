@@ -205,55 +205,24 @@ class ModelStatisticsClaimsTest extends TestCase
         $this->assertNull($metadata['evaluation']['sample_count']);
     }
 
-    public function test_homepage_uses_runtime_evaluation_and_defined_latency(): void
+    public function test_homepage_does_not_call_runtime_metadata_or_render_model_metrics(): void
     {
-        $this->mockRuntime([
-            'available' => true,
-            'model_status' => 'ready',
-            'model_version' => 'v9.9.9',
-            'threshold' => 0.91,
-            'temperature' => 0.87,
-            'labels' => ['valid', 'hoax'],
-            'evaluation' => [
-                'model_version' => 'v9.9.9',
-                'accuracy' => 0.88,
-                'macro_f1' => 0.86,
-                'sample_count' => 120,
-                'dataset_name' => 'fixture-corpus',
-                'dataset_version' => 'v2',
-                'split' => 'held-out test',
-                'exported_at' => '2026-09-01T00:00:00+00:00',
-            ],
-        ]);
-
-        foreach ([40, 42, 44] as $inferenceMs) {
-            $submission = Submission::create([
-                'input_type' => 'text',
-                'raw_input' => 'Teks selesai untuk telemetry.',
-                'status' => 'completed',
-                'processing_completed_at' => now(),
-            ]);
-            DetectionResult::create([
-                'submission_id' => $submission->id,
-                'label' => 'valid',
-                'confidence_score' => 0.91,
-                'model_version' => 'v9.9.9',
-                'inference_ms' => $inferenceMs,
-            ]);
-        }
+        $runtime = Mockery::mock(BertRuntimeMetadata::class);
+        $runtime->shouldNotReceive('fetch');
+        $this->app->instance(BertRuntimeMetadata::class, $runtime);
+        Http::preventStrayRequests();
 
         $response = $this->get(route('home'));
 
         $response->assertOk()
-            ->assertSee('v9.9.9')
-            ->assertSee('88.00%')
-            ->assertSee('held-out test')
-            ->assertSee('n=120')
-            ->assertSee('fixture-corpus v2')
-            ->assertSee('export 2026-09-01T00:00:00+00:00')
-            ->assertSee('42.0 ms')
+            ->assertDontSee('Informasi model dan evaluasi')
+            ->assertDontSee('Median BERT inference')
+            ->assertDontSee('Akurasi evaluasi')
+            ->assertDontSee('v9.9.9')
             ->assertDontSee('95%+')
             ->assertDontSee('15s');
+
+        Http::assertNothingSent();
     }
 
     public function test_homepage_and_widget_render_n_a_when_runtime_is_unavailable(): void
@@ -277,8 +246,8 @@ class ModelStatisticsClaimsTest extends TestCase
             ],
         ]);
 
-        $response = $this->get(route('home'));
-        $response->assertOk()->assertSee('n/a');
+        // T1.5: the landing page no longer reads runtime metadata.
+        $this->get(route('home'))->assertOk()->assertDontSee('n/a');
 
         $stats = $this->widgetStats();
         $this->assertSame('n/a', $stats[0]->getValue());
@@ -321,7 +290,8 @@ class ModelStatisticsClaimsTest extends TestCase
 
         $response = $this->get(route('home'));
 
-        $response->assertOk()->assertSee('Median BERT inference')->assertSee('n/a');
+        // T1.5: latency telemetry is no longer computed for the landing page.
+        $response->assertOk()->assertDontSee('Median BERT inference');
     }
 
     public function test_widget_does_not_call_most_common_historical_version_active(): void

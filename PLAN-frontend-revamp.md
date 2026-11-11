@@ -159,11 +159,11 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 - **Penerimaan:** halaman hasil publik tidak lagi menampilkan field internal; admin tetap dapat melihatnya (setelah T3.5).
 
 ### T1.5 (S) Kebersihan layout bersama
-- [ ] Tambahkan **Statistik** ke `partials/navigation.blade.php`; urutan: Periksa · Cara kerja · Statistik · Tentang; konsisten desktop & mobile (menu mobile aksesibel).
-- [ ] Ganti favicon emoji (`partials/head.blade.php`) dengan file SVG di `public/` (wordmark/ikon sederhana, warna evergreen).
-- [ ] Seragamkan meta author/footer sesuai **Lampiran E-1** (default: tunggu jawaban pemilik; jangan ubah nama sendiri).
-- [ ] Hapus tombol "Unduh seluruh riwayat CSV" dari halaman hasil (`partials/result/actions.blade.php`); tombol itu hanya di Riwayat.
-- [ ] Hapus blok "Informasi model dan evaluasi" dari landing dan hentikan komputasinya di `HomeController` (hapus `BertRuntimeMetadata->fetch()` dan `latencyStats()` bila tidak lagi dipakai; sesuaikan `tests/Unit/SubmissionFormPresentationTest.php` dan test terkait). Informasi model pindah ke Statistik sebagai disclosure "Tentang model" (T2.9).
+- [x] Tambahkan **Statistik** ke `partials/navigation.blade.php`; urutan: Periksa · Cara kerja · Statistik · Tentang; konsisten desktop & mobile (menu mobile aksesibel).
+- [x] Ganti favicon emoji (`partials/head.blade.php`) dengan file SVG di `public/` (wordmark/ikon sederhana, warna evergreen).
+- [x] Seragamkan meta author/footer sesuai **Lampiran E-1** (default: tunggu jawaban pemilik; jangan ubah nama sendiri).
+- [x] Hapus tombol "Unduh seluruh riwayat CSV" dari halaman hasil (`partials/result/actions.blade.php`); tombol itu hanya di Riwayat.
+- [x] Hapus blok "Informasi model dan evaluasi" dari landing dan hentikan komputasinya di `HomeController` (hapus `BertRuntimeMetadata->fetch()` dan `latencyStats()` bila tidak lagi dipakai; sesuaikan `tests/Unit/SubmissionFormPresentationTest.php` dan test terkait). Informasi model pindah ke Statistik sebagai disclosure "Tentang model" (T2.9).
 - **Penerimaan:** landing tidak lagi memanggil runtime BERT; test hijau.
 
 ### T1.6 (M) Navigasi & label panel admin

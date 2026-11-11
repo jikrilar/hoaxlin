@@ -53,7 +53,7 @@ class ResultEndpointAuthorizationTest extends TestCase
 
         $this->actingAs($admin)->get(route('hasil', $foreign))->assertOk()
             ->assertSee(route('hasil.pdf', $foreign), false)
-            ->assertSee('Unduh seluruh riwayat CSV')
+            ->assertDontSee('Unduh seluruh riwayat CSV')
             ->assertDontSee('id="feedback-form"', false);
         $this->actingAs($admin)->getJson(route('hasil.status', $foreign))->assertOk();
         $this->actingAs($admin)->get(route('hasil.pdf', $foreign))->assertOk();

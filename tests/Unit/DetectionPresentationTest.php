@@ -299,14 +299,13 @@ class DetectionPresentationTest extends TestCase
         $dom = $this->renderResult($submission, $result);
         $this->assertSame($form ? 1 : 0, $dom->query('//form[@id="feedback-form"]')->length);
         $this->assertSame($final ? 1 : 0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"/pdf")]')->length);
-        $this->assertSame($viewerId !== null && $verified ? 1 : 0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"/riwayat-export/csv")]')->length);
+        $this->assertSame(0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"/riwayat-export/csv")]')->length);
         $this->assertSame($viewerId !== null && $verified ? 1 : 0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[normalize-space(.)="Kembali ke riwayat"]')->length);
         $this->assertSame(1, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"#cek-berita")]')->length);
         $text = $dom->evaluate('string(//main)');
         $this->assertStringNotContainsString('Cetak / Simpan PDF', $text);
-        if ($viewerId !== null && $verified) {
-            $this->assertStringContainsString('Unduh seluruh riwayat CSV', $text);
-        }
+        // T1.5: the CSV export action belongs to Riwayat only.
+        $this->assertStringNotContainsString('Unduh seluruh riwayat CSV', $text);
         if ($final && $ownerId === $viewerId && $viewerId !== null && ! $verified) {
             $this->assertSame(1, $dom->query('//section[@aria-labelledby="feedback-heading"]//a[contains(@href,"/verify-email")]')->length);
         }

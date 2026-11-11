@@ -51,18 +51,5 @@
         </ol>
         <x-ui.link :href="route('cara-kerja')">Pelajari cara kerja</x-ui.link>
     </section>
-
-    <x-ui.disclosure title="Informasi model dan evaluasi" class="hl-submission-model" id="submission-model">
-        <p>Data berikut menjelaskan <x-ui.term key="classifier">model analisis</x-ui.term>, evaluasi, dan <x-ui.term key="inferensi">waktu analisis</x-ui.term> yang tersedia. Data ini bukan jaminan kebenaran setiap pemeriksaan.</p>
-        <dl class="hl-submission-statistics">
-            @foreach($modelStatistics as $stat)
-                <div>
-                    <dt>{{ $stat['label'] }}</dt>
-                    <dd>{{ $stat['value'] }} <span>{{ $stat['description'] }}</span></dd>
-                </div>
-            @endforeach
-        </dl>
-        <x-ui.link :href="route('statistik')">Lihat statistik dan konteks evaluasi</x-ui.link>
-    </x-ui.disclosure>
 </div>
 @endsection

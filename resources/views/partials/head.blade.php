@@ -12,13 +12,13 @@
 <title>{{ $pageTitle }}</title>
 <meta name="description" content="{{ $pageDescription }}">
 <meta name="keywords" content="cek hoax, deteksi hoax, berita hoax, BERT, AI, fact check, verifikasi berita">
-<meta name="author" content="Muhamad Jikril Aryanda">
+<meta name="author" content="Muhamad Jikril Aryanda">{{-- TODO(E-1): owner decision pending; align with footer credit. --}}
 
 <meta property="og:title" content="{{ $pageTitle }}">
 <meta property="og:description" content="{{ $pageDescription }}">
 <meta property="og:type" content="website">
 
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
 {{-- Licensed Inter/Newsreader fonts are self-hosted through the Vite stylesheet. --}}
 @vite(['resources/css/app.css', 'resources/js/app.js'])

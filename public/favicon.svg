@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Hoaxlin">
+    <rect width="64" height="64" rx="14" fill="#235C50"/>
+    <path d="M22 20v24M42 20v24M22 32h20" stroke="#F7F6F2" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <circle cx="47" cy="45" r="6.5" fill="none" stroke="#F7F6F2" stroke-width="3.5"/>
+    <path d="M51.5 49.5 57 55" stroke="#F7F6F2" stroke-width="3.5" stroke-linecap="round"/>
+</svg>
