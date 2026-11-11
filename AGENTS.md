@@ -13,6 +13,11 @@ dengan file bila tersedia; lingkup pengguna menentukan pekerjaan yang diizinkan.
 - Tidak ada retraining dalam roadmap aktif. Kurasi dataset dan benchmark BERT
   lanjutan ditunda. Tooling `bert-service/train/`, `dataset/`, dan laporan lama
   merupakan konteks historis, bukan mandat untuk menjalankannya.
+- `PLAN-frontend-revamp.md` merupakan instruksi eksplisit pemilik untuk: (a) mengubah
+  UI publik dan panel admin, (b) menyesuaikan tipografi, animasi, dan gaya komponen,
+  serta (c) mengembangkan alur Data Kurasi → pelatihan versi model. Rencana tersebut
+  **bukan** instruksi untuk menjalankan training sungguhan, mengubah threshold/tokenizer/
+  preprocessing/bobot, mengganti model aktif, atau menimpa baseline `indobert-hoax v1.0.0`.
 - Fokus berikutnya: kualitas RAG melalui evaluasi baseline vs improvement yang
   sederhana, reproducible, dan sesuai resource. KB **v1.1.1 (61 dokumen)** tetap
   baseline runtime; jangan mengubah snapshot/model/algoritma hanya demi demo/test.
@@ -135,12 +140,14 @@ perintah Linux/Fish dan Windows, setup Docker, workflow CI publik vs release pri
 
 ## 7. UI jika tugas menyentuh presentasi
 
-Pertahankan identitas light-only Warm Editorial Intelligence: ivory `#F7F6F2`,
-evergreen `#235C50`, Newsreader editorial + Inter UI, hierarchy/whitespace jelas,
-border/shadow minimal. Ini guardrail pemeliharaan, bukan mandat refactor menyeluruh.
-Jangan dekorasi gradient/glow/glass, menyalin Claude, atau global overflow hidden
-untuk menyembunyikan masalah. Gunakan semantic tokens, Blade escaped output,
-komponen reusable seperlunya, Tailwind 4 dan extension point Filament 5.
+Pertahankan palet warna light-only Warm Editorial Intelligence: ivory `#F7F6F2` dan
+evergreen `#235C50` (beserta token di `resources/css/design-tokens.css`), dengan
+pasangan font Newsreader editorial + Inter UI, hierarchy/whitespace jelas, dan
+border/shadow minimal. Sesuai `PLAN-frontend-revamp.md` (Tahap 2), skala tipografi,
+animasi/motion, dan gaya komponen boleh disesuaikan. Jangan memakai dekorasi
+gradient/glow/glass, menyalin Claude, atau global overflow hidden untuk
+menyembunyikan masalah. Gunakan semantic tokens, Blade escaped output, komponen
+reusable seperlunya, Tailwind 4 dan extension point Filament 5.
 
 Pertahankan `@vite`, Livewire dan stack Blade; jangan memuat Alpine dua kali.
 Progress dari backend, bukan persen/countdown palsu. Inisialisasi JS idempotent,
