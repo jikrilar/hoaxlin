@@ -111,7 +111,7 @@ preprocessing/bobot, mengganti model aktif, atau menimpa baseline `indobert-hoax
   - `AGENTS.md` §7: perbarui guardrail UI — palet tetap; tipografi/animasi/gaya komponen boleh disesuaikan sesuai tahap 2; larangan gradient/glow/glass tetap.
   - Tambahkan rujukan ke plan ini di `README.md` (bagian roadmap) dan **jangan** menghapus catatan "ditunda" lain.
   - Perubahan hanya pada dokumen; `DocumentationWorkflowContractTest` harus tetap hijau.
-- [ ] **T0.5 (S) Struktur kerja.** Buat branch `feat/frontend-revamp`. Buat `reports/frontend-revamp/` dengan `README.md` pendek berisi tautan ke baseline & screenshot.
+- [x] **T0.5 (S) Struktur kerja.** Buat branch `feat/frontend-revamp`. Buat `reports/frontend-revamp/` dengan `README.md` pendek berisi tautan ke baseline & screenshot.
 
 **Selesai Tahap 0 bila:** baseline terekam, daftar test sensitif-teks ada, AGENTS.md selaras, branch siap.
 
