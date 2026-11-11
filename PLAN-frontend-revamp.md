@@ -12,7 +12,17 @@
 ### 0.1 Aturan eksekusi
 1. Baca `AGENTS.md`, `README.md`, `PRD.md` lebih dulu. Jika ada konflik, `AGENTS.md` menang, **kecuali** untuk hal yang secara eksplisit diubah oleh Tahap 0.4 dokumen ini.
 2. Mulai tiap sesi dengan `git status`, `git branch`, `git worktree list`. Pertahankan perubahan pengguna.
-3. Bekerja di branch `feat/frontend-revamp` (boleh turunan per tahap: `feat/frontend-revamp-s1`, dst.). **Jangan push, merge, atau deploy tanpa instruksi pemilik.** Jangan reset/rebase/force-push/`git clean`.
+3. Bekerja di branch sesuai tahap berikut. **Jangan push, merge, atau deploy tanpa instruksi pemilik.** Jangan reset/rebase/force-push/`git clean`.
+
+   | Tahap | Branch | Dibuat dari |
+   |---|---|---|
+   | 0 | `docs/frontend-revamp-s0` | `main` |
+   | 1 | `feat/frontend-revamp-s1` | `main` setelah S0 ter-merge |
+   | 2 | `feat/frontend-revamp-s2` | `main` setelah S1 |
+   | 3 | `feat/frontend-revamp-s3` | `main` setelah S2 |
+   | 4 | `feat/frontend-revamp-s4` | `main` setelah S3 |
+   | 5 | `chore/frontend-revamp-s5` | `main` setelah S4 |
+
 4. **Satu tugas = satu commit** (bila tugas besar, pecah per sub-langkah). Ikuti gaya pesan commit yang sudah ada di `git log`. Periksa staged diff dan `git diff --check` sebelum commit. Jangan stage hasil test/generated build.
 5. Untuk perubahan perilaku: tulis atau sesuaikan test lebih dulu, lihat gagal, baru implementasi. **Dilarang melonggarkan assertion keamanan** agar test hijau. Test yang meng-assert *teks tampilan* boleh diperbarui secara sengaja bila teksnya memang diubah oleh plan ini; catat di pesan commit.
 6. Jalankan pemeriksaan sesuai tabel `AGENTS.md` §6 (Laravel/Pint, Frontend `node --test`, `npm run build`, dst.). Untuk PHP tanpa dependency host pakai target Docker `test`.
@@ -111,7 +121,7 @@ preprocessing/bobot, mengganti model aktif, atau menimpa baseline `indobert-hoax
   - `AGENTS.md` §7: perbarui guardrail UI — palet tetap; tipografi/animasi/gaya komponen boleh disesuaikan sesuai tahap 2; larangan gradient/glow/glass tetap.
   - Tambahkan rujukan ke plan ini di `README.md` (bagian roadmap) dan **jangan** menghapus catatan "ditunda" lain.
   - Perubahan hanya pada dokumen; `DocumentationWorkflowContractTest` harus tetap hijau.
-- [x] **T0.5 (S) Struktur kerja.** Buat branch `feat/frontend-revamp`. Buat `reports/frontend-revamp/` dengan `README.md` pendek berisi tautan ke baseline & screenshot.
+- [x] **T0.5 (S) Struktur kerja.** Buat branch `feat/frontend-revamp-s1`. Buat `reports/frontend-revamp/` dengan `README.md` pendek berisi tautan ke baseline & screenshot.
 
 **Selesai Tahap 0 bila:** baseline terekam, daftar test sensitif-teks ada, AGENTS.md selaras, branch siap.
 
