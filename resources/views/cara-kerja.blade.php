@@ -11,7 +11,7 @@
     <header class="hl-reading-intro">
         <h1 id="how-title" class="hl-heading-editorial">Cara kerja Hoaxlin</h1>
         <p>Informasi yang Anda kirim diolah menjadi teks, dianalisis oleh <x-ui.term key="indobert">model analisis (IndoBERT)</x-ui.term>, lalu dilengkapi referensi terkait dan penjelasan bila tersedia.</p>
-        <p class="hl-reading-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
+        <x-ui.disclaimer variant="full" class="hl-reading-note" />
     </header>
 
     <section class="hl-reading-section" aria-labelledby="input-title">

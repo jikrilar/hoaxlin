@@ -39,7 +39,7 @@
             @include('partials.submission.text')
         </div>
         @include('partials.submission.media')
-        <p class="hl-submission-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif. Periksa kembali informasi melalui sumber terpercaya.</p>
+        <x-ui.disclaimer class="hl-submission-note">Periksa kembali informasi melalui sumber terpercaya sebelum membagikannya.</x-ui.disclaimer>
     </section>
 
     <section id="cara-kerja" class="hl-submission-help" aria-labelledby="submission-help-title">

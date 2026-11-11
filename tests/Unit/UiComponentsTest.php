@@ -202,6 +202,34 @@ class UiComponentsTest extends TestCase
         $this->assertStringContainsString($payload, $dom->evaluate('string(//p)'));
     }
 
+    public function test_disclaimer_variants_are_explicit_and_fail_closed(): void
+    {
+        $dom = $this->render('<x-ui.disclaimer /><x-ui.disclaimer variant="full" />');
+
+        $this->assertSame(2, $dom->query('//*[@data-disclaimer]')->length);
+        $this->assertSame('compact', $dom->evaluate('string((//*[@data-disclaimer])[1]/@data-disclaimer)'));
+        $this->assertSame('full', $dom->evaluate('string((//*[@data-disclaimer])[2]/@data-disclaimer)'));
+        $this->assertStringContainsString(
+            'Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.',
+            $dom->evaluate('string((//*[@data-disclaimer])[1])'),
+        );
+        $this->assertSame(
+            '/cara-kerja#meaning-title',
+            $dom->evaluate('string((//*[@data-disclaimer])[2]//a/@href)'),
+        );
+        $this->assertStringContainsString('Cara membaca hasil', $dom->evaluate('string((//*[@data-disclaimer])[2]//a)'));
+        $this->assertStringContainsString('bukan bukti bahwa informasi benar atau palsu', $dom->evaluate('string((//*[@data-disclaimer])[2])'));
+        $this->assertStringContainsString('bukan persentase kebenaran berita', $dom->evaluate('string((//*[@data-disclaimer])[2])'));
+    }
+
+    public function test_disclaimer_accepts_page_specific_context_inside_the_same_block(): void
+    {
+        $dom = $this->render('<x-ui.disclaimer><p>Skor keyakinan bukan persentase kebenaran berita.</p></x-ui.disclaimer>');
+
+        $this->assertSame(1, $dom->query('//*[@data-disclaimer]')->length);
+        $this->assertStringContainsString('Skor keyakinan bukan persentase kebenaran berita.', $dom->evaluate('string(//*[@data-disclaimer])'));
+    }
+
     public static function invalidContracts(): array
     {
         return [
@@ -223,6 +251,7 @@ class UiComponentsTest extends TestCase
             'password autocomplete' => ['<x-ui.field id="one" label="Password"><x-forms.password name="password" autocomplete="email" /></x-ui.field>'],
             'alert tone' => ['<x-ui.alert tone="prediction" />'],
             'open boolean' => ['<x-ui.disclosure title="Detail" open="false" />'],
+            'disclaimer variant' => ['<x-ui.disclaimer variant="marketing" />'],
         ];
     }
 

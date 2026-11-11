@@ -224,4 +224,63 @@ class DocumentationWorkflowContractTest extends TestCase
                 ->assertDontSee('Total submission');
         }
     }
+
+    #[DataProvider('disclaimerPages')]
+    public function test_each_public_page_renders_at_most_one_disclaimer(string $route, string $variant): void
+    {
+        $html = $this->get(route($route))->assertOk()->getContent();
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_NONET);
+            $dom = new DOMXPath($document);
+
+            $this->assertSame(1, $dom->query('//*[@data-disclaimer]')->length, $route.' must render exactly one disclaimer.');
+            $this->assertSame($variant, $dom->evaluate('string(//*[@data-disclaimer]/@data-disclaimer)'), $route.' disclaimer variant mismatch.');
+            $this->assertSame(0, $dom->query('//footer//*[@data-disclaimer]')->length, $route.' must not repeat the disclaimer in the footer.');
+            $this->assertSame(1, $dom->query('//main//*[@data-disclaimer]')->length, $route.' disclaimer belongs inside main.');
+
+            $text = $dom->evaluate('string(//main)');
+            $this->assertStringContainsString('bukan verifikasi kebenaran yang definitif', $text);
+            if ($variant === 'full') {
+                $this->assertSame(1, $dom->query('//main//*[@data-disclaimer]//a[@href="'.route('cara-kerja', [], false).'#meaning-title"]')->length);
+                $this->assertStringContainsString('bukan bukti bahwa informasi benar atau palsu', $text);
+                $this->assertStringContainsString('bukan persentase kebenaran berita', $text);
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+    }
+
+    public static function disclaimerPages(): array
+    {
+        return [
+            'home' => ['home', 'compact'],
+            'how it works' => ['cara-kerja', 'full'],
+            'about' => ['tentang', 'full'],
+            'privacy' => ['kebijakan-privasi', 'compact'],
+            'login' => ['login', 'compact'],
+            'register' => ['register', 'compact'],
+        ];
+    }
+
+    public function test_footer_no_longer_repeats_the_model_disclaimer(): void
+    {
+        $html = $this->get(route('home'))->assertOk()->getContent();
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_NONET);
+            $dom = new DOMXPath($document);
+
+            $this->assertSame(0, $dom->query('//footer//*[@data-disclaimer]')->length);
+            $this->assertStringNotContainsString('bukan verifikasi kebenaran yang definitif', $dom->evaluate('string(//footer)'));
+            $this->assertStringContainsString('Analisis informasi dengan bantuan AI.', $dom->evaluate('string(//footer)'));
+            $this->assertSame(1, $dom->query('//main//*[@data-disclaimer]')->length);
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+    }
 }

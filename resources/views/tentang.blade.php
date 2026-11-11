@@ -8,7 +8,7 @@
     <header class="hl-reading-intro">
         <h1 id="about-title" class="hl-heading-editorial">Tentang Hoaxlin</h1>
         <p>Hoaxlin membantu Anda meninjau informasi melalui prediksi <x-ui.term key="indobert">model analisis (IndoBERT)</x-ui.term>, referensi terkait, dan penjelasan bila tersedia. Tujuannya memberi konteks untuk pemeriksaan lebih lanjut.</p>
-        <p class="hl-reading-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
+        <x-ui.disclaimer variant="full" class="hl-reading-note" />
     </header>
 
     <section class="hl-reading-section" aria-labelledby="audience-title">

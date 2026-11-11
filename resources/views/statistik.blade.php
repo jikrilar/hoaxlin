@@ -18,7 +18,7 @@
     <header class="hl-statistics-intro">
         <h1>Statistik pemeriksaan</h1>
         <p>Agregat aktivitas Hoaxlin. Jumlah pemeriksaan dan label tersimpan menggambarkan penggunaan aplikasi, bukan prevalensi hoaks di masyarakat atau akurasi model.</p>
-        <p class="hl-statistics-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
+        <x-ui.disclaimer class="hl-statistics-note">Jumlah pemeriksaan menggambarkan penggunaan aplikasi, bukan prevalensi hoaks di masyarakat.</x-ui.disclaimer>
     </header>
 
     <section class="hl-statistics-section" aria-labelledby="statistics-trend-heading">
@@ -82,7 +82,7 @@
                 @endif
             </tbody>
         </table>
-        <p class="hl-statistics-note">Status <x-ui.term key="abstention">belum terverifikasi (abstention)</x-ui.term>: Informasi belum terverifikasi oleh sumber terpercaya. Ini bukan bukti bahwa informasi benar atau palsu.</p>
+        <p class="hl-statistics-note">Status <x-ui.term key="abstention">belum terverifikasi (abstention)</x-ui.term> berarti informasi belum terverifikasi oleh sumber terpercaya. Ini bukan bukti bahwa informasi benar atau palsu.</p>
         <div class="hl-statistics-actions">
             <x-ui.link :href="route('home').'#cek-berita'" variant="primary">Periksa informasi</x-ui.link>
             <x-ui.link :href="route('cara-kerja')" variant="secondary">Cara kerja Hoaxlin</x-ui.link>

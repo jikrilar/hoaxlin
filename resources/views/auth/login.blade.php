@@ -34,5 +34,6 @@
     <x-ui.button type="submit" id="login-btn">Masuk</x-ui.button>
 </form>
 <p class="hl-auth-switch">Belum punya akun? <x-ui.link :href="route('register')">Buat akun</x-ui.link></p>
+<x-ui.disclaimer class="hl-auth-disclaimer" />
 <x-ui.link :href="route('home')" variant="tertiary" class="hl-auth-guest">Lanjutkan sebagai tamu</x-ui.link>
 @endsection

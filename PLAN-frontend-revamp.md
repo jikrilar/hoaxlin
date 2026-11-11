@@ -148,9 +148,9 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 - **Penerimaan:** `grep -riE` daftar istilah terlarang (Lampiran A, kolom "Dilarang di UI publik") pada `resources/views` (kecuali `filament/`) tidak menemukan kemunculan tanpa `x-ui.term`/penjelasan. Test sensitif-teks diperbarui.
 
 ### T1.3 (M) Konsolidasi disclaimer
-- [ ] Buat `components/ui/disclaimer.blade.php` dengan 2 varian: `compact` (1 kalimat) dan `full` (paragraf + tautan "Cara membaca hasil").
-- [ ] Tetapkan aturan: **maksimal 1 disclaimer per halaman** (varian `compact` di dekat hasil/ringkasan; `full` hanya di halaman Cara kerja/Tentang). Hapus pengulangan di footer dan catatan `hl-*-note` yang duplikat.
-- [ ] Kalimat inti yang **wajib tetap ada** di tempat yang relevan: hasil adalah prediksi model, bukan verifikasi kebenaran; label meragukan bukan bukti benar/palsu; skor bukan persentase kebenaran.
+- [x] Buat `components/ui/disclaimer.blade.php` dengan 2 varian: `compact` (1 kalimat) dan `full` (paragraf + tautan "Cara membaca hasil").
+- [x] Tetapkan aturan: **maksimal 1 disclaimer per halaman** (varian `compact` di dekat hasil/ringkasan; `full` hanya di halaman Cara kerja/Tentang). Hapus pengulangan di footer dan catatan `hl-*-note` yang duplikat.
+- [x] Kalimat inti yang **wajib tetap ada** di tempat yang relevan: hasil adalah prediksi model, bukan verifikasi kebenaran; label meragukan bukan bukti benar/palsu; skor bukan persentase kebenaran.
 - **Penerimaan:** tidak ada halaman publik dengan >1 disclaimer sejenis; `ModelStatisticsClaimsTest` & test klaim tetap hijau (atau diperbarui dengan alasan).
 
 ### T1.4 (M) Detail teknis hasil: sederhanakan

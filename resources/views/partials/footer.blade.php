@@ -11,7 +11,7 @@
     <div class="container-app hl-footer__inner">
         <div>
             <a href="{{ route('home') }}" class="hl-wordmark">hoaxlin.id</a>
-            <p class="hl-footer__description">Analisis informasi dengan bantuan AI. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
+            <p class="hl-footer__description">Analisis informasi dengan bantuan AI. Periksa kembali temuan model dengan sumber terpercaya.</p>
             <p class="hl-footer__credit">© {{ date('Y') }} hoaxlin.id · Tugas Akhir D3 Teknik Komputer, Abdan Dzul Ghaffa.</p>
         </div>
         <nav aria-label="Informasi">

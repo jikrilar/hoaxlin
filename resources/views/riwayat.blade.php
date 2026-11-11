@@ -108,7 +108,7 @@
 
     <section class="hl-history-results" aria-labelledby="history-results-title">
         <h2 id="history-results-title">Daftar pemeriksaan</h2>
-        <p class="hl-history-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif. <x-ui.term key="confidence">Skor keyakinan model</x-ui.term> menunjukkan tingkat keyakinan model, bukan persentase kebenaran berita. Informasi yang <x-ui.term key="abstention">belum terverifikasi</x-ui.term> bukan bukti bahwa informasi benar atau palsu.</p>
+        <x-ui.disclaimer class="hl-history-note"><x-ui.term key="confidence">Skor keyakinan model</x-ui.term> menunjukkan tingkat keyakinan model, bukan persentase kebenaran berita. Informasi yang <x-ui.term key="abstention">belum terverifikasi</x-ui.term> bukan bukti bahwa informasi benar atau palsu.</x-ui.disclaimer>
         @if($submissions->isNotEmpty())
             <p class="hl-history-note">Menampilkan {{ $submissions->firstItem() }}–{{ $submissions->lastItem() }} dari {{ $submissions->total() }} pemeriksaan{{ $hasFilters ? ' yang sesuai filter' : '' }}.</p>
             <ul class="hl-history-list" id="history-list">

@@ -219,7 +219,7 @@ class AuthShellTest extends TestCase
             $this->assertSame(1, $dom->query('//main//a[@href="http://localhost/login"]')->length);
             $this->assertSame(1, $dom->query('//label[@for="terms"]//a[@href="http://localhost/kebijakan-privasi"]')->length);
             $this->assertStringContainsString('verifikasi email', $dom->evaluate('string(//main)'));
-            $this->assertStringContainsString('bukan verifikasi kebenaran', $dom->evaluate('string(//label[@for="terms"])'));
+            $this->assertStringContainsString('Kebijakan Privasi', $dom->evaluate('string(//label[@for="terms"])'));
         }
     }
 

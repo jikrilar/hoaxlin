@@ -42,7 +42,8 @@
         <p>OpenAI API dapat menerima gambar untuk <x-ui.term key="ocr">OCR</x-ui.term>, <x-ui.term key="transkripsi">file media untuk transkripsi</x-ui.term>, teks untuk terjemahan Inggris ke Indonesia, serta prediksi, cuplikan teks, dan referensi untuk menyusun penjelasan. Konten diproses di server dan dapat dikirim ke layanan tersebut; pemrosesan tidak berlangsung hanya di perangkatmu.</p>
         <p>Penanganan data pada layanan eksternal mengikuti pengaturan dan ketentuan penyedia. Retensi media Hoaxlin tidak menetapkan retensi data di OpenAI. Baca <x-ui.link href="https://developers.openai.com/api/docs/guides/your-data" target="_blank">Penanganan data OpenAI API (tab baru)</x-ui.link> untuk rincian dari penyedia.</p>
         <p>Untuk URL artikel atau media, server menghubungi situs tujuan untuk mengambil konten. Layanan email dan penyimpanan juga mengikuti konfigurasi layanan yang digunakan Hoaxlin.</p>
-        <p>Input dan feedback tidak otomatis menjadi data training model. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
+        <p>Input dan umpan balik tidak otomatis menjadi data training model.</p>
+        <x-ui.disclaimer class="hl-reading-note" />
     </section>
 
     <section class="hl-reading-section" aria-labelledby="privacy-access-title">
