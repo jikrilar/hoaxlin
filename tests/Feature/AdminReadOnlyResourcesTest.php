@@ -124,6 +124,44 @@ class AdminReadOnlyResourcesTest extends TestCase
         $this->get(SubmissionResource::getUrl('view', ['record' => $record]))->assertOk()->assertSee('Input teks tidak tersedia')->assertSee('Teks terjemahan tidak tersedia')->assertSee('Belum tercatat');
     }
 
+    public function test_submission_detail_exposes_technical_provenance_removed_from_the_public_result(): void
+    {
+        $this->admin();
+        $submission = Submission::factory()->create([
+            'input_type' => 'text',
+            'raw_input' => 'Teks pemeriksaan untuk provenance teknis.',
+            'extracted_text' => 'Teks pemeriksaan untuk provenance teknis.',
+            'source_language' => 'en',
+            'translated_text' => 'Teks terjemahan untuk analisis.',
+            'translation_provider' => 'openai',
+            'translation_model' => 'translator-model',
+            'translation_cached' => true,
+            'pipeline_version' => 'pipeline-2026.11',
+            'status' => 'completed',
+            'processing_stage' => 'done',
+            'processing_completed_at' => '2026-11-01 10:00:00',
+        ]);
+        $result = DetectionResult::factory()->for($submission)->create([
+            'label' => 'valid',
+            'confidence_score' => 0.99,
+            'model_version' => 'indobert-hoax-v1.0.0',
+            'explanation_status' => 'ready',
+            'explanation' => 'Penjelasan tersimpan.',
+            'explanation_model' => 'explainer-model',
+            'inference_ms' => 143,
+            'classifier_cached' => true,
+            'explanation_cached' => false,
+        ]);
+
+        $this->get(SubmissionResource::getUrl('view', ['record' => $submission]))->assertOk()
+            ->assertSee('openai')->assertSee('translator-model')->assertSee('pipeline-2026.11')
+            ->assertSee('indobert-hoax-v1.0.0')->assertSee('explainer-model')->assertSee('143 ms')
+            ->assertSee('Cache terjemahan')->assertSee('Cache classifier')->assertSee('Cache penjelasan')
+            ->assertSee('01/11/2026 10:00');
+
+        $this->assertSame('indobert-hoax-v1.0.0', $result->fresh()->model_version);
+    }
+
     #[DataProvider('scores')]
     public function test_classifier_score_preserves_zero_precision_and_unavailable_without_accessor_coercion(mixed $score, ?string $expected): void
     {

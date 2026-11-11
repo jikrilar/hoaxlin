@@ -154,8 +154,8 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 - **Penerimaan:** tidak ada halaman publik dengan >1 disclaimer sejenis; `ModelStatisticsClaimsTest` & test klaim tetap hijau (atau diperbarui dengan alasan).
 
 ### T1.4 (M) Detail teknis hasil: sederhanakan
-- [ ] Di halaman hasil publik, tampilkan hanya yang berguna bagi pengguna: input asli, bahasa terdeteksi, apakah diterjemahkan (+ teks terjemahan), teks hasil ekstraksi.
-- [ ] Pindahkan ke **admin** (detail Submission, T3.5): provider/model terjemahan, cache terjemahan/classifier/penjelasan, versi classifier, model penjelasan, waktu inferensi, versi pipeline, timestamp selesai. **Data tetap disimpan dan tetap ada di ekspor CSV**; hanya presentasi publik yang berubah (`TranslationProvenanceExportTest`, `CsvExportTest` harus tetap hijau).
+- [x] Di halaman hasil publik, tampilkan hanya yang berguna bagi pengguna: input asli, bahasa terdeteksi, apakah diterjemahkan (+ teks terjemahan), teks hasil ekstraksi.
+- [x] Pindahkan ke **admin** (detail Submission, T3.5): provider/model terjemahan, cache terjemahan/classifier/penjelasan, versi classifier, model penjelasan, waktu inferensi, versi pipeline, timestamp selesai. **Data tetap disimpan dan tetap ada di ekspor CSV**; hanya presentasi publik yang berubah (`TranslationProvenanceExportTest`, `CsvExportTest` harus tetap hijau).
 - **Penerimaan:** halaman hasil publik tidak lagi menampilkan field internal; admin tetap dapat melihatnya (setelah T3.5).
 
 ### T1.5 (S) Kebersihan layout bersama
