@@ -27,19 +27,19 @@
 
     <p class="hl-submission-progress__status" role="status" aria-live="polite" aria-atomic="true">
         Status: <span data-progress-status>{{ $isFailed ? 'Gagal' : ($isCompleted ? 'Selesai' : ($status === 'pending' ? 'Menunggu' : ($status === 'processing' ? 'Diproses' : 'Belum tersedia'))) }}</span>.
-        {{ $isFailed ? 'Tahap terakhir tercatat:' : 'Tahap:' }}
+        <x-ui.term key="pipeline">{{ $isFailed ? 'Tahap pemeriksaan terakhir:' : 'Tahap pemeriksaan:' }}</x-ui.term>
         <span data-stage-label>{{ $stage ? $stageLabel : ($isCompleted ? 'Selesai' : 'Belum tersedia') }}</span>.
     </p>
 
     <p class="hl-submission-progress__description">
         @if($isFailed)
-            Pemrosesan terhenti. Hasil final belum tersedia. Kembali ke form untuk mengirim pemeriksaan baru.
+            Pemrosesan terhenti. Hasil final belum tersedia. Kembali ke formulir untuk mengirim pemeriksaan baru.
         @elseif($isCompleted)
-            Pemrosesan telah selesai. Buka halaman hasil untuk melihat hasil yang tersedia.
+            Pemeriksaan telah selesai. Buka halaman hasil untuk melihat hasil yang tersedia.
         @elseif(! $knownStatus)
-            Status terbaru belum dapat dijelaskan. Muat ulang halaman untuk memeriksa pembaruan.
+            Status terbaru belum dapat ditampilkan. Muat ulang halaman untuk memeriksa pembaruan.
         @else
-            Input sedang menunggu atau menjalani analisis. Hasil final tersedia setelah status pemrosesan selesai.
+            Informasi Anda sedang menunggu atau menjalani analisis. Hasil final tersedia setelah seluruh tahap selesai.
         @endif
     </p>
 

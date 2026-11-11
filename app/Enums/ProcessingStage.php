@@ -15,12 +15,12 @@ enum ProcessingStage: string
     public function label(): string
     {
         return match ($this) {
-            self::Queued => 'Dalam antrean',
-            self::Extracting => 'Ekstraksi teks',
-            self::Translating => 'Deteksi bahasa & terjemahan',
-            self::Classifying => 'Klasifikasi BERT',
-            self::Retrieving => 'Pencarian bukti',
-            self::Explaining => 'Penyusunan penjelasan',
+            self::Queued => 'Menunggu giliran',
+            self::Extracting => 'Membaca teks dari input',
+            self::Translating => 'Menerjemahkan teks',
+            self::Classifying => 'Menganalisis pola bahasa',
+            self::Retrieving => 'Mencari rujukan terkait',
+            self::Explaining => 'Menyusun penjelasan',
             self::Done => 'Selesai',
         };
     }

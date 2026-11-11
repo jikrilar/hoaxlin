@@ -109,7 +109,7 @@ class DetectionPresentationTest extends TestCase
         $request->setRouteResolver(fn () => $this->app['router']->getRoutes()->match($request));
         $this->app->boot();
         (new CompileLivewireTags)->boot();
-        $this->app['blade.compiler']->directive('livewire', fn () => '<?php echo view("livewire.submission-progress", ["submission"=>$submission, "status"=>$submission->status, "isCompleted"=>$submission->isCompleted(), "isFailed"=>$submission->isFailed(), "progress"=>60, "stageLabel"=>"Klasifikasi BERT"])->render(); ?>');
+        $this->app['blade.compiler']->directive('livewire', fn () => '<?php echo view("livewire.submission-progress", ["submission"=>$submission, "status"=>$submission->status, "isCompleted"=>$submission->isCompleted(), "isFailed"=>$submission->isFailed(), "progress"=>60, "stageLabel"=>"Menganalisis pola bahasa"])->render(); ?>');
     }
 
     protected function tearDown(): void

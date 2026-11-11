@@ -24,7 +24,7 @@ class Clock {
         this.time = until; await settle();
     }
 }
-const payload = (id = 101, extra = {}) => ({ id, status: 'processing', processing_stage: 'classifying', stage_label: 'Klasifikasi BERT', progress: 60, is_completed: false, is_failed: false, ...extra });
+const payload = (id = 101, extra = {}) => ({ id, status: 'processing', processing_stage: 'classifying', stage_label: 'Menganalisis pola bahasa', progress: 60, is_completed: false, is_failed: false, ...extra });
 const response = (data = payload(), status = 200, headers = {}) => ({ ok: status >= 200 && status < 300, status, headers: new Headers({ 'Content-Type': 'application/json', ...headers }), json: async () => data });
 function scheduler(options = {}) {
     const clock = new Clock(), calls = [], values = [], errors = [];
@@ -35,7 +35,7 @@ function scheduler(options = {}) {
 }
 
 test('status schema rejects mismatched IDs, contradictory terminal flags and invalid progress without consuming results', () => {
-    assert.deepEqual(readStatus(payload(101, { label: 'hoax', confidence_score: 1, failure_reason: 'secret' }), 101), { status: 'processing', stage: 'classifying', stageLabel: 'Klasifikasi BERT', progress: 60 });
+    assert.deepEqual(readStatus(payload(101, { label: 'hoax', confidence_score: 1, failure_reason: 'secret' }), 101), { status: 'processing', stage: 'classifying', stageLabel: 'Menganalisis pola bahasa', progress: 60 });
     for (const data of [null, payload(102), payload(101, { is_completed: true }), payload(101, { is_failed: 'false' }), payload(101, { progress: NaN }), payload(101, { progress: 101 }), payload(101, { progress: -1 }), payload(101, { progress: 1.1 }), payload(101, { processing_stage: undefined })]) assert.throws(() => readStatus(data, 101));
     assert.equal(readStatus(payload(101, { progress: 0 }), '101').progress, 0);
 });
@@ -101,7 +101,7 @@ function fixture({ id = '101', status = 'processing', fetch } = {}) {
     el.dataset.progressState = status; el.setAttribute('wire:id', `component-${id}`);
     const bar = new Node(); bar.firstElementChild = new Node(); bar.setAttribute('aria-valuenow', 60);
     for (const selector of ['h1', '[data-progress-status]', '[data-stage-label]', '[data-progress-percent]', '.hl-submission-progress__meter', '[data-progress-stage-unavailable]', '[data-progress-not-final-done]']) el.nodes.set(selector, new Node());
-    el.querySelector('[data-stage-label]').textContent = 'Klasifikasi BERT'; el.nodes.set('[role="progressbar"]', bar);
+    el.querySelector('[data-stage-label]').textContent = 'Menganalisis pola bahasa'; el.nodes.set('[role="progressbar"]', bar);
     const notice = new Node(); notice.hidden = true; root.nodes.set('[data-progress-transport]', notice); root.nodes.set('[data-progress-state]', el);
     view.fetch = (url, options) => { requests.push({ url, ...options }); return fetch ? fetch(url, options) : Promise.resolve(response(payload(Number(id)))); };
     const mountProgress = () => createProgress(root, { clock, fetch: view.fetch, reload: () => reloads.push(id) });
@@ -163,7 +163,7 @@ for (const status of [401, 403, 404, 419]) test(`HTTP ${status} halts fallback w
 
 test('transient errors retry with bounded backoff, retain the last stage and then offer manual recovery', async () => {
     const f = fixture({ fetch: async () => ({ ...response(), headers: new Headers({ 'Content-Type': 'text/html' }) }) }), dispose = f.mountProgress();
-    await f.clock.advance(2000); assert.equal(f.requests.length, 1); assert.equal(f.el.querySelector('[data-stage-label]').textContent, 'Klasifikasi BERT');
+    await f.clock.advance(2000); assert.equal(f.requests.length, 1); assert.equal(f.el.querySelector('[data-stage-label]').textContent, 'Menganalisis pola bahasa');
     await f.clock.advance(3999); assert.equal(f.requests.length, 1); await f.clock.advance(1); assert.equal(f.requests.length, 2);
     await f.clock.advance(8000); assert.equal(f.requests.length, 3); await f.clock.advance(60000); assert.equal(f.requests.length, 3); assert.equal(f.el.dataset.progressState, 'processing'); assert.equal(f.clock.jobs.size, 0); dispose();
 });

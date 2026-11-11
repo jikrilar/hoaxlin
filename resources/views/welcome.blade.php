@@ -32,7 +32,7 @@
             @include('partials.submission.input-types')
         @endauth
         @guest
-            <p class="hl-submission-access">Kamu dapat memeriksa teks tanpa akun. <x-ui.link :href="route('login')">Masuk</x-ui.link> untuk menggunakan URL, gambar, atau video.</p>
+            <p class="hl-submission-access">Tamu dapat memeriksa teks tanpa akun. <x-ui.link :href="route('login')">Masuk</x-ui.link> untuk menggunakan tautan artikel, gambar, atau video.</p>
         @endguest
         <div id="panel-teks" class="hl-input-panel" data-input-panel="teks">
             @auth <h3>Teks</h3> @endauth
@@ -53,7 +53,7 @@
     </section>
 
     <x-ui.disclosure title="Informasi model dan evaluasi" class="hl-submission-model" id="submission-model">
-        <p>Data berikut menjelaskan model, evaluasi, dan telemetry yang tersedia. Data ini bukan jaminan kebenaran setiap pemeriksaan.</p>
+        <p>Data berikut menjelaskan <x-ui.term key="classifier">model analisis</x-ui.term>, evaluasi, dan <x-ui.term key="inferensi">waktu analisis</x-ui.term> yang tersedia. Data ini bukan jaminan kebenaran setiap pemeriksaan.</p>
         <dl class="hl-submission-statistics">
             @foreach($modelStatistics as $stat)
                 <div>

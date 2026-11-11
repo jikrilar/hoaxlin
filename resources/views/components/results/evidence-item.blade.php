@@ -16,6 +16,6 @@
         @endif
     </p>
     @if(filled($reference->knowledge_base_version))
-        <p class="hl-result__hint">Versi basis pengetahuan: {{ $reference->knowledge_base_version }}</p>
+        <p class="hl-result__hint">Versi <x-ui.term key="knowledge_base">basis pengetahuan</x-ui.term>: {{ $reference->knowledge_base_version }}</p>
     @endif
 </li>

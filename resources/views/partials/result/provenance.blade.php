@@ -1,5 +1,5 @@
 <section class="hl-result__section" aria-labelledby="provenance-heading">
-    <h2 id="provenance-heading">Input dan provenance</h2>
+    <h2 id="provenance-heading">Input dan <x-ui.term key="provenance">asal data</x-ui.term></h2>
     <x-ui.disclosure title="Input dan teks analisis" id="input-provenance">
         <h3>Input asli</h3>
         @if(filled($submission->raw_input))
@@ -38,22 +38,22 @@
             <div><dt>Provider terjemahan</dt><dd>{{ filled($submission->translation_provider) ? $submission->translation_provider : 'Tidak tersedia' }}</dd></div>
             <div><dt>Model terjemahan</dt><dd>{{ filled($submission->translation_model) ? $submission->translation_model : 'Tidak tersedia' }}</dd></div>
             @if($submission->translation_cached !== null)
-                <div><dt>Cache terjemahan</dt><dd>{{ $submission->translation_cached ? 'Digunakan' : 'Tidak digunakan' }}</dd></div>
+                <div><dt><x-ui.term key="cache">Cache</x-ui.term> terjemahan</dt><dd>{{ $submission->translation_cached ? 'Digunakan' : 'Tidak digunakan' }}</dd></div>
             @endif
             @if($result)
-                <div><dt>Versi classifier</dt><dd>{{ filled($result->model_version) ? $result->model_version : 'Tidak tersedia' }}</dd></div>
+                <div><dt>Versi <x-ui.term key="classifier">classifier</x-ui.term></dt><dd>{{ filled($result->model_version) ? $result->model_version : 'Tidak tersedia' }}</dd></div>
                 <div><dt>Model penjelasan</dt><dd>{{ filled($result->explanation_model) ? $result->explanation_model : 'Tidak tersedia' }}</dd></div>
                 @if($result->inference_ms !== null)
-                    <div><dt>Waktu inferensi classifier</dt><dd>{{ $result->inference_ms }} ms</dd></div>
+                    <div><dt>Waktu <x-ui.term key="inferensi">inferensi</x-ui.term> <x-ui.term key="classifier">classifier</x-ui.term></dt><dd>{{ $result->inference_ms }} ms</dd></div>
                 @endif
                 @if($result->classifier_cached !== null)
-                    <div><dt>Cache classifier</dt><dd>{{ $result->classifier_cached ? 'Digunakan' : 'Tidak digunakan' }}</dd></div>
+                    <div><dt><x-ui.term key="cache">Cache</x-ui.term> <x-ui.term key="classifier">classifier</x-ui.term></dt><dd>{{ $result->classifier_cached ? 'Digunakan' : 'Tidak digunakan' }}</dd></div>
                 @endif
                 @if($result->explanation_cached !== null)
-                    <div><dt>Cache penjelasan</dt><dd>{{ $result->explanation_cached ? 'Digunakan' : 'Tidak digunakan' }}</dd></div>
+                    <div><dt><x-ui.term key="cache">Cache</x-ui.term> penjelasan</dt><dd>{{ $result->explanation_cached ? 'Digunakan' : 'Tidak digunakan' }}</dd></div>
                 @endif
             @endif
-            <div><dt>Versi pipeline</dt><dd>{{ filled($submission->pipeline_version) ? $submission->pipeline_version : 'Tidak tersedia' }}</dd></div>
+            <div><dt>Versi <x-ui.term key="pipeline">pipeline</x-ui.term></dt><dd>{{ filled($submission->pipeline_version) ? $submission->pipeline_version : 'Tidak tersedia' }}</dd></div>
             @if($submission->processing_completed_at)
                 <div><dt>Pemrosesan selesai</dt><dd><time datetime="{{ $submission->processing_completed_at->toIso8601String() }}">{{ $submission->processing_completed_at->format('d M Y, H:i T') }}</time></dd></div>
             @endif

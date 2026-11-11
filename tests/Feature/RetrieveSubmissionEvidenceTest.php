@@ -193,7 +193,7 @@ class RetrieveSubmissionEvidenceTest extends TestCase
     {
         $this->assertSame(ProcessingStage::Retrieving, ProcessingStage::Classifying->next());
         $this->assertSame(ProcessingStage::Explaining, ProcessingStage::Retrieving->next());
-        $this->assertSame('Pencarian bukti', ProcessingStage::Retrieving->label());
+        $this->assertSame('Mencari rujukan terkait', ProcessingStage::Retrieving->label());
         $this->assertSame(75, ProcessingStage::Retrieving->progressPercentage());
     }
 

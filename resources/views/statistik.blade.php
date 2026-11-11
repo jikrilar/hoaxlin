@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Statistik pemeriksaan — hoaxlin.id')
-@section('description', 'Lihat tren submission dan distribusi label tersimpan di Hoaxlin beserta konteks populasinya. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.')
+@section('description', 'Lihat tren pemeriksaan dan distribusi label tersimpan di Hoaxlin beserta konteks populasinya. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.')
 
 @section('content')
 @php
@@ -17,7 +17,7 @@
 <div class="container-app hl-statistics-page" data-page="statistics">
     <header class="hl-statistics-intro">
         <h1>Statistik pemeriksaan</h1>
-        <p>Agregat aktivitas Hoaxlin. Jumlah submission dan label tersimpan menggambarkan penggunaan aplikasi, bukan prevalensi hoaks di masyarakat atau akurasi model.</p>
+        <p>Agregat aktivitas Hoaxlin. Jumlah pemeriksaan dan label tersimpan menggambarkan penggunaan aplikasi, bukan prevalensi hoaks di masyarakat atau akurasi model.</p>
         <p class="hl-statistics-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
     </header>
 
@@ -31,16 +31,16 @@
             <div><dt>Zona waktu</dt><dd>{{ $period['timezone'] }}</dd></div>
             <div><dt>Data dihitung pada</dt><dd><time datetime="{{ $period['generated_at']->toIso8601String() }}">{{ $period['generated_at']->format('d/m/Y H:i') }}</time></dd></div>
         </dl>
-        <p>Periode ini memuat <strong>{{ number_format($totalInPeriod, 0, ',', '.') }} submission</strong> dari semua status, termasuk menunggu, diproses, selesai, dan gagal. Bulan berjalan belum berakhir.</p>
-        <p class="hl-statistics-note">Setiap bulan dihitung sejak awal bulan sampai sebelum awal bulan berikutnya, menurut zona waktu aplikasi. Kolom label menghitung submission yang memiliki hasil dengan label tersebut; tidak dibatasi ke status selesai. Label meragukan dan submission tanpa hasil tidak termasuk kolom Hoaks atau Valid.</p>
+        <p>Periode ini memuat <strong>{{ number_format($totalInPeriod, 0, ',', '.') }} pemeriksaan</strong> dari semua status, termasuk menunggu, diproses, selesai, dan gagal. Bulan berjalan belum berakhir.</p>
+        <p class="hl-statistics-note">Setiap bulan dihitung sejak awal bulan sampai sebelum awal bulan berikutnya, menurut zona waktu aplikasi. Kolom label menghitung pemeriksaan yang memiliki hasil dengan label tersebut; tidak dibatasi ke status selesai. Status <x-ui.term key="abstention">belum terverifikasi</x-ui.term> dan pemeriksaan tanpa hasil tidak termasuk kolom Hoaks atau Valid.</p>
         @if($totalInPeriod === 0)
-            <x-ui.empty-state message="Belum ada submission dalam periode 12 bulan ini. Nilai nol tetap ditampilkan pada tabel." />
+            <x-ui.empty-state message="Belum ada pemeriksaan dalam periode 12 bulan ini. Nilai nol tetap ditampilkan pada tabel." />
         @endif
         <p id="trend-table-hint" class="hl-statistics-note">Pada layar sempit, geser tabel untuk membaca semua kolom. Gunakan tombol panah saat area tabel mendapat fokus.</p>
         <div class="hl-statistics-table-scroll" tabindex="0" role="region" aria-labelledby="trend-table-caption" aria-describedby="trend-table-hint">
             <table id="statistics-trend-table" class="hl-statistics-table hl-statistics-table--trend">
-                <caption id="trend-table-caption">Jumlah submission per bulan dan label tersimpan</caption>
-                <thead><tr><th scope="col">Bulan</th><th scope="col">Total submission</th><th scope="col">Dengan label Hoaks</th><th scope="col">Dengan label Valid</th></tr></thead>
+                <caption id="trend-table-caption">Jumlah pemeriksaan per bulan dan label tersimpan</caption>
+                <thead><tr><th scope="col">Bulan</th><th scope="col">Total pemeriksaan</th><th scope="col">Dengan label Hoaks</th><th scope="col">Dengan label Valid</th></tr></thead>
                 <tbody>
                     @foreach($trend as $month)
                         <tr data-statistics-month="{{ $month['month'] }}">
@@ -57,7 +57,7 @@
             <figure class="hl-statistics-chart" data-statistics-chart-panel hidden>
                 <figcaption id="statistics-chart-caption">Grafik tren aktivitas — data yang sama dengan tabel di atas</figcaption>
                 <div class="hl-statistics-chart__canvas">
-                    <canvas data-statistics-trend="{{ json_encode($chartData) }}" role="img" aria-labelledby="statistics-chart-caption" aria-describedby="trend-table-caption">Nilai lengkap tersedia pada tabel jumlah submission per bulan.</canvas>
+                    <canvas data-statistics-trend="{{ json_encode($chartData) }}" role="img" aria-labelledby="statistics-chart-caption" aria-describedby="trend-table-caption">Nilai lengkap tersedia pada tabel jumlah pemeriksaan per bulan.</canvas>
                 </div>
             </figure>
         @endif
@@ -65,7 +65,7 @@
 
     <section class="hl-statistics-section" aria-labelledby="statistics-labels-heading">
         <h2 id="statistics-labels-heading">Distribusi label tersimpan</h2>
-        <p>Agregat dari <strong>{{ number_format($labelCount, 0, ',', '.') }} hasil dengan label tersimpan</strong> yang terhubung ke submission, tanpa batas periode 12 bulan dan tanpa filter status. Submission tanpa hasil tidak dihitung di sini.</p>
+        <p>Agregat dari <strong>{{ number_format($labelCount, 0, ',', '.') }} hasil dengan label tersimpan</strong> yang terhubung ke pemeriksaan, tanpa batas periode 12 bulan dan tanpa filter status. Pemeriksaan tanpa hasil tidak dihitung di sini.</p>
         <p class="hl-statistics-note">Distribusi ini menggabungkan versi model yang tersimpan. Jumlah label bukan distribusi topik, jumlah fakta terverifikasi, atau ukuran kualitas model.</p>
         @if($labelCount === 0)
             <x-ui.empty-state message="Belum ada hasil dengan label tersimpan. Angka nol berasal dari agregat data aplikasi." />
@@ -82,7 +82,7 @@
                 @endif
             </tbody>
         </table>
-        <p class="hl-statistics-note">Label meragukan adalah abstention: Informasi belum terverifikasi oleh sumber terpercaya. Ini bukan bukti bahwa informasi benar atau palsu.</p>
+        <p class="hl-statistics-note">Status <x-ui.term key="abstention">belum terverifikasi (abstention)</x-ui.term>: Informasi belum terverifikasi oleh sumber terpercaya. Ini bukan bukti bahwa informasi benar atau palsu.</p>
         <div class="hl-statistics-actions">
             <x-ui.link :href="route('home').'#cek-berita'" variant="primary">Periksa informasi</x-ui.link>
             <x-ui.link :href="route('cara-kerja')" variant="secondary">Cara kerja Hoaxlin</x-ui.link>

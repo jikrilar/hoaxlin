@@ -186,7 +186,7 @@ class SubmissionProgressPresentationTest extends TestCase
         $submission->processing_stage = 'retrieving';
         $component->refreshProgress();
         $this->assertSame(75, $component->progress);
-        $this->assertSame('Pencarian bukti', $component->stageLabel);
+        $this->assertSame('Mencari rujukan terkait', $component->stageLabel);
         $request = Request::create('http://localhost/riwayat/101');
         $request->setRouteResolver(fn () => $this->app['router']->getRoutes()->match($request));
         $this->app->instance('request', $request);

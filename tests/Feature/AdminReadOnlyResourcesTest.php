@@ -83,7 +83,7 @@ class AdminReadOnlyResourcesTest extends TestCase
         $result = DetectionResult::factory()->for($submission)->create(['label' => $label, 'explanation_status' => 'unavailable']);
         $expected = $status === 'completed' ? DetectionPresentation::label($label)['text'] : 'Record classifier parsial; bukan hasil final';
         Livewire::test(ListSubmissions::class)->assertTableColumnStateSet('detectionResult.label', $expected, $submission);
-        $response = $this->get(SubmissionResource::getUrl('view', ['record' => $submission]))->assertOk()->assertSee($expected)->assertSee('Penyusunan penjelasan');
+        $response = $this->get(SubmissionResource::getUrl('view', ['record' => $submission]))->assertOk()->assertSee($expected)->assertSee('Menyusun penjelasan');
         if ($status !== 'completed') {
             $response->assertDontSee(DetectionPresentation::label($label)['text']);
         }

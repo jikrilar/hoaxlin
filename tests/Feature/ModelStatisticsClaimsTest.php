@@ -34,7 +34,7 @@ class ModelStatisticsClaimsTest extends TestCase
             }
         }
         $response = $this->get(route('statistik'))->assertOk()->assertViewIs('statistik')
-            ->assertSee('Statistik pemeriksaan')->assertSee('5 submission')->assertSee('5 hasil dengan label tersimpan')
+            ->assertSee('Statistik pemeriksaan')->assertSee('5 pemeriksaan')->assertSee('5 hasil dengan label tersimpan')
             ->assertSee('dari semua status')->assertSee('tanpa batas periode 12 bulan dan tanpa filter status')
             ->assertSee('bukan prevalensi hoaks di masyarakat atau akurasi model')->assertSee('menggabungkan versi model')
             ->assertSee('Informasi belum terverifikasi oleh sumber terpercaya')->assertSee('Ini bukan bukti bahwa informasi benar atau palsu.')
@@ -60,8 +60,8 @@ class ModelStatisticsClaimsTest extends TestCase
     public function test_empty_statistics_keep_twelve_zero_months_and_native_tables_without_a_chart(): void
     {
         $this->travelTo('2026-09-15 12:00:00');
-        $response = $this->get(route('statistik'))->assertOk()->assertSee('Belum ada submission dalam periode 12 bulan ini.')
-            ->assertSee('Belum ada hasil dengan label tersimpan.')->assertSee('0 submission');
+        $response = $this->get(route('statistik'))->assertOk()->assertSee('Belum ada pemeriksaan dalam periode 12 bulan ini.')
+            ->assertSee('Belum ada hasil dengan label tersimpan.')->assertSee('0 pemeriksaan');
         $dom = $this->statisticsDom($response->getContent());
         $this->assertSame(36, $dom->query('//table[@id="statistics-trend-table"]/tbody/tr/td[text()="0"]')->length);
         $this->assertSame(3, $dom->query('//table[@id="statistics-label-table"]/tbody/tr/td[text()="0"]')->length);
@@ -75,8 +75,8 @@ class ModelStatisticsClaimsTest extends TestCase
         $this->travelTo('2026-09-15 12:00:00');
         $submission = Submission::factory()->create(['created_at' => '2020-01-01 00:00:00', 'status' => 'completed']);
         DetectionResult::factory()->for($submission)->create(['label' => 'meragukan']);
-        $this->get(route('statistik'))->assertOk()->assertSee('0 submission')->assertSee('1 hasil dengan label tersimpan')
-            ->assertSee('Belum ada submission dalam periode 12 bulan ini.')->assertDontSee('Belum ada hasil dengan label tersimpan.');
+        $this->get(route('statistik'))->assertOk()->assertSee('0 pemeriksaan')->assertSee('1 hasil dengan label tersimpan')
+            ->assertSee('Belum ada pemeriksaan dalam periode 12 bulan ini.')->assertDontSee('Belum ada hasil dengan label tersimpan.');
     }
 
     private function statisticsDom(string $html): DOMXPath

@@ -140,11 +140,11 @@ preprocessing/bobot, mengganti model aktif, atau menimpa baseline `indobert-hoax
 
 ### T1.2 (M) Tulis ulang copy halaman publik
 Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudut pandang pengguna, kata kerja aktif, satu ide per paragraf, istilah teknis → bahasa awam + `x-ui.term`.
-- [ ] `welcome.blade.php` + `partials/submission/*` (copy form, hint, error).
-- [ ] `hasil.blade.php`, `partials/result/*`, `components/results/*` (lihat juga T2.7).
-- [ ] `livewire/submission-progress.blade.php` + `app/Enums/ProcessingStage.php` (label tahap yang ramah; ⚠ VERIFIKASI tempat label didefinisikan).
-- [ ] `riwayat.blade.php`, `statistik.blade.php`, `cara-kerja.blade.php`, `tentang.blade.php`, `kebijakan-privasi.blade.php`, `profile.blade.php`, `auth/*`, `errors/*`.
-- [ ] Ganti kata "submission" di UI publik dengan "pemeriksaan"; "Tamu"/"Pengguna" konsisten.
+- [x] `welcome.blade.php` + `partials/submission/*` (copy form, hint, error).
+- [x] `hasil.blade.php`, `partials/result/*`, `components/results/*` (lihat juga T2.7).
+- [x] `livewire/submission-progress.blade.php` + `app/Enums/ProcessingStage.php` (label tahap yang ramah; ⚠ VERIFIKASI tempat label didefinisikan).
+- [x] `riwayat.blade.php`, `statistik.blade.php`, `cara-kerja.blade.php`, `tentang.blade.php`, `kebijakan-privasi.blade.php`, `profile.blade.php`, `auth/*`, `errors/*`.
+- [x] Ganti kata "submission" di UI publik dengan "pemeriksaan"; "Tamu"/"Pengguna" konsisten.
 - **Penerimaan:** `grep -riE` daftar istilah terlarang (Lampiran A, kolom "Dilarang di UI publik") pada `resources/views` (kecuali `filament/`) tidak menemukan kemunculan tanpa `x-ui.term`/penjelasan. Test sensitif-teks diperbarui.
 
 ### T1.3 (M) Konsolidasi disclaimer
