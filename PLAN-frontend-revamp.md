@@ -132,10 +132,10 @@ preprocessing/bobot, mengganti model aktif, atau menimpa baseline `indobert-hoax
 **Tujuan:** semua istilah teknis dijelaskan atau diganti; disclaimer tidak berulang; navigasi dan fitur sampah dirapikan. Belum ada redesain visual besar (itu Tahap 2).
 
 ### T1.1 (M) Komponen glosarium/tooltip
-- [ ] Buat sumber istilah tunggal: `lang/id/glossary.php` (⚠ VERIFIKASI struktur lokalisasi yang dipakai repo; jika tidak ada `lang/`, pakai `config/glossary.php`). Isi dari **Lampiran A** (key, label publik, penjelasan singkat ≤ 160 karakter).
-- [ ] Komponen Blade `resources/views/components/ui/term.blade.php`: `<x-ui.term key="confidence">skor keyakinan</x-ui.term>`. Render `<button type="button">` dengan popover aksesibel (`aria-expanded`, `aria-describedby`, tutup dengan Esc/klik luar/blur, dapat dipakai di sentuh, tidak hanya hover).
-- [ ] Modul JS `resources/js/components/term.js` mengikuti pola `defineModule`; init idempoten; **tanpa Alpine**. Tanpa JS: penjelasan tampil sebagai teks `title`/disclosure sehingga tetap terbaca.
-- [ ] Test: `tests/Frontend/term.test.mjs` (buka/tutup, Esc, fokus kembali ke pemicu), test Blade render untuk key tak dikenal (fallback aman, tidak error).
+- [x] Buat sumber istilah tunggal: `lang/id/glossary.php` (⚠ VERIFIKASI struktur lokalisasi yang dipakai repo; jika tidak ada `lang/`, pakai `config/glossary.php`). Isi dari **Lampiran A** (key, label publik, penjelasan singkat ≤ 160 karakter).
+- [x] Komponen Blade `resources/views/components/ui/term.blade.php`: `<x-ui.term key="confidence">skor keyakinan</x-ui.term>`. Render `<button type="button">` dengan popover aksesibel (`aria-expanded`, `aria-describedby`, tutup dengan Esc/klik luar/blur, dapat dipakai di sentuh, tidak hanya hover).
+- [x] Modul JS `resources/js/components/term.js` mengikuti pola `defineModule`; init idempoten; **tanpa Alpine**. Tanpa JS: penjelasan tampil sebagai teks `title`/disclosure sehingga tetap terbaca.
+- [x] Test: `tests/Frontend/term.test.mjs` (buka/tutup, Esc, fokus kembali ke pemicu), test Blade render untuk key tak dikenal (fallback aman, tidak error).
 - **Penerimaan:** komponen dapat dipakai di view publik; key tak dikenal tidak membuat halaman gagal.
 
 ### T1.2 (M) Tulis ulang copy halaman publik
