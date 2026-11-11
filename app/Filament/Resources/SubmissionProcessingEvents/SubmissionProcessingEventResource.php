@@ -20,7 +20,6 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use UnitEnum;
 
 class SubmissionProcessingEventResource extends Resource
 {
@@ -36,7 +35,8 @@ class SubmissionProcessingEventResource extends Resource
 
     protected static ?int $navigationSort = 90;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Monitoring';
+    /** Timeline moves into Pemeriksaan detail (T3.5); the resource is deleted in T3.6. */
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {

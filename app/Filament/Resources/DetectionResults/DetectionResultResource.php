@@ -25,6 +25,9 @@ class DetectionResultResource extends Resource
 
     protected static ?string $pluralModelLabel = 'hasil deteksi';
 
+    /** Data moves into Pemeriksaan detail (T3.5); the resource is deleted in T3.6. */
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function canCreate(): bool
     {
         return false;

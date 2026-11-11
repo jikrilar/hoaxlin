@@ -14,16 +14,21 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class FeedbackResource extends Resource
 {
     protected static ?string $model = Feedback::class;
 
-    protected static ?string $navigationLabel = 'Feedback';
+    protected static ?string $navigationLabel = 'Umpan Balik';
 
-    protected static ?string $modelLabel = 'feedback';
+    protected static ?string $modelLabel = 'umpan balik';
 
-    protected static ?string $pluralModelLabel = 'feedback';
+    protected static ?string $pluralModelLabel = 'umpan balik';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Operasional';
+
+    protected static ?int $navigationSort = 30;
 
     public static function canCreate(): bool
     {
@@ -45,7 +50,7 @@ class FeedbackResource extends Resource
         return false;
     }
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 
     public static function form(Schema $schema): Schema
     {

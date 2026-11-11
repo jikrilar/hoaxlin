@@ -167,9 +167,9 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 - **Penerimaan:** landing tidak lagi memanggil runtime BERT; test hijau.
 
 ### T1.6 (M) Navigasi & label panel admin
-- [ ] Di `AdminPanelProvider` definisikan grup navigasi: **Operasional** (Dashboard, Pemeriksaan, Umpan Balik), **Model AI** (Versi Model, Data Kurasi), **Pengguna & Keamanan** (Pengguna, Log Admin). Resource **Hasil Deteksi** dan **Processing Events** disembunyikan dari navigasi (`shouldRegisterNavigation(): false`) — dihapus permanen di T3.6 setelah datanya pindah.
-- [ ] Label Indonesia konsisten: "Submission"→"Pemeriksaan", "Feedback"→"Umpan Balik", "Admin Logs"→"Log Admin", "Katalog Dataset"→"Data Kurasi", "Versi Model BERT"→"Versi Model". Ikon **unik per menu** (Heroicon relevan).
-- [ ] Urutan: gunakan `navigationSort` eksplisit.
+- [x] Di `AdminPanelProvider` definisikan grup navigasi: **Operasional** (Dashboard, Pemeriksaan, Umpan Balik), **Model AI** (Versi Model, Data Kurasi), **Pengguna & Keamanan** (Pengguna, Log Admin). Resource **Hasil Deteksi** dan **Processing Events** disembunyikan dari navigasi (`shouldRegisterNavigation(): false`) — dihapus permanen di T3.6 setelah datanya pindah.
+- [x] Label Indonesia konsisten: "Submission"→"Pemeriksaan", "Feedback"→"Umpan Balik", "Admin Logs"→"Log Admin", "Katalog Dataset"→"Data Kurasi", "Versi Model BERT"→"Versi Model". Ikon **unik per menu** (Heroicon relevan).
+- [x] Urutan: gunakan `navigationSort` eksplisit.
 - **Penerimaan:** 7 item navigasi tampil dalam 3 grup; test admin (`AdminMonitoringResourcesTest`, dsb.) diperbarui.
 
 ### T1.7 (M) Istilah teknis di admin

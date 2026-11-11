@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class DatasetResource extends Resource
 {
@@ -22,11 +23,15 @@ class DatasetResource extends Resource
 
     protected static ?string $model = Dataset::class;
 
-    protected static ?string $navigationLabel = 'Katalog Dataset';
+    protected static ?string $navigationLabel = 'Data Kurasi';
 
     protected static ?string $modelLabel = 'data kurasi';
 
-    protected static ?string $pluralModelLabel = 'katalog dataset';
+    protected static ?string $pluralModelLabel = 'data kurasi';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Model AI';
+
+    protected static ?int $navigationSort = 50;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

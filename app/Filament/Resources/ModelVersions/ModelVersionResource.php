@@ -20,6 +20,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
+use UnitEnum;
 
 class ModelVersionResource extends Resource
 {
@@ -27,11 +28,15 @@ class ModelVersionResource extends Resource
 
     protected static ?string $model = ModelVersion::class;
 
-    protected static ?string $navigationLabel = 'Versi Model BERT';
+    protected static ?string $navigationLabel = 'Versi Model';
 
     protected static ?string $modelLabel = 'versi model';
 
     protected static ?string $pluralModelLabel = 'versi model';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Model AI';
+
+    protected static ?int $navigationSort = 40;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCpuChip;
 
