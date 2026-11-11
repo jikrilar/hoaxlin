@@ -490,9 +490,9 @@ PowerShell gunakan interpreter RAG Windows dan `--output "$env:TEMP/hoaxlin-rag-
 | --- | --- |
 | Tersedia | Pipeline multi-input, IndoBERT baseline `v1.0.0` (dengan dukungan incremental fine-tuning, perbandingan metrik vs baseline, dan aktivasi *hot-swap* di `/admin`), retrieval lokal KB v1.1.1, explanation grounded, hasil/riwayat/export/admin, CI publik tanpa bobot privat |
 | Selesai pada cleanup | C-01 konfigurasi tak terpakai; C-02 Docker/CI; C-02A writer audit; C-03 bytecode/cache; C-04 konsolidasi dokumentasi pada commit ini |
-| Prioritas berikutnya | Evaluasi dan peningkatan kualitas RAG dengan baseline vs improvement yang sederhana dan terukur |
+| Prioritas berikutnya | Evaluasi dan peningkatan kualitas RAG dengan baseline vs improvement yang sederhana dan terukur; revamp frontend publik/admin serta integrasi alur Data Kurasi → pelatihan versi model sesuai [PLAN-frontend-revamp.md](PLAN-frontend-revamp.md) |
 | Ditunda | Kurasi dataset skala penuh dan benchmark BERT eksternal lanjutan |
 | Tidak dalam roadmap aktif | Penimpaan artefak baseline IndoBERT `v1.0.0` atau kalibrasi ulang threshold/temperature tanpa persetujuan eksplisit |
 | Belum tuntas | Judgment representatif KB v1.1.1, pemilihan threshold retrieval berbasis bukti, usability, patch npm terpisah, penilaian log historis, konfigurasi workflow privat oleh maintainer |
 
-Build/test sukses tidak membuktikan kualitas prediksi atau peningkatan akurasi. Laporan historis dipertahankan sebagai bukti dengan cakupan/waktu aslinya, bukan instruksi roadmap aktif. Lihat [PRD](PRD.md) untuk kontrak produk, [AGENTS.md](AGENTS.md) untuk aturan kontribusi agent, dan [laporan cleanup](reports/repository-cleanup/c03.md) untuk batas verifikasi tahap sebelumnya. C-05 tidak dijalankan otomatis.
+Build/test sukses tidak membuktikan kualitas prediksi atau peningkatan akurasi. Laporan historis dipertahankan sebagai bukti dengan cakupan/waktu aslinya, bukan instruksi roadmap aktif. Lihat [PRD](PRD.md) untuk kontrak produk, [AGENTS.md](AGENTS.md) untuk aturan kontribusi agent, [PLAN-frontend-revamp.md](PLAN-frontend-revamp.md) untuk rencana revamp UI dan alur kurasi, dan [laporan cleanup](reports/repository-cleanup/c03.md) untuk batas verifikasi tahap sebelumnya. C-05 tidak dijalankan otomatis.
