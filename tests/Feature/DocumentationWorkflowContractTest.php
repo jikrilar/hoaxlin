@@ -141,6 +141,14 @@ class DocumentationWorkflowContractTest extends TestCase
         );
         $this->assertSame(['Ubah jadi teks', 'Terjemahkan bila perlu', 'Analisis model', 'Cari rujukan', 'Penjelasan'], $labels);
 
+        // Plain numbers ("1." … "5."), not badges or shape-wrapped glyphs.
+        $numbers = array_map(
+            fn ($node) => trim($node->textContent),
+            iterator_to_array($dom->query('//ol[@data-stepper]/li//*[contains(@class,"hl-stepper__number")]')),
+        );
+        $this->assertSame(['1.', '2.', '3.', '4.', '5.'], $numbers);
+        $this->assertSame(0, $dom->query('//ol[@data-stepper]//*[contains(@class,"hl-badge")]')->length);
+
         // A static explainer never marks a step as in progress.
         $this->assertSame(0, $dom->query('//ol[@data-stepper]/li[@aria-current]')->length);
         $this->assertSame(5, $dom->query('//ol[@data-stepper]/li')->length);

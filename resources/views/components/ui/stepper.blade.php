@@ -36,6 +36,7 @@
         @endphp
         <li data-step data-status="{{ $status }}" data-step-key="{{ $step['key'] }}"
             @if($status === 'current') aria-current="step" @endif>
+            <span class="hl-stepper__number" aria-hidden="true">{{ $index + 1 }}.</span>
             <span class="hl-stepper__label">{{ $step['label'] }}</span>
         </li>
     @endforeach

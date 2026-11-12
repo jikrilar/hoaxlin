@@ -303,9 +303,10 @@
     .hl-stat[data-tone="warning"] .hl-stat__value { color: var(--ds-warning-fg); }
     .hl-stat[data-tone="info"] .hl-stat__value { color: var(--ds-info-fg); }
 
-    /* Stepper (T2.3): marker-free steps; state is carried by text and colour only. */
+    /* Stepper (T2.3): plain-text step numbers, never wrapped in a badge or shape. */
     .hl-stepper { display: flex; flex-wrap: wrap; gap: var(--ds-space-3) var(--ds-space-6); margin: var(--ds-space-4) 0; padding: 0; list-style: none; counter-reset: none; }
     .hl-stepper > li { display: flex; align-items: baseline; gap: var(--ds-space-2); min-inline-size: 0; color: var(--ds-text-muted); }
+    .hl-stepper__number { flex-shrink: 0; font-variant-numeric: tabular-nums; font-weight: var(--ds-font-weight-medium); }
     .hl-stepper [data-status="done"] { color: var(--ds-text-body); }
     .hl-stepper [data-status="current"] { color: var(--ds-text-primary); font-weight: var(--ds-font-weight-semibold); }
     .hl-stepper [data-status="error"] { color: var(--ds-danger-fg); }
