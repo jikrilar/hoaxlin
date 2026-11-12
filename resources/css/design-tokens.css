@@ -199,17 +199,43 @@
     --ds-z-dialog: 70;
     --ds-z-toast: 80;
 
-    /* Functional motion: consumers choose explicit properties. */
-    --ds-duration-fast: 120ms;
-    --ds-duration-normal: 180ms;
-    --ds-duration-progress: 200ms;
-    --ds-ease: cubic-bezier(0.2, 0, 0, 1);
+    /* Functional motion: consumers choose explicit properties.
+       --ds-motion-* are the shared scale; --ds-duration-* keep legacy consumers. */
+    --ds-motion-fast: 120ms;
+    --ds-motion-base: 200ms;
+    --ds-motion-slow: 320ms;
+    --ds-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ds-ease-emphasis: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --ds-motion-rise: 8px;
+
+    --ds-duration-fast: var(--ds-motion-fast);
+    --ds-duration-normal: var(--ds-motion-base);
+    --ds-duration-progress: var(--ds-motion-base);
+    --ds-ease: var(--ds-ease-standard);
 }
 
+/* Motion is decoration here: collapse durations and travel, keep state changes instant. */
 @media (prefers-reduced-motion: reduce) {
     :root {
-        --ds-duration-fast: 0ms;
-        --ds-duration-normal: 0ms;
-        --ds-duration-progress: 0ms;
+        --ds-motion-fast: 0ms;
+        --ds-motion-base: 0ms;
+        --ds-motion-slow: 0ms;
+        --ds-motion-rise: 0px;
+    }
+
+    /* Safety net for motion that still hard-codes durations. */
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0s !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Entrances become static instead of jumping; content stays visible. */
+    .hl-disclosure__content, .hl-flash, .hl-dialog[open], .hl-result-page__content,
+    [data-submission-selector][data-enhanced] [data-input-panel],
+    [data-submission-selector][data-enhanced] [data-video-panel] {
+        animation: none !important;
+        transform: none !important;
     }
 }

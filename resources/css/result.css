@@ -4,6 +4,12 @@
     .hl-result-page__inner { max-width: 52rem; }
     .hl-result-page__back { margin-block-end: var(--ds-space-6); }
     .hl-result-page__content { min-width: 0; padding: clamp(var(--ds-space-4), 4vw, var(--ds-space-8)); margin-block-end: var(--ds-space-6); border: var(--ds-border-width) solid var(--ds-border-subtle); border-radius: var(--ds-radius-lg); background: var(--ds-bg-surface); }
+    /* Result content arrives once per page load; it must not delay reading. */
+    .hl-result-page__content { animation: hl-result-reveal var(--ds-motion-slow) var(--ds-ease-standard) both; }
+    @keyframes hl-result-reveal {
+        from { opacity: 0; transform: translateY(var(--ds-motion-rise)); }
+        to { opacity: 1; transform: translateY(0); }
+    }
     .hl-result-page h1 { font-size: var(--ds-type-page-title-size); margin-block-end: var(--ds-space-4); }
     .hl-result-page h2 { font-size: var(--ds-type-section-title-size); margin-block-end: var(--ds-space-3); }
     .hl-result-page h3 { font-size: var(--ds-type-body-size); margin-block-end: var(--ds-space-2); }

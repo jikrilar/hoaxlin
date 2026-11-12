@@ -10,6 +10,13 @@
     .hl-input-option { display: inline-flex; align-items: center; justify-content: center; min-block-size: 2.75rem; padding: var(--ds-space-2) var(--ds-space-3); border: var(--ds-border-width) solid var(--ds-border-control); border-radius: var(--ds-radius-md); color: var(--ds-link); text-decoration: none; font-size: var(--ds-type-body-sm-size); }
     .hl-input-option:hover, .hl-input-option[aria-selected="true"] { background: var(--ds-bg-selected); border-color: var(--ds-action-primary); }
     .hl-input-panel + .hl-input-panel, [data-video-panel] + [data-video-panel] { margin-block-start: var(--ds-space-6); }
+    /* Panels are hidden/shown with `hidden`, so the entrance replays on every tab switch.
+       The rule only applies once JS has wired the tabs, keeping the no-JS anchor flow static. */
+    [data-submission-selector][data-enhanced] [data-input-panel]:not([hidden]), [data-submission-selector][data-enhanced] [data-video-panel]:not([hidden]) { animation: hl-panel-enter var(--ds-motion-fast) var(--ds-ease-standard) both; }
+    @keyframes hl-panel-enter {
+        from { opacity: 0; transform: translateY(var(--ds-motion-rise)); }
+        to { opacity: 1; transform: translateY(0); }
+    }
     [data-submission-selector][data-enhanced] .hl-input-panel, [data-submission-selector][data-enhanced] [data-video-panel] { margin-block-start: 0; }
     .hl-input-panel > h3, [data-video-panel] > h4 { margin-block-end: var(--ds-space-4); }
     .hl-upload__input::file-selector-button { margin-inline-end: var(--ds-space-3); padding: var(--ds-space-2); border: var(--ds-border-width) solid var(--ds-border-control); border-radius: var(--ds-radius-sm); background: var(--ds-bg-subtle); color: var(--ds-text-primary); cursor: pointer; }
@@ -73,6 +80,7 @@
     .hl-nav-link--danger { color: var(--ds-danger-fg); }
     .hl-nav-toggle { border-color: var(--ds-border-control); }
     .hl-chevron { flex-shrink: 0; }
+    .hl-chevron { transition: transform var(--ds-motion-fast) var(--ds-ease-standard); }
     [data-mobile-toggle][aria-expanded="true"] .hl-chevron, .hl-account[open] .hl-chevron { transform: rotate(180deg); }
     .hl-account { position: relative; min-inline-size: 0; }
     .hl-account__toggle { list-style: none; border-color: var(--ds-border-control); }
@@ -84,6 +92,11 @@
     .hl-flash-list { padding-block-start: var(--ds-space-6); }
     .hl-header[data-navigation-ready] + .hl-flash-list { padding-block-start: calc(var(--ds-space-16) + var(--ds-space-6)); }
     .hl-flash__content { display: flex; align-items: flex-start; gap: var(--ds-space-4); }
+    .hl-flash { animation: hl-flash-enter var(--ds-motion-base) var(--ds-ease-emphasis) both; }
+    @keyframes hl-flash-enter {
+        from { opacity: 0; transform: translateY(var(--ds-motion-rise)); }
+        to { opacity: 1; transform: translateY(0); }
+    }
     .hl-flash__message { flex: 1; min-inline-size: 0; }
     .hl-footer { border-block-start: var(--ds-border-width) solid var(--ds-border-subtle); background: var(--ds-bg-surface); }
     .hl-footer__inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--ds-space-8); padding-block: var(--ds-space-8); }
@@ -122,6 +135,7 @@
         transform: translateY(calc(-100% - var(--ds-space-8)));
     }
 
+    .hl-skip-link { transition: transform var(--ds-motion-fast) var(--ds-ease-standard); }
     .hl-skip-link:focus {
         transform: translateY(0);
     }
@@ -141,6 +155,11 @@
 
     .hl-dialog::backdrop {
         background: rgb(var(--p-ink-rgb) / 40%);
+    }
+    .hl-dialog[open] { animation: hl-dialog-enter var(--ds-motion-fast) var(--ds-ease-standard) both; }
+    @keyframes hl-dialog-enter {
+        from { opacity: 0; transform: translateY(var(--ds-motion-rise)); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .hl-button {
@@ -175,6 +194,7 @@
     .hl-button[data-variant="destructive"]:not(:disabled):active { background: var(--ds-danger-active); }
     .hl-button:disabled { background: var(--ds-bg-disabled); color: var(--ds-text-disabled); border-color: var(--ds-border-subtle); cursor: not-allowed; }
     .hl-button__spinner { width: 1rem; height: 1rem; flex-shrink: 0; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: hl-spin 0.7s linear infinite; }
+    /* Spinner is the one endless loop: it signals work in progress, not decoration. */
     @keyframes hl-spin { to { transform: rotate(360deg); } }
 
     .hl-link { color: var(--ds-link); text-decoration: underline; text-underline-offset: 0.15em; }
@@ -246,7 +266,14 @@
 
     .hl-disclosure { margin-block-end: var(--ds-space-6); border-block: var(--ds-border-width) solid var(--ds-border-subtle); }
     .hl-disclosure__summary { padding-block: var(--ds-space-4); color: var(--ds-link); font-size: var(--ds-type-label-size); font-weight: var(--ds-font-weight-medium); cursor: pointer; }
+    .hl-disclosure[open] > .hl-disclosure__summary { color: var(--ds-text-primary); }
     .hl-disclosure__content { padding-block-end: var(--ds-space-4); }
+    /* Native <details> keeps its instant toggle; only the revealed content eases in. */
+    .hl-disclosure[open] > .hl-disclosure__content { animation: hl-disclosure-reveal var(--ds-motion-base) var(--ds-ease-standard) both; }
+    @keyframes hl-disclosure-reveal {
+        from { opacity: 0; transform: translateY(var(--ds-motion-rise)); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
     /* Inline glossary term: no box, no layout impact, one marker (dotted underline + tiny mark). */
     .hl-term {

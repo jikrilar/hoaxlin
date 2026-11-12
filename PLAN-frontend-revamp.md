@@ -200,9 +200,10 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 - **Penerimaan:** satu skala tipografi dipakai semua halaman; tidak ada ukuran font hard-coded di `result.css/history.css/statistics.css/information.css` yang menyimpang.
 
 ### T2.2 (S) Gerak (motion)
-- [ ] Tambahkan token: `--ds-motion-fast: 120ms`, `--ds-motion-base: 200ms`, `--ds-motion-slow: 320ms`, `--ds-ease-standard`, `--ds-ease-emphasis`.
-- [ ] Terapkan: hover/focus tombol & kartu, buka/tutup disclosure/FAQ, pergantian tab input, kemunculan hasil (fade+translateY ≤ 8px), transisi bar progres/stepper, toast/flash masuk-keluar.
-- [ ] **Wajib** `@media (prefers-reduced-motion: reduce)` mematikan/mengurangi semua gerak non-esensial. Tidak ada animasi berulang tanpa henti selain indikator "sedang memproses".
+- [x] Tambahkan token: `--ds-motion-fast: 120ms`, `--ds-motion-base: 200ms`, `--ds-motion-slow: 320ms`, `--ds-ease-standard`, `--ds-ease-emphasis`.
+- [x] Terapkan: hover/focus tombol & kartu, buka/tutup disclosure/FAQ, pergantian tab input, kemunculan hasil (fade+translateY ≤ 8px), transisi bar progres/stepper, toast/flash masuk-keluar.
+- [x] **Wajib** `@media (prefers-reduced-motion: reduce)` mematikan/mengurangi semua gerak non-esensial. Tidak ada animasi berulang tanpa henti selain indikator "sedang memproses".
+- **Bukti:** `tests/Frontend/motion.test.mjs` (8 test) dan `reports/frontend-revamp/after-s2/motion-verification.md` (nilai computed style mode normal dan reduced).
 - **Penerimaan:** tidak ada animasi yang mengganggu keterbacaan; reduced-motion diuji.
 
 ### T2.3 (L) Pustaka komponen
