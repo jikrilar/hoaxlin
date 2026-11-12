@@ -303,17 +303,13 @@
     .hl-stat[data-tone="warning"] .hl-stat__value { color: var(--ds-warning-fg); }
     .hl-stat[data-tone="info"] .hl-stat__value { color: var(--ds-info-fg); }
 
-    /* Stepper (T2.3): numbered, state shown by text marker as well as colour. */
-    .hl-stepper { display: flex; flex-wrap: wrap; gap: var(--ds-space-4); margin: var(--ds-space-4) 0; padding: 0; list-style: none; counter-reset: none; }
-    .hl-stepper > li { display: flex; align-items: center; gap: var(--ds-space-2); min-inline-size: 0; color: var(--ds-text-muted); }
-    .hl-stepper__index { display: inline-flex; align-items: center; justify-content: center; inline-size: 1.75rem; block-size: 1.75rem; flex-shrink: 0; border: var(--ds-border-width) solid currentColor; border-radius: 50%; font-size: var(--ds-type-meta-size); font-weight: var(--ds-font-weight-semibold); }
+    /* Stepper (T2.3): marker-free steps; state is carried by text and colour only. */
+    .hl-stepper { display: flex; flex-wrap: wrap; gap: var(--ds-space-3) var(--ds-space-6); margin: var(--ds-space-4) 0; padding: 0; list-style: none; counter-reset: none; }
+    .hl-stepper > li { display: flex; align-items: baseline; gap: var(--ds-space-2); min-inline-size: 0; color: var(--ds-text-muted); }
     .hl-stepper [data-status="done"] { color: var(--ds-text-body); }
-    .hl-stepper [data-status="done"] .hl-stepper__index { background: var(--ds-success-bg); border-color: var(--ds-success-fg); color: var(--ds-success-fg); }
     .hl-stepper [data-status="current"] { color: var(--ds-text-primary); font-weight: var(--ds-font-weight-semibold); }
-    .hl-stepper [data-status="current"] .hl-stepper__index { background: var(--ds-action-primary); border-color: var(--ds-action-primary); color: var(--ds-text-inverse); }
     .hl-stepper [data-status="error"] { color: var(--ds-danger-fg); }
-    .hl-stepper [data-status="error"] .hl-stepper__index { background: var(--ds-danger-bg); border-color: var(--ds-danger-fg); }
-    .hl-stepper [data-status="todo"] .hl-stepper__index { color: var(--ds-text-muted); }
+    .hl-stepper [data-status="todo"] { color: var(--ds-text-muted); }
 
     .hl-link { color: var(--ds-link); text-decoration: underline; text-underline-offset: 0.15em; }
     .hl-link:hover { color: var(--ds-action-hover); }

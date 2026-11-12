@@ -62,3 +62,16 @@ test('component views never hand-roll inline style attributes', () => {
         assert.doesNotMatch(source, /\sstyle="/, `${file} must use CSS classes, not inline styles`);
     }
 });
+
+test('numbered lists render without any marker', () => {
+    // Owner request: steps and ordered lists carry no bullet, circle, or number glyph.
+    assert.doesNotMatch(css, /\.hl-stepper__index/, 'stepper must not render an index badge');
+    assert.match(block('.hl-stepper'), /list-style:\s*none/);
+
+    for (const [file, selector] of [['information.css', '.hl-reading-steps'], ['result.css', '.hl-result-evidence__list']]) {
+        const source = readFileSync(new URL(`../../resources/css/${file}`, import.meta.url), 'utf8');
+        const body = source.slice(source.indexOf(`${selector} {`), source.indexOf('}', source.indexOf(`${selector} {`)));
+        assert.match(body, /list-style:\s*none/, `${selector} must not draw a marker`);
+        assert.doesNotMatch(body, /list-style:\s*(disc|circle|decimal)/, `${selector} must not draw a marker`);
+    }
+});

@@ -49,7 +49,6 @@
         @foreach($stepStates as $step)
             <li data-step="{{ $step['key'] }}" data-status="{{ $step['status'] }}"
                 @if($step['status'] === 'current') aria-current="step" @endif>
-                <span class="hl-stepper__index" aria-hidden="true">{{ $loop->iteration }}</span>
                 <span class="hl-stepper__label">{{ $step['label'] }}</span>
                 <span class="hl-visually-hidden">({{ match($step['status']) {
                     'done' => 'selesai',

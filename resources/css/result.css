@@ -40,7 +40,7 @@
     .hl-result__text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: var(--ds-type-body-leading); }
     .hl-result-page .hl-disclosure__content > h3 { margin-block-start: var(--ds-space-5); }
     .hl-result-page .hl-disclosure__content > p { margin-block-end: var(--ds-space-4); }
-    .hl-result-evidence__list { list-style: decimal; padding-inline-start: var(--ds-space-6); }
+    .hl-result-evidence__list { list-style: none; padding-inline-start: 0; }
     .hl-result-evidence__item { padding-block: var(--ds-space-5); border-block-end: var(--ds-border-width) solid var(--ds-border-subtle); }
     .hl-result-evidence__item:last-child { border-block-end: 0; }
     .hl-result-evidence__item h3, .hl-result-evidence__url { overflow-wrap: anywhere; }

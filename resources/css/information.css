@@ -62,18 +62,13 @@
     }
 
     .hl-reading-steps {
-        list-style: decimal;
-        padding-inline-start: var(--ds-space-6);
+        list-style: none;
+        padding-inline-start: 0;
         margin-block-start: var(--ds-space-5);
     }
 
     .hl-reading-steps > li {
         padding-inline-start: var(--ds-space-2);
-    }
-
-    .hl-reading-steps > li::marker {
-        color: var(--ds-text-muted);
-        font-weight: var(--ds-font-weight-medium);
     }
 
     .hl-reading-steps h3 {
