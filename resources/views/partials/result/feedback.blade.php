@@ -63,11 +63,14 @@
                             <p id="feedback-choice-error" class="hl-field__error">{{ $message }}</p>
                         @enderror
                     </fieldset>
+                    {{-- The comment field stays in the DOM; it is revealed once a choice is made (JS) or focused with CSS :has. --}}
+                    <div class="hl-result-feedback__comment" data-feedback-comment>
                     <x-ui.field id="feedback-comment" label="Komentar (opsional)" hint="Maksimal 1.000 karakter. Anda dapat menjelaskan alasan penilaian Anda." :error="$errors->first('comment')">
-                        <textarea id="feedback-comment" name="comment" class="hl-input hl-result-feedback__comment" maxlength="1000"
+                        <textarea id="feedback-comment" name="comment" class="hl-input hl-result-feedback__textarea" maxlength="1000"
                             aria-invalid="{{ $errors->has('comment') ? 'true' : 'false' }}"
                             aria-describedby="feedback-comment-hint{{ $errors->has('comment') ? ' feedback-comment-error' : '' }}">{{ $previousComment }}</textarea>
                     </x-ui.field>
+                    </div>
                     <x-ui.button type="submit" id="feedback-submit">Kirim umpan balik</x-ui.button>
                 </form>
             @endif

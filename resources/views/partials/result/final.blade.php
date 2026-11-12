@@ -3,6 +3,7 @@
     @include('partials.result.timestamps')
     <x-results.prediction :label="$result->label" :confidence="$result->confidence_score" />
 </section>
+@include('partials.result.next-steps')
 <x-results.explanation :result="$result" />
 <section class="hl-result__section hl-result-evidence" aria-labelledby="evidence-heading">
     <h2 id="evidence-heading">Referensi terkait</h2>

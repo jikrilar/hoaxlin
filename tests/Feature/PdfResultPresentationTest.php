@@ -40,6 +40,10 @@ class PdfResultPresentationTest extends TestCase
         $this->assertStringContainsString('<td>v1.0.0</td>', $html);
         $this->assertStringNotContainsString('vv1.0.0', $html);
         $this->assertStringContainsString('Penjelasan final: “Periksa sumbernya.”', $html);
+        // T2.7: the PDF carries the same plain-language sentence and next steps as the web page.
+        $this->assertStringContainsString('Langkah selanjutnya:', $html);
+        $this->assertStringContainsString('Periksa sumber asli informasi ini', $html);
+        $this->assertStringNotContainsString(route('hasil', $data['submission']->id), $html);
 
         $pdf = Pdf::loadView('hasil-pdf', $data)->setPaper('a4', 'portrait');
         $bytes = $pdf->output();
@@ -57,6 +61,7 @@ class PdfResultPresentationTest extends TestCase
             'valid' => ['valid', 'Prediksi model: Valid'],
             'hoax' => ['hoax', 'Prediksi model: Hoaks'],
             'abstention' => ['meragukan', 'Informasi belum terverifikasi oleh sumber terpercaya'],
+            'valid copy' => ['valid', 'Pola teks ini mirip dengan informasi yang valid. Ini belum menjamin isinya benar'],
         ];
     }
 

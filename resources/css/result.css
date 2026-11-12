@@ -24,6 +24,17 @@
     .hl-result-prediction[data-tone="danger"] { background: var(--ds-danger-bg); color: var(--ds-danger-fg); border-color: currentColor; }
     .hl-result-prediction[data-tone="warning"] { background: var(--ds-warning-bg); color: var(--ds-warning-fg); border-color: currentColor; }
     .hl-result-prediction__label { font-weight: var(--ds-font-weight-semibold); }
+    /* Badge keeps its tone; the result summary renders it flat, without a second surface. */
+    .hl-result-prediction .hl-badge { background: transparent; padding: 0; border: 0; font-size: var(--ds-type-body-sm-size); }
+    .hl-result-prediction__description { margin-block-start: var(--ds-space-2); max-inline-size: var(--ds-reading-measure); }
+    .hl-result-prediction__score { margin-block-start: var(--ds-space-3); }
+    .hl-result-next-steps__list { display: grid; gap: var(--ds-space-2); margin-block-start: var(--ds-space-3); padding-inline-start: var(--ds-space-5); list-style: disc; max-inline-size: var(--ds-reading-measure); }
+    .hl-result-evidence__open { margin-block-start: var(--ds-space-2); }
+    .hl-result-actions [data-copy-summary] { align-self: center; }
+    /* Comment stays collapsed until a rating is chosen; focus-within keeps the field reachable. */
+    .hl-result-feedback__comment { display: none; margin-block-start: var(--ds-space-4); }
+    .hl-result-feedback__comment[data-revealed],
+    .hl-result-feedback:has(input[name="is_correct"]:checked) .hl-result-feedback__comment { display: block; }
     .hl-result-prediction p + p { margin-block-start: var(--ds-space-2); }
     .hl-result__disclaimer, .hl-result__hint { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); line-height: var(--ds-type-body-sm-leading); margin-block: var(--ds-space-2) var(--ds-space-4); }
     .hl-result__text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: var(--ds-type-body-leading); }
@@ -45,7 +56,7 @@
     .hl-result-feedback__options label:has(:checked) { border-color: var(--ds-action-primary); background: var(--ds-bg-selected); }
     .hl-result-feedback__options label:focus-within { outline: var(--ds-focus-width) solid var(--ds-focus); outline-offset: var(--ds-focus-offset); }
     .hl-result-feedback__options input { inline-size: 1.125rem; block-size: 1.125rem; flex-shrink: 0; }
-    .hl-input.hl-result-feedback__comment { min-block-size: 7rem; }
+    .hl-input.hl-result-feedback__textarea { min-block-size: 7rem; }
     .hl-result-feedback__errors { margin-block-end: var(--ds-space-5); }
     .hl-result-feedback__errors ul { list-style: disc; padding-inline-start: var(--ds-space-5); }
     .hl-result-feedback__errors a { color: inherit; }

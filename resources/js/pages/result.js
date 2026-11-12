@@ -1,4 +1,5 @@
 import { createScope, defineModule } from '../core/scope.js';
+import { mountCommentReveal, mountCopy } from './result-actions.js';
 import { createFallback, isTerminal, responseError } from '../progress/fallback.js';
 import { observeLivewire } from '../progress/livewire.js';
 
@@ -146,4 +147,6 @@ export function createProgress(root, { clock = root.ownerDocument.defaultView,
 
 export const mount = defineModule((body, scope) => {
     for (const root of body.querySelectorAll('[data-page="result"] [data-progress-root]')) scope.own(createProgress(root));
+    for (const button of body.querySelectorAll('[data-page="result"] [data-copy-summary]')) mountCopy(scope, button);
+    for (const section of body.querySelectorAll('[data-page="result"] .hl-result-feedback')) mountCommentReveal(scope, section);
 });

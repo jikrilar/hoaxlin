@@ -271,9 +271,11 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 5. **Input Anda** (disclosure): input asli, terjemahan (bila ada), teks hasil ekstraksi, media privat (tetap lewat route `hasil.media`).
 6. **Umpan balik satu klik:** "Apakah hasil ini sesuai?" → Sesuai / Tidak sesuai; komentar opsional muncul setelah memilih. Aturan tetap: hanya pemilik dengan email terverifikasi, sekali kirim.
 7. **Aksi:** Periksa informasi lain · Unduh PDF · **Salin ringkasan** (clipboard saja; isi: label, kalimat penjelas, tanggal; tanpa ID/URL hasil) · Kembali ke riwayat (bila terverifikasi).
-- [ ] Tambahkan struktur & copy; hapus tombol CSV dari halaman ini (T1.5).
-- [ ] PDF (`hasil-pdf.blade.php`) disesuaikan copy-nya; PDF tidak memakai Vite/JS → uji terpisah.
+- [x] Tambahkan struktur & copy; hapus tombol CSV dari halaman ini (T1.5).
+- [x] PDF (`hasil-pdf.blade.php`) disesuaikan copy-nya; PDF tidak memakai Vite/JS → uji terpisah.
 - **Pengujian wajib:** `FinalResultStateTest`, `ResultEvidencePresentationTest`, `GroundedExplanationTest`, `ExplanationDegradationTest`, `GuestSubmissionAccessTest`, `ResultEndpointAuthorizationTest`, `RagRetrieverTest`, test PDF. Tambah test: salin ringkasan tidak memuat ID submission/URL.
+- **Bukti:** `ResultSummaryPresentationTest` (badge + kalimat penjelas + skor tanpa pita, langkah selanjutnya tanpa tautan eksternal, kemiripan rujukan, payload salin tanpa ID/URL, komentar tersembunyi), `PdfResultPresentationTest` (copy PDF + tetap satu halaman), `submission-form.test.mjs`/`result-actions.test.mjs` (sanitasi clipboard), `reports/frontend-revamp/after-s2/t27/`.
+- **Catatan:** kalimat abstention kanonik tetap verbatim di dalam deskripsi; PDF hanya memuat dua langkah pertama agar kontrak satu halaman terjaga.
 - **Penerimaan:** pengguna awam dapat menyebutkan arti hasil & langkah berikutnya; tidak ada klaim kebenaran.
 
 ### T2.8 (M) Riwayat

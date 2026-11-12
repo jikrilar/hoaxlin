@@ -15,14 +15,59 @@ final class DetectionPresentation
             && (string) $result->submission_id === (string) $submission->getKey() ? $result : null;
     }
 
-    /** @return array{text: string, tone: string, abstained: bool} */
+    /**
+     * Canonical label text plus the plain-language sentence shown under it (T2.7).
+     *
+     * `text`/`tone` are the product contract and must not change; `description`
+     * only restates the same meaning for readers and never claims verification.
+     *
+     * @return array{text: string, tone: string, abstained: bool, description: string}
+     */
     public static function label(?string $label): array
     {
         return match (strtolower($label ?? '')) {
-            'valid' => ['text' => 'Prediksi model: Valid', 'tone' => 'neutral', 'abstained' => false],
-            'hoax' => ['text' => 'Prediksi model: Hoaks', 'tone' => 'danger', 'abstained' => false],
-            'meragukan' => ['text' => 'Informasi belum terverifikasi oleh sumber terpercaya', 'tone' => 'warning', 'abstained' => true],
-            default => ['text' => 'Label prediksi belum tersedia', 'tone' => 'neutral', 'abstained' => false],
+            'valid' => [
+                'text' => 'Prediksi model: Valid',
+                'tone' => 'neutral',
+                'abstained' => false,
+                'description' => 'Pola teks ini mirip dengan informasi yang valid. Ini belum menjamin isinya benar — tetap cek sumbernya.',
+            ],
+            'hoax' => [
+                'text' => 'Prediksi model: Hoaks',
+                'tone' => 'danger',
+                'abstained' => false,
+                'description' => 'Pola teks ini mirip dengan hoaks. Cek di sumber terpercaya sebelum membagikannya.',
+            ],
+            'meragukan' => [
+                'text' => 'Informasi belum terverifikasi oleh sumber terpercaya',
+                'tone' => 'warning',
+                'abstained' => true,
+                'description' => 'Model belum cukup yakin. Ini bukan bukti bahwa informasi benar atau palsu. Cari konfirmasi dari sumber resmi.',
+            ],
+            default => [
+                'text' => 'Label prediksi belum tersedia',
+                'tone' => 'neutral',
+                'abstained' => false,
+                'description' => 'Model belum dapat memilih label untuk input ini. Anggap hasil ini belum tersedia dan cek ulang nanti.',
+            ],
+        };
+    }
+
+    /**
+     * Static next steps for a label (T2.7). No external links: the owner has not
+     * approved a curated fact-check list (Appendix E-4).
+     *
+     * @return list<string>
+     */
+    public static function nextSteps(?string $label): array
+    {
+        $common = ['Periksa sumber asli informasi ini, bukan hanya kutipannya.', 'Cek tanggal dan konteks: informasi lama bisa beredar ulang dengan konteks berbeda.'];
+
+        return match (strtolower($label ?? '')) {
+            'valid' => [...$common, 'Bandingkan dengan satu atau dua sumber lain yang kredibel.', 'Tetap sebutkan sumber ketika membagikannya.'],
+            'hoax' => [...$common, 'Bandingkan dengan sumber resmi atau media yang kredibel.', 'Jangan bagikan sebelum menemukan sumber yang dapat dipercaya.'],
+            'meragukan' => [...$common, 'Cari konfirmasi dari sumber resmi sebelum mengambil kesimpulan.', 'Bila tetap ragu, jangan bagikan.'],
+            default => [...$common, 'Bila tetap ragu, jangan bagikan.', 'Kirim ulang pemeriksaan setelah informasi lengkap.'],
         };
     }
 
