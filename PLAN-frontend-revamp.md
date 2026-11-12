@@ -136,7 +136,12 @@ preprocessing/bobot, mengganti model aktif, atau menimpa baseline `indobert-hoax
 - [x] Komponen Blade `resources/views/components/ui/term.blade.php`: `<x-ui.term key="confidence">skor keyakinan</x-ui.term>`. Render `<button type="button">` dengan popover aksesibel (`aria-expanded`, `aria-describedby`, tutup dengan Esc/klik luar/blur, dapat dipakai di sentuh, tidak hanya hover).
 - [x] Modul JS `resources/js/components/term.js` mengikuti pola `defineModule`; init idempoten; **tanpa Alpine**. Tanpa JS: penjelasan tampil sebagai teks `title`/disclosure sehingga tetap terbaca.
 - [x] Test: `tests/Frontend/term.test.mjs` (buka/tutup, Esc, fokus kembali ke pemicu), test Blade render untuk key tak dikenal (fallback aman, tidak error).
-- **Penerimaan:** komponen dapat dipakai di view publik; key tak dikenal tidak membuat halaman gagal.
+- [x] **Aturan pemakaian istilah (wajib untuk T1.2 dan seterusnya):**
+  1. Jelaskan sebuah istilah **hanya pada kemunculan pertama di satu halaman**; kemunculan berikutnya teks biasa.
+  2. Maksimal **2 istilah berpenjelasan per paragraf**.
+  3. Jangan menaruh **dua istilah berurutan** tanpa kata penghubung.
+  4. Jangan membungkus kata yang sudah dijelaskan di kalimat itu sendiri (termasuk judul `h3/dt` yang langsung diikuti penjelasan sejenis).
+- **Penerimaan:** komponen dapat dipakai di view publik; key tak dikenal tidak membuat halaman gagal; komponen tetap **inline** (tidak menambah tinggi baris), hanya satu penanda visual, dan tidak menyisipkan spasi sebelum tanda baca.
 
 ### T1.2 (M) Tulis ulang copy halaman publik
 Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudut pandang pengguna, kata kerja aktif, satu ide per paragraf, istilah teknis → bahasa awam + `x-ui.term`.
@@ -145,7 +150,7 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 - [x] `livewire/submission-progress.blade.php` + `app/Enums/ProcessingStage.php` (label tahap yang ramah; ⚠ VERIFIKASI tempat label didefinisikan).
 - [x] `riwayat.blade.php`, `statistik.blade.php`, `cara-kerja.blade.php`, `tentang.blade.php`, `kebijakan-privasi.blade.php`, `profile.blade.php`, `auth/*`, `errors/*`.
 - [x] Ganti kata "submission" di UI publik dengan "pemeriksaan"; "Tamu"/"Pengguna" konsisten.
-- **Penerimaan:** `grep -riE` daftar istilah terlarang (Lampiran A, kolom "Dilarang di UI publik") pada `resources/views` (kecuali `filament/`) tidak menemukan kemunculan tanpa `x-ui.term`/penjelasan. Test sensitif-teks diperbarui.
+- **Penerimaan:** `grep -riE` daftar istilah terlarang (Lampiran A, kolom "Dilarang di UI publik") pada `resources/views` (kecuali `filament/`) tidak menemukan kemunculan tanpa `x-ui.term`/penjelasan. Test sensitif-teks diperbarui. Terapkan juga **Aturan pemakaian istilah** dari T1.1 (kemunculan pertama saja, maksimal 2 per paragraf, tanpa istilah berurutan).
 
 ### T1.3 (M) Konsolidasi disclaimer
 - [x] Buat `components/ui/disclaimer.blade.php` dengan 2 varian: `compact` (1 kalimat) dan `full` (paragraf + tautan "Cara membaca hasil").
