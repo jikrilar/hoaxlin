@@ -126,11 +126,110 @@ class UiComponentsTest extends TestCase
         $this->assertSame(0, $dom->query('//details/@title | //details/@aria-expanded | //div/@tone')->length);
     }
 
+    public function test_button_sizes_and_danger_variant_are_declared_not_inlined(): void
+    {
+        $dom = $this->render('<x-ui.button id="small" size="sm">Kecil</x-ui.button><x-ui.button id="large" size="lg">Besar</x-ui.button><x-ui.button id="danger" variant="destructive">Hapus</x-ui.button>');
+
+        $this->assertSame('sm', $dom->evaluate('string(//*[@id="small"]/@data-size)'));
+        $this->assertSame('lg', $dom->evaluate('string(//*[@id="large"]/@data-size)'));
+        $this->assertSame('destructive', $dom->evaluate('string(//*[@id="danger"]/@data-variant)'));
+        $this->assertSame(0, $dom->query('//button/@size | //button/@data-size="md"')->length);
+    }
+
+    public function test_card_exposes_header_body_footer_and_optional_interactive_region(): void
+    {
+        $card = '<x-ui.card id="plain" header="Judul kartu" footer="Kaki">Isi kartu</x-ui.card>'
+            .'<x-ui.card id="interactive" :interactive="true" href="/hasil/1" aria-label="Buka hasil">Hasil</x-ui.card>';
+        $dom = $this->render($card);
+
+        $this->assertSame(1, $dom->query('//*[@id="plain" and contains(concat(" ", normalize-space(@class), " "), " hl-card ")]')->length);
+        $this->assertSame('section', $dom->evaluate('name(//*[@id="plain"])'));
+        $this->assertSame(0, $dom->query('//*[@id="plain"]/@data-interactive')->length);
+        $this->assertSame('Judul kartu', trim($dom->evaluate('string(//*[@id="plain"]//*[contains(@class,"hl-card__header")])')));
+        $this->assertSame('Kaki', trim($dom->evaluate('string(//*[@id="plain"]//*[contains(@class,"hl-card__footer")])')));
+        $this->assertSame('Isi kartu', trim($dom->evaluate('string(//*[@id="plain"]//*[contains(@class,"hl-card__body")])')));
+        $this->assertSame(1, $dom->query('//*[@id="interactive"]/@data-interactive')->length);
+        $this->assertSame('a', $dom->evaluate('name(//*[@id="interactive"])'));
+        $this->assertSame('/hasil/1', $dom->evaluate('string(//*[@id="interactive"]/@href)'));
+        $this->assertSame('Buka hasil', $dom->evaluate('string(//*[@id="interactive"]/@aria-label)'));
+        $this->assertSame(0, $dom->query('//*[@id="interactive"]//*[contains(@class,"hl-card__header")]')->length);
+        $this->assertSame(1, $dom->query('//*[@id="interactive"]//*[contains(@class,"hl-card__body")]')->length);
+    }
+
+    public function test_badge_pairs_icon_with_text_for_every_prediction_tone(): void
+    {
+        $dom = $this->render('<x-ui.badge tone="success">Valid</x-ui.badge><x-ui.badge tone="danger">Hoaks</x-ui.badge><x-ui.badge tone="warning">Belum terverifikasi</x-ui.badge><x-ui.badge>Netral</x-ui.badge>');
+
+        $this->assertSame(4, $dom->query('//*[contains(concat(" ", normalize-space(@class), " "), " hl-badge ")]')->length);
+        $this->assertSame(4, $dom->query('//*[contains(@class,"hl-badge")]/*[@aria-hidden="true"]')->length, 'every badge carries a decorative icon');
+        $this->assertSame(4, $dom->query('//*[contains(@class,"hl-badge")]/*[contains(@class,"hl-badge__text")]')->length);
+        $this->assertSame(['success', 'danger', 'warning', 'neutral'], array_map(
+            fn ($node) => $node->getAttribute('data-tone'),
+            iterator_to_array($dom->query('//*[contains(concat(" ", normalize-space(@class), " "), " hl-badge ")]')),
+        ));
+    }
+
+    public function test_tabs_render_accessible_tablist_without_hiding_content_before_js(): void
+    {
+        $dom = $this->render('<x-ui.tabs id="input-tabs" label="Jenis input" :tabs="$tabs" :active="\'url\'" />', ['tabs' => [
+            ['key' => 'teks', 'label' => 'Teks'],
+            ['key' => 'url', 'label' => 'Tautan artikel'],
+        ]]);
+
+        $this->assertSame('tablist', $dom->evaluate('string(//*[@data-tabs]/*[@role="tablist"]/@role)'));
+        $this->assertSame('Jenis input', $dom->evaluate('string(//*[@data-tabs]/*[@role="tablist"]/@aria-label)'));
+        $this->assertSame('', trim($dom->evaluate('string(//*[@id="input-tabs-panel-url"])')), 'panel content is page-owned');
+
+        $this->assertSame(2, $dom->query('//*[@role="tablist"]/*[@role="tab"]')->length);
+        $this->assertSame('true', $dom->evaluate('string(//*[@id="input-tabs-tab-url"]/@aria-selected)'));
+        $this->assertSame('false', $dom->evaluate('string(//*[@id="input-tabs-tab-teks"]/@aria-selected)'));
+        $this->assertSame('0', $dom->evaluate('string(//*[@id="input-tabs-tab-url"]/@tabindex)'));
+        $this->assertSame('-1', $dom->evaluate('string(//*[@id="input-tabs-tab-teks"]/@tabindex)'));
+        $this->assertSame('input-tabs-panel-url', $dom->evaluate('string(//*[@id="input-tabs-tab-url"]/@aria-controls)'));
+        $this->assertSame('input-tabs-tab-url', $dom->evaluate('string(//*[@id="input-tabs-panel-url"]/@aria-labelledby)'));
+        $this->assertSame(0, $dom->query('//*[@id="input-tabs-panel-url"]/@hidden')->length);
+        $this->assertSame(1, $dom->query('//*[@id="input-tabs-panel-teks"]/@hidden')->length);
+        $this->assertSame(0, $dom->query('//*[@role="tab"]/@href')->length, 'tabs are buttons, not anchor navigation');
+    }
+
+    public function test_stat_shows_value_label_glossary_term_and_description(): void
+    {
+        $dom = $this->render('<x-ui.stat label="Prediksi model" value="Valid" term="classifier" description="Total prediksi yang tercatat." tone="success" />');
+
+        $this->assertStringContainsString('Prediksi model', $dom->evaluate('string(//*[contains(@class,"hl-stat__label")]//button[@data-term-trigger])'));
+        $this->assertSame('Valid', trim($dom->evaluate('string(//*[contains(@class,"hl-stat__value")])')));
+        $this->assertSame(1, $dom->query('//*[contains(@class,"hl-stat")]//button[@data-term-trigger]')->length);
+        $this->assertSame('Total prediksi yang tercatat.', trim($dom->evaluate('string(//*[contains(@class,"hl-stat__description")])')));
+        $this->assertSame('success', $dom->evaluate('string(//*[contains(@class,"hl-stat")]/@data-tone)'));
+    }
+
+    public function test_stepper_marks_done_current_todo_and_error_steps(): void
+    {
+        $dom = $this->render('<x-ui.stepper :steps="$steps" current="analisis" />', ['steps' => [
+            ['key' => 'kirim', 'label' => 'Kirim'],
+            ['key' => 'analisis', 'label' => 'Analisis'],
+            ['key' => 'gagal', 'label' => 'Gagal', 'status' => 'error'],
+            ['key' => 'baca', 'label' => 'Baca hasil'],
+        ]]);
+
+        $this->assertSame(['done', 'current', 'error', 'todo'], array_map(
+            fn ($node) => $node->getAttribute('data-status'),
+            iterator_to_array($dom->query('//*[@data-stepper]/li[@data-step]')),
+        ));
+        $this->assertSame('', $dom->evaluate('string(//*[@data-stepper]/@role)'), 'native ol keeps list semantics');
+        $this->assertSame('Tahap pemeriksaan', $dom->evaluate('string(//*[@data-stepper]/@aria-label)'));
+        $this->assertSame(['step'], array_values(array_map(
+            fn ($node) => $node->getAttribute('aria-current'),
+            array_filter(iterator_to_array($dom->query('//*[@data-step]')), fn ($node) => $node->hasAttribute('aria-current')),
+        )));
+        $this->assertStringContainsString('Analisis', $dom->evaluate('string(//*[@data-status="current"])'));
+    }
+
     #[DataProvider('invalidContracts')]
-    public function test_invalid_component_contracts_fail_closed(string $template): void
+    public function test_invalid_component_contracts_fail_closed(string $template, array $data = []): void
     {
         try {
-            $this->render($template);
+            $this->render($template, $data);
             $this->fail('Invalid component contract was rendered.');
         } catch (ViewException $exception) {
             $cause = $exception;
@@ -284,6 +383,15 @@ class UiComponentsTest extends TestCase
             'alert tone' => ['<x-ui.alert tone="prediction" />'],
             'open boolean' => ['<x-ui.disclosure title="Detail" open="false" />'],
             'disclaimer variant' => ['<x-ui.disclaimer variant="marketing" />'],
+            'button size' => ['<x-ui.button size="huge" />'],
+            'card href' => ['<x-ui.card href="javascript:alert(1)" />'],
+            'card interactive without href' => ['<x-ui.card :interactive="true" />'],
+            'badge tone' => ['<x-ui.badge tone="purple" />'],
+            'badge empty text' => ['<x-ui.badge>   </x-ui.badge>'],
+            'tabs unknown active' => ['<x-ui.tabs id="tabs" label="Jenis" :tabs="$tabs" active="missing" />', ['tabs' => [['key' => 'a', 'label' => 'A', 'panel' => 'A']]]],
+            'stat label' => ['<x-ui.stat label="" value="1" />'],
+            'stepper unknown current' => ['<x-ui.stepper :steps="$steps" current="missing" />', ['steps' => [['key' => 'a', 'label' => 'A']]]],
+            'stepper unknown status' => ['<x-ui.stepper :steps="$steps" />', ['steps' => [['key' => 'a', 'label' => 'A', 'status' => 'done']]]],
         ];
     }
 

@@ -208,15 +208,17 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 
 ### T2.3 (L) Pustaka komponen
 Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.css` (pecah file bila terlalu besar):
-- [ ] `button` (primary/secondary/tertiary/danger, ukuran, state loading & disabled), `link`.
-- [ ] `field`, `forms/input|select|password|upload-field`: ukuran, state error/hint konsisten.
-- [ ] **`card`** (baru): header, body, footer, varian `interactive`.
-- [ ] **`badge`** (baru): tone `neutral|success|danger|warning|info`; dipakai untuk label prediksi (valid/hoax/meragukan) dengan **ikon + teks** (bukan warna saja).
-- [ ] **`tabs`** (baru, aksesibel: `role=tablist/tab/tabpanel`, panah kiri/kanan, Home/End). Ganti pola "tab = tautan #anchor" pada `partials/submission/input-types.blade.php` (T2.5).
-- [ ] **`stat`** (baru): angka + label + `x-ui.term` + deskripsi.
-- [ ] **`stepper`** (baru): daftar langkah bernomor, status `done|current|todo|error`.
-- [ ] `alert`, `disclosure`, `empty-state`, `pagination` disesuaikan gaya baru.
-- [ ] Halaman katalog internal opsional `/_ui` **jangan** dibuat di produksi; dokumentasikan komponen di `reports/frontend-revamp/components.md` dengan contoh pemakaian.
+- [x] `button` (primary/secondary/tertiary/danger, ukuran, state loading & disabled), `link`.
+- [x] `field`, `forms/input|select|password|upload-field`: ukuran, state error/hint konsisten.
+- [x] **`card`** (baru): header, body, footer, varian `interactive`.
+- [x] **`badge`** (baru): tone `neutral|success|danger|warning|info`; dipakai untuk label prediksi (valid/hoax/meragukan) dengan **ikon + teks** (bukan warna saja).
+- [x] **`tabs`** (baru, aksesibel: `role=tablist/tab/tabpanel`, panah kiri/kanan, Home/End). Ganti pola "tab = tautan #anchor" pada `partials/submission/input-types.blade.php` (T2.5).
+- [x] **`stat`** (baru): angka + label + `x-ui.term` + deskripsi.
+- [x] **`stepper`** (baru): daftar langkah bernomor, status `done|current|todo|error`.
+- [x] `alert`, `disclosure`, `empty-state`, `pagination` disesuaikan gaya baru.
+- [x] Halaman katalog internal opsional `/_ui` **jangan** dibuat di produksi; dokumentasikan komponen di `reports/frontend-revamp/components.md` dengan contoh pemakaian.
+- **Bukti:** `tests/Unit/UiComponentsTest.php` (render tiap komponen + kontrak gagal-tertutup), `tests/Frontend/tabs.test.mjs` (keyboard: klik, `←`/`→` berputar, `Home`/`End`, `Space`, roving tabindex, dispose), `tests/Frontend/components-style.test.mjs` (satu blok gaya per komponen, tanpa restyle tombol per halaman), katalog `reports/frontend-revamp/components.md`.
+- **Catatan migrasi:** pola tab masih `#anchor` di `partials/submission/input-types.blade.php`; penggantian ke `x-ui.tabs` milik T2.5 (form tunggal + `?tab=`), sehingga komponen tersedia tanpa memaksa perubahan kontrak backend sekarang.
 - **Penerimaan:** komponen baru punya test render + test keyboard (untuk tabs); tidak ada duplikasi gaya tombol/kartu antar halaman.
 
 ### T2.4 (M) Layout bersama

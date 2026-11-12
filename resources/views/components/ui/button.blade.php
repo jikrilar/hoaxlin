@@ -1,16 +1,18 @@
-@props(['variant' => 'primary', 'type' => 'button', 'disabled' => false, 'loading' => false])
+@props(['variant' => 'primary', 'type' => 'button', 'size' => 'md', 'disabled' => false, 'loading' => false])
 
 @php
     if (! in_array($variant, ['primary', 'secondary', 'tertiary', 'destructive'], true)
         || ! in_array($type, ['button', 'submit', 'reset'], true)
+        || ! in_array($size, ['sm', 'md', 'lg'], true)
         || ! is_bool($disabled) || ! is_bool($loading)) {
         throw new InvalidArgumentException('Invalid button variant, type or state.');
     }
 @endphp
 
 <button type="{{ $type }}" data-variant="{{ $variant }}"
+    @if($size !== 'md') data-size="{{ $size }}" @endif
     @disabled($disabled || $loading) @if($loading) aria-busy="true" @endif
-    {{ $attributes->except(['aria-busy', 'data-variant'])->class(['hl-button']) }}>
+    {{ $attributes->except(['aria-busy', 'data-variant', 'data-size'])->class(['hl-button']) }}>
     @if($loading)
         <span class="hl-button__spinner" aria-hidden="true"></span>
     @endif

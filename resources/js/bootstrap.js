@@ -11,6 +11,10 @@ const modules = [
         load: () => import('./components/term'),
     },
     {
+        matches: root => Boolean(root.querySelector('[data-tabs]')),
+        load: () => import('./components/tabs'),
+    },
+    {
         matches: root => Boolean(root.querySelector('[data-page="submission"]')),
         load: () => import('./pages/submission-form'),
     },

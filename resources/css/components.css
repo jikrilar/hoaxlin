@@ -197,6 +197,91 @@
     /* Spinner is the one endless loop: it signals work in progress, not decoration. */
     @keyframes hl-spin { to { transform: rotate(360deg); } }
 
+    /* Button sizes (T2.3): md is the default 44px target. */
+    .hl-button[data-size="sm"] { min-height: 2.25rem; padding: var(--ds-space-1) var(--ds-space-3); font-size: var(--ds-type-meta-size); }
+    .hl-button[data-size="lg"] { min-height: 3rem; padding: var(--ds-space-3) var(--ds-space-6); font-size: var(--ds-type-body-size); }
+
+    /* Card (T2.3): shared surface, one border/shadow language for page-level panels. */
+    .hl-card {
+        display: flex;
+        flex-direction: column;
+        gap: var(--ds-space-3);
+        margin-block-end: var(--ds-space-6);
+        padding: clamp(var(--ds-space-4), 4vw, var(--ds-space-6));
+        border: var(--ds-border-width) solid var(--ds-border-subtle);
+        border-radius: var(--ds-radius-lg);
+        background: var(--ds-bg-surface);
+        color: inherit;
+        text-decoration: none;
+    }
+    .hl-card__header { color: var(--ds-text-primary); font-weight: var(--ds-font-weight-semibold); }
+    .hl-card__body { min-inline-size: 0; }
+    .hl-card__footer { display: flex; flex-wrap: wrap; gap: var(--ds-space-3); color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .hl-card--interactive { transition: border-color var(--ds-motion-fast) var(--ds-ease-standard), background-color var(--ds-motion-fast) var(--ds-ease-standard); }
+    .hl-card--interactive:hover { border-color: var(--ds-action-primary); background: var(--ds-bg-subtle); }
+    .hl-card--interactive .hl-card__header { color: var(--ds-link); text-decoration: underline; text-underline-offset: 0.15em; }
+
+    /* Badge (T2.3): icon + text; tone is decoration on top of the words. */
+    .hl-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--ds-space-1);
+        padding: var(--ds-space-1) var(--ds-space-2);
+        border: var(--ds-border-width) solid currentColor;
+        border-radius: var(--ds-radius-sm);
+        background: var(--ds-bg-subtle);
+        color: var(--ds-text-primary);
+        font-size: var(--ds-type-meta-size);
+        font-weight: var(--ds-font-weight-medium);
+        line-height: var(--ds-type-meta-leading);
+    }
+    .hl-badge__icon { flex-shrink: 0; overflow: visible; }
+    .hl-badge[data-tone="success"] { background: var(--ds-success-bg); color: var(--ds-success-fg); }
+    .hl-badge[data-tone="danger"] { background: var(--ds-danger-bg); color: var(--ds-danger-fg); }
+    .hl-badge[data-tone="warning"] { background: var(--ds-warning-bg); color: var(--ds-warning-fg); }
+    .hl-badge[data-tone="info"] { background: var(--ds-info-bg); color: var(--ds-info-fg); }
+
+    /* Tabs (T2.3): buttons on a rule; the selected tab is readable without colour alone. */
+    .hl-tabs__list { display: flex; flex-wrap: wrap; gap: var(--ds-space-1); margin-block-end: var(--ds-space-4); border-block-end: var(--ds-border-width) solid var(--ds-border-subtle); }
+    .hl-tabs__tab {
+        display: inline-flex;
+        align-items: center;
+        min-block-size: 2.75rem;
+        padding: var(--ds-space-2) var(--ds-space-3);
+        border: 0;
+        border-block-end: 3px solid transparent;
+        background: transparent;
+        color: var(--ds-text-body);
+        font-size: var(--ds-type-label-size);
+        font-weight: var(--ds-font-weight-medium);
+        cursor: pointer;
+    }
+    .hl-tabs__tab:hover { background: var(--ds-bg-subtle); color: var(--ds-link); }
+    .hl-tabs__tab[aria-selected="true"] { border-block-end-color: var(--ds-action-primary); color: var(--ds-text-primary); font-weight: var(--ds-font-weight-semibold); }
+    .hl-tabs__panel:focus-visible { outline: var(--ds-focus-width) solid var(--ds-focus); outline-offset: var(--ds-focus-offset); }
+
+    /* Stat (T2.3): label, value, description in one predictable stack. */
+    .hl-stat { display: flex; flex-direction: column; gap: var(--ds-space-1); min-inline-size: 0; }
+    .hl-stat__label { color: var(--ds-text-muted); font-size: var(--ds-type-label-size); line-height: var(--ds-type-label-leading); }
+    .hl-stat__value { color: var(--ds-text-primary); font-family: var(--ds-font-editorial); font-size: var(--ds-type-h2-size); font-weight: var(--ds-font-weight-regular); line-height: var(--ds-type-h2-leading); }
+    .hl-stat__description { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); line-height: var(--ds-type-body-sm-leading); }
+    .hl-stat[data-tone="success"] .hl-stat__value { color: var(--ds-success-fg); }
+    .hl-stat[data-tone="danger"] .hl-stat__value { color: var(--ds-danger-fg); }
+    .hl-stat[data-tone="warning"] .hl-stat__value { color: var(--ds-warning-fg); }
+    .hl-stat[data-tone="info"] .hl-stat__value { color: var(--ds-info-fg); }
+
+    /* Stepper (T2.3): numbered, state shown by text marker as well as colour. */
+    .hl-stepper { display: flex; flex-wrap: wrap; gap: var(--ds-space-4); margin: var(--ds-space-4) 0; padding: 0; list-style: none; counter-reset: none; }
+    .hl-stepper > li { display: flex; align-items: center; gap: var(--ds-space-2); min-inline-size: 0; color: var(--ds-text-muted); }
+    .hl-stepper__index { display: inline-flex; align-items: center; justify-content: center; inline-size: 1.75rem; block-size: 1.75rem; flex-shrink: 0; border: var(--ds-border-width) solid currentColor; border-radius: 50%; font-size: var(--ds-type-meta-size); font-weight: var(--ds-font-weight-semibold); }
+    .hl-stepper [data-status="done"] { color: var(--ds-text-body); }
+    .hl-stepper [data-status="done"] .hl-stepper__index { background: var(--ds-success-bg); border-color: var(--ds-success-fg); color: var(--ds-success-fg); }
+    .hl-stepper [data-status="current"] { color: var(--ds-text-primary); font-weight: var(--ds-font-weight-semibold); }
+    .hl-stepper [data-status="current"] .hl-stepper__index { background: var(--ds-action-primary); border-color: var(--ds-action-primary); color: var(--ds-text-inverse); }
+    .hl-stepper [data-status="error"] { color: var(--ds-danger-fg); }
+    .hl-stepper [data-status="error"] .hl-stepper__index { background: var(--ds-danger-bg); border-color: var(--ds-danger-fg); }
+    .hl-stepper [data-status="todo"] .hl-stepper__index { color: var(--ds-text-muted); }
+
     .hl-link { color: var(--ds-link); text-decoration: underline; text-underline-offset: 0.15em; }
     .hl-link:hover { color: var(--ds-action-hover); }
     .hl-link:active { color: var(--ds-action-active); }
