@@ -222,8 +222,10 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 - **Penerimaan:** komponen baru punya test render + test keyboard (untuk tabs); tidak ada duplikasi gaya tombol/kartu antar halaman.
 
 ### T2.4 (M) Layout bersama
-- [ ] `layouts/app.blade.php`, `partials/navigation|footer|flash`: header sticky sederhana, navigasi mobile (menu tombol aksesibel), footer ringkas (tautan + kredit sesuai E-1), flash dengan tombol tutup.
-- [ ] `container-app` & grid: lebar konten per jenis halaman (form sempit, bacaan sedang, statistik lebar).
+- [x] `layouts/app.blade.php`, `partials/navigation|footer|flash`: header sticky sederhana, navigasi mobile (menu tombol aksesibel), footer ringkas (tautan + kredit sesuai E-1), flash dengan tombol tutup.
+- [x] `container-app` & grid: lebar konten per jenis halaman (form sempit, bacaan sedang, statistik lebar).
+- **Bukti:** `tests/Unit/PublicNavigationTest.php` (header sticky-ready, tombol Menu aksesibel, flash tutup opsional, satu shell), `tests/Frontend/layout.test.mjs` (token lebar per jenis halaman, header fixed hanya saat ready, tanpa lebar literal), `reports/frontend-revamp/after-s2/components/layout-verification.md`.
+- **Catatan:** shell auth tidak memakai nav publik (disengaja); kredit footer tetap TODO(E-1) sesuai keputusan plan.
 - **Penerimaan:** nav konsisten di semua halaman publik & auth; skip-link tetap ada.
 
 ### T2.5 (L) Landing page + form pemeriksaan

@@ -1,7 +1,7 @@
 /* Public reusable components and shared layout. */
 @layer components {
     .container-app { width: 100%; max-width: var(--ds-container-shell); margin-inline: auto; padding-inline: var(--ds-space-4); }
-    .hl-submission-page { max-inline-size: 52rem; padding-block: calc(var(--ds-space-16) + var(--ds-space-6)) var(--ds-space-12); }
+    .hl-submission-page { max-inline-size: var(--ds-container-form); padding-block: calc(var(--ds-space-16) + var(--ds-space-6)) var(--ds-space-12); }
     .hl-submission-intro { margin-block-end: var(--ds-space-6); }
     .hl-submission-intro p { max-inline-size: var(--ds-reading-measure); margin-block-start: var(--ds-space-3); color: var(--ds-text-muted); }
     .hl-submission-surface { padding: clamp(var(--ds-space-4), 4vw, var(--ds-space-6)); background: var(--ds-bg-surface); border: var(--ds-border-width) solid var(--ds-border-subtle); border-radius: var(--ds-radius-lg); }
@@ -91,7 +91,10 @@
     .hl-account__hint { padding: var(--ds-space-3); color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
     .hl-flash-list { padding-block-start: var(--ds-space-6); }
     .hl-header[data-navigation-ready] + .hl-flash-list { padding-block-start: calc(var(--ds-space-16) + var(--ds-space-6)); }
-    .hl-flash__content { display: flex; align-items: flex-start; gap: var(--ds-space-4); }
+    .hl-flash__content { display: flex; align-items: flex-start; flex-wrap: wrap; gap: var(--ds-space-2) var(--ds-space-4); }
+    .hl-flash__content > .hl-flash__message { flex: 1 1 12rem; }
+    /* The dismiss control keeps its own hit area and never squeezes the message. */
+    .hl-flash__content > .hl-button { flex-shrink: 0; }
     .hl-flash { animation: hl-flash-enter var(--ds-motion-base) var(--ds-ease-emphasis) both; }
     @keyframes hl-flash-enter {
         from { opacity: 0; transform: translateY(var(--ds-motion-rise)); }

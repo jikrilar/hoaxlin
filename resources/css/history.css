@@ -1,5 +1,5 @@
 @layer components {
-    .hl-history-page { max-inline-size: 70rem; padding-block: var(--ds-space-8) var(--ds-space-16); }
+    .hl-history-page { max-inline-size: var(--ds-container-history); padding-block: var(--ds-space-8) var(--ds-space-16); }
     .hl-header[data-navigation-ready] + main .hl-history-page { padding-block-start: calc(var(--ds-space-16) + var(--ds-space-8)); }
     .hl-history-intro h1 { font-size: var(--ds-type-page-title-size); }
     .hl-history-intro > p, .hl-history-note { color: var(--ds-text-muted); margin-block-start: var(--ds-space-2); }
