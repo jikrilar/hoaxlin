@@ -1,10 +1,10 @@
 @layer components {
     .hl-statistics-page { padding-block: var(--ds-space-8) var(--ds-space-16); }
     .hl-header[data-navigation-ready] + main .hl-statistics-page { padding-block-start: calc(var(--ds-space-16) + var(--ds-space-8)); }
-    .hl-statistics-intro > p { max-inline-size: 70ch; margin-block-start: var(--ds-space-3); }
+    .hl-statistics-intro > p { max-inline-size: var(--ds-reading-measure); margin-block-start: var(--ds-space-3); }
     .hl-statistics-note { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); line-height: var(--ds-type-body-sm-leading); }
     .hl-statistics-section { margin-block-start: var(--ds-space-8); padding-block-start: var(--ds-space-6); border-block-start: var(--ds-border-width) solid var(--ds-border-subtle); }
-    .hl-statistics-section > p { margin-block-start: var(--ds-space-4); max-inline-size: 80ch; }
+    .hl-statistics-section > p { margin-block-start: var(--ds-space-4); max-inline-size: var(--ds-reading-measure); }
     .hl-statistics-context { display: flex; flex-wrap: wrap; gap: var(--ds-space-4) var(--ds-space-8); margin-block: var(--ds-space-4); }
     .hl-statistics-context dt { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
     .hl-statistics-context dd { margin-block-start: var(--ds-space-1); }

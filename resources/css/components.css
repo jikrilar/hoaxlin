@@ -38,7 +38,8 @@
     .hl-auth-errors ul { list-style: disc; padding-inline-start: var(--ds-space-5); }
     .hl-auth-errors a { color: inherit; }
     .hl-auth-title { margin-block-end: var(--ds-space-6); }
-    .hl-auth-title h1 { font-size: var(--ds-type-page-title-size); font-weight: var(--ds-font-weight-semibold); }
+    /* Auth forms are a UI surface: Inter, label-scale heading. */
+    .hl-auth-title h1 { font-family: var(--ds-font-ui); font-size: var(--ds-type-h4-size); font-weight: var(--ds-font-weight-semibold); letter-spacing: var(--ds-tracking-ui); line-height: var(--ds-type-h4-leading); }
     .hl-auth-title p { margin-block-start: var(--ds-space-2); color: var(--ds-text-muted); }
     .hl-auth-choice { display: flex; align-items: center; gap: var(--ds-space-3); margin-block-end: var(--ds-space-6); }
     .hl-auth-choice label { min-block-size: 2.75rem; align-content: center; }
@@ -61,7 +62,7 @@
     .hl-header { background: var(--ds-bg-canvas); border-block-end: var(--ds-border-width) solid var(--ds-border-subtle); }
     .hl-header[data-navigation-ready] { position: fixed; inset-block-start: 0; inset-inline: 0; z-index: var(--ds-z-header); }
     .hl-header__inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--ds-space-4); padding-block: var(--ds-space-2); }
-    .hl-wordmark { flex-shrink: 0; color: var(--ds-action-primary); font-family: var(--ds-font-ui); font-size: 1.25rem; font-weight: var(--ds-font-weight-semibold); text-decoration: none; }
+    .hl-wordmark { flex-shrink: 0; color: var(--ds-action-primary); font-family: var(--ds-font-ui); font-size: var(--ds-type-h4-size); font-weight: var(--ds-font-weight-semibold); text-decoration: none; }
     .hl-nav-panel, .hl-nav-links, .hl-nav-auth { display: flex; align-items: center; gap: var(--ds-space-2); }
     .hl-nav-panel { flex-wrap: wrap; gap: var(--ds-space-6); }
     .hl-nav-link, .hl-nav-toggle { display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-2); min-block-size: 2.75rem; padding: var(--ds-space-2) var(--ds-space-3); border: var(--ds-border-width) solid transparent; border-radius: var(--ds-radius-md); background: transparent; color: var(--ds-text-body); font-size: var(--ds-type-label-size); font-weight: var(--ds-font-weight-medium); text-decoration: none; cursor: pointer; }
@@ -298,11 +299,13 @@
         border-radius: 2px;
     }
 
+    /* Marker is a glyph inside inline text; it scales with the parent font and must not
+       affect the line box, so it keeps em units and a 1:1 leading. */
     .hl-term__mark {
-        display: inline;
+        display: inline-block;
         margin-inline-start: 0.1em;
         color: var(--ds-action-primary);
-        font-size: 0.75em;
+        font-size: 0.7em;
         font-weight: var(--ds-font-weight-semibold);
         line-height: 1;
         vertical-align: super;

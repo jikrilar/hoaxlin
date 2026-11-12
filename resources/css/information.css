@@ -10,7 +10,7 @@
     }
 
     .hl-reading-page p, .hl-reading-page dd {
-        max-inline-size: 70ch;
+        max-inline-size: var(--ds-reading-measure);
     }
 
     .hl-reading-intro h1 {

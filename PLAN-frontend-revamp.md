@@ -193,9 +193,10 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 **Tujuan:** tampilan rapi, konsisten, informatif, dan ramah pengguna umum. Palet tetap.
 
 ### T2.1 (M) Tipografi dan ritme
-- [ ] Definisikan ulang skala di `resources/css/design-tokens.css`: ukuran, line-height, bobot, tracking untuk `display`, `h1–h4`, `lead`, `body`, `small`, `meta`; ukuran dasar ≥ 16px; panjang baris baca 60–75 karakter (`--ds-reading-measure`).
-- [ ] Pertahankan pasangan Newsreader (judul editorial) + Inter (UI). Ubah **peran**-nya bila perlu (mis. judul hero & judul bagian = Newsreader; label, tombol, tabel = Inter). Tidak menambah font baru kecuali sesuai guardrail.
-- [ ] Skala spasi vertikal konsisten antar bagian (token `--ds-space-*`); hapus nilai ad-hoc di CSS halaman.
+- [x] Definisikan ulang skala di `resources/css/design-tokens.css`: ukuran, line-height, bobot, tracking untuk `display`, `h1–h4`, `lead`, `body`, `small`, `meta`; ukuran dasar ≥ 16px; panjang baris baca 60–75 karakter (`--ds-reading-measure`).
+- [x] Pertahankan pasangan Newsreader (judul editorial) + Inter (UI). Ubah **peran**-nya bila perlu (mis. judul hero & judul bagian = Newsreader; label, tombol, tabel = Inter). Tidak menambah font baru kecuali sesuai guardrail.
+- [x] Skala spasi vertikal konsisten antar bagian (token `--ds-space-*`); hapus nilai ad-hoc di CSS halaman.
+- **Bukti:** `tests/Frontend/typography.test.mjs` (8 test), screenshots 375/768/1280 di `reports/frontend-revamp/after-s2/`.
 - **Penerimaan:** satu skala tipografi dipakai semua halaman; tidak ada ukuran font hard-coded di `result.css/history.css/statistics.css/information.css` yang menyimpang.
 
 ### T2.2 (S) Gerak (motion)

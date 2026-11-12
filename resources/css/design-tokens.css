@@ -77,40 +77,94 @@
     --ds-font-weight-regular: 400;
     --ds-font-weight-medium: 500;
     --ds-font-weight-semibold: 600;
-    --ds-tracking-editorial: -0.02em;
-    --ds-type-display-size: clamp(2rem, 5vw, 3rem);
-    --ds-type-display-leading: 1.15;
+    /* Type roles (T2.1).
+       Editorial = Newsreader for display/h1–h4 and section heads.
+       UI = Inter for body copy, labels, buttons, tables and metadata.
+       Every role ships size + leading + weight; tracking is role-based too. */
+    --ds-tracking-editorial: -0.015em;
+    --ds-tracking-heading: -0.01em;
+    --ds-tracking-ui: 0em;
+    --ds-tracking-wide: 0.02em;
+
+    /* display — hero statements on the landing page. */
+    --ds-type-display-size: clamp(2.125rem, 5vw, 3.25rem);
+    --ds-type-display-leading: 1.1;
     --ds-type-display-weight: var(--ds-font-weight-regular);
-    --ds-type-editorial-heading-size: clamp(1.75rem, 4vw, 2.25rem);
-    --ds-type-editorial-heading-leading: 1.2;
-    --ds-type-editorial-heading-weight: var(--ds-font-weight-regular);
-    --ds-type-page-title-size: clamp(1.5rem, 3vw, 1.75rem);
-    --ds-type-page-title-leading: 1.3;
-    --ds-type-page-title-weight: var(--ds-font-weight-semibold);
-    --ds-type-section-title-size: clamp(1.25rem, 2.5vw, 1.375rem);
-    --ds-type-section-title-leading: 1.35;
-    --ds-type-section-title-weight: var(--ds-font-weight-semibold);
-    --ds-type-item-title-size: clamp(1rem, 2vw, 1.125rem);
-    --ds-type-item-title-leading: 1.4;
-    --ds-type-item-title-weight: var(--ds-font-weight-semibold);
-    --ds-type-lead-size: clamp(1rem, 2vw, 1.125rem);
+    --ds-type-display-tracking: var(--ds-tracking-editorial);
+
+    /* h1 — page title on reading pages and result pages. */
+    --ds-type-h1-size: clamp(1.875rem, 4vw, 2.5rem);
+    --ds-type-h1-leading: 1.15;
+    --ds-type-h1-weight: var(--ds-font-weight-regular);
+    --ds-type-h1-tracking: var(--ds-tracking-editorial);
+
+    /* h2 — section title. */
+    --ds-type-h2-size: clamp(1.375rem, 2.6vw, 1.625rem);
+    --ds-type-h2-leading: 1.3;
+    --ds-type-h2-weight: var(--ds-font-weight-regular);
+    --ds-type-h2-tracking: var(--ds-tracking-heading);
+
+    /* h3 — sub-section / item group. */
+    --ds-type-h3-size: clamp(1.125rem, 1.8vw, 1.25rem);
+    --ds-type-h3-leading: 1.35;
+    --ds-type-h3-weight: var(--ds-font-weight-medium);
+    --ds-type-h3-tracking: var(--ds-tracking-ui);
+
+    /* h4 — smallest heading, still readable at 16px+. */
+    --ds-type-h4-size: 1rem;
+    --ds-type-h4-leading: 1.45;
+    --ds-type-h4-weight: var(--ds-font-weight-semibold);
+    --ds-type-h4-tracking: var(--ds-tracking-ui);
+
+    /* lead — one-sentence intro under a hero or page title. */
+    --ds-type-lead-size: clamp(1.0625rem, 1.6vw, 1.1875rem);
     --ds-type-lead-leading: 1.6;
     --ds-type-lead-weight: var(--ds-font-weight-regular);
+    --ds-type-lead-tracking: var(--ds-tracking-ui);
+
+    /* body — default paragraph copy. Never smaller than 16px. */
     --ds-type-body-size: 1rem;
-    --ds-type-body-leading: 1.6;
+    --ds-type-body-leading: 1.65;
     --ds-type-body-weight: var(--ds-font-weight-regular);
-    --ds-type-body-sm-size: 0.875rem;
-    --ds-type-body-sm-leading: 1.55;
+    --ds-type-body-tracking: var(--ds-tracking-ui);
+
+    /* small — secondary copy (notes, hints). */
+    --ds-type-body-sm-size: 0.9375rem;
+    --ds-type-body-sm-leading: 1.6;
     --ds-type-body-sm-weight: var(--ds-font-weight-regular);
-    --ds-type-label-size: 0.875rem;
-    --ds-type-label-leading: 1.4;
-    --ds-type-label-weight: var(--ds-font-weight-medium);
+    --ds-type-body-sm-tracking: var(--ds-tracking-ui);
+
+    /* meta — labels above values and timestamps. */
     --ds-type-meta-size: 0.8125rem;
     --ds-type-meta-leading: 1.5;
     --ds-type-meta-weight: var(--ds-font-weight-regular);
+    --ds-type-meta-tracking: var(--ds-tracking-wide);
+
+    /* label — UI controls and table headers. */
+    --ds-type-label-size: 0.875rem;
+    --ds-type-label-leading: 1.4;
+    --ds-type-label-weight: var(--ds-font-weight-medium);
+    --ds-type-label-tracking: var(--ds-tracking-ui);
+
+    /* code — inline/code blocks. */
     --ds-type-code-size: 0.8125rem;
     --ds-type-code-leading: 1.5;
     --ds-type-code-weight: var(--ds-font-weight-regular);
+    --ds-type-code-tracking: var(--ds-tracking-ui);
+
+    /* Legacy aliases kept so existing consumers keep working while pages migrate. */
+    --ds-type-editorial-heading-size: var(--ds-type-h1-size);
+    --ds-type-editorial-heading-leading: var(--ds-type-h1-leading);
+    --ds-type-editorial-heading-weight: var(--ds-type-h1-weight);
+    --ds-type-page-title-size: var(--ds-type-h2-size);
+    --ds-type-page-title-leading: var(--ds-type-h2-leading);
+    --ds-type-page-title-weight: var(--ds-type-h2-weight);
+    --ds-type-section-title-size: var(--ds-type-h2-size);
+    --ds-type-section-title-leading: var(--ds-type-h2-leading);
+    --ds-type-section-title-weight: var(--ds-type-h2-weight);
+    --ds-type-item-title-size: var(--ds-type-h3-size);
+    --ds-type-item-title-leading: var(--ds-type-h3-leading);
+    --ds-type-item-title-weight: var(--ds-type-h3-weight);
 
     /* Spacing, layout and shape. */
     --ds-space-1: 0.25rem;
