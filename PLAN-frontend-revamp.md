@@ -252,8 +252,10 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 - **Penerimaan:** pengunjung memahami apa itu Hoaxlin dalam ±10 detik tanpa membuka halaman lain; satu CAPTCHA per kirim.
 
 ### T2.6 (M) Halaman progres
-- [ ] `livewire/submission-progress.blade.php`: tampilkan `stepper` tahap (Ekstraksi → Terjemahan bila perlu → Analisis → Rujukan → Penjelasan) dengan status tiap tahap dari data backend (`ProcessingStage`). Pertahankan: polling `wire:poll.2s.visible`, `aria-live`, **tanpa persen/ETA palsu**; bila indikator persen tetap dipakai, pertahankan teks bahwa itu mengikuti tahap tercatat.
-- [ ] Status gagal: pesan ramah + tombol "Periksa informasi baru"; tombol "Muat ulang status" dijadikan tertiary (polling sudah otomatis).
+- [x] `livewire/submission-progress.blade.php`: tampilkan `stepper` tahap (Ekstraksi → Terjemahan bila perlu → Analisis → Rujukan → Penjelasan) dengan status tiap tahap dari data backend (`ProcessingStage`). Pertahankan: polling `wire:poll.2s.visible`, `aria-live`, **tanpa persen/ETA palsu**; bila indikator persen tetap dipakai, pertahankan teks bahwa itu mengikuti tahap tercatat.
+- [x] Status gagal: pesan ramah + tombol "Periksa informasi baru"; tombol "Muat ulang status" dijadikan tertiary (polling sudah otomatis).
+- **Bukti:** `SubmissionProgressTest` (5 langkah, status dari `ProcessingStage::stepStates`, `aria-current`, gagal→`error` tanpa meter), `progress.test.mjs` (stepper diperbarui dari payload fallback), `reports/frontend-revamp/after-s2/t26/`.
+- **Catatan:** persen indikator dipertahankan dengan teks "mengikuti tahap yang tercatat"; stepper menggambarkan tahap, bukan waktu.
 - **Penerimaan:** `SubmissionProgressTest`, `PublicPipelineErrorTest`, `tests/Frontend/progress.test.mjs` hijau.
 
 ### T2.7 (L) Halaman hasil

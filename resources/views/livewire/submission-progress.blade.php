@@ -5,6 +5,7 @@
     $refreshUrl = request()->routeIs('riwayat.show')
         ? route('riwayat.show', $submission->id)
         : route('hasil', $submission->id);
+    $stepStates = \App\Enums\ProcessingStage::stepStates($stage, $isCompleted, $isFailed);
 @endphp
 
 <section class="hl-submission-progress" wire:key="submission-progress-{{ $submission->id }}"
@@ -43,6 +44,23 @@
         @endif
     </p>
 
+    {{-- Stepper mirrors the recorded stage only; no step advances on its own. --}}
+    <ol class="hl-stepper hl-submission-progress__stepper" aria-label="Tahap pemeriksaan" data-progress-stepper>
+        @foreach($stepStates as $step)
+            <li data-step="{{ $step['key'] }}" data-status="{{ $step['status'] }}"
+                @if($step['status'] === 'current') aria-current="step" @endif>
+                <span class="hl-stepper__index" aria-hidden="true">{{ $loop->iteration }}</span>
+                <span class="hl-stepper__label">{{ $step['label'] }}</span>
+                <span class="hl-visually-hidden">({{ match($step['status']) {
+                    'done' => 'selesai',
+                    'current' => 'sedang berjalan',
+                    'error' => 'gagal',
+                    default => 'belum dimulai',
+                } }})</span>
+            </li>
+        @endforeach
+    </ol>
+
     @if(! $isFailed && $knownStatus)
         <div class="hl-submission-progress__meter">
             <div class="hl-submission-progress__metadata">
@@ -67,9 +85,14 @@
     @endif
 
     <div class="hl-submission-progress__actions">
-        <a href="{{ $refreshUrl }}" class="hl-button" data-variant="{{ $isCompleted ? 'primary' : 'secondary' }}" data-progress-refresh>
-            {{ $isCompleted ? 'Lihat Hasil' : 'Muat ulang status' }}
-        </a>
+        @if($isCompleted)
+            <a href="{{ $refreshUrl }}" class="hl-button" data-variant="primary" data-progress-refresh>Lihat Hasil</a>
+        @else
+            {{-- Polling is automatic; the manual reload is a fallback, not the primary action. --}}
+            <a href="{{ $refreshUrl }}" class="hl-button" data-variant="tertiary" data-progress-refresh>
+                {{ $isFailed ? 'Lihat status akhir' : 'Muat ulang status' }}
+            </a>
+        @endif
         @if($isFailed)
             <a href="{{ url('/') }}#cek-berita" class="hl-button" data-variant="primary">Periksa informasi baru</a>
         @endif

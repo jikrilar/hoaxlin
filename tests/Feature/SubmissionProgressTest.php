@@ -157,6 +157,84 @@ class SubmissionProgressTest extends TestCase
         $component->call('refreshProgress')->assertStatus(403);
     }
 
+    public function test_progress_renders_a_data_driven_stage_stepper(): void
+    {
+        $user = User::factory()->create();
+        $submission = Submission::create([
+            'user_id' => $user->id,
+            'input_type' => 'text',
+            'raw_input' => str_repeat('Stepper. ', 10),
+            'status' => 'processing',
+            'processing_stage' => ProcessingStage::Classifying->value,
+        ]);
+
+        $this->actingAs($user);
+        Livewire::test(SubmissionProgress::class, ['submission' => $submission])
+            ->assertSee('data-progress-stepper', false)
+            ->assertSee('Ekstraksi')
+            ->assertSee('Terjemahan')
+            ->assertSee('Analisis')
+            ->assertSee('Rujukan')
+            ->assertSee('Penjelasan')
+            ->assertSee('data-step="extracting" data-status="done"', false)
+            ->assertSee('data-step="translating" data-status="done"', false)
+            ->assertSee('data-step="classifying" data-status="current"', false)
+            ->assertSee('data-step="retrieving" data-status="todo"', false)
+            ->assertSee('aria-current="step"', false)
+            // The readable stage label and machine-readable state stay in sync.
+            ->assertSee('Menganalisis pola bahasa')
+            ->assertSee('60%');
+    }
+
+    public function test_stepper_never_invents_progress_before_a_stage_is_recorded(): void
+    {
+        $user = User::factory()->create();
+        $submission = Submission::create([
+            'user_id' => $user->id,
+            'input_type' => 'text',
+            'raw_input' => str_repeat('Menunggu. ', 10),
+            'status' => 'pending',
+            'processing_stage' => ProcessingStage::Queued->value,
+        ]);
+
+        $this->actingAs($user);
+        $component = Livewire::test(SubmissionProgress::class, ['submission' => $submission]);
+        $html = $component->html();
+
+        foreach (['extracting', 'translating', 'classifying', 'retrieving', 'explaining'] as $key) {
+            $this->assertStringContainsString('data-step="'.$key.'" data-status="todo"', $html);
+        }
+        $this->assertStringNotContainsString('data-status="current"', $html);
+        $this->assertStringNotContainsString('aria-current="step"', $html);
+    }
+
+    public function test_failed_stepper_marks_the_recorded_stage_as_error(): void
+    {
+        $user = User::factory()->create();
+        $submission = Submission::create([
+            'user_id' => $user->id,
+            'input_type' => 'text',
+            'raw_input' => str_repeat('Gagal di analisis. ', 10),
+            'status' => 'failed',
+            'processing_stage' => ProcessingStage::Classifying->value,
+            'failure_reason' => 'Model timeout',
+        ]);
+
+        $this->actingAs($user);
+        $component = Livewire::test(SubmissionProgress::class, ['submission' => $submission]);
+        $html = $component->html();
+
+        $this->assertStringContainsString('data-step="extracting" data-status="done"', $html);
+        $this->assertStringContainsString('data-step="classifying" data-status="error"', $html);
+        $this->assertStringContainsString('data-step="retrieving" data-status="todo"', $html);
+        $this->assertStringNotContainsString('aria-current="step"', $html);
+        // Failed submissions never show a success meter or polling.
+        $this->assertStringNotContainsString('role="progressbar"', $html);
+        $this->assertStringNotContainsString('wire:poll.2s.visible', $html);
+        $this->assertSame(1, substr_count($html, 'data-variant="primary"'));
+        $this->assertStringContainsString('Periksa informasi baru', $html);
+    }
+
     public function test_failed_done_stage_keeps_backend_percentage_without_a_success_meter(): void
     {
         $owner = User::factory()->create();
