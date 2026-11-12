@@ -13,6 +13,12 @@
         'label' => $month['display_label'],
         'total' => $month['total'], 'hoax' => $month['hoax'], 'valid' => $month['valid'],
     ]);
+    // Label distribution mirrors the table below, including its text labels and tone.
+    $labelChartData = collect($labels)->map(fn ($label) => [
+        'label' => \App\View\Presenters\DetectionPresentation::label($label)['text'],
+        'count' => (int) ($byTopic[$label] ?? 0),
+        'tone' => \App\View\Presenters\DetectionPresentation::label($label)['tone'],
+    ])->values();
 @endphp
 <div class="container-app hl-statistics-page" data-page="statistics">
     <header class="hl-statistics-intro">
@@ -32,35 +38,46 @@
             <div><dt>Data dihitung pada</dt><dd><time datetime="{{ $period['generated_at']->toIso8601String() }}">{{ $period['generated_at']->format('d/m/Y H:i') }}</time></dd></div>
         </dl>
         <p>Periode ini memuat <strong>{{ number_format($totalInPeriod, 0, ',', '.') }} pemeriksaan</strong> dari semua status, termasuk menunggu, diproses, selesai, dan gagal. Bulan berjalan belum berakhir.</p>
-        <p class="hl-statistics-note">Setiap bulan dihitung sejak awal bulan sampai sebelum awal bulan berikutnya, menurut zona waktu aplikasi. Kolom label menghitung pemeriksaan yang memiliki hasil dengan label tersebut; tidak dibatasi ke status selesai. Status belum terverifikasi dan pemeriksaan tanpa hasil tidak termasuk kolom Hoaks atau Valid.</p>
         @if($totalInPeriod === 0)
             <x-ui.empty-state message="Belum ada pemeriksaan dalam periode 12 bulan ini. Nilai nol tetap ditampilkan pada tabel." />
         @endif
-        <p id="trend-table-hint" class="hl-statistics-note">Pada layar sempit, geser tabel untuk membaca semua kolom. Gunakan tombol panah saat area tabel mendapat fokus.</p>
-        <div class="hl-statistics-table-scroll" tabindex="0" role="region" aria-labelledby="trend-table-caption" aria-describedby="trend-table-hint">
-            <table id="statistics-trend-table" class="hl-statistics-table hl-statistics-table--trend">
-                <caption id="trend-table-caption">Jumlah pemeriksaan per bulan dan label tersimpan</caption>
-                <thead><tr><th scope="col">Bulan</th><th scope="col">Total pemeriksaan</th><th scope="col">Dengan label Hoaks</th><th scope="col">Dengan label Valid</th></tr></thead>
-                <tbody>
-                    @foreach($trend as $month)
-                        <tr data-statistics-month="{{ $month['month'] }}">
-                            <th scope="row"><time datetime="{{ $month['month'] }}">{{ $month['display_label'] }}</time></th>
-                            <td>{{ number_format((int) $month['total'], 0, ',', '.') }}</td>
-                            <td>{{ number_format((int) $month['hoax'], 0, ',', '.') }}</td>
-                            <td>{{ number_format((int) $month['valid'], 0, ',', '.') }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        {{-- T2.9: the chart leads; the native table stays one disclosure away for everyone else. --}}
         @if($totalInPeriod > 0)
             <figure class="hl-statistics-chart" data-statistics-chart-panel hidden>
-                <figcaption id="statistics-chart-caption">Grafik tren aktivitas — data yang sama dengan tabel di atas</figcaption>
+                <figcaption id="statistics-chart-caption">Grafik tren aktivitas — data yang sama dengan tabel di bawah</figcaption>
                 <div class="hl-statistics-chart__canvas">
                     <canvas data-statistics-trend="{{ json_encode($chartData) }}" role="img" aria-labelledby="statistics-chart-caption" aria-describedby="trend-table-caption">Nilai lengkap tersedia pada tabel jumlah pemeriksaan per bulan.</canvas>
                 </div>
             </figure>
         @endif
+        <p id="trend-table-hint" class="hl-statistics-note">Pada layar sempit, geser tabel untuk membaca semua kolom. Gunakan tombol panah saat area tabel mendapat fokus.</p>
+        <details class="hl-disclosure hl-statistics-disclosure">
+            <summary class="hl-disclosure__summary">Lihat data tabel</summary>
+            <div class="hl-disclosure__content">
+                <div class="hl-statistics-table-scroll" tabindex="0" role="region" aria-labelledby="trend-table-caption" aria-describedby="trend-table-hint">
+                    <table id="statistics-trend-table" class="hl-statistics-table hl-statistics-table--trend">
+                        <caption id="trend-table-caption">Jumlah pemeriksaan per bulan dan label tersimpan</caption>
+                        <thead><tr><th scope="col">Bulan</th><th scope="col">Total pemeriksaan</th><th scope="col">Dengan label Hoaks</th><th scope="col">Dengan label Valid</th></tr></thead>
+                        <tbody>
+                            @foreach($trend as $month)
+                                <tr data-statistics-month="{{ $month['month'] }}">
+                                    <th scope="row"><time datetime="{{ $month['month'] }}">{{ $month['display_label'] }}</time></th>
+                                    <td>{{ number_format((int) $month['total'], 0, ',', '.') }}</td>
+                                    <td>{{ number_format((int) $month['hoax'], 0, ',', '.') }}</td>
+                                    <td>{{ number_format((int) $month['valid'], 0, ',', '.') }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </details>
+
+        <x-ui.disclosure title="Cara angka ini dihitung" class="hl-statistics-disclosure">
+            <p>Setiap bulan dihitung sejak awal bulan sampai sebelum awal bulan berikutnya, menurut zona waktu {{ $period['timezone'] }}. Rentang bersifat setengah-terbuka, sehingga satu pemeriksaan tidak pernah dihitung di dua bulan.</p>
+            <p>Kolom total memuat pemeriksaan dari semua status, termasuk menunggu, diproses, selesai, dan gagal. Kolom label menghitung pemeriksaan yang memiliki hasil dengan label tersebut; tidak dibatasi ke status selesai. Status belum terverifikasi dan pemeriksaan tanpa hasil tidak termasuk kolom Hoaks atau Valid.</p>
+            <p>Distribusi label di bagian bawah dihitung dari seluruh hasil tersimpan, tanpa batas periode dan tanpa filter status.</p>
+        </x-ui.disclosure>
     </section>
 
     <section class="hl-statistics-section" aria-labelledby="statistics-labels-heading">
@@ -70,8 +87,16 @@
         @if($labelCount === 0)
             <x-ui.empty-state message="Belum ada hasil dengan label tersimpan. Angka nol berasal dari agregat data aplikasi." />
         @endif
+        @if($labelCount > 0)
+            <figure class="hl-statistics-chart" data-statistics-labels-panel hidden>
+                <figcaption id="statistics-labels-caption">Distribusi label tersimpan — data yang sama dengan tabel di bawah</figcaption>
+                <div class="hl-statistics-chart__canvas hl-statistics-chart__canvas--compact">
+                    <canvas data-statistics-labels="{{ json_encode($labelChartData) }}" role="img" aria-labelledby="statistics-labels-caption" aria-describedby="statistics-label-table-caption">Nilai lengkap tersedia pada tabel distribusi label.</canvas>
+                </div>
+            </figure>
+        @endif
         <table id="statistics-label-table" class="hl-statistics-table">
-            <caption>Jumlah hasil menurut label tersimpan, seluruh periode</caption>
+            <caption id="statistics-label-table-caption">Jumlah hasil menurut label tersimpan, seluruh periode</caption>
             <thead><tr><th scope="col">Label prediksi</th><th scope="col">Jumlah hasil</th></tr></thead>
             <tbody>
                 @foreach($labels as $label)
@@ -83,6 +108,14 @@
             </tbody>
         </table>
         <p class="hl-statistics-note">Status <x-ui.term key="abstention">belum terverifikasi</x-ui.term> berarti informasi belum diverifikasi oleh sumber terpercaya. Ini bukan bukti bahwa informasi benar atau palsu.</p>
+        <x-ui.disclosure title="Tentang model" class="hl-statistics-disclosure">
+            @php($activeModel = \App\Models\ModelVersion::currentActive())
+            <p>Model aktif: <strong>{{ $activeModel?->version_name ?? 'Belum tersedia' }}</strong>.
+                Versi dicatat saat hasil disimpan; agregat ini menggabungkan beberapa versi model.</p>
+            <p>Tanggal evaluasi: <strong>{{ $activeModel?->updated_at?->format('d M Y') ?? 'Belum tersedia' }}</strong>.
+                Halaman ini tidak menerbitkan angka akurasi produk; evaluasi model adalah bukti terbatas pada dataset uji, bukan jaminan atas informasi tertentu.</p>
+        </x-ui.disclosure>
+
         <div class="hl-statistics-actions">
             <x-ui.link :href="route('home').'#cek-berita'" variant="primary">Periksa informasi</x-ui.link>
             <x-ui.link :href="route('cara-kerja')" variant="secondary">Cara kerja Hoaxlin</x-ui.link>

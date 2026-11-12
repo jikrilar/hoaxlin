@@ -20,5 +20,7 @@
     .hl-statistics-chart { margin-block-start: var(--ds-space-6); }
     .hl-statistics-chart figcaption { font-size: var(--ds-type-body-sm-size); margin-block-end: var(--ds-space-3); }
     .hl-statistics-chart__canvas { position: relative; block-size: 20rem; min-inline-size: 0; }
+    .hl-statistics-chart__canvas--compact { block-size: 16rem; inline-size: min(100%, 28rem); }
+    .hl-statistics-disclosure { margin-block-start: var(--ds-space-4); }
     .hl-statistics-actions { display: flex; flex-wrap: wrap; gap: var(--ds-space-3); margin-block-start: var(--ds-space-5); }
 }

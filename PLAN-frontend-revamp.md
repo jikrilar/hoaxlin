@@ -287,11 +287,13 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 - **Penerimaan:** test riwayat hijau; 375px nyaman dipakai.
 
 ### T2.9 (M) Statistik publik
-- [ ] Grafik tren (Chart.js sudah menjadi dependency; `resources/js/pages/statistics*.js`) tampil **utama**, tabel menjadi fallback/`disclosure` "Lihat data tabel" (tetap ada untuk aksesibilitas).
-- [ ] Tambahkan donut/bar distribusi label (data sama dengan tabel; warna dari token; pola/ikon agar tidak hanya warna).
-- [ ] Penjelasan metodologi (periode, zona waktu, definisi hitungan) dilipat di "Cara angka ini dihitung".
-- [ ] Tambahkan disclosure "Tentang model" (model aktif, tanggal evaluasi) bila data runtime tersedia; **tanpa** klaim akurasi produk.
-- [ ] Tetap menyatakan: ini aktivitas aplikasi, bukan prevalensi hoaks.
+- [x] Grafik tren (Chart.js sudah menjadi dependency; `resources/js/pages/statistics*.js`) tampil **utama**, tabel menjadi fallback/`disclosure` "Lihat data tabel" (tetap ada untuk aksesibilitas).
+- [x] Tambahkan donut/bar distribusi label (data sama dengan tabel; warna dari token; pola/ikon agar tidak hanya warna).
+- [x] Penjelasan metodologi (periode, zona waktu, definisi hitungan) dilipat di "Cara angka ini dihitung".
+- [x] Tambahkan disclosure "Tentang model" (model aktif, tanggal evaluasi) bila data runtime tersedia; **tanpa** klaim akurasi produk.
+- [x] Tetap menyatakan: ini aktivitas aplikasi, bukan prevalensi hoaks.
+- **Bukti:** `ModelStatisticsClaimsTest` (chart utama sebelum tabel, tabel dalam disclosure, data donut = tabel, disclosure metodologi & model tanpa klaim akurasi), `MonthlyStatisticsBoundaryTest` tetap hijau, `lifecycle.test.mjs` (donut + degradasi independen), `reports/frontend-revamp/after-s2/t29/`.
+- **Catatan:** "Tentang model" memakai `ModelVersion::currentActive()` (bukan panggilan runtime BERT) agar halaman publik tetap tanpa HTTP keluar; angka akurasi sengaja tidak ditampilkan.
 - **Penerimaan:** `MonthlyStatisticsBoundaryTest`, `ModelStatisticsClaimsTest` hijau.
 
 ### T2.10 (M) Cara kerja & Tentang

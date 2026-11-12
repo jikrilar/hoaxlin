@@ -5,6 +5,8 @@ export function createStatisticsModule(loadChart = () => import('./statistics-ch
     return defineModule((root, scope) => {
         const canvas = root.querySelector('[data-statistics-trend]');
         const panel = root.querySelector('[data-statistics-chart-panel]');
+        const labelsCanvas = root.querySelector('[data-statistics-labels]');
+        const labelsPanel = root.querySelector('[data-statistics-labels-panel]');
         if (!canvas || !panel) return;
         let trend;
         try {
@@ -16,11 +18,29 @@ export function createStatisticsModule(loadChart = () => import('./statistics-ch
                 || !trend.some(month => month.total > 0)) return;
         } catch { return; }
 
+        let labelData = null;
+        if (labelsCanvas && labelsPanel) {
+            try {
+                const parsed = JSON.parse(labelsCanvas.dataset.statisticsLabels);
+                if (Array.isArray(parsed) && parsed.length > 0 && parsed.length <= 5
+                    && parsed.every(item => typeof item.label === 'string' && item.label.length > 0 && item.label.length <= 120
+                        && Number.isSafeInteger(item.count) && item.count >= 0
+                        && ['neutral', 'danger', 'warning', 'success', 'info'].includes(item.tone))) {
+                    labelData = parsed;
+                }
+            } catch { labelData = null; }
+        }
+
         const view = root.ownerDocument.defaultView;
         const token = name => view.getComputedStyle(root.ownerDocument.documentElement).getPropertyValue(name).trim();
         const active = () => !scope.signal.aborted && canvas.isConnected;
         let chart;
-        scope.own(() => { chart?.destroy(); chart = undefined; panel.hidden = true; });
+        let labelsChart;
+        scope.own(() => {
+            chart?.destroy(); chart = undefined; panel.hidden = true;
+            labelsChart?.destroy(); labelsChart = undefined;
+            if (labelsPanel) labelsPanel.hidden = true;
+        });
 
         Promise.resolve().then(() => active() ? loadChart() : null).then(loaded => {
             if (!loaded || !active()) return;
@@ -48,10 +68,42 @@ export function createStatisticsModule(loadChart = () => import('./statistics-ch
                     },
                 });
                 if (!active()) { chart.destroy(); chart = undefined; panel.hidden = true; }
+
+                if (labelData && labelsCanvas && labelsPanel) try {
+                    // Same numbers as the table; every slice is also named in the legend text.
+                    const tones = { neutral: '--ds-text-body', danger: '--ds-danger-fg', warning: '--ds-warning-fg', success: '--ds-success-fg', info: '--ds-info-fg' };
+                    labelsPanel.hidden = false;
+                    labelsChart = new Chart(labelsCanvas, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labelData.map(item => item.label),
+                            datasets: [{
+                                data: labelData.map(item => item.count),
+                                backgroundColor: labelData.map(item => token(tones[item.tone] ?? tones.neutral)),
+                                borderColor: token('--ds-bg-surface'),
+                                borderWidth: 2,
+                            }],
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false, animation: false, cutout: '55%',
+                            plugins: {
+                                legend: { position: 'bottom', onClick: () => {}, labels: { color: token('--ds-text-body'), boxWidth: 14, boxHeight: 14 } },
+                                tooltip: { callbacks: { label: item => `${item.label}: ${item.parsed}` } },
+                            },
+                        },
+                    });
+                    if (!active()) { labelsChart.destroy(); labelsChart = undefined; labelsPanel.hidden = true; }
+                } catch {
+                    // A failed label chart must not take the trend chart down with it.
+                    Chart.getChart?.(labelsCanvas)?.destroy();
+                    labelsChart = undefined;
+                    labelsPanel.hidden = true;
+                }
             } catch {
                 // Chart.js may register an instance before a constructor failure.
                 Chart.getChart?.(canvas)?.destroy();
                 panel.hidden = true;
+                if (labelsPanel) labelsPanel.hidden = true;
             }
         }).catch(() => { if (active()) panel.hidden = true; });
     });

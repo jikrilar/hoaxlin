@@ -49,12 +49,85 @@ class ModelStatisticsClaimsTest extends TestCase
         $this->assertSame('2', $dom->evaluate('string(//tr[@data-statistics-label="hoax"]/td)'));
         $this->assertSame(1, $dom->query('//main')->length);
         $this->assertSame(1, $dom->query('//main//h1')->length);
-        $this->assertSame(1, $dom->query('//figure[@hidden]//canvas[@role="img"]')->length);
+        // T2.9: two progressive-enhancement charts (trend + label distribution), both hidden until JS.
+        $this->assertSame(2, $dom->query('//figure[@hidden]//canvas[@role="img"]')->length);
         $html = $response->getContent();
-        $this->assertLessThan(strpos($html, '<canvas'), strpos($html, 'id="statistics-trend-table"'));
+        // The chart is now primary and the native table follows it inside a disclosure.
+        $this->assertLessThan(strpos($html, 'id="statistics-trend-table"'), strpos($html, '<canvas'));
+        $this->assertSame(1, $dom->query('//details[contains(@class,"hl-disclosure")]//table[@id="statistics-trend-table"]')->length);
         $chart = json_decode($dom->evaluate('string(//canvas/@data-statistics-trend)'), true, flags: JSON_THROW_ON_ERROR);
         $this->assertSame(['label' => 'September 2026', 'total' => 5, 'hoax' => 1, 'valid' => 2], $chart[11]);
         Http::assertNothingSent();
+    }
+
+    public function test_trend_chart_is_primary_and_the_table_stays_available_in_a_disclosure(): void
+    {
+        $this->travelTo('2026-09-15 12:00:00');
+        $submission = Submission::factory()->create(['status' => 'completed', 'created_at' => '2026-09-02 10:00:00']);
+        DetectionResult::factory()->for($submission)->create(['label' => 'hoax']);
+
+        $response = $this->get(route('statistik'))->assertOk();
+        $dom = $this->statisticsDom($response->getContent());
+
+        // Chart first in reading order, table collapsed but present for assistive tech.
+        $details = $dom->query('//details[.//table[@id="statistics-trend-table"]]')->item(0);
+        $this->assertNotNull($details);
+        $this->assertSame(0, $dom->query('//details[.//table[@id="statistics-trend-table"]]/@open')->length);
+        $this->assertStringContainsString('Lihat data tabel', $dom->evaluate('string(//details[.//table[@id="statistics-trend-table"]]/summary)'));
+        $this->assertSame(12, $dom->query('//table[@id="statistics-trend-table"]/tbody/tr')->length);
+        $this->assertSame(1, $dom->query('//figure[contains(@class,"hl-statistics-chart")]//canvas[@data-statistics-trend]')->length);
+    }
+
+    public function test_label_distribution_chart_mirrors_the_table_with_text_labels_and_token_tones(): void
+    {
+        $this->travelTo('2026-09-15 12:00:00');
+        $counts = ['valid' => 3, 'hoax' => 2, 'meragukan' => 1];
+        foreach ($counts as $label => $times) {
+            foreach (range(1, $times) as $ignored) {
+                $submission = Submission::factory()->create(['status' => 'completed', 'created_at' => '2026-09-02 10:00:00']);
+                DetectionResult::factory()->for($submission)->create(['label' => $label]);
+            }
+        }
+
+        $response = $this->get(route('statistik'))->assertOk();
+        $dom = $this->statisticsDom($response->getContent());
+
+        $canvas = $dom->query('//canvas[@data-statistics-labels]')->item(0);
+        $this->assertNotNull($canvas, 'label distribution renders a chart');
+        $data = json_decode($canvas->getAttribute('data-statistics-labels'), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame([
+            ['label' => 'Prediksi model: Valid', 'count' => 3, 'tone' => 'neutral'],
+            ['label' => 'Prediksi model: Hoaks', 'count' => 2, 'tone' => 'danger'],
+            ['label' => 'Informasi belum terverifikasi oleh sumber terpercaya', 'count' => 1, 'tone' => 'warning'],
+        ], $data);
+
+        // Every category is named in text, so colour is never the only differentiator.
+        $this->assertSame(3, $dom->query('//table[@id="statistics-label-table"]/tbody/tr')->length);
+        $this->assertSame(1, $dom->query('//figure[@hidden]//canvas[@data-statistics-labels]')->length);
+        $this->assertSame(0, $dom->query('//main//*[@style]')->length);
+    }
+
+    public function test_methodology_and_model_details_are_collapsed_disclosures_without_accuracy_claims(): void
+    {
+        $this->travelTo('2026-09-15 12:00:00');
+        config(['app.timezone' => 'Asia/Jakarta']);
+
+        $response = $this->get(route('statistik'))->assertOk();
+        $dom = $this->statisticsDom($response->getContent());
+
+        $method = $dom->query('//details[.//summary[contains(., "Cara angka ini dihitung")]]')->item(0);
+        $this->assertNotNull($method);
+        $this->assertFalse($method->hasAttribute('open'), 'methodology starts collapsed');
+        $this->assertStringContainsString('Asia/Jakarta', $method->textContent);
+        $this->assertStringContainsString('Setiap bulan dihitung sejak awal bulan', $method->textContent);
+
+        $model = $dom->query('//details[.//summary[contains(., "Tentang model")]]')->item(0);
+        $this->assertNotNull($model);
+        $this->assertStringContainsString('Model aktif', $model->textContent);
+        // No product accuracy claim may be published here.
+        $this->assertDoesNotMatchRegularExpression('/akurasi\s*[:=]\s*\d/i', $model->textContent);
+        $this->assertStringNotContainsString('95%+', $model->textContent);
+        $this->assertStringNotContainsString('100% akurat', $model->textContent);
     }
 
     public function test_empty_statistics_keep_twelve_zero_months_and_native_tables_without_a_chart(): void
