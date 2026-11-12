@@ -50,7 +50,7 @@ test('Newsreader stays the editorial heading face and Inter stays the UI face', 
 
 test('UI surfaces (auth forms) opt headings back into the Inter face', () => {
     const css = read('components.css');
-    const authRule = css.match(/\.hl-auth-title h1 \{[^}]*\}/);
+    const authRule = css.match(/\.hl-auth-title h1, \.hl-auth-heading \{[^}]*\}/);
     assert.ok(authRule, 'auth heading rule must exist');
     assert.match(authRule[0], /font-family:\s*var\(--ds-font-ui\)/, 'auth heading must stay in the UI face');
     assert.match(authRule[0], /font-size:\s*var\(--ds-type-h4-size\)/, 'auth heading must use the type scale');

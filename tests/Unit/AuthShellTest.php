@@ -143,6 +143,37 @@ class AuthShellTest extends TestCase
         parent::tearDown();
     }
 
+    public function test_auth_pages_use_the_shared_component_language_with_friendly_copy(): void
+    {
+        $this->user = new User;
+        $this->user->setRawAttributes(['email' => 'fixture@example.test']);
+        $dom = $this->render('auth.login', '/login');
+
+        // Auth is a UI surface: the heading uses the UI face at h4 scale (T2.1 contract).
+        $this->assertSame(1, $dom->query('//main//h1[contains(@class,"hl-auth-heading")]')->length);
+        $this->assertSame(1, $dom->query('//main//*[contains(concat(" ", normalize-space(@class), " "), " hl-auth-title ")]')->length);
+        $this->assertSame(1, $dom->query('//main//*[@data-disclaimer]')->length);
+
+        // Field hints explain the format before submission instead of after an error.
+        $this->assertStringContainsString('Gunakan email yang aktif', $dom->evaluate('string(//*[@id="email-hint"])'));
+        $this->assertStringContainsString('Lupa kata sandi', $dom->evaluate('string(//main)'));
+
+        // No raw technical jargon from Appendix A leaks into auth copy.
+        $text = $dom->evaluate('string(//main)');
+        foreach (['classifier', 'submission', 'endpoint', 'queue', 'job', 'provenance'] as $jargon) {
+            $this->assertDoesNotMatchRegularExpression('/\b'.$jargon.'\b/i', $text);
+        }
+    }
+
+    public function test_auth_pages_keep_one_primary_action_and_a_guest_exit(): void
+    {
+        $dom = $this->render('auth.login', '/login');
+
+        $this->assertSame(1, $dom->query('//main//button[@type="submit" and contains(@class,"hl-button")]')->length);
+        $this->assertSame(1, $dom->query('//main//a[contains(@class,"hl-auth-guest") and @href="http://localhost"]')->length);
+        $this->assertSame(0, $dom->query('//main//*[@onclick or @style]')->length);
+    }
+
     #[DataProvider('pages')]
     public function test_auth_shell_preserves_native_form_contracts_and_never_restores_passwords(string $view, string $path, array $actions, array $autocompletes): void
     {

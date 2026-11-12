@@ -10,7 +10,7 @@
 
 @section('content')
 <div class="hl-auth-title">
-    <h1>Buat kata sandi baru</h1>
+    <h1 class="hl-auth-heading">Buat kata sandi baru</h1>
     <p>Masukkan email akun dan kata sandi baru. Tautan reset diperiksa saat perubahan dikirim.</p>
 </div>
 

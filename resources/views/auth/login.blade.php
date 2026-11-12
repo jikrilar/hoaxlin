@@ -7,13 +7,13 @@
 
 @section('content')
 <div class="hl-auth-title">
-    <h1>Masuk</h1>
-    <p>Masuk ke akun Anda untuk melanjutkan pemeriksaan informasi.</p>
+    <h1 class="hl-auth-heading">Masuk</h1>
+    <p>Masuk untuk memakai tautan artikel, gambar, video, dan riwayat pemeriksaan. Tamu tetap bisa memeriksa teks.</p>
 </div>
 
 <form method="POST" action="{{ route('login.store') }}" id="login-form" class="hl-auth-form" data-submit-label="Memproses...">
     @csrf
-    <x-ui.field id="email" label="Alamat email" :error="$errors->first('email')">
+    <x-ui.field id="email" label="Alamat email" hint="Gunakan email yang aktif; kami tidak mengirim kata sandi ke alamat ini." :error="$errors->first('email')">
         <x-forms.input type="email" name="email" :value="is_string(old('email')) ? old('email') : ''" required
             autocomplete="email" autocapitalize="none" spellcheck="false" :autofocus="! $errors->any()" />
     </x-ui.field>

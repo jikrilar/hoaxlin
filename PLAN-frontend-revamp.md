@@ -305,7 +305,9 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 - **Penerimaan:** tidak ada paragraf yang identik di dua halaman.
 
 ### T2.11 (S) Auth, profil, error
-- [ ] Terapkan komponen/tipografi baru pada `auth/*`, `profile.blade.php`, `errors/*`; copy ramah; tetap aksesibel. Uji `AuthenticationTest`, `ProfileTest`.
+- [x] Terapkan komponen/tipografi baru pada `auth/*`, `profile.blade.php`, `errors/*`; copy ramah; tetap aksesibel. Uji `AuthenticationTest`, `ProfileTest`.
+- **Bukti:** `AuthShellTest` (heading `hl-auth-heading` Inter, satu aksi utama + jalan keluar tamu, tanpa jargon), `ErrorPageTest` (kode HTTP sebagai catatan, tanpa bocoran path), `AuthenticationTest`/`ProfileTest` hijau, `reports/frontend-revamp/after-s2/t211/`.
+- **Catatan:** copy yang sudah dikontrak test dokumentasi dipertahankan verbatim; badge status email di profil memakai teks sebagai pembeda utama.
 
 ### T2.12 (M) QA visual & aksesibilitas tahap 2
 - [ ] Screenshot "after-s2" 375/768/1280 untuk semua halaman publik, simpan di `reports/frontend-revamp/after-s2/`.

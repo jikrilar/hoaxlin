@@ -16,9 +16,9 @@
 <div class="container-app hl-profile-page">
     <header class="hl-profile-intro">
         <h1>Profil dan keamanan akun</h1>
-        <p>Kelola identitas dan keamanan akun Anda.</p>
+        <p>Ubah nama, email, dan kata sandi akun Anda di sini. Setiap perubahan berlaku langsung setelah disimpan.</p>
         <div class="hl-profile-status">
-            <span>{{ $user->hasVerifiedEmail() ? 'Email terverifikasi' : 'Email belum terverifikasi' }}</span>
+            <x-ui.badge :tone="$user->hasVerifiedEmail() ? 'success' : 'warning'">{{ $user->hasVerifiedEmail() ? 'Email terverifikasi' : 'Email belum terverifikasi' }}</x-ui.badge>
             @if($user->hasVerifiedEmail())
                 <x-ui.link :href="route('riwayat')" variant="tertiary">Lihat riwayat</x-ui.link>
             @else
@@ -29,7 +29,7 @@
 
     <section class="hl-profile-section" aria-labelledby="profile-identity-title">
         <h2 id="profile-identity-title">Identitas akun</h2>
-        <p>Mengubah alamat email akan meminta verifikasi ulang. Akun yang belum terverifikasi akan diarahkan ke halaman verifikasi setelah disimpan.</p>
+        <p>Mengubah email akan meminta verifikasi ulang; setelah disimpan Anda diarahkan ke halaman verifikasi.</p>
         @include('partials.profile.errors', ['bag' => $profileErrors, 'id' => 'profile-errors', 'title' => 'Periksa identitas akun', 'targets' => ['name' => 'name', 'email' => 'email'], 'focus' => ! $deleteErrors->any()])
         <form method="POST" action="{{ route('profile.update') }}" id="profile-form" data-submit-label="Menyimpan...">
             @csrf
@@ -46,7 +46,7 @@
 
     <section class="hl-profile-section" aria-labelledby="profile-password-title">
         <h2 id="profile-password-title">Ubah kata sandi</h2>
-        <p>Masukkan kata sandi saat ini untuk menetapkan kata sandi baru.</p>
+        <p>Masukkan kata sandi saat ini, lalu kata sandi baru dua kali.</p>
         @include('partials.profile.errors', ['bag' => $passwordErrors, 'id' => 'password-errors', 'title' => 'Periksa perubahan kata sandi', 'targets' => ['current_password' => 'current_password', 'password' => 'password', 'password_confirmation' => 'password_confirmation'], 'focus' => ! $deleteErrors->any() && ! $profileErrors->any()])
         <form method="POST" action="{{ route('password.update') }}" id="password-form" data-submit-label="Memperbarui...">
             @csrf
@@ -66,7 +66,7 @@
 
     <section class="hl-profile-section hl-profile-delete" aria-labelledby="profile-delete-title">
         <h2 id="profile-delete-title">Hapus akun</h2>
-        <p>Penghapusan akun bersifat permanen. Akun, riwayat pemeriksaan milik akun, dan media unggahannya akan dihapus. Anda akan keluar dari akun.</p>
+        <p>Tindakan ini permanen: akun, riwayat pemeriksaan milik akun, dan media unggahannya dihapus, lalu Anda keluar dari akun.</p>
         <x-ui.button variant="destructive" id="delete-account-btn" data-dialog-open="delete-modal" aria-haspopup="dialog" aria-controls="delete-modal" hidden>Hapus akun</x-ui.button>
         <details id="delete-confirmation" @if($deleteErrors->any()) open @endif>
             <summary class="hl-button" data-variant="destructive">Konfirmasi penghapusan akun</summary>

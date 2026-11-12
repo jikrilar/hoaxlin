@@ -7,7 +7,7 @@
 
 @section('content')
 <div class="hl-auth-title">
-    <h1>Buat akun</h1>
+    <h1 class="hl-auth-heading">Buat akun</h1>
     <p>Gunakan akun untuk memeriksa tautan dan media. Setelah mendaftar, verifikasi email untuk mengakses riwayat dan memberikan umpan balik.</p>
 </div>
 
