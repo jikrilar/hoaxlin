@@ -36,8 +36,12 @@ test('each page kind declares one content width token', () => {
             : rule(selector);
         assert.match(body, new RegExp(`${token}\\)`), `${selector} must use ${token}`);
     }
-    // Wide data pages use the shell width without a second wrapper.
-    assert.equal(rule('.hl-statistics-page').includes('max-inline-size'), false);
+    // Statistics matches the reading width so its content aligns with other information pages;
+    // wide tables scroll inside their own region instead of widening the page.
+    assert.match(
+        blockOf(readFileSync(new URL('../../resources/css/statistics.css', import.meta.url), 'utf8'), '.hl-statistics-page'),
+        /max-inline-size:\s*var\(--ds-container-reading\)/,
+    );
 });
 
 test('nothing in page CSS hard-codes a container width', () => {
