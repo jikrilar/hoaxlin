@@ -114,7 +114,7 @@ class FeedbackTest extends TestCase
             ->assertSee('id="feedback-form"', false)
             ->assertSee('type="radio" name="is_correct" value="0" required', false)
             ->assertSee('maxlength="1000"', false)
-            ->assertSee('Unduh seluruh riwayat CSV');
+            ->assertDontSee('Unduh seluruh riwayat CSV');
 
         $this->post(route('feedback'), [
             'submission_id' => $submission->id,

@@ -8,7 +8,7 @@
         ];
     @endphp
     <div id="submission-errors" role="alert" tabindex="-1" autofocus class="hl-submission-errors" data-submission-errors>
-        <h3>Periksa kembali input kamu:</h3>
+        <h3>Periksa kembali isian Anda:</h3>
         <ul>
             @foreach ($errors->messages() as $field => $messages)
                 @foreach ($messages as $error)

@@ -6,7 +6,7 @@
     <details class="hl-admin-data-disclosure" wire:ignore.self>
         <summary>Tabel data tren · 30 hari</summary>
         @if(!$trend['available'])
-            <p class="hl-admin-note">Data tren belum tersedia (n/a). Muat ulang halaman untuk mencoba kembali.</p>
+            <p class="hl-admin-note">Data tren belum tersedia. Muat ulang halaman untuk mencoba kembali.</p>
         @else
             <p class="hl-admin-note">{{ $trend['start'] }}–{{ $trend['end'] }} · {{ $trend['timezone'] }}. Grafik dan tabel memakai data yang sama.</p>
             <table class="hl-admin-data-table" data-admin-trend>

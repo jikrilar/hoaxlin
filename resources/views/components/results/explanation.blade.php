@@ -8,8 +8,8 @@
     @elseif($state === \App\Enums\ExplanationStatus::Pending)
         <p>Penjelasan AI belum tersedia untuk hasil ini.</p>
     @elseif($state === \App\Enums\ExplanationStatus::Unavailable)
-        <p>Penjelasan AI tidak tersedia. Prediksi classifier tetap ditampilkan.</p>
+        <p>Penjelasan AI tidak tersedia. Prediksi model tetap ditampilkan.</p>
     @else
-        <p>Teks penjelasan tidak tersedia untuk hasil ini. Prediksi classifier tetap ditampilkan.</p>
+        <p>Teks penjelasan tidak tersedia untuk hasil ini. Prediksi model tetap ditampilkan.</p>
     @endif
 </section>

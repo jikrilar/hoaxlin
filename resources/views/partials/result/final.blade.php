@@ -6,7 +6,7 @@
 <x-results.explanation :result="$result" />
 <section class="hl-result__section hl-result-evidence" aria-labelledby="evidence-heading">
     <h2 id="evidence-heading">Referensi terkait</h2>
-    <p class="hl-result__hint">Referensi berasal dari basis pengetahuan yang digunakan saat analisis. Keterkaitan sumber tidak otomatis mendukung prediksi model.</p>
+    <p class="hl-result__hint">Referensi diambil dari <x-ui.term key="knowledge_base">basis pengetahuan</x-ui.term> yang digunakan saat analisis. Keterkaitan sumber tidak otomatis mendukung prediksi model.</p>
     @php $references = \App\View\Presenters\DetectionPresentation::evidence($submission->evidenceReferences); @endphp
     @if($references->isEmpty())
         <x-ui.empty-state message="Tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini." />

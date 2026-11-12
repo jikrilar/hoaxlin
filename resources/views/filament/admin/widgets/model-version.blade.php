@@ -13,7 +13,7 @@
             <summary>Tiga kelompok versi dengan hasil tersimpan terbanyak</summary>
             <p class="hl-admin-note">Seluruh riwayat hasil, termasuk hasil nonfinal. Maksimal tiga kelompok; bukan jumlah seluruh versi model.</p>
             @if(!$history['available'])
-                <p class="hl-admin-note">Riwayat versi belum tersedia (n/a).</p>
+                <p class="hl-admin-note">Riwayat versi belum tersedia.</p>
             @elseif($history['rows'] === [])
                 <p class="hl-admin-note">Belum ada riwayat versi.</p>
             @else

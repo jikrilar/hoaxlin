@@ -104,7 +104,7 @@ class AdminDashboardTest extends TestCase
         $this->assertCount(30, $widget->instance()->getTrend()['rows']);
         $this->assertSame(0, array_sum(array_column($widget->instance()->getTrend()['rows'], 'total')));
         $this->assertSame([], (new ReflectionMethod($widget->instance(), 'getData'))->invoke($widget->instance()));
-        Livewire::test(ModelVersionWidget::class)->assertSee('n/a')->assertSee('Runtime BERT tidak tersedia')->assertSee('Belum ada riwayat versi.');
+        Livewire::test(ModelVersionWidget::class)->assertSee('Belum tersedia')->assertDontSee('n/a')->assertSee('Layanan model tidak tersedia')->assertSee('Belum ada riwayat versi.');
     }
 
     public function test_runtime_provenance_and_top_three_groups_are_escaped_without_promoting_history_to_active(): void
@@ -148,10 +148,10 @@ class AdminDashboardTest extends TestCase
             }
         });
         try {
-            $ops = Livewire::test(StatsOverview::class)->assertSee('Ringkasan operasi belum tersedia (n/a)')->assertDontSee('PRIVATE_ADMIN_TRACE')->assertDontSee('Belum ada hasil');
+            $ops = Livewire::test(StatsOverview::class)->assertSee('Ringkasan operasi belum tersedia')->assertDontSee('PRIVATE_ADMIN_TRACE')->assertDontSee('Belum ada hasil');
             $this->assertSame([null, null, null], array_column($ops->instance()->render()->getData()['labels'], 'count'));
             Livewire::test(SubmissionTrendChart::class)->assertSee('Data tren belum tersedia')->assertDontSee('PRIVATE_ADMIN_TRACE')->assertDontSee('Belum ada submission');
-            Livewire::test(ModelVersionWidget::class)->assertSee('Riwayat versi belum tersedia (n/a)')->assertDontSee('PRIVATE_ADMIN_TRACE');
+            Livewire::test(ModelVersionWidget::class)->assertSee('Riwayat versi belum tersedia')->assertDontSee('PRIVATE_ADMIN_TRACE');
         } finally {
             $fail = false;
         }

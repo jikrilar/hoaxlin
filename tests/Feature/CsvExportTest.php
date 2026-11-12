@@ -134,12 +134,13 @@ class CsvExportTest extends TestCase
         $history = $this->actingAs($user)->get(route('riwayat', $filters))
             ->assertOk()->assertViewHas('submissions', fn ($items): bool => $items->total() === 1);
         $result = $this->get(route('hasil', $matching))->assertOk();
-        foreach ([$history, $result] as $response) {
-            $response->assertSee('Unduh seluruh riwayat CSV')
-                ->assertSee('href="'.route('riwayat.csv').'"', false)
-                ->assertSee('CSV berisi seluruh riwayat akun Anda, bukan hanya');
-            $this->assertSame(1, substr_count($response->getContent(), 'href="'.route('riwayat.csv').'"'));
-        }
+        $history->assertSee('Unduh seluruh riwayat CSV')
+            ->assertSee('href="'.route('riwayat.csv').'"', false)
+            ->assertSee('CSV berisi seluruh riwayat akun Anda, bukan hanya');
+        $this->assertSame(1, substr_count($history->getContent(), 'href="'.route('riwayat.csv').'"'));
+        // T1.5: the export link lives only on Riwayat, never on the result page.
+        $result->assertDontSee('Unduh seluruh riwayat CSV')
+            ->assertDontSee('href="'.route('riwayat.csv').'"', false);
 
         $response = $this->get(route('riwayat.csv', $filters + ['page' => 2, 'user_id' => $foreign->user_id]))
             ->assertOk()->assertHeader('content-type', 'text/csv; charset=UTF-8');

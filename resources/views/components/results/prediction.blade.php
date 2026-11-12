@@ -9,8 +9,9 @@
         <p>Ini bukan bukti bahwa informasi benar atau palsu.</p>
     @endif
 </div>
-<p class="hl-result__disclaimer">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
+<x-ui.disclaimer class="hl-result__disclaimer">
+    Skor ini menunjukkan tingkat keyakinan <x-ui.term key="classifier">model analisis</x-ui.term> pada prediksinya, bukan persentase kebenaran berita.
+</x-ui.disclaimer>
 <dl class="hl-result__metadata">
-    <div><dt>Skor Keyakinan Model</dt><dd data-result-confidence>{{ $score ?? 'Tidak tersedia' }}</dd></div>
+    <div><dt><x-ui.term key="confidence">Skor Keyakinan Model</x-ui.term></dt><dd data-result-confidence>{{ $score ?? 'Tidak tersedia' }}</dd></div>
 </dl>
-<p class="hl-result__hint">Skor ini menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita.</p>

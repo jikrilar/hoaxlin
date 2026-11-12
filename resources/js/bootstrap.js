@@ -7,6 +7,10 @@ const modules = [
     { load: () => import('./components/form-submit') },
     { load: () => import('./components/dialog') },
     {
+        matches: root => Boolean(root.querySelector('[data-term]')),
+        load: () => import('./components/term'),
+    },
+    {
         matches: root => Boolean(root.querySelector('[data-page="submission"]')),
         load: () => import('./pages/submission-form'),
     },

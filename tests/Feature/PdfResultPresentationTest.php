@@ -67,7 +67,7 @@ class PdfResultPresentationTest extends TestCase
 
         $this->assertStringContainsString('Label prediksi belum tersedia', $html);
         $this->assertStringContainsString('<th>Skor Keyakinan Model</th><td>'.$expected.'</td>', $html);
-        $this->assertStringContainsString('<th>Versi classifier</th><td>Tidak tersedia</td>', $html);
+        $this->assertStringContainsString('<th>Versi model analisis</th><td>Tidak tersedia</td>', $html);
         $this->assertStringNotContainsString('Prediksi model: Valid', $html);
     }
 
@@ -90,7 +90,7 @@ class PdfResultPresentationTest extends TestCase
     {
         return [
             'pending' => ['pending', 'NARASI_LAMA', 'Penjelasan AI belum tersedia untuk hasil ini.'],
-            'unavailable' => ['unavailable', 'NARASI_LAMA', 'Penjelasan AI tidak tersedia. Prediksi classifier tetap ditampilkan.'],
+            'unavailable' => ['unavailable', 'NARASI_LAMA', 'Penjelasan AI tidak tersedia. Prediksi model analisis tetap ditampilkan.'],
             'unknown' => [null, 'NARASI_LAMA', 'Teks penjelasan tidak tersedia untuk hasil ini.'],
             'ready empty' => ['ready', ' ', 'Teks penjelasan tidak tersedia untuk hasil ini.'],
         ];

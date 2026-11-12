@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\AdminGlossary;
 use App\Filament\Widgets\Concerns\RequiresAdminPanel;
 use App\Models\DetectionResult;
 use App\Services\Bert\BertRuntimeMetadata;
@@ -22,23 +23,30 @@ class ModelVersionWidget extends BaseWidget
 
     protected string $view = 'filament.admin.widgets.model-version';
 
+    private const UNAVAILABLE = 'Belum tersedia';
+
     private ?array $history = null;
 
     protected function getStats(): array
     {
         $runtime = app(BertRuntimeMetadata::class)->fetch();
         $available = $runtime['available'];
-        $runtimeVersion = $available ? ($runtime['model_version'] ?? 'n/a') : 'n/a';
-        $threshold = $available && is_numeric($runtime['threshold'] ?? null) ? number_format((float) $runtime['threshold'], 4, '.', '') : 'n/a';
+        $runtimeVersion = $available && filled($runtime['model_version'] ?? null) ? (string) $runtime['model_version'] : self::UNAVAILABLE;
+        $threshold = $available && is_numeric($runtime['threshold'] ?? null) ? number_format((float) $runtime['threshold'], 4, '.', '') : self::UNAVAILABLE;
         $evaluation = $runtime['evaluation'] ?? [];
-        $evaluationValue = $available && is_numeric($evaluation['accuracy'] ?? null) ? number_format((float) $evaluation['accuracy'] * 100, 2, '.', '').'%' : 'n/a';
+        $evaluationValue = $available && is_numeric($evaluation['accuracy'] ?? null) ? number_format((float) $evaluation['accuracy'] * 100, 2, '.', '').'%' : self::UNAVAILABLE;
         $history = $this->getHistory();
 
         return [
-            Stat::make('Model runtime BERT', $runtimeVersion)->description($available ? 'Sumber: runtime BERT /version' : 'Runtime BERT tidak tersedia; versi historis tidak dipakai sebagai model aktif.'),
-            Stat::make('Threshold abstention', $threshold)->description('Batas skor keyakinan classifier; bukan persentase kebenaran informasi.'),
-            Stat::make('Akurasi evaluasi artefak', $evaluationValue)->description($this->evaluationDescription($evaluation, $runtimeVersion, $available)),
-            Stat::make('Kelompok versi pada riwayat', $history['available'] ? count($history['rows']).' kelompok teratas' : 'n/a')
+            Stat::make('Model runtime BERT', $runtimeVersion)->description(
+                ($available && filled($runtime['model_version'] ?? null) ? 'Sumber: layanan model aktif. ' : 'Layanan model tidak tersedia; versi historis tidak dipakai sebagai model aktif. ')
+                .AdminGlossary::explain('active_inference_status'),
+            ),
+            Stat::make('Batas keyakinan (abstention)', $threshold)->description(AdminGlossary::explain('threshold')),
+            Stat::make('Akurasi evaluasi artefak', $evaluationValue)->description(
+                $this->evaluationDescription($evaluation, $runtimeVersion, $available).' '.AdminGlossary::explain('baseline_comparison'),
+            ),
+            Stat::make('Kelompok versi pada riwayat', $history['available'] ? count($history['rows']).' kelompok teratas' : self::UNAVAILABLE)
                 ->description($history['available'] ? (implode(', ', array_column($history['rows'], 'version')) ?: 'Belum ada riwayat versi.') : 'Riwayat versi belum dapat dibaca.'),
         ];
     }
@@ -76,11 +84,11 @@ class ModelVersionWidget extends BaseWidget
 
         return implode(' · ', [
             'Model '.$runtimeVersion,
-            'Dataset '.(filled($evaluation['dataset_name'] ?? null) ? $evaluation['dataset_name'] : 'n/a'),
-            'Versi dataset '.(filled($evaluation['dataset_version'] ?? null) ? $evaluation['dataset_version'] : 'n/a'),
-            'Split '.(filled($evaluation['split'] ?? null) ? $evaluation['split'] : 'n/a'),
-            'n='.(is_numeric($evaluation['sample_count'] ?? null) ? $evaluation['sample_count'] : 'n/a'),
-            'Ekspor '.(filled($evaluation['exported_at'] ?? null) ? $evaluation['exported_at'] : 'n/a'),
+            'Dataset '.(filled($evaluation['dataset_name'] ?? null) ? $evaluation['dataset_name'] : self::UNAVAILABLE),
+            'Versi dataset '.(filled($evaluation['dataset_version'] ?? null) ? $evaluation['dataset_version'] : self::UNAVAILABLE),
+            'Split '.(filled($evaluation['split'] ?? null) ? $evaluation['split'] : self::UNAVAILABLE),
+            'n='.(is_numeric($evaluation['sample_count'] ?? null) ? $evaluation['sample_count'] : self::UNAVAILABLE),
+            'Ekspor '.(filled($evaluation['exported_at'] ?? null) ? $evaluation['exported_at'] : self::UNAVAILABLE),
         ]);
     }
 }

@@ -109,7 +109,7 @@ class DetectionPresentationTest extends TestCase
         $request->setRouteResolver(fn () => $this->app['router']->getRoutes()->match($request));
         $this->app->boot();
         (new CompileLivewireTags)->boot();
-        $this->app['blade.compiler']->directive('livewire', fn () => '<?php echo view("livewire.submission-progress", ["submission"=>$submission, "status"=>$submission->status, "isCompleted"=>$submission->isCompleted(), "isFailed"=>$submission->isFailed(), "progress"=>60, "stageLabel"=>"Klasifikasi BERT"])->render(); ?>');
+        $this->app['blade.compiler']->directive('livewire', fn () => '<?php echo view("livewire.submission-progress", ["submission"=>$submission, "status"=>$submission->status, "isCompleted"=>$submission->isCompleted(), "isFailed"=>$submission->isFailed(), "progress"=>60, "stageLabel"=>"Menganalisis pola bahasa"])->render(); ?>');
     }
 
     protected function tearDown(): void
@@ -267,16 +267,24 @@ class DetectionPresentationTest extends TestCase
         $this->app['config']->set('services.openai.prompt_version', 'Unrelated current prompt');
         $dom = $this->renderResult($submission, $result);
         $text = $dom->evaluate('string(//main)');
-        foreach (['Tautan video', 'Long <script id="attack">input</script>', 'Extracted <b>literal</b>', 'Translation <img id="attack" src=x>', 'provider-fixture', 'translation-fixture', 'pipeline-fixture', 'stored-version', 'stored-explainer', '0 ms', '01 Sep 2026, 13:45'] as $value) {
+
+        // T1.4: the public result keeps only fields a user can act on.
+        foreach (['Tautan video', 'Long <script id="attack">input</script>', 'Extracted <b>literal</b>', 'Translation <img id="attack" src=x>', 'Bahasa terdeteksi', 'Diterjemahkan'] as $value) {
             $this->assertStringContainsString($value, $text);
+        }
+        foreach (['provider-fixture', 'translation-fixture', 'pipeline-fixture', 'stored-version', 'stored-explainer', '0 ms', 'Versi classifier', 'Versi pipeline', 'Waktu inferensi', 'Cache classifier', 'Cache penjelasan', 'Cache terjemahan', '01 Sep 2026, 13:45'] as $internal) {
+            $this->assertStringNotContainsString($internal, $text);
         }
         $this->assertStringNotContainsString('Unrelated current prompt', $text);
         $this->assertStringNotContainsString('private/path.mp4', $text);
         $this->assertStringNotContainsString('5 menit', $text);
         $this->assertSame(0, $dom->query('//*[@id="attack"]')->length);
         $this->assertSame(1, $dom->query('//a[contains(@href,"/hasil/101/media") and @rel="noopener noreferrer"]')->length);
-        $this->assertSame(2, $dom->query('//details[@id="input-provenance" or @id="model-provenance"]')->length);
-        $this->assertSame(1, $dom->query('//time[starts-with(@datetime,"2026-09-01T13:45")]')->length);
+        $this->assertSame(1, $dom->query('//details[@id="input-provenance"]')->length);
+        $this->assertSame(0, $dom->query('//details[@id="model-provenance"]')->length);
+        // Submission time stays public; the completion timestamp moved to the admin detail (T1.4).
+        $this->assertSame(1, $dom->query('//time[starts-with(@datetime,"2026-09-01T12:00")]')->length);
+        $this->assertSame(0, $dom->query('//time[starts-with(@datetime,"2026-09-01T13:45")]')->length);
     }
 
     #[DataProvider('viewers')]
@@ -291,14 +299,13 @@ class DetectionPresentationTest extends TestCase
         $dom = $this->renderResult($submission, $result);
         $this->assertSame($form ? 1 : 0, $dom->query('//form[@id="feedback-form"]')->length);
         $this->assertSame($final ? 1 : 0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"/pdf")]')->length);
-        $this->assertSame($viewerId !== null && $verified ? 1 : 0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"/riwayat-export/csv")]')->length);
+        $this->assertSame(0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"/riwayat-export/csv")]')->length);
         $this->assertSame($viewerId !== null && $verified ? 1 : 0, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[normalize-space(.)="Kembali ke riwayat"]')->length);
         $this->assertSame(1, $dom->query('//nav[@aria-label="Tindakan hasil"]//a[contains(@href,"#cek-berita")]')->length);
         $text = $dom->evaluate('string(//main)');
         $this->assertStringNotContainsString('Cetak / Simpan PDF', $text);
-        if ($viewerId !== null && $verified) {
-            $this->assertStringContainsString('Unduh seluruh riwayat CSV', $text);
-        }
+        // T1.5: the CSV export action belongs to Riwayat only.
+        $this->assertStringNotContainsString('Unduh seluruh riwayat CSV', $text);
         if ($final && $ownerId === $viewerId && $viewerId !== null && ! $verified) {
             $this->assertSame(1, $dom->query('//section[@aria-labelledby="feedback-heading"]//a[contains(@href,"/verify-email")]')->length);
         }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\AdminGlossary;
 use App\Filament\Widgets\Concerns\RequiresAdminPanel;
 use App\Models\DetectionResult;
 use App\Models\Submission;
@@ -31,14 +32,14 @@ class StatsOverview extends BaseWidget
 
         try {
             return [
-                Stat::make('Seluruh submission', number_format(Submission::count(), 0, ',', '.'))->description('Semua status, seluruh riwayat'),
+                Stat::make('Seluruh pemeriksaan', number_format(Submission::count(), 0, ',', '.'))->description('Semua status, seluruh riwayat'),
                 Stat::make('Dikirim hari ini', number_format(Submission::whereDate('created_at', $today)->count(), 0, ',', '.'))
                     ->description($today->format('d/m/Y').' · '.config('app.timezone')),
                 Stat::make('Menunggu atau diproses', number_format(Submission::whereIn('status', ['pending', 'processing'])->count(), 0, ',', '.'))
-                    ->description('Status pending dan processing, seluruh riwayat'),
-                Stat::make('Submission gagal', number_format(Submission::where('status', 'failed')->count(), 0, ',', '.'))->description('Status failed, seluruh riwayat'),
-                Stat::make('Entri failed jobs', number_format(DB::table('failed_jobs')->count(), 0, ',', '.'))
-                    ->description('Entri antrean gagal; bukan jumlah submission unik'),
+                    ->description('Status menunggu dan diproses, seluruh riwayat'),
+                Stat::make('Pemeriksaan gagal', number_format(Submission::where('status', 'failed')->count(), 0, ',', '.'))->description('Status gagal, seluruh riwayat'),
+                Stat::make('Tugas latar belakang gagal', number_format(DB::table('failed_jobs')->count(), 0, ',', '.'))
+                    ->description(AdminGlossary::explain('failed_jobs')),
             ];
         } catch (PDOException $exception) {
             report($exception);

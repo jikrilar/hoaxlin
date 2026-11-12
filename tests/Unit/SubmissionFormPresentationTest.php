@@ -147,7 +147,7 @@ class SubmissionFormPresentationTest extends TestCase
         $this->assertSame(0, $dom->query('//*[@onsubmit or @onclick or @onchange] | //*[@id="loading-overlay"]')->length);
         $this->assertStringContainsString('bukan verifikasi kebenaran yang definitif', $dom->evaluate('string(//meta[@name="description"]/@content)'));
         $this->assertSame(1, $dom->query('//*[@id="cara-kerja"]/preceding::*[@id="form-teks"]')->length);
-        $this->assertSame(1, $dom->query('//*[@id="submission-model"]/preceding::*[@id="form-teks"]')->length);
+        $this->assertSame(0, $dom->query('//*[@id="submission-model"]')->length);
     }
 
     #[DataProvider('oldText')]
@@ -248,7 +248,7 @@ class SubmissionFormPresentationTest extends TestCase
 
     private function render(): DOMXPath
     {
-        $html = $this->app['view']->make('welcome', ['captchaQuestion' => '2 + 3', 'modelStatistics' => [['label' => 'Model', 'value' => 'fixture', 'description' => 'Data sintetis']], 'submissionOptions' => SubmissionFormOptions::from(new TranscriptionMediaContract)])->render();
+        $html = $this->app['view']->make('welcome', ['captchaQuestion' => '2 + 3', 'submissionOptions' => SubmissionFormOptions::from(new TranscriptionMediaContract)])->render();
         $previous = libxml_use_internal_errors(true);
         try {
             $document = new DOMDocument;

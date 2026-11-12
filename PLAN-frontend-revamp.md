@@ -132,51 +132,56 @@ preprocessing/bobot, mengganti model aktif, atau menimpa baseline `indobert-hoax
 **Tujuan:** semua istilah teknis dijelaskan atau diganti; disclaimer tidak berulang; navigasi dan fitur sampah dirapikan. Belum ada redesain visual besar (itu Tahap 2).
 
 ### T1.1 (M) Komponen glosarium/tooltip
-- [ ] Buat sumber istilah tunggal: `lang/id/glossary.php` (⚠ VERIFIKASI struktur lokalisasi yang dipakai repo; jika tidak ada `lang/`, pakai `config/glossary.php`). Isi dari **Lampiran A** (key, label publik, penjelasan singkat ≤ 160 karakter).
-- [ ] Komponen Blade `resources/views/components/ui/term.blade.php`: `<x-ui.term key="confidence">skor keyakinan</x-ui.term>`. Render `<button type="button">` dengan popover aksesibel (`aria-expanded`, `aria-describedby`, tutup dengan Esc/klik luar/blur, dapat dipakai di sentuh, tidak hanya hover).
-- [ ] Modul JS `resources/js/components/term.js` mengikuti pola `defineModule`; init idempoten; **tanpa Alpine**. Tanpa JS: penjelasan tampil sebagai teks `title`/disclosure sehingga tetap terbaca.
-- [ ] Test: `tests/Frontend/term.test.mjs` (buka/tutup, Esc, fokus kembali ke pemicu), test Blade render untuk key tak dikenal (fallback aman, tidak error).
-- **Penerimaan:** komponen dapat dipakai di view publik; key tak dikenal tidak membuat halaman gagal.
+- [x] Buat sumber istilah tunggal: `lang/id/glossary.php` (⚠ VERIFIKASI struktur lokalisasi yang dipakai repo; jika tidak ada `lang/`, pakai `config/glossary.php`). Isi dari **Lampiran A** (key, label publik, penjelasan singkat ≤ 160 karakter).
+- [x] Komponen Blade `resources/views/components/ui/term.blade.php`: `<x-ui.term key="confidence">skor keyakinan</x-ui.term>`. Render `<button type="button">` dengan popover aksesibel (`aria-expanded`, `aria-describedby`, tutup dengan Esc/klik luar/blur, dapat dipakai di sentuh, tidak hanya hover).
+- [x] Modul JS `resources/js/components/term.js` mengikuti pola `defineModule`; init idempoten; **tanpa Alpine**. Tanpa JS: penjelasan tampil sebagai teks `title`/disclosure sehingga tetap terbaca.
+- [x] Test: `tests/Frontend/term.test.mjs` (buka/tutup, Esc, fokus kembali ke pemicu), test Blade render untuk key tak dikenal (fallback aman, tidak error).
+- [x] **Aturan pemakaian istilah (wajib untuk T1.2 dan seterusnya):**
+  1. Jelaskan sebuah istilah **hanya pada kemunculan pertama di satu halaman**; kemunculan berikutnya teks biasa.
+  2. Maksimal **2 istilah berpenjelasan per paragraf**.
+  3. Jangan menaruh **dua istilah berurutan** tanpa kata penghubung.
+  4. Jangan membungkus kata yang sudah dijelaskan di kalimat itu sendiri (termasuk judul `h3/dt` yang langsung diikuti penjelasan sejenis).
+- **Penerimaan:** komponen dapat dipakai di view publik; key tak dikenal tidak membuat halaman gagal; komponen tetap **inline** (tidak menambah tinggi baris), hanya satu penanda visual, dan tidak menyisipkan spasi sebelum tanda baca.
 
 ### T1.2 (M) Tulis ulang copy halaman publik
 Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudut pandang pengguna, kata kerja aktif, satu ide per paragraf, istilah teknis → bahasa awam + `x-ui.term`.
-- [ ] `welcome.blade.php` + `partials/submission/*` (copy form, hint, error).
-- [ ] `hasil.blade.php`, `partials/result/*`, `components/results/*` (lihat juga T2.7).
-- [ ] `livewire/submission-progress.blade.php` + `app/Enums/ProcessingStage.php` (label tahap yang ramah; ⚠ VERIFIKASI tempat label didefinisikan).
-- [ ] `riwayat.blade.php`, `statistik.blade.php`, `cara-kerja.blade.php`, `tentang.blade.php`, `kebijakan-privasi.blade.php`, `profile.blade.php`, `auth/*`, `errors/*`.
-- [ ] Ganti kata "submission" di UI publik dengan "pemeriksaan"; "Tamu"/"Pengguna" konsisten.
-- **Penerimaan:** `grep -riE` daftar istilah terlarang (Lampiran A, kolom "Dilarang di UI publik") pada `resources/views` (kecuali `filament/`) tidak menemukan kemunculan tanpa `x-ui.term`/penjelasan. Test sensitif-teks diperbarui.
+- [x] `welcome.blade.php` + `partials/submission/*` (copy form, hint, error).
+- [x] `hasil.blade.php`, `partials/result/*`, `components/results/*` (lihat juga T2.7).
+- [x] `livewire/submission-progress.blade.php` + `app/Enums/ProcessingStage.php` (label tahap yang ramah; ⚠ VERIFIKASI tempat label didefinisikan).
+- [x] `riwayat.blade.php`, `statistik.blade.php`, `cara-kerja.blade.php`, `tentang.blade.php`, `kebijakan-privasi.blade.php`, `profile.blade.php`, `auth/*`, `errors/*`.
+- [x] Ganti kata "submission" di UI publik dengan "pemeriksaan"; "Tamu"/"Pengguna" konsisten.
+- **Penerimaan:** `grep -riE` daftar istilah terlarang (Lampiran A, kolom "Dilarang di UI publik") pada `resources/views` (kecuali `filament/`) tidak menemukan kemunculan tanpa `x-ui.term`/penjelasan. Test sensitif-teks diperbarui. Terapkan juga **Aturan pemakaian istilah** dari T1.1 (kemunculan pertama saja, maksimal 2 per paragraf, tanpa istilah berurutan).
 
 ### T1.3 (M) Konsolidasi disclaimer
-- [ ] Buat `components/ui/disclaimer.blade.php` dengan 2 varian: `compact` (1 kalimat) dan `full` (paragraf + tautan "Cara membaca hasil").
-- [ ] Tetapkan aturan: **maksimal 1 disclaimer per halaman** (varian `compact` di dekat hasil/ringkasan; `full` hanya di halaman Cara kerja/Tentang). Hapus pengulangan di footer dan catatan `hl-*-note` yang duplikat.
-- [ ] Kalimat inti yang **wajib tetap ada** di tempat yang relevan: hasil adalah prediksi model, bukan verifikasi kebenaran; label meragukan bukan bukti benar/palsu; skor bukan persentase kebenaran.
+- [x] Buat `components/ui/disclaimer.blade.php` dengan 2 varian: `compact` (1 kalimat) dan `full` (paragraf + tautan "Cara membaca hasil").
+- [x] Tetapkan aturan: **maksimal 1 disclaimer per halaman** (varian `compact` di dekat hasil/ringkasan; `full` hanya di halaman Cara kerja/Tentang). Hapus pengulangan di footer dan catatan `hl-*-note` yang duplikat.
+- [x] Kalimat inti yang **wajib tetap ada** di tempat yang relevan: hasil adalah prediksi model, bukan verifikasi kebenaran; label meragukan bukan bukti benar/palsu; skor bukan persentase kebenaran.
 - **Penerimaan:** tidak ada halaman publik dengan >1 disclaimer sejenis; `ModelStatisticsClaimsTest` & test klaim tetap hijau (atau diperbarui dengan alasan).
 
 ### T1.4 (M) Detail teknis hasil: sederhanakan
-- [ ] Di halaman hasil publik, tampilkan hanya yang berguna bagi pengguna: input asli, bahasa terdeteksi, apakah diterjemahkan (+ teks terjemahan), teks hasil ekstraksi.
-- [ ] Pindahkan ke **admin** (detail Submission, T3.5): provider/model terjemahan, cache terjemahan/classifier/penjelasan, versi classifier, model penjelasan, waktu inferensi, versi pipeline, timestamp selesai. **Data tetap disimpan dan tetap ada di ekspor CSV**; hanya presentasi publik yang berubah (`TranslationProvenanceExportTest`, `CsvExportTest` harus tetap hijau).
+- [x] Di halaman hasil publik, tampilkan hanya yang berguna bagi pengguna: input asli, bahasa terdeteksi, apakah diterjemahkan (+ teks terjemahan), teks hasil ekstraksi.
+- [x] Pindahkan ke **admin** (detail Submission, T3.5): provider/model terjemahan, cache terjemahan/classifier/penjelasan, versi classifier, model penjelasan, waktu inferensi, versi pipeline, timestamp selesai. **Data tetap disimpan dan tetap ada di ekspor CSV**; hanya presentasi publik yang berubah (`TranslationProvenanceExportTest`, `CsvExportTest` harus tetap hijau).
 - **Penerimaan:** halaman hasil publik tidak lagi menampilkan field internal; admin tetap dapat melihatnya (setelah T3.5).
 
 ### T1.5 (S) Kebersihan layout bersama
-- [ ] Tambahkan **Statistik** ke `partials/navigation.blade.php`; urutan: Periksa · Cara kerja · Statistik · Tentang; konsisten desktop & mobile (menu mobile aksesibel).
-- [ ] Ganti favicon emoji (`partials/head.blade.php`) dengan file SVG di `public/` (wordmark/ikon sederhana, warna evergreen).
-- [ ] Seragamkan meta author/footer sesuai **Lampiran E-1** (default: tunggu jawaban pemilik; jangan ubah nama sendiri).
-- [ ] Hapus tombol "Unduh seluruh riwayat CSV" dari halaman hasil (`partials/result/actions.blade.php`); tombol itu hanya di Riwayat.
-- [ ] Hapus blok "Informasi model dan evaluasi" dari landing dan hentikan komputasinya di `HomeController` (hapus `BertRuntimeMetadata->fetch()` dan `latencyStats()` bila tidak lagi dipakai; sesuaikan `tests/Unit/SubmissionFormPresentationTest.php` dan test terkait). Informasi model pindah ke Statistik sebagai disclosure "Tentang model" (T2.9).
+- [x] Tambahkan **Statistik** ke `partials/navigation.blade.php`; urutan: Periksa · Cara kerja · Statistik · Tentang; konsisten desktop & mobile (menu mobile aksesibel).
+- [x] Ganti favicon emoji (`partials/head.blade.php`) dengan file SVG di `public/` (wordmark/ikon sederhana, warna evergreen).
+- [x] Seragamkan meta author/footer sesuai **Lampiran E-1** (default: tunggu jawaban pemilik; jangan ubah nama sendiri).
+- [x] Hapus tombol "Unduh seluruh riwayat CSV" dari halaman hasil (`partials/result/actions.blade.php`); tombol itu hanya di Riwayat.
+- [x] Hapus blok "Informasi model dan evaluasi" dari landing dan hentikan komputasinya di `HomeController` (hapus `BertRuntimeMetadata->fetch()` dan `latencyStats()` bila tidak lagi dipakai; sesuaikan `tests/Unit/SubmissionFormPresentationTest.php` dan test terkait). Informasi model pindah ke Statistik sebagai disclosure "Tentang model" (T2.9).
 - **Penerimaan:** landing tidak lagi memanggil runtime BERT; test hijau.
 
 ### T1.6 (M) Navigasi & label panel admin
-- [ ] Di `AdminPanelProvider` definisikan grup navigasi: **Operasional** (Dashboard, Pemeriksaan, Umpan Balik), **Model AI** (Versi Model, Data Kurasi), **Pengguna & Keamanan** (Pengguna, Log Admin). Resource **Hasil Deteksi** dan **Processing Events** disembunyikan dari navigasi (`shouldRegisterNavigation(): false`) — dihapus permanen di T3.6 setelah datanya pindah.
-- [ ] Label Indonesia konsisten: "Submission"→"Pemeriksaan", "Feedback"→"Umpan Balik", "Admin Logs"→"Log Admin", "Katalog Dataset"→"Data Kurasi", "Versi Model BERT"→"Versi Model". Ikon **unik per menu** (Heroicon relevan).
-- [ ] Urutan: gunakan `navigationSort` eksplisit.
+- [x] Di `AdminPanelProvider` definisikan grup navigasi: **Operasional** (Dashboard, Pemeriksaan, Umpan Balik), **Model AI** (Versi Model, Data Kurasi), **Pengguna & Keamanan** (Pengguna, Log Admin). Resource **Hasil Deteksi** dan **Processing Events** disembunyikan dari navigasi (`shouldRegisterNavigation(): false`) — dihapus permanen di T3.6 setelah datanya pindah.
+- [x] Label Indonesia konsisten: "Submission"→"Pemeriksaan", "Feedback"→"Umpan Balik", "Admin Logs"→"Log Admin", "Katalog Dataset"→"Data Kurasi", "Versi Model BERT"→"Versi Model". Ikon **unik per menu** (Heroicon relevan).
+- [x] Urutan: gunakan `navigationSort` eksplisit.
 - **Penerimaan:** 7 item navigasi tampil dalam 3 grup; test admin (`AdminMonitoringResourcesTest`, dsb.) diperbarui.
 
 ### T1.7 (M) Istilah teknis di admin
-- [ ] Tambahkan penjelasan singkat (hint icon + tooltip Filament; ⚠ VERIFIKASI API Filament 5: `hintIcon`, `hintIconTooltip`, `helperText`, `Tooltip` pada kolom/ stat) untuk: Threshold abstention, F1-score, Baseline, Perbandingan vs baseline, Hot-swap/Aktifkan model, Incremental fine-tuning, Status inferensi aktif, Failed jobs, Tahap pipeline, Percobaan, Kode kendala, "n/a".
-- [ ] Ganti "n/a" dengan "Belum tersedia"; "Entri failed jobs" → "Tugas latar belakang gagal".
-- [ ] Perbaiki kolom "Verifikasi email" di tabel Pengguna (saat ini teks tetap "Terverifikasi"): tampilkan badge `Terverifikasi` (dengan tanggal pada tooltip) vs `Belum`.
-- [ ] Salin teks `TRAINING_NOTICE`, `CURATION_NOTICE`, dsb. ke bahasa awam (tetap akurat bahwa pelatihan tidak otomatis mengganti model aktif).
+- [x] Tambahkan penjelasan singkat (hint icon + tooltip Filament; ⚠ VERIFIKASI API Filament 5: `hintIcon`, `hintIconTooltip`, `helperText`, `Tooltip` pada kolom/ stat) untuk: Threshold abstention, F1-score, Baseline, Perbandingan vs baseline, Hot-swap/Aktifkan model, Incremental fine-tuning, Status inferensi aktif, Failed jobs, Tahap pipeline, Percobaan, Kode kendala, "n/a".
+- [x] Ganti "n/a" dengan "Belum tersedia"; "Entri failed jobs" → "Tugas latar belakang gagal".
+- [x] Perbaiki kolom "Verifikasi email" di tabel Pengguna (saat ini teks tetap "Terverifikasi"): tampilkan badge `Terverifikasi` (dengan tanggal pada tooltip) vs `Belum`.
+- [x] Salin teks `TRAINING_NOTICE`, `CURATION_NOTICE`, dsb. ke bahasa awam (tetap akurat bahwa pelatihan tidak otomatis mengganti model aktif).
 - **Penerimaan:** tidak ada istilah di Lampiran A (kolom admin) tanpa penjelasan di UI admin.
 
 **Selesai Tahap 1 bila:** semua T1.x centang; grep istilah lolos; test + build hijau; screenshot "after-s1" disimpan.

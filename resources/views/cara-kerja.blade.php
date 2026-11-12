@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Cara kerja Hoaxlin — hoaxlin.id')
-@section('description', 'Kenali alur input, prediksi IndoBERT, dan referensi terkait dari basis pengetahuan lokal. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.')
+@section('description', 'Kenali alur pemeriksaan informasi, prediksi model, dan rujukan terkait di Hoaxlin. Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.')
 
 @section('content')
 @php
@@ -10,13 +10,13 @@
 <article class="container-app hl-reading-page" aria-labelledby="how-title">
     <header class="hl-reading-intro">
         <h1 id="how-title" class="hl-heading-editorial">Cara kerja Hoaxlin</h1>
-        <p>Informasi yang kamu kirim diolah menjadi teks, dianalisis oleh IndoBERT, lalu dilengkapi referensi terkait dan penjelasan bila tersedia.</p>
-        <p class="hl-reading-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
+        <p>Informasi yang Anda kirim diolah menjadi teks, dianalisis oleh IndoBERT, lalu dilengkapi referensi terkait dan penjelasan bila tersedia.</p>
+        <x-ui.disclaimer variant="full" class="hl-reading-note" />
     </header>
 
     <section class="hl-reading-section" aria-labelledby="input-title">
         <h2 id="input-title">Pilih input yang sesuai</h2>
-        <p>Tamu hanya dapat mengirim teks. Setelah masuk ke akun, kamu juga dapat menggunakan tautan artikel, gambar, video unggahan, dan tautan video.</p>
+        <p>Tamu hanya dapat mengirim teks. Pengguna yang sudah masuk ke akun juga dapat menggunakan tautan artikel, gambar, video unggahan, dan tautan video.</p>
         <dl class="hl-reading-definitions">
             <div>
                 <dt>Teks</dt>
@@ -28,11 +28,11 @@
             </div>
             <div>
                 <dt>Gambar</dt>
-                <dd>{{ strtoupper(implode(', ', $inputOptions['image']['extensions'])) }}; maksimal {{ $inputOptions['image']['maxSizeLabel'] }} dan {{ $inputOptions['image']['maxWidth'] }} × {{ $inputOptions['image']['maxHeight'] }} piksel. Teks dibaca melalui OCR.</dd>
+                <dd>{{ strtoupper(implode(', ', $inputOptions['image']['extensions'])) }}; maksimal {{ $inputOptions['image']['maxSizeLabel'] }} dan {{ $inputOptions['image']['maxWidth'] }} × {{ $inputOptions['image']['maxHeight'] }} piksel. Tulisan pada gambar dibaca melalui pembacaan teks gambar.</dd>
             </div>
             <div>
                 <dt>Video unggahan</dt>
-                <dd>{{ strtoupper(implode(', ', $inputOptions['video']['extensions'])) }}; maksimal {{ $inputOptions['video']['maxSizeLabel'] }} dan {{ $inputOptions['video']['maxDurationSeconds'] }} detik. Ucapan pada audio ditranskripsikan menjadi teks.</dd>
+                <dd>{{ strtoupper(implode(', ', $inputOptions['video']['extensions'])) }}; maksimal {{ $inputOptions['video']['maxSizeLabel'] }} dan {{ $inputOptions['video']['maxDurationSeconds'] }} detik. Ucapan pada audio diubah menjadi teks.</dd>
             </div>
             <div>
                 <dt>Tautan video</dt>
@@ -47,24 +47,24 @@
         <p>Proses mengikuti jenis input. Tidak semua input memerlukan ekstraksi media atau terjemahan.</p>
         <ol class="hl-reading-steps">
             <li>
-                <h3>Ekstraksi teks</h3>
-                <p>Teks dirapikan, isi artikel diekstrak, gambar dibaca melalui OCR, atau audio pada media ditranskripsikan. Kualitas gambar, suara, dan konteks input memengaruhi teks yang dapat dianalisis.</p>
+                <h3>Membaca teks dari input</h3>
+                <p>Teks dirapikan, isi artikel diambil, gambar dibaca melalui <x-ui.term key="ocr">pembacaan teks gambar</x-ui.term>, atau audio pada media diubah menjadi teks. Kualitas gambar, suara, dan konteks input memengaruhi teks yang dapat dianalisis.</p>
             </li>
             <li>
                 <h3>Terjemahan bila diperlukan</h3>
-                <p>Bahasa teks diperiksa. Teks Indonesia langsung digunakan; teks Inggris diterjemahkan ke Indonesia sebelum klasifikasi. Input asli, teks hasil ekstraksi, dan terjemahan bila ada dapat ditinjau pada detail hasil.</p>
+                <p>Bahasa teks diperiksa. Teks Indonesia langsung digunakan; teks Inggris diterjemahkan ke Indonesia sebelum analisis. Input asli, teks hasil ekstraksi, dan terjemahan bila ada dapat ditinjau pada detail hasil.</p>
             </li>
             <li>
-                <h3>Klasifikasi IndoBERT</h3>
-                <p>IndoBERT menganalisis pola bahasa untuk menghasilkan label prediksi dan skor keyakinan model. Model dilatih dengan kelas valid dan hoax; label meragukan adalah abstention saat skor keyakinan di bawah ambang runtime, bukan kelas training ketiga.</p>
+                <h3>Analisis pola bahasa</h3>
+                <p>IndoBERT menganalisis pola bahasa untuk menghasilkan label prediksi dan <x-ui.term key="confidence">skor keyakinan</x-ui.term>. Model dilatih dengan kelas valid dan hoaks. Status <x-ui.term key="abstention">belum terverifikasi</x-ui.term> diberikan saat skor berada di bawah batas yang ditetapkan layanan model; ini bukan kelas training ketiga.</p>
             </li>
             <li>
-                <h3>Retrieval referensi terkait</h3>
-                <p>RAG mencari teks yang relevan dalam basis pengetahuan lokal. Pencarian ini tidak mencakup seluruh web dan tidak mengubah label atau skor keyakinan classifier. Referensi terkait tidak otomatis mendukung prediksi model.</p>
+                <h3>Pencarian rujukan terkait</h3>
+                <p><x-ui.term key="retrieval">Pencarian rujukan</x-ui.term> mencari teks relevan di basis pengetahuan lokal Hoaxlin. Pencarian ini tidak mencakup seluruh internet dan tidak mengubah label atau skor keyakinan model. Referensi terkait tidak otomatis mendukung prediksi model.</p>
             </li>
             <li>
                 <h3>Penjelasan bila tersedia</h3>
-                <p>OpenAI menyusun penjelasan berdasarkan prediksi, cuplikan input, dan referensi yang tersedia. Penjelasan bukan classifier kedua. Jika layanan penjelasan tidak tersedia, statusnya ditampilkan secara jujur dan hasil klasifikasi yang sudah selesai tetap dapat dibaca.</p>
+                <p>OpenAI menyusun penjelasan berdasarkan prediksi, cuplikan input, dan referensi yang tersedia. Penjelasan bukan penentu label kedua. Jika layanan penjelasan tidak tersedia, statusnya ditampilkan secara jujur dan hasil klasifikasi yang sudah selesai tetap dapat dibaca.</p>
             </li>
         </ol>
         <p class="hl-reading-note">Hasil final ditampilkan setelah pemrosesan selesai. Jika ekstraksi, terjemahan yang diperlukan, atau klasifikasi gagal, halaman hasil menampilkan kegagalan dan langkah pemulihan yang tersedia.</p>
@@ -76,7 +76,7 @@
             @foreach([
                 'valid' => 'Model memprediksi pola teks sebagai valid. Prediksi ini bukan bukti bahwa seluruh isi informasi benar.',
                 'hoax' => 'Model memprediksi pola teks sebagai hoaks. Prediksi ini tetap perlu diperiksa terhadap sumber dan konteks aslinya.',
-                'meragukan' => 'Ini bukan bukti bahwa informasi benar atau palsu. Model menahan keputusan karena skor keyakinannya tidak memenuhi ambang runtime; ini bukan klaim bahwa semua sumber telah diperiksa.',
+                'meragukan' => 'Ini bukan bukti bahwa informasi benar atau palsu. Model menahan keputusan karena skor keyakinannya belum mencapai batas keyakinan layanan model; ini bukan klaim bahwa semua sumber telah diperiksa.',
             ] as $label => $meaning)
                 <div>
                     <dt>{{ \App\View\Presenters\DetectionPresentation::label($label)['text'] }}</dt>
@@ -85,9 +85,9 @@
             @endforeach
         </dl>
         <h3>Skor keyakinan model</h3>
-        <p>Confidence menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita, akurasi produk, atau kredibilitas sumber. Skor kemiripan retrieval mengukur relevansi referensi terhadap teks, bukan confidence classifier.</p>
+        <p>Skor keyakinan menunjukkan keyakinan model pada prediksinya, bukan persentase kebenaran berita, akurasi produk, atau kredibilitas sumber. <x-ui.term key="similarity_score">Skor kemiripan</x-ui.term> pada pencarian rujukan mengukur relevansi referensi terhadap teks, bukan tingkat keyakinan model.</p>
         <h3>Referensi dan penjelasan yang belum tersedia</h3>
-        <p>Jika tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini, halaman hasil menyatakan keterbatasan tersebut. Ini tidak berarti tidak ada bukti di seluruh Internet. Penjelasan dapat sedang disiapkan atau tidak tersedia; sistem tidak membuat referensi atau narasi pengganti yang seolah nyata.</p>
+        <p>Jika tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini, halaman hasil menyatakan keterbatasan tersebut. Ini tidak berarti tidak ada bukti di seluruh internet. Penjelasan dapat sedang disiapkan atau tidak tersedia; sistem tidak membuat referensi atau narasi pengganti yang seolah nyata.</p>
     </section>
 
     <section class="hl-reading-section" aria-labelledby="review-title">

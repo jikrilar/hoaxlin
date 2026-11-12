@@ -57,11 +57,11 @@
     <p>Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
     <table class="metadata">
         <tr><th>Skor Keyakinan Model</th><td>{{ $score ?? 'Tidak tersedia' }}</td></tr>
-        <tr><th>Versi classifier</th><td>{{ filled($result->model_version) ? $result->model_version : 'Tidak tersedia' }}</td></tr>
+        <tr><th>Versi model analisis</th><td>{{ filled($result->model_version) ? $result->model_version : 'Tidak tersedia' }}</td></tr>
     </table>
-    <p class="hint">Skor ini menunjukkan keyakinan classifier pada prediksinya, bukan persentase kebenaran berita.</p>
+    <p class="hint">Skor ini menunjukkan keyakinan model analisis pada prediksinya, bukan persentase kebenaran berita.</p>
 
-    <h2>Input dan provenance</h2>
+    <h2>Input dan asal data</h2>
     <p>Jenis input: {{ DetectionPresentation::inputType($submission->input_type) }}</p>
     @if(filled($submission->raw_input))
         <h3>Input asli</h3>
@@ -96,7 +96,7 @@
         <tr><th>Bahasa Sumber</th><td>{{ filled($submission->source_language) ? $submission->source_language : 'Tidak tersedia' }}</td></tr>
         <tr><th>Provider Terjemahan</th><td>{{ filled($submission->translation_provider) ? $submission->translation_provider : 'Tidak tersedia' }}</td></tr>
         <tr><th>Model Terjemahan</th><td>{{ filled($submission->translation_model) ? $submission->translation_model : 'Tidak tersedia' }}</td></tr>
-        <tr><th>Versi pipeline</th><td>{{ filled($submission->pipeline_version) ? $submission->pipeline_version : 'Tidak tersedia' }}</td></tr>
+        <tr><th>Versi tahap pemeriksaan</th><td>{{ filled($submission->pipeline_version) ? $submission->pipeline_version : 'Tidak tersedia' }}</td></tr>
         @if($submission->processing_completed_at)
             <tr><th>Pemrosesan selesai</th><td>{{ $submission->processing_completed_at->copy()->timezone($timezone)->format('d M Y, H:i T') }}</td></tr>
         @endif
@@ -109,9 +109,9 @@
     @elseif($explanationState === ExplanationStatus::Pending)
         <p>Penjelasan AI belum tersedia untuk hasil ini.</p>
     @elseif($explanationState === ExplanationStatus::Unavailable)
-        <p>Penjelasan AI tidak tersedia. Prediksi classifier tetap ditampilkan.</p>
+        <p>Penjelasan AI tidak tersedia. Prediksi model analisis tetap ditampilkan.</p>
     @else
-        <p>Teks penjelasan tidak tersedia untuk hasil ini. Prediksi classifier tetap ditampilkan.</p>
+        <p>Teks penjelasan tidak tersedia untuk hasil ini. Prediksi model analisis tetap ditampilkan.</p>
     @endif
     <p class="hint">Model penjelasan: {{ filled($result->explanation_model) ? $result->explanation_model : 'Tidak tersedia' }}.</p>
 

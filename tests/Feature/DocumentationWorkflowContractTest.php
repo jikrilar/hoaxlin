@@ -100,11 +100,11 @@ class DocumentationWorkflowContractTest extends TestCase
             ->assertSee('prediksi, cuplikan teks, dan referensi')->assertSee('tidak berlangsung hanya di perangkatmu')
             ->assertSee('Alamat IP digunakan untuk pembatasan permintaan')->assertSee('informasi sesi dan perangkat')
             ->assertSee('pemilik dan admin sesuai izin aplikasi')->assertSee('termasuk ketika peminta adalah admin')
-            ->assertSee('memerlukan email terverifikasi')->assertSee('ID submission saja bukan izin berbagi publik')
+            ->assertSee('memerlukan email terverifikasi')->assertSee('ID pemeriksaan saja bukan izin berbagi publik')
             ->assertSee('tidak menghapus data pemeriksaan dari server')->assertSee('cache')->assertSee('Log dan catatan penggunaan')
             ->assertSee('tidak otomatis menjadi data training model')->assertSee('kata sandi saat ini dan konfirmasi')
             ->assertSee('referensi terkait, feedback terkait, catatan pemrosesan, dan file media terkait')
-            ->assertSee('tidak menjalankan pembersihan menyeluruh pada cache, log, atau cadangan')
+            ->assertSee('tidak menjalankan pembersihan menyeluruh pada')->assertSee('log, atau cadangan')
             ->assertSee('tidak mengirim permintaan penghapusan ke layanan eksternal')
             ->assertDontSee('tanpa identitas personal')->assertDontSee('form di halaman Tentang')
             ->assertDontSee('Perubahan material akan diumumkan');
@@ -114,11 +114,11 @@ class DocumentationWorkflowContractTest extends TestCase
     public function test_how_it_works_explains_the_real_pipeline_and_preserves_result_semantics(): void
     {
         $response = $this->get(route('cara-kerja'))->assertOk()
-            ->assertSeeInOrder(['Pilih input yang sesuai', 'Ekstraksi teks', 'Terjemahan bila diperlukan', 'Klasifikasi IndoBERT', 'Retrieval referensi terkait', 'Penjelasan bila tersedia', 'Membaca hasil dengan hati-hati', 'Tinjau sumber secara mandiri'])
+            ->assertSeeInOrder(['Pilih input yang sesuai', 'Membaca teks dari input', 'Terjemahan bila diperlukan', 'Analisis pola bahasa', 'Pencarian rujukan terkait', 'Penjelasan bila tersedia', 'Membaca hasil dengan hati-hati', 'Tinjau sumber secara mandiri'])
             ->assertSee('Tamu hanya dapat mengirim teks')->assertSee('teks Inggris diterjemahkan ke Indonesia')
             ->assertSee('bukan kelas training ketiga')->assertSee('Ini bukan bukti bahwa informasi benar atau palsu.')
-            ->assertSee('tidak mengubah label atau skor keyakinan classifier')
-            ->assertSee('bukan persentase kebenaran berita')->assertSee('bukan confidence classifier')
+            ->assertSee('tidak mengubah label atau skor keyakinan model')
+            ->assertSee('bukan persentase kebenaran berita')->assertSee('bukan tingkat keyakinan model')
             ->assertSee('basis pengetahuan saat ini')->assertSee('statusnya ditampilkan secara jujur')
             ->assertSee('Hasil final ditampilkan setelah pemrosesan selesai')
             ->assertSee('Halaman YouTube, TikTok, Instagram, Facebook, atau halaman pemutar tidak didukung.');
@@ -144,7 +144,7 @@ class DocumentationWorkflowContractTest extends TestCase
     {
         $this->get(route('tentang'))->assertOk()->assertSee('Tamu dapat memeriksa teks tanpa akun')
             ->assertSee('memerlukan akun dengan email terverifikasi')->assertSee('pemilik dan admin sesuai izin aplikasi')
-            ->assertSee('ID submission saja bukan tautan berbagi publik')->assertSee('layanan eksternal')
+            ->assertSee('ID pemeriksaan saja bukan tautan berbagi publik')->assertSee('layanan eksternal')
             ->assertSee('tidak otomatis mendukung prediksi')->assertSee('tidak membatalkan klasifikasi yang sudah selesai')
             ->assertSee(route('kebijakan-privasi'), false)->assertSee(route('cara-kerja'), false)
             ->assertDontSee('Abdan Dzul Ghaffar Razaq')->assertDontSee('Avatar pengembang');
@@ -212,6 +212,75 @@ class DocumentationWorkflowContractTest extends TestCase
     {
         foreach (['README.md', 'PRD.md', 'bert-service/README.md'] as $path) {
             $this->assertFileExists(base_path($path));
+        }
+    }
+
+    public function test_public_pages_use_term_popovers_and_replace_submission_jargon(): void
+    {
+        foreach (['cara-kerja', 'tentang', 'kebijakan-privasi'] as $route) {
+            $response = $this->get(route($route))->assertOk();
+            $response->assertSee('data-term-trigger', false)
+                ->assertDontSee('ID submission')
+                ->assertDontSee('Total submission');
+        }
+    }
+
+    #[DataProvider('disclaimerPages')]
+    public function test_each_public_page_renders_at_most_one_disclaimer(string $route, string $variant): void
+    {
+        $html = $this->get(route($route))->assertOk()->getContent();
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_NONET);
+            $dom = new DOMXPath($document);
+
+            $this->assertSame(1, $dom->query('//*[@data-disclaimer]')->length, $route.' must render exactly one disclaimer.');
+            $this->assertSame($variant, $dom->evaluate('string(//*[@data-disclaimer]/@data-disclaimer)'), $route.' disclaimer variant mismatch.');
+            $this->assertSame(0, $dom->query('//footer//*[@data-disclaimer]')->length, $route.' must not repeat the disclaimer in the footer.');
+            $this->assertSame(1, $dom->query('//main//*[@data-disclaimer]')->length, $route.' disclaimer belongs inside main.');
+
+            $text = $dom->evaluate('string(//main)');
+            $this->assertStringContainsString('bukan verifikasi kebenaran yang definitif', $text);
+            if ($variant === 'full') {
+                $this->assertSame(1, $dom->query('//main//*[@data-disclaimer]//a[@href="'.route('cara-kerja', [], false).'#meaning-title"]')->length);
+                $this->assertStringContainsString('bukan bukti bahwa informasi benar atau palsu', $text);
+                $this->assertStringContainsString('bukan persentase kebenaran berita', $text);
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+    }
+
+    public static function disclaimerPages(): array
+    {
+        return [
+            'home' => ['home', 'compact'],
+            'how it works' => ['cara-kerja', 'full'],
+            'about' => ['tentang', 'full'],
+            'privacy' => ['kebijakan-privasi', 'compact'],
+            'login' => ['login', 'compact'],
+            'register' => ['register', 'compact'],
+        ];
+    }
+
+    public function test_footer_no_longer_repeats_the_model_disclaimer(): void
+    {
+        $html = $this->get(route('home'))->assertOk()->getContent();
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_NONET);
+            $dom = new DOMXPath($document);
+
+            $this->assertSame(0, $dom->query('//footer//*[@data-disclaimer]')->length);
+            $this->assertStringNotContainsString('bukan verifikasi kebenaran yang definitif', $dom->evaluate('string(//footer)'));
+            $this->assertStringContainsString('Analisis informasi dengan bantuan AI.', $dom->evaluate('string(//footer)'));
+            $this->assertSame(1, $dom->query('//main//*[@data-disclaimer]')->length);
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
         }
     }
 }

@@ -78,7 +78,7 @@ class AdminMonitoringResourcesTest extends TestCase
         $second = $this->event(['stage' => 'classifying', 'outcome' => 'succeeded', 'duration_ms' => 0, 'created_at' => now()->subMinute()]);
         $third = $this->event(['stage' => 'classifying', 'outcome' => 'failed', 'duration_ms' => 1250, 'created_at' => now()->subMinutes(2)]);
         $page = Livewire::test(ListSubmissionProcessingEvents::class)->assertCanSeeTableRecords([$second, $third, $first], inOrder: true)
-            ->assertTableColumnFormattedStateSet('stage', 'Klasifikasi BERT', $second)
+            ->assertTableColumnFormattedStateSet('stage', 'Menganalisis pola bahasa', $second)
             ->assertTableColumnFormattedStateSet('outcome', 'Berhasil', $second)
             ->assertTableColumnFormattedStateSet('duration_ms', '0 ms', $second)
             ->assertTableColumnFormattedStateSet('duration_ms', '1.250 ms', $third);

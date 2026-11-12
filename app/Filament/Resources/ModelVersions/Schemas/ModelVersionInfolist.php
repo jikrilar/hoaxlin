@@ -3,10 +3,12 @@
 namespace App\Filament\Resources\ModelVersions\Schemas;
 
 use App\Filament\Resources\ModelVersions\ModelVersionResource;
+use App\Filament\Support\AdminGlossary;
 use App\Models\ModelVersion;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class ModelVersionInfolist
 {
@@ -29,6 +31,8 @@ class ModelVersionInfolist
                             ->color(ModelVersionResource::statusColor(...)),
                         TextEntry::make('is_active')
                             ->label('Status inferensi')
+                            ->hintIcon(Heroicon::OutlinedQuestionMarkCircle)
+                            ->hintIconTooltip(AdminGlossary::explain('active_inference_status'))
                             ->badge()
                             ->formatStateUsing(static fn (bool $state): string => $state ? 'Aktif' : 'Tidak aktif')
                             ->color(static fn (bool $state): string => $state ? 'success' : 'gray'),
@@ -57,6 +61,8 @@ class ModelVersionInfolist
                             ->placeholder('Belum tersedia'),
                         TextEntry::make('f1_score')
                             ->label('Macro F1-score')
+                            ->hintIcon(Heroicon::OutlinedQuestionMarkCircle)
+                            ->hintIconTooltip(AdminGlossary::explain('f1_score'))
                             ->formatStateUsing(ModelVersionResource::formatPercentage(...))
                             ->placeholder('Belum tersedia'),
                         TextEntry::make('training_duration')
@@ -65,6 +71,8 @@ class ModelVersionInfolist
                             ->placeholder('Belum tersedia'),
                         TextEntry::make('baseline_accuracy')
                             ->label('Perbandingan akurasi vs baseline')
+                            ->hintIcon(Heroicon::OutlinedQuestionMarkCircle)
+                            ->hintIconTooltip(AdminGlossary::explain('baseline_comparison'))
                             ->formatStateUsing(static fn (?float $state, ModelVersion $record): ?string => ModelVersionResource::formatDelta($record->accuracy, $state))
                             ->placeholder('Belum tersedia'),
                         TextEntry::make('baseline_f1_score')

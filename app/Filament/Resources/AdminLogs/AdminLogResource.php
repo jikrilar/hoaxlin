@@ -23,17 +23,17 @@ class AdminLogResource extends Resource
 {
     protected static ?string $model = AdminLog::class;
 
-    protected static ?string $navigationLabel = 'Admin Logs';
+    protected static ?string $navigationLabel = 'Log Admin';
 
-    protected static ?string $modelLabel = 'log';
+    protected static ?string $modelLabel = 'log admin';
 
-    protected static ?string $pluralModelLabel = 'admin logs';
+    protected static ?string $pluralModelLabel = 'log admin';
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedShieldCheck;
 
-    protected static ?int $navigationSort = 91;
+    protected static ?int $navigationSort = 70;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Monitoring';
+    protected static UnitEnum|string|null $navigationGroup = 'Pengguna & Keamanan';
 
     public static function form(Schema $schema): Schema
     {

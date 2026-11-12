@@ -157,6 +157,111 @@ class UiComponentsTest extends TestCase
         $this->assertSame('current', $dom->evaluate('string(//button[@data-password-toggle="current"]/@aria-controls)'));
     }
 
+    public function test_term_renders_accessible_popover_with_glossary_description_and_no_js_title_fallback(): void
+    {
+        $glossary = require dirname(__DIR__, 2).'/config/glossary.php';
+        $this->assertNotEmpty($glossary);
+        foreach ($glossary as $key => $entry) {
+            $this->assertIsString($key);
+            $this->assertNotSame('', trim($entry['label'] ?? ''));
+            $this->assertNotSame('', trim($entry['description'] ?? ''));
+            $this->assertLessThanOrEqual(160, mb_strlen($entry['description']));
+        }
+
+        $dom = $this->render('<p><x-ui.term key="confidence">skor keyakinan</x-ui.term> dan <x-ui.term key="rag" /></p>');
+
+        $this->assertSame(2, $dom->query('//*[@data-term]')->length);
+        $this->assertSame(2, $dom->query('//button[@type="button" and @data-term-trigger and @aria-expanded="false"]')->length);
+        $this->assertStringContainsString('skor keyakinan', $dom->evaluate('string((//button[@data-term-trigger])[1])'));
+        $this->assertStringContainsString('pencarian rujukan', $dom->evaluate('string((//button[@data-term-trigger])[2])'));
+        $this->assertSame(
+            'Seberapa yakin model terhadap tebakannya. Bukan persentase kebenaran berita.',
+            $dom->evaluate('string((//button[@data-term-trigger])[1]/@title)'),
+        );
+        $firstId = $dom->evaluate('string((//button[@data-term-trigger])[1]/@aria-describedby)');
+        $secondId = $dom->evaluate('string((//button[@data-term-trigger])[2]/@aria-describedby)');
+        $this->assertNotSame('', $firstId);
+        $this->assertNotSame('', $secondId);
+        $this->assertNotSame($firstId, $secondId);
+        $this->assertSame(
+            'Seberapa yakin model terhadap tebakannya. Bukan persentase kebenaran berita.',
+            $dom->evaluate('string(//*[@id="'.$firstId.'" and @role="tooltip" and @data-term-popover and @hidden])'),
+        );
+    }
+
+    public function test_term_output_has_no_whitespace_before_punctuation_or_between_siblings(): void
+    {
+        $dom = $this->render('<p>Status <x-ui.term key="abstention">belum terverifikasi</x-ui.term>, bukan kelas training ketiga. Skor <x-ui.term key="confidence">keyakinan</x-ui.term>.</p>');
+
+        $buttons = $dom->query('//button[@data-term-trigger]');
+        $this->assertSame(2, $buttons->length);
+
+        $first = $buttons->item(0);
+        $second = $buttons->item(1);
+
+        // Trailing spaces/newlines inside the trigger would surface before the following punctuation.
+        $this->assertSame('belum terverifikasi?', trim($first->textContent));
+        $this->assertSame('belum terverifikasi?', $first->textContent, 'slot text must not carry surrounding whitespace');
+        $this->assertSame('keyakinan?', $second->textContent);
+
+        // The following text node starts with the punctuation, not with whitespace.
+        $this->assertSame(', bukan kelas training ketiga. Skor ', $first->parentNode->nextSibling->textContent);
+        $this->assertSame('.', $second->parentNode->nextSibling->textContent);
+
+        $this->assertSame(2, $dom->query('//*[contains(@class,"hl-term__mark") and @aria-hidden="true"]')->length);
+        $this->assertSame(0, $dom->query('//*[contains(@class,"hl-term__icon")]')->length);
+    }
+
+    public function test_term_trigger_has_no_interactive_box_wrapper_around_the_sentence(): void
+    {
+        $dom = $this->render('<p>Prediksi <x-ui.term key="classifier">model analisis</x-ui.term> tetap ditampilkan.</p>');
+
+        $this->assertSame(1, $dom->query('//p/span[contains(concat(" ", normalize-space(@class), " "), " hl-term ")][not(@style)]')->length);
+        $this->assertSame(0, $dom->query('//button[@data-term-trigger]/div | //button[@data-term-trigger]/p')->length);
+        $this->assertSame(1, $dom->query('//button[@data-term-trigger][not(@class) or contains(@class,"hl-term__trigger")]')->length);
+    }
+
+    public function test_unknown_term_key_renders_safe_text_fallback_without_throwing(): void
+    {
+        $payload = '<script id="attack">alert(1)</script>';
+        $dom = $this->render('<p><x-ui.term key="unknown_key_fixture">istilah khusus</x-ui.term> <x-ui.term key="unknown_empty" /> <x-ui.term key="unknown_xss">{{ $payload }}</x-ui.term></p>', [
+            'payload' => $payload,
+        ]);
+
+        $this->assertSame(0, $dom->query('//button[@data-term-trigger] | //*[@data-term-popover] | //script[@id="attack"]')->length);
+        $this->assertStringContainsString('istilah khusus', $dom->evaluate('string(//p)'));
+        $this->assertStringContainsString('unknown_empty', $dom->evaluate('string(//p)'));
+        $this->assertStringContainsString($payload, htmlspecialchars_decode($dom->evaluate('string(//p)'), ENT_QUOTES));
+    }
+
+    public function test_disclaimer_variants_are_explicit_and_fail_closed(): void
+    {
+        $dom = $this->render('<x-ui.disclaimer /><x-ui.disclaimer variant="full" />');
+
+        $this->assertSame(2, $dom->query('//*[@data-disclaimer]')->length);
+        $this->assertSame('compact', $dom->evaluate('string((//*[@data-disclaimer])[1]/@data-disclaimer)'));
+        $this->assertSame('full', $dom->evaluate('string((//*[@data-disclaimer])[2]/@data-disclaimer)'));
+        $this->assertStringContainsString(
+            'Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.',
+            $dom->evaluate('string((//*[@data-disclaimer])[1])'),
+        );
+        $this->assertSame(
+            '/cara-kerja#meaning-title',
+            $dom->evaluate('string((//*[@data-disclaimer])[2]//a/@href)'),
+        );
+        $this->assertStringContainsString('Cara membaca hasil', $dom->evaluate('string((//*[@data-disclaimer])[2]//a)'));
+        $this->assertStringContainsString('bukan bukti bahwa informasi benar atau palsu', $dom->evaluate('string((//*[@data-disclaimer])[2])'));
+        $this->assertStringContainsString('bukan persentase kebenaran berita', $dom->evaluate('string((//*[@data-disclaimer])[2])'));
+    }
+
+    public function test_disclaimer_accepts_page_specific_context_inside_the_same_block(): void
+    {
+        $dom = $this->render('<x-ui.disclaimer><p>Skor keyakinan bukan persentase kebenaran berita.</p></x-ui.disclaimer>');
+
+        $this->assertSame(1, $dom->query('//*[@data-disclaimer]')->length);
+        $this->assertStringContainsString('Skor keyakinan bukan persentase kebenaran berita.', $dom->evaluate('string(//*[@data-disclaimer])'));
+    }
+
     public static function invalidContracts(): array
     {
         return [
@@ -178,6 +283,7 @@ class UiComponentsTest extends TestCase
             'password autocomplete' => ['<x-ui.field id="one" label="Password"><x-forms.password name="password" autocomplete="email" /></x-ui.field>'],
             'alert tone' => ['<x-ui.alert tone="prediction" />'],
             'open boolean' => ['<x-ui.disclosure title="Detail" open="false" />'],
+            'disclaimer variant' => ['<x-ui.disclaimer variant="marketing" />'],
         ];
     }
 

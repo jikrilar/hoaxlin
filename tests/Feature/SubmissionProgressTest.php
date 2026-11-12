@@ -106,19 +106,19 @@ class SubmissionProgressTest extends TestCase
         $component = Livewire::test(SubmissionProgress::class, ['submission' => $submission]);
 
         $component->assertSee('60%')
-            ->assertSee('Klasifikasi BERT')
+            ->assertSee('Menganalisis pola bahasa')
             ->assertSee('Sedang Menganalisis');
 
         $submission->update(['processing_stage' => ProcessingStage::Retrieving->value]);
         $component->call('refreshProgress')
             ->assertSee('75%')
-            ->assertSee('Pencarian bukti');
+            ->assertSee('Mencari rujukan terkait');
 
         // Simulate stage change and refresh
         $submission->update(['processing_stage' => ProcessingStage::Explaining->value]);
         $component->call('refreshProgress')
             ->assertSee('85%')
-            ->assertSee('Penyusunan penjelasan');
+            ->assertSee('Menyusun penjelasan');
     }
 
     public function test_livewire_shows_failed_state(): void

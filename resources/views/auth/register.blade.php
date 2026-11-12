@@ -30,7 +30,7 @@
     <div class="hl-auth-choice">
         <input type="checkbox" id="terms" name="terms" value="1" required @checked(in_array(old('terms'), [true, 1, '1', 'yes', 'on', 'true'], true))
             aria-invalid="{{ $errors->has('terms') ? 'true' : 'false' }}" @if($errors->has('terms')) aria-describedby="terms-error" @endif>
-        <label for="terms">Saya menyetujui <x-ui.link :href="route('kebijakan-privasi')">Kebijakan Privasi</x-ui.link> dan memahami bahwa hasil analisis merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</label>
+        <label for="terms">Saya menyetujui <x-ui.link :href="route('kebijakan-privasi')">Kebijakan Privasi</x-ui.link>.</label>
     </div>
     @error('terms')
         <p id="terms-error" class="hl-field__error">{{ $message }}</p>
@@ -38,4 +38,5 @@
     <x-ui.button type="submit" id="register-btn">Buat akun</x-ui.button>
 </form>
 <p class="hl-auth-switch">Sudah punya akun? <x-ui.link :href="route('login')">Masuk</x-ui.link></p>
+<x-ui.disclaimer class="hl-auth-disclaimer" />
 @endsection

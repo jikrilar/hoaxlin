@@ -32,14 +32,14 @@
             @include('partials.submission.input-types')
         @endauth
         @guest
-            <p class="hl-submission-access">Kamu dapat memeriksa teks tanpa akun. <x-ui.link :href="route('login')">Masuk</x-ui.link> untuk menggunakan URL, gambar, atau video.</p>
+            <p class="hl-submission-access">Tamu dapat memeriksa teks tanpa akun. <x-ui.link :href="route('login')">Masuk</x-ui.link> untuk menggunakan tautan artikel, gambar, atau video.</p>
         @endguest
         <div id="panel-teks" class="hl-input-panel" data-input-panel="teks">
             @auth <h3>Teks</h3> @endauth
             @include('partials.submission.text')
         </div>
         @include('partials.submission.media')
-        <p class="hl-submission-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif. Periksa kembali informasi melalui sumber terpercaya.</p>
+        <x-ui.disclaimer class="hl-submission-note">Periksa kembali informasi melalui sumber terpercaya sebelum membagikannya.</x-ui.disclaimer>
     </section>
 
     <section id="cara-kerja" class="hl-submission-help" aria-labelledby="submission-help-title">
@@ -51,18 +51,5 @@
         </ol>
         <x-ui.link :href="route('cara-kerja')">Pelajari cara kerja</x-ui.link>
     </section>
-
-    <x-ui.disclosure title="Informasi model dan evaluasi" class="hl-submission-model" id="submission-model">
-        <p>Data berikut menjelaskan model, evaluasi, dan telemetry yang tersedia. Data ini bukan jaminan kebenaran setiap pemeriksaan.</p>
-        <dl class="hl-submission-statistics">
-            @foreach($modelStatistics as $stat)
-                <div>
-                    <dt>{{ $stat['label'] }}</dt>
-                    <dd>{{ $stat['value'] }} <span>{{ $stat['description'] }}</span></dd>
-                </div>
-            @endforeach
-        </dl>
-        <x-ui.link :href="route('statistik')">Lihat statistik dan konteks evaluasi</x-ui.link>
-    </x-ui.disclosure>
 </div>
 @endsection

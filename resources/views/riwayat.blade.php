@@ -84,7 +84,7 @@
                         @endforeach
                     </x-forms.select>
                 </x-ui.field>
-                <x-ui.field id="history-status" label="Status pemrosesan" :error="$errors->first('status')">
+                <x-ui.field id="history-status" label="Status pemeriksaan" :error="$errors->first('status')">
                     <x-forms.select name="status">
                         @foreach($statusOptions as $value => $label)
                             <option value="{{ $value }}" @selected($filterValues['status'] === $value)>{{ $label }}</option>
@@ -108,7 +108,7 @@
 
     <section class="hl-history-results" aria-labelledby="history-results-title">
         <h2 id="history-results-title">Daftar pemeriksaan</h2>
-        <p class="hl-history-note">Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif. Skor menunjukkan keyakinan model, bukan persentase kebenaran berita. Informasi yang belum terverifikasi bukan bukti bahwa informasi benar atau palsu.</p>
+        <x-ui.disclaimer class="hl-history-note"><x-ui.term key="confidence">Skor keyakinan model</x-ui.term> menunjukkan tingkat keyakinan model, bukan persentase kebenaran berita. Informasi yang belum terverifikasi bukan bukti bahwa informasi benar atau palsu.</x-ui.disclaimer>
         @if($submissions->isNotEmpty())
             <p class="hl-history-note">Menampilkan {{ $submissions->firstItem() }}–{{ $submissions->lastItem() }} dari {{ $submissions->total() }} pemeriksaan{{ $hasFilters ? ' yang sesuai filter' : '' }}.</p>
             <ul class="hl-history-list" id="history-list">
@@ -126,7 +126,7 @@
                             <time datetime="{{ $submission->created_at->toIso8601String() }}">{{ $submission->created_at->format('d M Y, H:i') }}</time>
                         </p>
                         <dl class="hl-history-state">
-                            <div><dt>Status pemrosesan</dt><dd>{{ $statusOptions[$submission->status] ?? 'Status belum tersedia' }}</dd></div>
+                            <div><dt>Status pemeriksaan</dt><dd>{{ $statusOptions[$submission->status] ?? 'Status belum tersedia' }}</dd></div>
                             <div><dt>Hasil</dt><dd data-history-label data-tone="{{ $prediction['tone'] ?? 'neutral' }}">{{ $prediction['text'] ?? 'Belum tersedia' }}</dd></div>
                             <div><dt>Skor keyakinan model</dt><dd data-history-confidence>{{ $confidence ?? 'Belum tersedia' }}</dd></div>
                         </dl>

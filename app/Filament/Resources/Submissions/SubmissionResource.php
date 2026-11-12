@@ -14,16 +14,21 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class SubmissionResource extends Resource
 {
     protected static ?string $model = Submission::class;
 
-    protected static ?string $navigationLabel = 'Submission';
+    protected static ?string $navigationLabel = 'Pemeriksaan';
 
-    protected static ?string $modelLabel = 'submission';
+    protected static ?string $modelLabel = 'pemeriksaan';
 
-    protected static ?string $pluralModelLabel = 'submission';
+    protected static ?string $pluralModelLabel = 'pemeriksaan';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Operasional';
+
+    protected static ?int $navigationSort = 20;
 
     public static function canCreate(): bool
     {
@@ -45,7 +50,7 @@ class SubmissionResource extends Resource
         return false;
     }
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
     public static function form(Schema $schema): Schema
     {
