@@ -247,57 +247,71 @@
     .hl-disclosure__summary { padding-block: var(--ds-space-4); color: var(--ds-link); font-size: var(--ds-type-label-size); font-weight: var(--ds-font-weight-medium); cursor: pointer; }
     .hl-disclosure__content { padding-block-end: var(--ds-space-4); }
 
+    /* Inline glossary term: no box, no layout impact, one marker (dotted underline + tiny mark). */
     .hl-term {
         position: relative;
-        display: inline-flex;
-        align-items: center;
-        vertical-align: baseline;
+        display: inline;
+        color: inherit;
+        font: inherit;
+        line-height: inherit;
     }
 
     .hl-term__trigger {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--ds-space-1);
-        min-inline-size: 2.75rem;
-        min-block-size: 2.75rem;
-        padding: var(--ds-space-1) var(--ds-space-2);
+        position: relative;
+        display: inline;
+        appearance: none;
+        -webkit-appearance: none;
+        margin: 0;
+        padding: 0;
         border: 0;
-        border-radius: var(--ds-radius-sm);
-        background: transparent;
-        color: var(--ds-link);
+        border-radius: 0;
+        background: none;
+        color: inherit;
         font: inherit;
-        text-align: start;
-        text-decoration: underline dotted currentColor;
+        line-height: inherit;
+        letter-spacing: inherit;
+        text-align: inherit;
+        text-decoration: underline dotted var(--ds-border-control);
+        text-decoration-thickness: 1px;
         text-underline-offset: 0.2em;
-        cursor: pointer;
+        cursor: help;
+    }
+
+    /* Invisible 44px hit area; absolute positioning keeps inline flow intact. */
+    .hl-term__trigger::after {
+        content: '';
+        position: absolute;
+        inset-block: -0.85em;
+        inset-inline: -0.4em;
     }
 
     .hl-term__trigger:hover,
     .hl-term__trigger[aria-expanded="true"] {
-        background: var(--ds-bg-selected);
         color: var(--ds-action-primary);
+        text-decoration-color: var(--ds-action-primary);
+        text-decoration-style: solid;
     }
 
-    .hl-term__icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        inline-size: 1.125rem;
-        block-size: 1.125rem;
-        flex-shrink: 0;
-        border: var(--ds-border-width) solid var(--ds-border-control);
-        border-radius: 9999px;
-        background: var(--ds-bg-subtle);
+    .hl-term__trigger:focus-visible {
+        outline: 2px solid var(--ds-focus);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+
+    .hl-term__mark {
+        display: inline;
+        margin-inline-start: 0.1em;
         color: var(--ds-action-primary);
-        font-family: var(--ds-font-ui);
-        font-size: var(--ds-type-meta-size);
+        font-size: 0.75em;
         font-weight: var(--ds-font-weight-semibold);
         line-height: 1;
+        vertical-align: super;
+        text-decoration: none;
     }
 
     .hl-term__popover {
         position: absolute;
-        inset-block-start: calc(100% + var(--ds-space-1));
+        inset-block-start: calc(100% + var(--ds-space-2));
         inset-inline-start: 0;
         z-index: var(--ds-z-popover);
         inline-size: max-content;
@@ -310,9 +324,11 @@
         box-shadow: var(--ds-shadow-overlay);
         font-family: var(--ds-font-ui);
         font-size: var(--ds-type-body-sm-size);
+        font-style: normal;
         font-weight: var(--ds-font-weight-regular);
         line-height: var(--ds-type-body-sm-leading);
         text-align: start;
+        text-decoration: none;
         white-space: normal;
     }
 

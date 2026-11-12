@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { mount } from '../../resources/js/components/term.js';
 function createTerm(id, doc, description = 'Penjelasan istilah.') {
     const attrs = new Map([
@@ -137,4 +138,72 @@ test('cleanup is idempotent, closes open popover, and restores native title attr
     assert.equal(f.first.popover.hidden, true);
     assert.equal(f.first.trigger.getAttribute('aria-expanded'), 'false');
     assert.equal(f.first.trigger.getAttribute('title'), 'Seberapa yakin model terhadap tebakannya.');
+});
+
+test('trigger stays inline and opening a popover does not change the paragraph box', () => {
+    const f = fixture();
+    const cleanup = mount(f.root);
+
+    // The component renders a <button>; the CSS contract keeps it inline with zero box.
+    assert.match(f.first.trigger.constructor.name, /EventTarget|Object/);
+    const declared = readTriggerCss();
+    assert.equal(declared.display, 'inline');
+    assert.equal(declared.appearance, 'none', 'native button chrome must be removed so the trigger keeps inline flow');
+    assert.equal(declared.margin, '0');
+    assert.equal(declared.padding, '0');
+    assert.equal(declared.border, '0');
+    assert.equal(declared['line-height'], 'inherit');
+    assert.equal(declared.position, 'relative', 'relative is required for the absolute hit-area/popover');
+    assert.doesNotMatch(readFileSync(new URL('../../resources/css/components.css', import.meta.url), 'utf8'), /\.hl-term__trigger:hover[^{]*\{[^}]*padding/, 'hover must not add padding');
+
+    const before = paragraphGeometry(f);
+    f.first.trigger.dispatchEvent(new Event('click'));
+    assert.equal(f.first.popover.hidden, false);
+    assert.equal(paragraphGeometry(f).extraHeight, before.extraHeight, 'opening must not resize the paragraph');
+
+    f.first.trigger.dispatchEvent(new Event('click'));
+    assert.equal(f.first.popover.hidden, true);
+    assert.equal(paragraphGeometry(f).extraHeight, before.extraHeight, 'closing must not resize the paragraph');
+
+    cleanup();
+});
+
+/** Read the real CSS declarations so the test fails when the stylesheet regresses. */
+function readTriggerCss() {
+    const css = readFileSync(new URL('../../resources/css/components.css', import.meta.url), 'utf8');
+    const rule = /\.hl-term__trigger\s*\{([^}]*)\}/.exec(css);
+    assert.ok(rule, '.hl-term__trigger rule must exist');
+    const declarations = {};
+    for (const line of rule[1].split(';')) {
+        const [property, value] = line.split(':').map(part => part?.trim());
+        if (property && value) declarations[property] = value;
+    }
+    assert.doesNotMatch(rule[1], /min-block-size\s*:\s*(?!0)/, 'no 44px min height on an inline trigger');
+    return declarations;
+}
+
+/** Paragraph box derived from the popover state only (absolute positioning must not add height). */
+function paragraphGeometry(f) {
+    const css = readFileSync(new URL('../../resources/css/components.css', import.meta.url), 'utf8');
+    const popoverRule = /\.hl-term__popover\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
+    const absolutelyPositioned = /position\s*:\s*absolute/.test(popoverRule);
+    const popoverTakesSpace = f.first.popover.hidden === false && !absolutelyPositioned;
+    return { open: f.first.popover.hidden === false, extraHeight: popoverTakesSpace ? 1 : 0 };
+}
+
+test('Space does not scroll but the trigger keeps native button activation; Enter is untouched', () => {
+    const f = fixture();
+    const cleanup = mount(f.root);
+
+    const space = new Event('keydown', { cancelable: true });
+    Object.defineProperty(space, 'key', { value: ' ' });
+    f.first.trigger.dispatchEvent(space);
+    assert.equal(space.defaultPrevented, true, 'Space must not scroll the page');
+
+    const enter = new Event('keydown', { cancelable: true });
+    Object.defineProperty(enter, 'key', { value: 'Enter' });
+    f.first.trigger.dispatchEvent(enter);
+    assert.equal(enter.defaultPrevented, false, 'Enter must keep native activation');
+
+    cleanup();
 });

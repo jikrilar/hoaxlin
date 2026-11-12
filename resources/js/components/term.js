@@ -51,6 +51,11 @@ export const mount = defineModule((root, scope) => {
             setOpen(item, nextState);
         });
 
+        // Space must not scroll, but it must still activate the native button; Enter is left alone.
+        scope.listen(trigger, 'keydown', event => {
+            if (event.key === ' ' && !event.repeat) event.preventDefault();
+        });
+
         scope.listen(container, 'focusout', event => {
             if (active === item && event.relatedTarget && !container.contains(event.relatedTarget)) {
                 setOpen(item, false);
