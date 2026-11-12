@@ -335,7 +335,8 @@ class SubmissionTest extends TestCase
         $this->assertSame(1, substr_count($page->getContent(), 'name="captcha_answer"'), 'one CAPTCHA per submission');
         $this->assertSame(1, substr_count($page->getContent(), 'name="website"'), 'one honeypot');
         $this->assertSame(1, substr_count($page->getContent(), 'name="_token"'), 'one CSRF token');
-        $page->assertSee('Mulai periksa')
+        // T2.5 hero CTA removed at the owner's request: the form sits directly under the header.
+        $page->assertDontSee('Mulai periksa')
             ->assertSee('Contoh tampilan, bukan hasil nyata')
             ->assertSee('name="input_type" value="text"', false)
             ->assertDontSee('name="input_type" value="url"', false)

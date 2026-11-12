@@ -5,7 +5,6 @@
     /* Landing sections (T2.5): one rhythm for hero, steps, examples, FAQ. */
     .hl-hero { margin-block: var(--ds-space-8) var(--ds-space-12); max-inline-size: var(--ds-container-reading); }
     .hl-hero__lead { margin-block-start: var(--ds-space-4); color: var(--ds-text-muted); font-size: var(--ds-type-lead-size); line-height: var(--ds-type-lead-leading); }
-    .hl-hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-3); margin-block-start: var(--ds-space-6); }
     .hl-hero__note { margin-block-start: var(--ds-space-4); color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
     .hl-landing-section { margin-block-start: var(--ds-space-12); }
     .hl-landing-section > h2 { margin-block-end: var(--ds-space-4); }

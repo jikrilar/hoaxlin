@@ -20,10 +20,6 @@
     <header class="hl-hero" aria-labelledby="hero-title">
         <h1 id="hero-title" class="hl-heading-editorial">Periksa informasi sebelum Anda membagikannya.</h1>
         <p class="hl-hero__lead">Tempel informasi untuk mendapatkan prediksi model dan rujukan terkait, tanpa perlu akun.</p>
-        <div class="hl-hero__actions">
-            <x-ui.link :href="'#cek-berita'" variant="primary">Mulai periksa</x-ui.link>
-            <x-ui.link :href="route('cara-kerja')" variant="tertiary">Cara kerja</x-ui.link>
-        </div>
         <p class="hl-hero__note">Hasil berupa prediksi model, bukan keputusan akhir.</p>
     </header>
 
