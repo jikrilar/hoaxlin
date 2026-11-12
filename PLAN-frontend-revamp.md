@@ -173,10 +173,10 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 - **Penerimaan:** 7 item navigasi tampil dalam 3 grup; test admin (`AdminMonitoringResourcesTest`, dsb.) diperbarui.
 
 ### T1.7 (M) Istilah teknis di admin
-- [ ] Tambahkan penjelasan singkat (hint icon + tooltip Filament; ⚠ VERIFIKASI API Filament 5: `hintIcon`, `hintIconTooltip`, `helperText`, `Tooltip` pada kolom/ stat) untuk: Threshold abstention, F1-score, Baseline, Perbandingan vs baseline, Hot-swap/Aktifkan model, Incremental fine-tuning, Status inferensi aktif, Failed jobs, Tahap pipeline, Percobaan, Kode kendala, "n/a".
-- [ ] Ganti "n/a" dengan "Belum tersedia"; "Entri failed jobs" → "Tugas latar belakang gagal".
-- [ ] Perbaiki kolom "Verifikasi email" di tabel Pengguna (saat ini teks tetap "Terverifikasi"): tampilkan badge `Terverifikasi` (dengan tanggal pada tooltip) vs `Belum`.
-- [ ] Salin teks `TRAINING_NOTICE`, `CURATION_NOTICE`, dsb. ke bahasa awam (tetap akurat bahwa pelatihan tidak otomatis mengganti model aktif).
+- [x] Tambahkan penjelasan singkat (hint icon + tooltip Filament; ⚠ VERIFIKASI API Filament 5: `hintIcon`, `hintIconTooltip`, `helperText`, `Tooltip` pada kolom/ stat) untuk: Threshold abstention, F1-score, Baseline, Perbandingan vs baseline, Hot-swap/Aktifkan model, Incremental fine-tuning, Status inferensi aktif, Failed jobs, Tahap pipeline, Percobaan, Kode kendala, "n/a".
+- [x] Ganti "n/a" dengan "Belum tersedia"; "Entri failed jobs" → "Tugas latar belakang gagal".
+- [x] Perbaiki kolom "Verifikasi email" di tabel Pengguna (saat ini teks tetap "Terverifikasi"): tampilkan badge `Terverifikasi` (dengan tanggal pada tooltip) vs `Belum`.
+- [x] Salin teks `TRAINING_NOTICE`, `CURATION_NOTICE`, dsb. ke bahasa awam (tetap akurat bahwa pelatihan tidak otomatis mengganti model aktif).
 - **Penerimaan:** tidak ada istilah di Lampiran A (kolom admin) tanpa penjelasan di UI admin.
 
 **Selesai Tahap 1 bila:** semua T1.x centang; grep istilah lolos; test + build hijau; screenshot "after-s1" disimpan.

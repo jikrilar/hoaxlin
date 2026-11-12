@@ -3,12 +3,14 @@
 namespace App\Filament\Resources\Submissions\Schemas;
 
 use App\Filament\Resources\DetectionResults\DetectionResultResource;
+use App\Filament\Support\AdminGlossary;
 use App\Filament\Support\ReadOnlyPresentation;
 use App\Models\Submission;
 use App\View\Presenters\DetectionPresentation;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class SubmissionInfolist
 {
@@ -23,7 +25,7 @@ class SubmissionInfolist
                         TextEntry::make('user.name')->label('Pengguna')->placeholder('Tamu'),
                         TextEntry::make('input_type')->label('Jenis input')->formatStateUsing(fn (?string $state): string => DetectionPresentation::inputType($state)),
                         TextEntry::make('status')->label('Status submission')->formatStateUsing(ReadOnlyPresentation::status(...)),
-                        TextEntry::make('processing_stage')->label('Tahap pipeline')->formatStateUsing(ReadOnlyPresentation::stage(...))->placeholder('Tahap belum tercatat'),
+                        TextEntry::make('processing_stage')->label('Tahap pipeline')->hintIcon(Heroicon::OutlinedQuestionMarkCircle)->hintIconTooltip(AdminGlossary::explain('pipeline_stage'))->formatStateUsing(ReadOnlyPresentation::stage(...))->placeholder('Tahap belum tercatat'),
                         TextEntry::make('classifier_record')->label('Hasil classifier')
                             ->state(fn (Submission $record): string => ReadOnlyPresentation::submissionResult($record))
                             ->url(fn (Submission $record): ?string => $record->detectionResult === null ? null : DetectionResultResource::getUrl('view', ['record' => $record->detectionResult]))

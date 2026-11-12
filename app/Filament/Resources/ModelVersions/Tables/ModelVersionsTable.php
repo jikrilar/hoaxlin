@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ModelVersions\Tables;
 
 use App\Filament\Resources\ModelVersions\ModelVersionResource;
+use App\Filament\Support\AdminGlossary;
 use App\Models\ModelVersion;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -37,11 +38,13 @@ class ModelVersionsTable
                     ->sortable(),
                 TextColumn::make('f1_score')
                     ->label('F1-score')
+                    ->tooltip(AdminGlossary::explain('f1_score'))
                     ->formatStateUsing(ModelVersionResource::formatPercentage(...))
                     ->placeholder('Belum tersedia')
                     ->sortable(),
                 TextColumn::make('baseline_accuracy')
                     ->label('Perbandingan vs Baseline')
+                    ->tooltip(AdminGlossary::explain('baseline_comparison'))
                     ->state(static fn (ModelVersion $record): ?string => ModelVersionResource::formatBaselineSummary($record))
                     ->placeholder('Belum tersedia'),
                 TextColumn::make('training_duration')
@@ -51,6 +54,7 @@ class ModelVersionsTable
                     ->sortable(),
                 TextColumn::make('is_active')
                     ->label('Status aktif')
+                    ->tooltip(AdminGlossary::explain('active_inference_status'))
                     ->badge()
                     ->formatStateUsing(static fn (bool $state): string => $state ? 'Aktif' : 'Tidak aktif')
                     ->color(static fn (bool $state): string => $state ? 'success' : 'gray')
@@ -65,7 +69,8 @@ class ModelVersionsTable
                     ->label('Status pelatihan')
                     ->options(ModelVersionResource::statusOptions()),
                 TernaryFilter::make('is_active')
-                    ->label('Status inferensi aktif'),
+                    ->label('Status inferensi aktif')
+                    ->placeholder(AdminGlossary::explain('active_inference_status')),
             ])
             ->recordActions([
                 ViewAction::make()->label('Lihat detail'),

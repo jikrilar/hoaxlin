@@ -19,7 +19,7 @@ use UnitEnum;
 
 class DatasetResource extends Resource
 {
-    public const CURATION_NOTICE = 'Referensi kurasi production. Perubahan di sini tidak melatih ulang atau mengganti model BERT aktif.';
+    public const CURATION_NOTICE = 'Kumpulan teks berlabel yang disusun admin. Menambah atau mengubah data di sini tidak melatih ulang dan tidak mengganti model aktif.';
 
     protected static ?string $model = Dataset::class;
 

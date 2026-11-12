@@ -24,7 +24,7 @@ use UnitEnum;
 
 class ModelVersionResource extends Resource
 {
-    public const TRAINING_NOTICE = 'Pelatihan bertahap (incremental fine-tuning) berjalan di latar belakang pada layanan BERT tanpa menggantikan baseline v1.0.0 secara otomatis. Aktivasi versi baru dilakukan secara manual setelah pelatihan selesai.';
+    public const TRAINING_NOTICE = 'Pelatihan lanjutan berjalan di latar belakang dan tidak otomatis menggantikan model aktif v1.0.0. Versi baru hanya dipakai setelah administrator mengaktifkannya secara manual.';
 
     protected static ?string $model = ModelVersion::class;
 
@@ -145,6 +145,18 @@ class ModelVersionResource extends Resource
         return $summary;
     }
 
+    /**
+     * Plain-language activation warning. Validation metrics never guarantee production quality.
+     */
+    public static function activationDescription(string $versionName, ?string $comparison): string
+    {
+        $baseText = "Layanan model akan beralih ke {$versionName} tanpa memulai ulang layanan. Status aktif diperbarui hanya bila layanan mengonfirmasi pemuatan model berhasil. Metrik berasal dari data validasi internal dan tidak menjamin kualitas pada data baru.";
+
+        return $comparison !== null && $comparison !== 'Acuan baseline v1.0.0'
+            ? "{$baseText} Perbandingan validasi: {$comparison}."
+            : $baseText;
+    }
+
     public static function makeActivateAction(): Action
     {
         return Action::make('activate')
@@ -155,14 +167,7 @@ class ModelVersionResource extends Resource
             ->visible(static fn (ModelVersion $record): bool => $record->isCompleted() && ! $record->is_active)
             ->requiresConfirmation()
             ->modalHeading(static fn (ModelVersion $record): string => "Aktifkan model {$record->version_name}?")
-            ->modalDescription(static function (ModelVersion $record): string {
-                $baseText = "Layanan BERT akan melakukan hot-swap ke artefak {$record->version_name}. Status aktif di database hanya diperbarui jika layanan BERT mengonfirmasi pemuatan model berhasil.";
-                $comparison = static::formatBaselineSummary($record);
-
-                return $comparison !== null && $comparison !== 'Acuan baseline v1.0.0'
-                    ? "{$baseText} Perbandingan validasi: {$comparison}."
-                    : $baseText;
-            })
+            ->modalDescription(static fn (ModelVersion $record): string => static::activationDescription($record->version_name, static::formatBaselineSummary($record)))
             ->modalSubmitActionLabel('Aktifkan Model')
             ->action(static function (ModelVersion $record): void {
                 try {

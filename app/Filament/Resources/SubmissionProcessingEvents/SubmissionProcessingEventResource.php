@@ -7,6 +7,7 @@ use App\Enums\ProcessingStage;
 use App\Filament\Resources\SubmissionProcessingEvents\Pages\ListSubmissionProcessingEvents;
 use App\Filament\Resources\SubmissionProcessingEvents\Pages\ViewSubmissionProcessingEvent;
 use App\Filament\Resources\Submissions\SubmissionResource;
+use App\Filament\Support\AdminGlossary;
 use App\Filament\Support\MonitoringPresentation;
 use App\Models\SubmissionProcessingEvent;
 use BackedEnum;
@@ -49,10 +50,10 @@ class SubmissionProcessingEventResource extends Resource
             ->columns([
                 TextColumn::make('id')->label('ID catatan')->sortable(),
                 TextColumn::make('submission.id')->label('Submission')->sortable(),
-                TextColumn::make('stage')->label('Tahap')->state(fn (SubmissionProcessingEvent $record): ?string => $record->getRawOriginal('stage'))->formatStateUsing(MonitoringPresentation::stage(...))->sortable()->wrap(),
+                TextColumn::make('stage')->label('Tahap')->tooltip(AdminGlossary::explain('pipeline_stage'))->state(fn (SubmissionProcessingEvent $record): ?string => $record->getRawOriginal('stage'))->formatStateUsing(MonitoringPresentation::stage(...))->sortable()->wrap(),
                 TextColumn::make('outcome')->label('Hasil operasi')->state(fn (SubmissionProcessingEvent $record): ?string => $record->getRawOriginal('outcome'))->formatStateUsing(MonitoringPresentation::outcome(...))->sortable()->wrap(),
                 TextColumn::make('service')->label('Layanan')->formatStateUsing(MonitoringPresentation::service(...))->placeholder('Layanan tidak tercatat'),
-                TextColumn::make('attempt')->label('Percobaan')->sortable(),
+                TextColumn::make('attempt')->label('Percobaan')->tooltip(AdminGlossary::explain('attempts'))->sortable(),
                 TextColumn::make('duration_ms')->label('Durasi')->formatStateUsing(MonitoringPresentation::duration(...))->placeholder('Durasi tidak tercatat')->sortable(),
                 TextColumn::make('created_at')->label('Dicatat')->dateTime('d/m/Y H:i:s')->sortable(),
             ])
@@ -76,12 +77,12 @@ class SubmissionProcessingEventResource extends Resource
                 TextEntry::make('id')->label('ID catatan'),
                 TextEntry::make('submission_id')->label('ID submission')
                     ->url(fn (SubmissionProcessingEvent $record): ?string => $record->submission === null ? null : SubmissionResource::getUrl('view', ['record' => $record->submission])),
-                TextEntry::make('stage')->label('Tahap')->state(fn (SubmissionProcessingEvent $record): ?string => $record->getRawOriginal('stage'))->formatStateUsing(MonitoringPresentation::stage(...)),
+                TextEntry::make('stage')->label('Tahap')->hintIcon(Heroicon::OutlinedQuestionMarkCircle)->hintIconTooltip(AdminGlossary::explain('pipeline_stage'))->state(fn (SubmissionProcessingEvent $record): ?string => $record->getRawOriginal('stage'))->formatStateUsing(MonitoringPresentation::stage(...)),
                 TextEntry::make('outcome')->label('Hasil operasi')->state(fn (SubmissionProcessingEvent $record): ?string => $record->getRawOriginal('outcome'))->formatStateUsing(MonitoringPresentation::outcome(...)),
                 TextEntry::make('service')->label('Layanan')->formatStateUsing(MonitoringPresentation::service(...))->placeholder('Layanan tidak tercatat'),
-                TextEntry::make('attempt')->label('Percobaan'),
+                TextEntry::make('attempt')->label('Percobaan')->hintIcon(Heroicon::OutlinedQuestionMarkCircle)->hintIconTooltip(AdminGlossary::explain('attempts')),
                 TextEntry::make('duration_ms')->label('Durasi')->formatStateUsing(MonitoringPresentation::duration(...))->placeholder('Durasi tidak tercatat'),
-                TextEntry::make('error_code')->label('Kode kendala')->formatStateUsing(MonitoringPresentation::errorCode(...))->placeholder('Kode kendala tidak tercatat'),
+                TextEntry::make('error_code')->label('Kode kendala')->hintIcon(Heroicon::OutlinedQuestionMarkCircle)->hintIconTooltip(AdminGlossary::explain('error_code'))->formatStateUsing(MonitoringPresentation::errorCode(...))->placeholder('Kode kendala tidak tercatat'),
                 TextEntry::make('created_at')->label('Dicatat')->dateTime('d/m/Y H:i:s'),
             ])->columns(2)->columnSpanFull(),
             Section::make('Metadata operasional')->description(MonitoringPresentation::METADATA_NOTICE)->schema([

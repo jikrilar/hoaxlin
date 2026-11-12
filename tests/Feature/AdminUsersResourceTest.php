@@ -60,8 +60,25 @@ class AdminUsersResourceTest extends TestCase
             ->assertSee($user->name)->assertDontSee('<script id="attack">', false)
             ->assertSee('Identitas akun')->assertSee('Pengguna')->assertSee('Belum terverifikasi')
             ->assertDontSee($user->password)->assertDontSee($user->remember_token);
-        Livewire::test(ListUsers::class)->assertSee('Pengguna')->assertSee('Belum terverifikasi')->assertDontSee('<script id="attack">', false)
+        Livewire::test(ListUsers::class)->assertSee('Pengguna')->assertDontSee('<script id="attack">', false)
             ->assertDontSee($user->name)->searchTable('UniqueTailFixture')->assertCanSeeTableRecords([$user]);
+    }
+
+    public function test_verification_column_shows_badge_and_dated_tooltip(): void
+    {
+        $this->admin();
+        $verified = User::factory()->create(['name' => 'Verified Fixture', 'email_verified_at' => '2026-10-14 09:30:00']);
+        $pending = User::factory()->unverified()->create(['name' => 'Pending Fixture']);
+
+        $page = Livewire::test(ListUsers::class);
+
+        $page->assertTableColumnFormattedStateSet('email_verified_at', 'Terverifikasi', $verified)
+            ->assertTableColumnFormattedStateSet('email_verified_at', 'Belum', $pending);
+
+        $column = $page->instance()->getTable()->getColumn('email_verified_at');
+        $this->assertSame('Terverifikasi pada 14/10/2026 09:30', $this->tooltipFor($column, $verified));
+        $this->assertSame('Belum terverifikasi', $this->tooltipFor($column, $pending));
+        $page->assertSeeHtml('fi-badge');
     }
 
     public function test_native_search_sort_filters_and_pagination_keep_their_populations(): void
@@ -182,6 +199,13 @@ class AdminUsersResourceTest extends TestCase
         $this->assertModelMissing($user);
         $this->assertModelMissing($submission);
         $this->assertModelExists($admin);
+    }
+
+    private function tooltipFor($column, User $record): ?string
+    {
+        $column->record($record);
+
+        return $column->evaluate($column->getTooltip());
     }
 
     private function admin(): User

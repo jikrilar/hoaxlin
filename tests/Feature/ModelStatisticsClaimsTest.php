@@ -250,9 +250,9 @@ class ModelStatisticsClaimsTest extends TestCase
         $this->get(route('home'))->assertOk()->assertDontSee('n/a');
 
         $stats = $this->widgetStats();
-        $this->assertSame('n/a', $stats[0]->getValue());
-        $this->assertSame('n/a', $stats[1]->getValue());
-        $this->assertSame('n/a', $stats[2]->getValue());
+        $this->assertSame('Belum tersedia', $stats[0]->getValue());
+        $this->assertSame('Belum tersedia', $stats[1]->getValue());
+        $this->assertSame('Belum tersedia', $stats[2]->getValue());
     }
 
     public function test_latency_is_n_a_when_active_model_has_too_few_samples(): void

@@ -10,7 +10,7 @@
                 @endforeach
             </dl>
         @else
-            <p class="hl-admin-note" role="status">Ringkasan operasi belum tersedia (n/a). Muat ulang halaman untuk mencoba membaca data kembali.</p>
+            <p class="hl-admin-note" role="status">Ringkasan operasi belum tersedia. Muat ulang halaman untuk mencoba membaca data kembali.</p>
         @endif
 
         <table class="hl-admin-data-table" data-admin-labels>
@@ -18,7 +18,7 @@
             <thead><tr><th scope="col">Label prediksi</th><th scope="col">Jumlah hasil</th></tr></thead>
             <tbody>
                 @foreach($labels as $label)
-                    <tr data-label="{{ $label['code'] }}"><th scope="row">{{ $label['label'] }}</th><td>{{ $label['count'] === null ? 'n/a' : number_format($label['count'], 0, ',', '.') }}</td></tr>
+                    <tr data-label="{{ $label['code'] }}"><th scope="row">{{ $label['label'] }}</th><td>{{ $label['count'] === null ? 'Belum tersedia' : number_format($label['count'], 0, ',', '.') }}</td></tr>
                 @endforeach
             </tbody>
         </table>
