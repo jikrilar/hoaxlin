@@ -32,7 +32,7 @@
             <div><dt>Data dihitung pada</dt><dd><time datetime="{{ $period['generated_at']->toIso8601String() }}">{{ $period['generated_at']->format('d/m/Y H:i') }}</time></dd></div>
         </dl>
         <p>Periode ini memuat <strong>{{ number_format($totalInPeriod, 0, ',', '.') }} pemeriksaan</strong> dari semua status, termasuk menunggu, diproses, selesai, dan gagal. Bulan berjalan belum berakhir.</p>
-        <p class="hl-statistics-note">Setiap bulan dihitung sejak awal bulan sampai sebelum awal bulan berikutnya, menurut zona waktu aplikasi. Kolom label menghitung pemeriksaan yang memiliki hasil dengan label tersebut; tidak dibatasi ke status selesai. Status <x-ui.term key="abstention">belum terverifikasi</x-ui.term> dan pemeriksaan tanpa hasil tidak termasuk kolom Hoaks atau Valid.</p>
+        <p class="hl-statistics-note">Setiap bulan dihitung sejak awal bulan sampai sebelum awal bulan berikutnya, menurut zona waktu aplikasi. Kolom label menghitung pemeriksaan yang memiliki hasil dengan label tersebut; tidak dibatasi ke status selesai. Status belum terverifikasi dan pemeriksaan tanpa hasil tidak termasuk kolom Hoaks atau Valid.</p>
         @if($totalInPeriod === 0)
             <x-ui.empty-state message="Belum ada pemeriksaan dalam periode 12 bulan ini. Nilai nol tetap ditampilkan pada tabel." />
         @endif
@@ -82,7 +82,7 @@
                 @endif
             </tbody>
         </table>
-        <p class="hl-statistics-note">Status <x-ui.term key="abstention">belum terverifikasi (abstention)</x-ui.term> berarti informasi belum terverifikasi oleh sumber terpercaya. Ini bukan bukti bahwa informasi benar atau palsu.</p>
+        <p class="hl-statistics-note">Status <x-ui.term key="abstention">belum terverifikasi</x-ui.term> berarti informasi belum diverifikasi oleh sumber terpercaya. Ini bukan bukti bahwa informasi benar atau palsu.</p>
         <div class="hl-statistics-actions">
             <x-ui.link :href="route('home').'#cek-berita'" variant="primary">Periksa informasi</x-ui.link>
             <x-ui.link :href="route('cara-kerja')" variant="secondary">Cara kerja Hoaxlin</x-ui.link>

@@ -16,7 +16,7 @@
         @endif
     @else
         <p>Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif. Prediksi bisa keliru dan bukan keputusan akhir.</p>
-        <p>Label <x-ui.term key="meragukan">belum terverifikasi</x-ui.term> bukan bukti bahwa informasi benar atau palsu. <x-ui.term key="confidence">Skor keyakinan model</x-ui.term> bukan persentase kebenaran berita.</p>
+        <p>Label <x-ui.term key="meragukan">belum terverifikasi</x-ui.term> bukan bukti bahwa informasi benar atau palsu. Skor keyakinan bukan persentase kebenaran berita.</p>
         @if ($hasSlot)
             <div class="hl-disclaimer__context">{{ $slot }}</div>
         @endif

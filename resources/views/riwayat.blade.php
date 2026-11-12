@@ -108,7 +108,7 @@
 
     <section class="hl-history-results" aria-labelledby="history-results-title">
         <h2 id="history-results-title">Daftar pemeriksaan</h2>
-        <x-ui.disclaimer class="hl-history-note"><x-ui.term key="confidence">Skor keyakinan model</x-ui.term> menunjukkan tingkat keyakinan model, bukan persentase kebenaran berita. Informasi yang <x-ui.term key="abstention">belum terverifikasi</x-ui.term> bukan bukti bahwa informasi benar atau palsu.</x-ui.disclaimer>
+        <x-ui.disclaimer class="hl-history-note"><x-ui.term key="confidence">Skor keyakinan model</x-ui.term> menunjukkan tingkat keyakinan model, bukan persentase kebenaran berita. Informasi yang belum terverifikasi bukan bukti bahwa informasi benar atau palsu.</x-ui.disclaimer>
         @if($submissions->isNotEmpty())
             <p class="hl-history-note">Menampilkan {{ $submissions->firstItem() }}–{{ $submissions->lastItem() }} dari {{ $submissions->total() }} pemeriksaan{{ $hasFilters ? ' yang sesuai filter' : '' }}.</p>
             <ul class="hl-history-list" id="history-list">
@@ -128,7 +128,7 @@
                         <dl class="hl-history-state">
                             <div><dt>Status pemeriksaan</dt><dd>{{ $statusOptions[$submission->status] ?? 'Status belum tersedia' }}</dd></div>
                             <div><dt>Hasil</dt><dd data-history-label data-tone="{{ $prediction['tone'] ?? 'neutral' }}">{{ $prediction['text'] ?? 'Belum tersedia' }}</dd></div>
-                            <div><dt><x-ui.term key="confidence">Skor keyakinan model</x-ui.term></dt><dd data-history-confidence>{{ $confidence ?? 'Belum tersedia' }}</dd></div>
+                            <div><dt>Skor keyakinan model</dt><dd data-history-confidence>{{ $confidence ?? 'Belum tersedia' }}</dd></div>
                         </dl>
                         <x-ui.link :href="route('riwayat.show', $submission->id)" variant="tertiary" :aria-label="'Lihat hasil pemeriksaan '.$submission->id">Lihat hasil</x-ui.link>
                     </li>

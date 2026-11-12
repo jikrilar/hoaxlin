@@ -10,7 +10,7 @@
 <article class="container-app hl-reading-page" aria-labelledby="how-title">
     <header class="hl-reading-intro">
         <h1 id="how-title" class="hl-heading-editorial">Cara kerja Hoaxlin</h1>
-        <p>Informasi yang Anda kirim diolah menjadi teks, dianalisis oleh <x-ui.term key="indobert">model analisis (IndoBERT)</x-ui.term>, lalu dilengkapi referensi terkait dan penjelasan bila tersedia.</p>
+        <p>Informasi yang Anda kirim diolah menjadi teks, dianalisis oleh IndoBERT, lalu dilengkapi referensi terkait dan penjelasan bila tersedia.</p>
         <x-ui.disclaimer variant="full" class="hl-reading-note" />
     </header>
 
@@ -28,15 +28,15 @@
             </div>
             <div>
                 <dt>Gambar</dt>
-                <dd>{{ strtoupper(implode(', ', $inputOptions['image']['extensions'])) }}; maksimal {{ $inputOptions['image']['maxSizeLabel'] }} dan {{ $inputOptions['image']['maxWidth'] }} × {{ $inputOptions['image']['maxHeight'] }} piksel. Tulisan pada gambar dibaca melalui <x-ui.term key="ocr">pembacaan teks gambar (OCR)</x-ui.term>.</dd>
+                <dd>{{ strtoupper(implode(', ', $inputOptions['image']['extensions'])) }}; maksimal {{ $inputOptions['image']['maxSizeLabel'] }} dan {{ $inputOptions['image']['maxWidth'] }} × {{ $inputOptions['image']['maxHeight'] }} piksel. Tulisan pada gambar dibaca melalui pembacaan teks gambar.</dd>
             </div>
             <div>
                 <dt>Video unggahan</dt>
-                <dd>{{ strtoupper(implode(', ', $inputOptions['video']['extensions'])) }}; maksimal {{ $inputOptions['video']['maxSizeLabel'] }} dan {{ $inputOptions['video']['maxDurationSeconds'] }} detik. Ucapan pada audio diubah menjadi teks melalui <x-ui.term key="transkripsi">transkripsi</x-ui.term>.</dd>
+                <dd>{{ strtoupper(implode(', ', $inputOptions['video']['extensions'])) }}; maksimal {{ $inputOptions['video']['maxSizeLabel'] }} dan {{ $inputOptions['video']['maxDurationSeconds'] }} detik. Ucapan pada audio diubah menjadi teks.</dd>
             </div>
             <div>
                 <dt>Tautan video</dt>
-                <dd>URL HTTP atau HTTPS langsung ke file audio/video {{ strtoupper(implode(', ', $inputOptions['videoUrl']['extensions'])) }} yang didukung, dengan batas ukuran dan durasi <x-ui.term key="transkripsi">transkripsi</x-ui.term> yang sama. Halaman YouTube, TikTok, Instagram, Facebook, atau halaman pemutar tidak didukung.</dd>
+                <dd>URL HTTP atau HTTPS langsung ke file audio/video {{ strtoupper(implode(', ', $inputOptions['videoUrl']['extensions'])) }} yang didukung, dengan batas ukuran dan durasi transkripsi yang sama. Halaman YouTube, TikTok, Instagram, Facebook, atau halaman pemutar tidak didukung.</dd>
             </div>
         </dl>
         <p class="hl-reading-note">Format dan isi file tetap divalidasi saat dikirim. Batas serta pilihan input juga tersedia pada form pemeriksaan.</p>
@@ -48,7 +48,7 @@
         <ol class="hl-reading-steps">
             <li>
                 <h3>Membaca teks dari input</h3>
-                <p>Teks dirapikan, isi artikel diambil, gambar dibaca melalui <x-ui.term key="ocr">OCR</x-ui.term>, atau audio pada media diubah menjadi teks melalui <x-ui.term key="transkripsi">transkripsi</x-ui.term>. Kualitas gambar, suara, dan konteks input memengaruhi teks yang dapat dianalisis.</p>
+                <p>Teks dirapikan, isi artikel diambil, gambar dibaca melalui <x-ui.term key="ocr">pembacaan teks gambar</x-ui.term>, atau audio pada media diubah menjadi teks. Kualitas gambar, suara, dan konteks input memengaruhi teks yang dapat dianalisis.</p>
             </li>
             <li>
                 <h3>Terjemahan bila diperlukan</h3>
@@ -56,15 +56,15 @@
             </li>
             <li>
                 <h3>Analisis pola bahasa</h3>
-                <p><x-ui.term key="indobert">IndoBERT</x-ui.term> menganalisis pola bahasa untuk menghasilkan label prediksi dan <x-ui.term key="confidence">skor keyakinan model</x-ui.term>. Model dilatih dengan kelas valid dan hoaks; status <x-ui.term key="abstention">belum terverifikasi (abstention)</x-ui.term> diberikan saat skor keyakinan berada di bawah <x-ui.term key="threshold">batas keyakinan</x-ui.term> <x-ui.term key="runtime">layanan model</x-ui.term>, bukan kelas training ketiga.</p>
+                <p>IndoBERT menganalisis pola bahasa untuk menghasilkan label prediksi dan <x-ui.term key="confidence">skor keyakinan</x-ui.term>. Model dilatih dengan kelas valid dan hoaks. Status <x-ui.term key="abstention">belum terverifikasi</x-ui.term> diberikan saat skor berada di bawah batas yang ditetapkan layanan model; ini bukan kelas training ketiga.</p>
             </li>
             <li>
                 <h3>Pencarian rujukan terkait</h3>
-                <p><x-ui.term key="rag">Pencarian rujukan (RAG)</x-ui.term> mencari teks relevan di dalam <x-ui.term key="knowledge_base">basis pengetahuan</x-ui.term> lokal. Pencarian ini tidak mencakup seluruh internet dan tidak mengubah label atau skor keyakinan model. Referensi terkait tidak otomatis mendukung prediksi model.</p>
+                <p><x-ui.term key="retrieval">Pencarian rujukan</x-ui.term> mencari teks relevan di basis pengetahuan lokal Hoaxlin. Pencarian ini tidak mencakup seluruh internet dan tidak mengubah label atau skor keyakinan model. Referensi terkait tidak otomatis mendukung prediksi model.</p>
             </li>
             <li>
                 <h3>Penjelasan bila tersedia</h3>
-                <p>OpenAI menyusun penjelasan berdasarkan prediksi, cuplikan input, dan referensi yang tersedia. Penjelasan bukan <x-ui.term key="classifier">classifier</x-ui.term> kedua. Jika layanan penjelasan tidak tersedia, statusnya ditampilkan secara jujur dan hasil klasifikasi yang sudah selesai tetap dapat dibaca.</p>
+                <p>OpenAI menyusun penjelasan berdasarkan prediksi, cuplikan input, dan referensi yang tersedia. Penjelasan bukan penentu label kedua. Jika layanan penjelasan tidak tersedia, statusnya ditampilkan secara jujur dan hasil klasifikasi yang sudah selesai tetap dapat dibaca.</p>
             </li>
         </ol>
         <p class="hl-reading-note">Hasil final ditampilkan setelah pemrosesan selesai. Jika ekstraksi, terjemahan yang diperlukan, atau klasifikasi gagal, halaman hasil menampilkan kegagalan dan langkah pemulihan yang tersedia.</p>
@@ -84,10 +84,10 @@
                 </div>
             @endforeach
         </dl>
-        <h3><x-ui.term key="confidence">Skor keyakinan model</x-ui.term></h3>
-        <p><x-ui.term key="confidence">Skor keyakinan</x-ui.term> menunjukkan keyakinan model pada prediksinya, bukan persentase kebenaran berita, akurasi produk, atau kredibilitas sumber. <x-ui.term key="similarity_score">Skor kemiripan</x-ui.term> pada <x-ui.term key="retrieval">pencarian rujukan</x-ui.term> mengukur relevansi referensi terhadap teks, bukan tingkat keyakinan model.</p>
+        <h3>Skor keyakinan model</h3>
+        <p>Skor keyakinan menunjukkan keyakinan model pada prediksinya, bukan persentase kebenaran berita, akurasi produk, atau kredibilitas sumber. <x-ui.term key="similarity_score">Skor kemiripan</x-ui.term> pada pencarian rujukan mengukur relevansi referensi terhadap teks, bukan tingkat keyakinan model.</p>
         <h3>Referensi dan penjelasan yang belum tersedia</h3>
-        <p>Jika tidak ditemukan referensi yang cukup relevan pada <x-ui.term key="knowledge_base">basis pengetahuan saat ini</x-ui.term>, halaman hasil menyatakan keterbatasan tersebut. Ini tidak berarti tidak ada bukti di seluruh internet. Penjelasan dapat sedang disiapkan atau tidak tersedia; sistem tidak membuat referensi atau narasi pengganti yang seolah nyata.</p>
+        <p>Jika tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini, halaman hasil menyatakan keterbatasan tersebut. Ini tidak berarti tidak ada bukti di seluruh internet. Penjelasan dapat sedang disiapkan atau tidak tersedia; sistem tidak membuat referensi atau narasi pengganti yang seolah nyata.</p>
     </section>
 
     <section class="hl-reading-section" aria-labelledby="review-title">

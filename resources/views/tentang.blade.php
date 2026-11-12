@@ -19,25 +19,25 @@
 
     <section class="hl-reading-section" aria-labelledby="principles-title">
         <h2 id="principles-title">Transparansi dan akses data</h2>
-        <p>Label dan <x-ui.term key="confidence">skor keyakinan model</x-ui.term> adalah keluaran model, bukan kepastian faktual. Referensi berasal dari <x-ui.term key="knowledge_base">basis pengetahuan</x-ui.term> lokal; keterkaitannya tidak otomatis mendukung prediksi. Hasil menjelaskan ketika referensi atau penjelasan belum tersedia.</p>
+        <p>Label dan <x-ui.term key="confidence">skor keyakinan model</x-ui.term> adalah keluaran model, bukan kepastian faktual. Referensi berasal dari basis pengetahuan lokal; keterkaitannya tidak otomatis mendukung prediksi. Hasil menjelaskan ketika referensi atau penjelasan belum tersedia.</p>
         <p>Hasil akun dibatasi ke pemilik dan admin sesuai izin aplikasi. Hasil tamu memakai izin akses dalam sesi; ID pemeriksaan saja bukan tautan berbagi publik. Media diakses melalui jalur khusus yang memeriksa izin.</p>
-        <p><x-ui.term key="ocr">Pembacaan teks gambar (OCR)</x-ui.term>, <x-ui.term key="transkripsi">transkripsi</x-ui.term>, terjemahan, dan penjelasan dapat melibatkan layanan eksternal. Rincian praktik data tersedia dalam <x-ui.link :href="route('kebijakan-privasi')">Kebijakan privasi</x-ui.link>.</p>
+        <p><x-ui.term key="ocr">Pembacaan teks gambar</x-ui.term>, pengubahan suara menjadi teks, terjemahan, dan penjelasan dapat melibatkan layanan eksternal. Rincian praktik data tersedia dalam <x-ui.link :href="route('kebijakan-privasi')">Kebijakan privasi</x-ui.link>.</p>
     </section>
 
     <section class="hl-reading-section" aria-labelledby="technology-title">
         <h2 id="technology-title">Teknologi dan perannya</h2>
         <dl class="hl-reading-definitions">
             <div>
-                <dt><x-ui.term key="indobert">IndoBERT</x-ui.term></dt>
+                <dt>IndoBERT</dt>
                 <dd><x-ui.term key="classifier">Classifier</x-ui.term> untuk teks Indonesia, termasuk teks yang telah diterjemahkan. Model memberikan prediksi dan <x-ui.term key="confidence">skor keyakinan</x-ui.term>; layanan pendukung tidak mengganti label model.</dd>
             </div>
             <div>
-                <dt><x-ui.term key="retrieval">Pencarian rujukan (Retrieval)</x-ui.term> lokal</dt>
-                <dd><x-ui.term key="rag">RAG</x-ui.term> mencari referensi terkait dari dokumen yang tersedia. Cakupannya terbatas pada <x-ui.term key="knowledge_base">basis pengetahuan</x-ui.term> saat analisis, bukan pencarian seluruh internet.</dd>
+                <dt>Pencarian rujukan lokal</dt>
+                <dd>RAG mencari referensi terkait dari dokumen yang tersedia. Cakupannya terbatas pada <x-ui.term key="knowledge_base">basis pengetahuan</x-ui.term> saat analisis, bukan pencarian seluruh internet.</dd>
             </div>
             <div>
                 <dt>OpenAI</dt>
-                <dd>Mendukung <x-ui.term key="ocr">OCR</x-ui.term>, <x-ui.term key="transkripsi">transkripsi</x-ui.term>, terjemahan Inggris ke Indonesia, dan penjelasan berdasarkan input serta hasil yang tersedia. Gangguan penjelasan tidak membatalkan klasifikasi yang sudah selesai.</dd>
+                <dd>Mendukung OCR, transkripsi, terjemahan Inggris ke Indonesia, dan penjelasan berdasarkan input serta hasil yang tersedia. Gangguan penjelasan tidak membatalkan klasifikasi yang sudah selesai.</dd>
             </div>
             <div>
                 <dt>Aplikasi web</dt>
