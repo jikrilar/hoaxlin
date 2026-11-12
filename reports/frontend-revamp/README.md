@@ -14,6 +14,7 @@ Direktori ini menyimpan hasil baseline, pemetaan test, dan tangkapan layar untuk
 - [Bukti Landing + Form T2.5 (`after-s2/t25/`)](after-s2/t25/) — struktur satu form/ satu CAPTCHA, hero, dan screenshot 375/768/1280.
 - [Bukti Halaman Progres T2.6 (`after-s2/t26/`)](after-s2/t26/) — stepper tahap dari data backend, status gagal, dan screenshot 375/768/1280.
 - [Bukti Halaman Hasil T2.7 (`after-s2/t27/`)](after-s2/t27/) — badge + kalimat penjelas, langkah selanjutnya, kemiripan rujukan, salin ringkasan, dan screenshot 375/768/1280.
+- [Bukti Riwayat T2.8 (`after-s2/t28/`)](after-s2/t28/) — kartu riwayat, chip ringkasan, filter terlipat, dan screenshot 375/768/1280.
 - [Screenshot Baseline (`before/`)](before/) — 60 tangkapan layar *full-page* kondisi awal pada viewport `375px`, `768px`, dan `1280px`:
   - Publik & autentikasi: [`home`](before/home-1280.png), [`cara-kerja`](before/cara-kerja-1280.png), [`tentang`](before/tentang-1280.png), [`statistik`](before/statistik-1280.png), [`login`](before/login-1280.png), [`register`](before/register-1280.png)
   - Hasil pemeriksaan: [`hasil-selesai`](before/hasil-selesai-1280.png), [`hasil-gagal`](before/hasil-gagal-1280.png), [`hasil-meragukan`](before/hasil-meragukan-1280.png)

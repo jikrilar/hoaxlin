@@ -14,8 +14,9 @@
         $filterValues[$field] = is_string($value) ? $value : '';
     }
     $hasFilters = false;
+    $activeFilterCount = 0;
     foreach (request()->only(['search', 'label', 'input_type', 'status']) as $value) {
-        if (is_string($value) && trim($value) !== '') $hasFilters = true;
+        if (is_string($value) && trim($value) !== '') { $hasFilters = true; $activeFilterCount++; }
     }
     $emptyPage = $submissions->isEmpty() && $submissions->total() > 0;
     $firstPageUrl = route('riwayat', request()->only(['search', 'label', 'input_type', 'status', 'sort']));
@@ -39,11 +40,11 @@
     <section class="hl-history-summary" aria-labelledby="history-summary-title">
         <h2 id="history-summary-title">Ringkasan seluruh riwayat</h2>
         <p class="hl-history-note">Ringkasan label yang tersimpan pada seluruh riwayat akun. Angka ini tidak mengikuti filter atau halaman aktif.</p>
-        <dl>
-            <div><dt>Valid (label model)</dt><dd>{{ $stats['valid'] }}</dd></div>
-            <div><dt>Hoaks (label model)</dt><dd>{{ $stats['hoax'] }}</dd></div>
-            <div><dt>Informasi belum terverifikasi oleh sumber terpercaya</dt><dd>{{ $stats['meragukan'] }}</dd></div>
-        </dl>
+        <ul class="hl-history-chips" role="list">
+            <li class="hl-history-chip" data-tone="neutral"><x-ui.badge tone="success">Valid</x-ui.badge><span class="hl-history-chip__count">{{ $stats['valid'] }}</span></li>
+            <li class="hl-history-chip" data-tone="danger"><x-ui.badge tone="danger">Hoaks</x-ui.badge><span class="hl-history-chip__count">{{ $stats['hoax'] }}</span></li>
+            <li class="hl-history-chip" data-tone="warning"><x-ui.badge tone="warning">Belum terverifikasi</x-ui.badge><span class="hl-history-chip__count">{{ $stats['meragukan'] }}</span></li>
+        </ul>
     </section>
 
     <section class="hl-history-filters" aria-labelledby="history-filter-title">
@@ -66,6 +67,10 @@
             </x-ui.alert>
         @endif
         <form method="GET" action="{{ route('riwayat') }}" id="history-filter-form">
+            {{-- Native <details> keeps every control submittable; the summary states how many filters are active. --}}
+            <details class="hl-disclosure hl-history-filter-disclosure" @if($errors->any()) open @endif>
+                <summary class="hl-disclosure__summary">Filter{{ $activeFilterCount > 0 ? ' ('.$activeFilterCount.' aktif)' : '' }}</summary>
+                <div class="hl-disclosure__content">
             <div class="hl-history-filter-fields">
                 <x-ui.field id="history-search" label="Cari teks atau URL" hint="Cari pada teks, hasil ekstraksi, atau URL. Maksimal 100 karakter." :error="$errors->first('search')" class="hl-history-search">
                     <x-forms.input type="search" name="search" :value="$filterValues['search']" maxlength="100" />
@@ -103,6 +108,8 @@
                 <x-ui.button type="submit">Terapkan filter</x-ui.button>
                 <x-ui.link :href="route('riwayat')" variant="tertiary">Reset filter</x-ui.link>
             </div>
+                </div>
+            </details>
         </form>
     </section>
 
@@ -119,18 +126,23 @@
                         $confidence = $result ? \App\View\Presenters\DetectionPresentation::confidence($result->confidence_score) : null;
                         $preview = filled($submission->raw_input) ? $submission->raw_input : (filled($submission->source_url) ? $submission->source_url : 'Input media');
                     @endphp
-                    <li class="hl-history-item" data-history-id="{{ $submission->id }}">
-                        <h3>{{ \Illuminate\Support\Str::limit($preview, 150) }}</h3>
+                    <li class="hl-card hl-history-item" data-history-id="{{ $submission->id }}">
+                        <h3 class="hl-history-item__preview">{{ \Illuminate\Support\Str::limit($preview, 150) }}</h3>
                         <p class="hl-history-item__meta">
                             {{ \App\View\Presenters\DetectionPresentation::inputType($submission->input_type) }} ·
                             <time datetime="{{ $submission->created_at->toIso8601String() }}">{{ $submission->created_at->format('d M Y, H:i') }}</time>
                         </p>
-                        <dl class="hl-history-state">
-                            <div><dt>Status pemeriksaan</dt><dd>{{ $statusOptions[$submission->status] ?? 'Status belum tersedia' }}</dd></div>
-                            <div><dt>Hasil</dt><dd data-history-label data-tone="{{ $prediction['tone'] ?? 'neutral' }}">{{ $prediction['text'] ?? 'Belum tersedia' }}</dd></div>
-                            <div><dt>Skor keyakinan model</dt><dd data-history-confidence>{{ $confidence ?? 'Belum tersedia' }}</dd></div>
-                        </dl>
-                        <x-ui.link :href="route('riwayat.show', $submission->id)" variant="tertiary" :aria-label="'Lihat hasil pemeriksaan '.$submission->id">Lihat hasil</x-ui.link>
+                        <p class="hl-history-item__status">
+                            <span>Status: <strong>{{ $statusOptions[$submission->status] ?? 'Status belum tersedia' }}</strong></span>
+                            <span class="hl-history-item__score">Skor keyakinan model: <strong data-history-confidence>{{ $confidence ?? 'Belum tersedia' }}</strong></span>
+                        </p>
+                        <p class="hl-history-item__label">
+                            {{-- Tone is reinforcement only: the label text itself states the meaning. --}}
+                            <span class="hl-badge" data-history-label data-tone="{{ $prediction['tone'] ?? 'neutral' }}"><span class="hl-badge__text">{{ $prediction['text'] ?? 'Belum tersedia' }}</span></span>
+                        </p>
+                        <div class="hl-history-item__actions">
+                            <x-ui.link :href="route('riwayat.show', $submission->id)" variant="secondary" :aria-label="'Lihat hasil pemeriksaan '.$submission->id">Lihat hasil</x-ui.link>
+                        </div>
                     </li>
                 @endforeach
             </ul>

@@ -279,9 +279,11 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 - **Penerimaan:** pengguna awam dapat menyebutkan arti hasil & langkah berikutnya; tidak ada klaim kebenaran.
 
 ### T2.8 (M) Riwayat
-- [ ] Daftar berbentuk kartu: cuplikan input, jenis, tanggal, `badge` hasil, tombol "Lihat hasil". Filter dilipat (disclosure "Filter") dengan jumlah filter aktif; ringkasan label sebagai chip di atas daftar.
-- [ ] Tombol "Unduh seluruh riwayat (CSV)" tetap di sini dengan penjelasan bahwa isi = seluruh riwayat akun.
-- [ ] Pertahankan validasi filter, pagination, empty state, `data-history-*` yang dipakai test.
+- [x] Daftar berbentuk kartu: cuplikan input, jenis, tanggal, `badge` hasil, tombol "Lihat hasil". Filter dilipat (disclosure "Filter") dengan jumlah filter aktif; ringkasan label sebagai chip di atas daftar.
+- [x] Tombol "Unduh seluruh riwayat (CSV)" tetap di sini dengan penjelasan bahwa isi = seluruh riwayat akun.
+- [x] Pertahankan validasi filter, pagination, empty state, `data-history-*` yang dipakai test.
+- **Bukti:** `HistoryPresentationTest` (chip ringkasan, filter `<details>` + jumlah aktif, auto-open saat error, kartu + badge, CSV seluruh riwayat), `SubmissionHistoryTest` tetap hijau, `reports/frontend-revamp/after-s2/t28/`.
+- **Catatan:** filter dibuka otomatis hanya ketika validasi gagal agar tautan ringkasan error tidak menunjuk field tersembunyi; tanpa JS tidak ada perubahan perilaku.
 - **Penerimaan:** test riwayat hijau; 375px nyaman dipakai.
 
 ### T2.9 (M) Statistik publik
