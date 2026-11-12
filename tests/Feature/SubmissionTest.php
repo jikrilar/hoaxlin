@@ -154,13 +154,13 @@ class SubmissionTest extends TestCase
         $page = $this->get(route('home'))->assertOk()
             ->assertSee('id="submission-errors" role="alert"', false)
             ->assertSee('Platform video tidak didukung. Gunakan URL langsung ke file audio/video.')
-            ->assertSee('data-active-input="video" data-active-video="url"', false)
-            ->assertSee('id="panel-video" class="hl-input-panel"', false)
+            ->assertSee('data-active-tab="video-url"', false)
+            ->assertSee('id="input-panel-video-url"', false)
             ->assertSee('name="input_type" value="video_url"', false)
             ->assertSee('value="'.$sourceUrl.'"', false)
             ->assertDontSee('validation.');
 
-        $page->assertSee('id="video-tab-url"', false)->assertSee('data-video-mode="url"', false);
+        $page->assertSee('id="input-tab-video-url"', false);
 
         $this->from(route('home'))->post(route('deteksi'), $this->withCaptcha([
             'input_type' => 'video_url',
@@ -278,13 +278,13 @@ class SubmissionTest extends TestCase
                 ->assertSee('value="'.$sourceUrl.'"', false);
 
             if ($inputType === 'url') {
-                $page->assertSee('data-active-input="url"', false)
-                    ->assertSee('id="panel-url" class="hl-input-panel"', false);
+                $page->assertSee('data-active-tab="url"', false)
+                    ->assertSee('id="input-panel-url"', false);
             } else {
-                $page->assertSee('data-active-input="video" data-active-video="url"', false)
-                    ->assertSee('id="panel-video" class="hl-input-panel"', false)
+                $page->assertSee('data-active-tab="video-url"', false)
+                    ->assertSee('id="input-panel-video-url"', false)
                     ->assertSee('name="input_type" value="video_url"', false);
-                $page->assertSee('id="video-tab-url"', false)->assertSee('data-video-mode="url"', false);
+                $page->assertSee('id="input-tab-video-url"', false);
             }
         }
 
@@ -316,14 +316,93 @@ class SubmissionTest extends TestCase
                 ->assertSee('Jawaban CAPTCHA salah.');
 
             if ($inputType === 'image') {
-                $page->assertSee('data-active-input="gambar"', false);
+                $page->assertSee('data-active-tab="image"', false);
             } else {
-                $page->assertSee('data-active-input="video" data-active-video="upload"', false)
+                $page->assertSee('data-active-tab="video"', false)
                     ->assertSee('name="input_type" value="video"', false);
             }
         }
 
         $this->assertDatabaseEmpty('submissions');
+    }
+
+    public function test_landing_renders_one_form_with_one_captcha_and_guest_blocks_other_types(): void
+    {
+        $page = $this->get(route('home'))->assertOk();
+
+        $this->assertSame(1, substr_count($page->getContent(), 'action="'.route('deteksi').'"'), 'guest sees exactly one submission form');
+        $this->assertSame(1, substr_count($page->getContent(), 'enctype="multipart/form-data"'));
+        $this->assertSame(1, substr_count($page->getContent(), 'name="captcha_answer"'), 'one CAPTCHA per submission');
+        $this->assertSame(1, substr_count($page->getContent(), 'name="website"'), 'one honeypot');
+        $this->assertSame(1, substr_count($page->getContent(), 'name="_token"'), 'one CSRF token');
+        $page->assertSee('Mulai periksa')
+            ->assertSee('Contoh tampilan, bukan hasil nyata')
+            ->assertSee('name="input_type" value="text"', false)
+            ->assertDontSee('name="input_type" value="url"', false)
+            ->assertDontSee('role="tablist"', false)
+            ->assertSee('Masuk untuk memakai');
+    }
+
+    public function test_authenticated_landing_exposes_every_input_type_in_the_same_form(): void
+    {
+        $page = $this->actingAs(User::factory()->create())->get(route('home'))->assertOk();
+
+        // One submission form; the logout control in the header is the only other form.
+        $this->assertSame(1, substr_count($page->getContent(), 'action="'.route('deteksi').'"'), 'authenticated users share one submission form');
+        $this->assertSame(1, substr_count($page->getContent(), 'name="captcha_answer"'));
+
+        foreach (['text', 'url', 'image', 'video', 'video_url'] as $type) {
+            $page->assertSee('name="input_type" value="'.$type.'"', false);
+        }
+        $page->assertSee('id="input-panel-text"', false)
+            ->assertSee('id="input-panel-video-url"', false)
+            ->assertSee('role="tablist"', false);
+    }
+
+    public function test_inactive_panels_are_disabled_on_the_server_for_no_js_submission(): void
+    {
+        $page = $this->actingAs(User::factory()->create())->get(route('home'))->assertOk();
+        $html = $page->getContent();
+
+        preg_match_all('/<fieldset[^>]*data-input-fields[^>]*>/', $html, $fieldsets);
+        $this->assertCount(5, $fieldsets[0], 'every input type has its own fieldset');
+
+        $panels = [];
+        preg_match_all('/<div[^>]*id="input-panel-([a-z-]+)"[^>]*>/', $html, $panels);
+        $this->assertSame(['text', 'url', 'image', 'video', 'video-url'], $panels[1]);
+
+        // Only the active panel is reachable without JS; the rest are hidden and disabled.
+        foreach ($panels[1] as $key) {
+            $active = $key === 'text';
+            $panelTag = preg_match('/<div[^>]*id="input-panel-'.$key.'"[^>]*>/', $html, $match) ? $match[0] : '';
+            $this->assertSame(
+                $active ? 0 : 1,
+                str_contains($panelTag, 'hidden') ? 1 : 0,
+                'panel '.$key.' visibility must match the active tab',
+            );
+        }
+    }
+
+    public function test_tab_query_and_old_input_select_the_restored_panel(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('home', ['tab' => 'gambar']))
+            ->assertOk()
+            ->assertSee('data-active-tab="image"', false);
+
+        $this->get(route('home', ['tab' => 'unknown']))
+            ->assertOk()
+            ->assertSee('data-active-tab="text"', false);
+
+        $this->from(route('home'))->post(route('deteksi'), [
+            'input_type' => 'url',
+            'source_url' => 'https://example.com/berita',
+            'captcha_answer' => (int) session('submission_captcha.answer') + 1,
+        ])->assertRedirect(route('home'));
+
+        $this->get(route('home'))->assertOk()
+            ->assertSee('data-active-tab="url"', false)
+            ->assertSee('value="https://example.com/berita"', false);
     }
 
     /** @param array<string, mixed> $payload */

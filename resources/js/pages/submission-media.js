@@ -28,78 +28,44 @@ export function fileError(file, kind, options) {
     return '';
 }
 
+/**
+ * Single-form tab sync (T2.5): exactly one panel stays enabled, so exactly one
+ * input_type/raw_input/source_url/media_file can be submitted. The same rule is
+ * already enforced on the server for the no-JS render.
+ */
 function mountSelector(root, scope) {
-    const container = root.querySelector('[data-submission-selector]');
-    if (!container) return;
-    const panels = [...container.querySelectorAll('[data-input-panel]')];
-    const videos = [...container.querySelectorAll('[data-video-panel]')];
-    const tabs = [...container.querySelectorAll('[data-input-tab]')];
-    const modes = [...container.querySelectorAll('[data-video-mode]')];
+    const form = root.querySelector('[data-submission-form]');
+    if (!form) return;
+    const panels = [...form.querySelectorAll('[data-input-fields]')].map(fields => ({
+        fields,
+        panel: fields.closest('[role="tabpanel"]'),
+    }));
+    if (!panels.length) return;
     const apply = () => {
-        for (const panel of panels) {
-            const selected = panel.dataset.inputPanel === container.dataset.activeInput;
-            panel.hidden = !selected;
-            for (const fields of panel.querySelectorAll('[data-submission-fields]')) fields.disabled = !selected;
-        }
-        for (const panel of videos) {
-            const selected = container.dataset.activeInput === 'video' && panel.dataset.videoPanel === container.dataset.activeVideo;
-            panel.hidden = panel.dataset.videoPanel !== container.dataset.activeVideo;
-            panel.querySelector('[data-submission-fields]').disabled = !selected;
-        }
-        for (const [links, value, key] of [[tabs, container.dataset.activeInput, 'inputTab'], [modes, container.dataset.activeVideo, 'videoMode']]) {
-            for (const link of links) {
-                const selected = link.dataset[key] === value;
-                link.setAttribute('aria-selected', String(selected));
-                link.tabIndex = selected ? 0 : -1;
-            }
+        for (const { fields, panel } of panels) {
+            const selected = panel?.id === `input-panel-${form.dataset.activeTab}`;
+            if (panel) panel.hidden = !selected;
+            fields.disabled = !selected;
         }
     };
-    for (const [links, key, stateKey] of [[tabs, 'inputTab', 'activeInput'], [modes, 'videoMode', 'activeVideo']]) {
-        if (!links.length) continue;
-        const nav = links[0].parentElement;
-        nav.setAttribute('role', 'tablist');
-        scope.own(() => nav.removeAttribute('role'));
-        for (const link of links) {
-            const panel = container.querySelector(link.getAttribute('href'));
-            link.setAttribute('role', 'tab');
-            link.setAttribute('aria-controls', panel.id);
-            panel.setAttribute('role', 'tabpanel');
-            panel.setAttribute('aria-labelledby', link.id);
-            const select = () => { container.dataset[stateKey] = link.dataset[key]; apply(); };
-            scope.listen(link, 'click', event => { event.preventDefault(); select(); });
-            scope.listen(link, 'keydown', event => {
-                if (event.key === ' ') { event.preventDefault(); select(); return; }
-                const index = links.indexOf(link);
-                const target = { ArrowRight: (index + 1) % links.length, ArrowLeft: (index - 1 + links.length) % links.length, Home: 0, End: links.length - 1 }[event.key];
-                if (target === undefined) return;
-                event.preventDefault();
-                container.dataset[stateKey] = links[target].dataset[key];
-                apply();
-                links[target].focus();
-            });
-            scope.own(() => {
-                for (const attribute of ['role', 'aria-controls', 'aria-selected', 'tabindex']) link.removeAttribute(attribute);
-                panel.removeAttribute('role');
-                panel.removeAttribute('aria-labelledby');
-            });
-        }
-    }
-    container.dataset.enhanced = '';
+    const select = key => {
+        form.dataset.activeTab = key;
+        apply();
+    };
+    scope.listen(form, 'tabchange', event => select(event.detail?.key ?? form.dataset.activeTab));
     apply();
-    scope.own(() => {
-        delete container.dataset.enhanced;
-        for (const panel of [...panels, ...videos]) panel.hidden = false;
-        for (const fields of container.querySelectorAll('[data-submission-fields]')) fields.disabled = false;
-    });
 }
 
 function mountUrlForms(root, scope) {
-    for (const form of root.querySelectorAll('[data-url-submission]')) {
-        const input = form.querySelector('[data-source-url]');
-        const error = form.querySelector('[data-url-error]');
-        const preview = form.querySelector('[data-url-preview]');
+    for (const input of root.querySelectorAll('[data-source-url]')) {
+        const form = input.closest('form');
+        if (!form) continue;
+        const error = input.parentElement.querySelector('[data-url-error]');
+        const preview = input.parentElement.querySelector('[data-url-preview]');
         const serverInvalid = input.getAttribute('aria-invalid');
-        const options = form.dataset.directUrlOptions ? JSON.parse(form.dataset.directUrlOptions) : undefined;
+        const options = input.dataset.direct === 'true' && input.dataset.directUrlOptions
+            ? JSON.parse(input.dataset.directUrlOptions)
+            : undefined;
         const validate = () => {
             const message = input.value.length > input.maxLength ? `URL maksimal ${input.maxLength} karakter.` : urlError(input.value, options);
             input.setCustomValidity(message);
@@ -118,7 +84,10 @@ function mountUrlForms(root, scope) {
             update();
         });
         scope.listen(input, 'invalid', show);
+        // Only the enabled panel may block submission; a hidden panel must never
+        // hold the form hostage with its own (inactive) value.
         scope.listen(form, 'submit', event => {
+            if (input.disabled) return;
             if (validate()) { event.preventDefault(); input.reportValidity(); }
         });
         scope.listen(form, 'reset', event => scope.timeout(() => {
@@ -194,6 +163,7 @@ function mountUploads(root, scope) {
             status.textContent += ' — Pratinjau tidak tersedia; server tetap memvalidasi file.';
         });
         scope.listen(input.form, 'submit', event => {
+            if (input.disabled) return;
             const file = input.files[0];
             if (file) {
                 const message = fileError(file, kind, options);
@@ -210,7 +180,7 @@ export function mountMediaInputs(root, scope) {
     mountSelector(root, scope);
     mountUrlForms(root, scope);
     mountUploads(root, scope);
-    for (const form of root.querySelectorAll('[data-url-submission], [data-upload-submission]')) {
+    for (const form of root.querySelectorAll('[data-submission-form]')) {
         const status = form.querySelector('[data-submission-status]');
         scope.listen(form, 'submit', event => scope.timeout(() => {
             if (!event.defaultPrevented) status.textContent = 'Mengirim informasi. Tunggu respons server.';

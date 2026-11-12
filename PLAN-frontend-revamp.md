@@ -240,13 +240,15 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 8. **Batasan & privasi:** ringkas + tautan Kebijakan Privasi.
 
 **Form (kontrak backend tidak berubah):**
-- [ ] Ubah dari 4 form terpisah (masing-masing dengan CAPTCHA) menjadi **satu form** dengan `tabs` jenis input dan **satu CAPTCHA**. `input_type` dikirim sesuai tab aktif; kontrol pada panel tidak aktif **di-`disabled`** oleh JS (agar tidak ikut terkirim dan tidak memblokir validasi `required`). Pertahankan nama field, honeypot, CSRF, `enctype="multipart/form-data"`, dan preservasi input saat error (`old()`).
-- [ ] Tanpa JS (progressive enhancement): tampilkan hanya panel Teks (tamu) atau panel terpilih via `?tab=`; pastikan form tetap dapat dikirim.
-- [ ] Hitung karakter live, preview URL, preview gambar, validasi ukuran/durasi sisi klien (tetap divalidasi ulang server) — pertahankan perilaku yang sudah ada di `resources/js/pages/submission-form.js` & `submission-media.js`, sesuaikan selector.
-- [ ] Hint batas (ukuran/durasi/format) berasal dari `SubmissionFormOptions` seperti sekarang; **jangan hard-code angka**.
-- [ ] Pesan error: ringkasan di atas form dengan tautan ke field (sudah ada) tetap; perjelas bahasa.
-- [ ] CAPTCHA: tetap soal atomik yang sama (backend tak berubah); tampilkan sekali di bawah panel, label jelas ("Jawab soal singkat ini agar kami tahu Anda bukan robot").
+- [x] Ubah dari 4 form terpisah (masing-masing dengan CAPTCHA) menjadi **satu form** dengan `tabs` jenis input dan **satu CAPTCHA**. `input_type` dikirim sesuai tab aktif; kontrol pada panel tidak aktif **di-`disabled`** oleh JS (agar tidak ikut terkirim dan tidak memblokir validasi `required`). Pertahankan nama field, honeypot, CSRF, `enctype="multipart/form-data"`, dan preservasi input saat error (`old()`).
+- [x] Tanpa JS (progressive enhancement): tampilkan hanya panel Teks (tamu) atau panel terpilih via `?tab=`; pastikan form tetap dapat dikirim.
+- [x] Hitung karakter live, preview URL, preview gambar, validasi ukuran/durasi sisi klien (tetap divalidasi ulang server) — pertahankan perilaku yang sudah ada di `resources/js/pages/submission-form.js` & `submission-media.js`, sesuaikan selector.
+- [x] Hint batas (ukuran/durasi/format) berasal dari `SubmissionFormOptions` seperti sekarang; **jangan hard-code angka**.
+- [x] Pesan error: ringkasan di atas form dengan tautan ke field (sudah ada) tetap; perjelas bahasa.
+- [x] CAPTCHA: tetap soal atomik yang sama (backend tak berubah); tampilkan sekali di bawah panel, label jelas ("Jawab soal singkat ini agar kami tahu Anda bukan robot").
 - **Pengujian wajib hijau tanpa melonggarkan assertion:** `SubmissionTest`, `AtomicCaptchaQuotaTest`, `VideoMediaContractTest`, `ExternalUrlSecurityTest`, `tests/Frontend/submission-form.test.mjs`, `submission-media.test.mjs`. Tambahkan test: submit tiap jenis input dari form tunggal; panel tidak aktif tidak ikut terkirim; error mempertahankan tab & input.
+- **Bukti:** `SubmissionTest` (satu form/ satu CAPTCHA/ satu honeypot, 5 tab untuk pengguna login, fieldset non-aktif `disabled`, `?tab=` dan `old()` memilih panel), `SubmissionFormPresentationTest`, `GuestSubmissionAccessTest`, `tabs.test.mjs` (+`tabchange`), `submission-media.test.mjs` (sinkronisasi panel), `reports/frontend-revamp/after-s2/t25/`.
+- **Catatan:** panel Teks selalu menjadi panel pertama terpilih untuk tamu; `enctype="multipart/form-data"` tunggal dipakai semua tab sehingga unggahan tidak butuh form kedua.
 - **Penerimaan:** pengunjung memahami apa itu Hoaxlin dalam ±10 detik tanpa membuka halaman lain; satu CAPTCHA per kirim.
 
 ### T2.6 (M) Halaman progres

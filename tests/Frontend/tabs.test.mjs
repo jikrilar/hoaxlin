@@ -29,12 +29,11 @@ function fixture() {
     tabs[0].setAttribute('aria-selected', 'true');
     const panels = [node(), node(), node()];
     const tablist = { querySelectorAll: () => tabs };
-    const root = {
+    const root = Object.assign(new EventTarget(), {
         dataset: {},
-        querySelector: selector => selector === '[role="tablist"]' ? tablist : null,
         querySelectorAll: () => [],
         panel: null,
-    };
+    });
     const doc = { getElementById: () => null };
     root.querySelector = selector => {
         if (selector === '[role="tablist"]') return tablist;
@@ -131,14 +130,14 @@ test('bundle mount enhances every tablist on the page and disposes cleanly', asy
             },
         }));
         const tablist = { querySelectorAll: () => tabs };
-        const root = {
+        const root = Object.assign(new EventTarget(), {
             dataset: {},
             querySelector: selector => {
                 if (selector === '[role="tablist"]') return tablist;
                 const id = selector.replace(/^#/, '');
                 return panels.find(p => p.id === id) ?? null;
             },
-        };
+        });
         panels.push(...tabs.map(tab => ({ id: tab.attrs['aria-controls'], hidden: false })));
         created.push(root);
         return root;

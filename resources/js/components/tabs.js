@@ -33,7 +33,10 @@ export function mountTabs(container, scope) {
             const panel = panels[position];
             if (panel) panel.hidden = !selected;
         });
-        container.dataset.activeTab = tabs[index].dataset.tabKey ?? String(index);
+        const key = tabs[index].dataset.tabKey ?? String(index);
+        container.dataset.activeTab = key;
+        // Consumers (single-form submission) keep their own state in sync.
+        container.dispatchEvent(new CustomEvent('tabchange', { detail: { key }, bubbles: true }));
     };
 
     const current = () => Math.max(0, tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true'));

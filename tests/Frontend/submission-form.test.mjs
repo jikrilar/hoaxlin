@@ -6,15 +6,19 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 10));
 function fixture(value = '') {
     const attrs = new Map([['aria-invalid', 'false']]);
     const input = Object.assign(new EventTarget(), {
-        value, minLength: 50, maxLength: 50000, custom: '',
+        value, minLength: 50, maxLength: 50000, custom: '', disabled: false,
         getAttribute: key => attrs.get(key), setAttribute: (key, value) => attrs.set(key, value),
         setCustomValidity(value) { this.custom = value; },
         reportValidity() { if (this.custom) this.dispatchEvent(new Event('invalid')); return !this.custom; },
     });
     const counter = { textContent: '' }, error = { hidden: true, textContent: '' }, status = { textContent: '' }, captcha = { value: '5' };
-    const nodes = { '[name="raw_input"]': input, '[data-text-count]': counter, '[data-text-error]': error, '[data-submission-status]': status, '[name="captcha_answer"]': captcha };
-    const form = Object.assign(new EventTarget(), { querySelector: selector => nodes[selector] });
-    const root = { querySelectorAll: () => [], querySelector: selector => selector === '[data-text-submission]' ? form : null, ownerDocument: { activeElement: null } };
+    const nodes = { '[data-text-input]': input, '[data-text-count]': counter, '[data-text-error]': error, '[data-submission-status]': status, '[name="captcha_answer"]': captcha };
+    const form = Object.assign(new EventTarget(), {
+        dataset: { activeTab: 'text' },
+        querySelector: selector => nodes[selector],
+        querySelectorAll: () => [],
+    });
+    const root = { querySelectorAll: () => [], querySelector: selector => selector === '[data-submission-form]' ? form : null, ownerDocument: { activeElement: null } };
     return { root, form, input, counter, error, status, captcha };
 }
 const submit = () => new Event('submit', { cancelable: true });
