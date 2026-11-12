@@ -310,9 +310,11 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 - **Catatan:** copy yang sudah dikontrak test dokumentasi dipertahankan verbatim; badge status email di profil memakai teks sebagai pembeda utama.
 
 ### T2.12 (M) QA visual & aksesibilitas tahap 2
-- [ ] Screenshot "after-s2" 375/768/1280 untuk semua halaman publik, simpan di `reports/frontend-revamp/after-s2/`.
-- [ ] Audit: keyboard-only (Tab/Shift+Tab/Enter/Esc), pembaca layar (label/role), zoom 200%, reduced-motion, kontras AA (cek token `--ds-text-muted` pada latar `--ds-bg-subtle`), konsol bebas error, jaringan tanpa 404 aset.
-- [ ] `npm run build` + `node --test tests/Frontend/*.test.mjs` + suite Laravel terkait hijau.
+- [x] Screenshot "after-s2" 375/768/1280 untuk semua halaman publik, simpan di `reports/frontend-revamp/after-s2/`.
+- [x] Audit: keyboard-only (Tab/Shift+Tab/Enter/Esc), pembaca layar (label/role), zoom 200%, reduced-motion, kontras AA (cek token `--ds-text-muted` pada latar `--ds-bg-subtle`), konsol bebas error, jaringan tanpa 404 aset.
+- [x] `npm run build` + `node --test tests/Frontend/*.test.mjs` + suite Laravel terkait hijau.
+- **Bukti:** `reports/frontend-revamp/after-s2/qa/` (27 screenshot 375/768/1280 untuk 9 halaman publik + laporan audit), 117/117 frontend, 917 Laravel lulus, Pint PASS.
+- **Batas:** pembaca layar diuji lewat struktur DOM (bukan NVDA/JAWS), zoom via emulasi 640px@2x, kontras dihitung dari nilai token; halaman admin milik Tahap 3.
 
 **Selesai Tahap 2 bila:** T2.1–T2.12 centang dan bukti screenshot/QA tersimpan.
 
