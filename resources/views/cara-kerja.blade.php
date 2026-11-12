@@ -14,6 +14,19 @@
         <x-ui.disclaimer variant="full" class="hl-reading-note" />
     </header>
 
+    <section class="hl-reading-section" aria-labelledby="steps-title">
+        <h2 id="steps-title">Lima langkah pemeriksaan</h2>
+        <p>Gambaran singkat perjalanan informasi Anda. Rincian tiap langkah ada di bawah.</p>
+        <x-ui.stepper label="Alur pemeriksaan informasi" :steps="[
+            ['key' => 'teks', 'label' => 'Ubah jadi teks'],
+            ['key' => 'terjemahan', 'label' => 'Terjemahkan bila perlu'],
+            ['key' => 'analisis', 'label' => 'Analisis model'],
+            ['key' => 'rujukan', 'label' => 'Cari rujukan'],
+            ['key' => 'penjelasan', 'label' => 'Penjelasan'],
+        ]" />
+        <p class="hl-reading-note">Setiap langkah memakai hasil langkah sebelumnya. Bila satu langkah gagal, halaman hasil menyebutkannya dan tidak mengarang hasil pengganti.</p>
+    </section>
+
     <section class="hl-reading-section" aria-labelledby="input-title">
         <h2 id="input-title">Pilih input yang sesuai</h2>
         <p>Tamu hanya dapat mengirim teks. Pengguna yang sudah masuk ke akun juga dapat menggunakan tautan artikel, gambar, video unggahan, dan tautan video.</p>
@@ -88,6 +101,30 @@
         <p>Skor keyakinan menunjukkan keyakinan model pada prediksinya, bukan persentase kebenaran berita, akurasi produk, atau kredibilitas sumber. <x-ui.term key="similarity_score">Skor kemiripan</x-ui.term> pada pencarian rujukan mengukur relevansi referensi terhadap teks, bukan tingkat keyakinan model.</p>
         <h3>Referensi dan penjelasan yang belum tersedia</h3>
         <p>Jika tidak ditemukan referensi yang cukup relevan pada basis pengetahuan saat ini, halaman hasil menyatakan keterbatasan tersebut. Ini tidak berarti tidak ada bukti di seluruh internet. Penjelasan dapat sedang disiapkan atau tidak tersedia; sistem tidak membuat referensi atau narasi pengganti yang seolah nyata.</p>
+    </section>
+
+    <section class="hl-reading-section" aria-labelledby="terms-title">
+        <h2 id="terms-title">Istilah</h2>
+        <p>Istilah yang dipakai di halaman hasil dan di sini, dengan arti sehari-hari.</p>
+        @php
+            // One source of truth: the public glossary in config/glossary.php (Appendix A).
+            $adminOnlyTerms = ['f1_score', 'evaluation_accuracy', 'baseline', 'baseline_comparison', 'hot_swap',
+                'incremental_fine_tuning', 'active_inference_status', 'failed_jobs', 'attempts', 'error_code', 'curation_data'];
+            $publicTerms = array_diff_key(config('glossary') ?? [], array_flip($adminOnlyTerms));
+            // Collapse duplicate labels (synonym keys point at the same explanation).
+            $seenTerms = [];
+            foreach ($publicTerms as $entry) {
+                $seenTerms[$entry['label']] = $entry['description'];
+            }
+        @endphp
+        <dl class="hl-reading-definitions">
+            @foreach($seenTerms as $label => $description)
+                <div>
+                    <dt>{{ $label }}</dt>
+                    <dd>{{ $description }}</dd>
+                </div>
+            @endforeach
+        </dl>
     </section>
 
     <section class="hl-reading-section" aria-labelledby="review-title">

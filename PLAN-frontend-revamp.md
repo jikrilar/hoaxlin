@@ -297,9 +297,11 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 - **Penerimaan:** `MonthlyStatisticsBoundaryTest`, `ModelStatisticsClaimsTest` hijau.
 
 ### T2.10 (M) Cara kerja & Tentang
-- [ ] **Pertahankan kedua URL** (`cara-kerja`, `tentang`). Hilangkan duplikasi isi.
-- [ ] **Cara kerja:** `stepper` visual 5 langkah dalam bahasa awam (kirim → ubah jadi teks → terjemahkan bila perlu → analisis model → cari rujukan → penjelasan), bagian "Cara membaca hasil", bagian "Istilah" (render dari glosarium Lampiran A).
-- [ ] **Tentang:** tujuan, siapa yang bisa memakai (tamu vs akun), privasi & akses data ringkas, keterbatasan, konteks proyek (Tugas Akhir), FAQ.
+- [x] **Pertahankan kedua URL** (`cara-kerja`, `tentang`). Hilangkan duplikasi isi.
+- [x] **Cara kerja:** `stepper` visual 5 langkah dalam bahasa awam (kirim → ubah jadi teks → terjemahkan bila perlu → analisis model → cari rujukan → penjelasan), bagian "Cara membaca hasil", bagian "Istilah" (render dari glosarium Lampiran A).
+- [x] **Tentang:** tujuan, siapa yang bisa memakai (tamu vs akun), privasi & akses data ringkas, keterbatasan, konteks proyek (Tugas Akhir), FAQ.
+- **Bukti:** `DocumentationWorkflowContractTest` (stepper 5 langkah tanpa status berjalan, glosarium publik dari `config/glossary.php` tanpa istilah admin, struktur Tentang + 4 FAQ, tidak ada paragraf identik), `reports/frontend-revamp/after-s2/t210/`.
+- **Catatan:** disclaimer model bersama dikecualikan dari aturan "tanpa paragraf identik" karena memang notice legal yang sama di setiap halaman; kalimat batas bukti ("tidak otomatis mendukung prediksi", "tidak membatalkan klasifikasi") dipertahankan di Tentang.
 - **Penerimaan:** tidak ada paragraf yang identik di dua halaman.
 
 ### T2.11 (S) Auth, profil, error
