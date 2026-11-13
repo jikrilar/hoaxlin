@@ -13,9 +13,12 @@ use App\Filament\Resources\SubmissionProcessingEvents\Pages\ListSubmissionProces
 use App\Filament\Resources\Submissions\Pages\ListSubmissions;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
+use App\Filament\Widgets\DashboardCharts;
+use App\Filament\Widgets\KpiOverview;
+use App\Filament\Widgets\LatencyWidget;
 use App\Filament\Widgets\ModelVersionWidget;
-use App\Filament\Widgets\StatsOverview;
-use App\Filament\Widgets\SubmissionTrendChart;
+use App\Filament\Widgets\NeedsActionWidget;
+use App\Filament\Widgets\OpenAiBudgetWidget;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -85,10 +88,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                // Account/logout remain in the native user menu. Keep the
-                // dashboard focused on operations, trend, then model context.
-                StatsOverview::class,
-                SubmissionTrendChart::class,
+                // Order mirrors the T3.2 layout: action required, KPIs, charts,
+                // latency/budget, then model and data context.
+                NeedsActionWidget::class,
+                KpiOverview::class,
+                DashboardCharts::class,
+                LatencyWidget::class,
+                OpenAiBudgetWidget::class,
                 ModelVersionWidget::class,
             ])
             ->middleware([

@@ -343,11 +343,17 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
    - Umpan balik: rasio Sesuai vs Tidak sesuai (stacked bar), dengan catatan ini penilaian pengguna, bukan akurasi model.
    - **Biaya OpenAI bulan ini vs kuota** (gauge/progress) dari `openai_usage_periods` dan `config('services.openai.monthly_quota_usd')`.
 4. **Model & data** (ringkas): model aktif, ambang keyakinan (dengan tooltip), hasil evaluasi artefak dengan keterangan dataset/split dan catatan bahwa itu bukan jaminan akurasi produk; jumlah Data Kurasi terverifikasi per label (setelah Tahap 4).
-- [ ] **Filter rentang waktu** bersama (7/30/90 hari) untuk widget bertanggal (⚠ VERIFIKASI API filter widget/dashboard Filament 5, mis. `HasFiltersSchema`/`InteractsWithPageFilters`).
-- [ ] Query diagregasi & di-cache singkat (≤ 60 dtk) dengan penanganan `PDOException` seperti widget sekarang (tampilkan "Belum tersedia" bukan error). Periksa indeks yang dibutuhkan; tambah migrasi indeks bila perlu (additive, reversible).
-- [ ] Pertahankan tabel data sebagai `disclosure` "Lihat data tabel" untuk aksesibilitas (atribut `data-admin-*` yang diuji dipertahankan atau test diperbarui).
-- [ ] Semua definisi hitung dijelaskan lewat tooltip; sertakan teks "bukan prevalensi hoaks, bukan akurasi model".
+- [x] **Filter rentang waktu** bersama (7/30/90 hari) untuk widget bertanggal (⚠ VERIFIKASI API filter widget/dashboard Filament 5, mis. `HasFiltersSchema`/`InteractsWithPageFilters`).
+  - Verifikasi: Filament 5.8.3 memakai `Filament\Pages\Dashboard\Concerns\HasFiltersForm` di halaman + `Filament\Widgets\Concerns\InteractsWithPageFilters` (`#[Reactive] public ?array $pageFilters`) di widget. `Panel::getPageClass()` **tidak ada**; filter dibaca dari `$this->pageFilters['range']` lewat `DashboardMetrics::rangeDays()` (fallback 30).
+- [x] Query diagregasi & di-cache singkat (≤ 60 dtk) dengan penanganan `PDOException` seperti widget sekarang (tampilkan "Belum tersedia" bukan error). Periksa indeks yang dibutuhkan; tambah migrasi indeks bila perlu (additive, reversible).
+  - `App\Services\Admin\DashboardMetrics` (cache 60 dtk per rentang, fallback `available=false`) dan `App\Services\Admin\ServiceHealth`; migrasi `2026_11_13_000001_add_admin_dashboard_indexes` (additive, reversible).
+- [x] Pertahankan tabel data sebagai `disclosure` "Lihat data tabel" untuk aksesibilitas (atribut `data-admin-*` yang diuji dipertahankan atau test diperbarui).
+  - `data-admin-kpis`, `data-admin-needs-action`, `data-admin-service-health`, `data-admin-latency`, `data-admin-openai-spend`, `data-admin-curation`, `data-admin-trend`, `data-admin-breakdown`. Widget lama `StatsOverview`/`SubmissionTrendChart` dihapus; `AdminDashboardTest` dan `AdminJargonTest` diperbarui ke widget pengganti.
+- [x] Semua definisi hitung dijelaskan lewat tooltip; sertakan teks "bukan prevalensi hoaks, bukan akurasi model".
+  - Komponen `resources/views/components/admin/definition.blade.php` (icon-button + tooltip Filament, `aria-label` "Penjelasan: …"); 10 definisi dirender dan diuji jumlahnya.
 - **Penerimaan:** setiap data di dashboard punya visual yang jelas; tidak ada widget kosong tanpa empty state; `AdminMonitoringResourcesTest`, `FilamentAuditObserverTest` tetap hijau; dashboard < 2 dtk pada data fixture ≥ 10k pemeriksaan (⚠ VERIFIKASI dengan seed sementara di env terpisah).
+  - Terverifikasi: 12.000 submission + 2.000 hasil di env sementara (SQLite, `APP_DEBUG=false`): TTFB 86–140 ms, halaman siap 325–516 ms per rentang 7/30/90 (Chromium, 375/768/1280). Tidak ada overflow horizontal. `AdminMonitoringResourcesTest`, `FilamentAuditObserverTest`, suite penuh hijau. Bukti: `reports/frontend-revamp/after-s3/`.
+  - **Ditunda sesuai ketergantungan plan:** tombol/aksi **Coba lagi** (T3.4) dan daftar umpan balik "tidak sesuai" belum ditinjau (T3.5). Widget hanya menautkan ke daftar Pemeriksaan dan tidak mengubah data.
 
 ### T3.3 (M) Standarisasi tabel admin
 Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data Kurasi:

@@ -9,7 +9,7 @@ use App\Filament\Resources\SubmissionProcessingEvents\SubmissionProcessingEventR
 use App\Filament\Resources\Submissions\SubmissionResource;
 use App\Filament\Support\AdminGlossary;
 use App\Filament\Widgets\ModelVersionWidget;
-use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\NeedsActionWidget;
 use App\Models\Submission;
 use App\Models\User;
 use App\Services\Bert\BertRuntimeMetadata;
@@ -108,7 +108,7 @@ class AdminJargonTest extends TestCase
     public function test_failed_jobs_stat_is_renamed_and_explained(): void
     {
         $this->admin();
-        $html = Livewire::test(StatsOverview::class)->html();
+        $html = Livewire::test(NeedsActionWidget::class)->html();
 
         $this->assertStringNotContainsString('Entri failed jobs', $html);
         $this->assertStringContainsString('Tugas latar belakang gagal', $html);

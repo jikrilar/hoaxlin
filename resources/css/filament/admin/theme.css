@@ -213,3 +213,36 @@
         .fi-panel-admin .hl-admin-facts > div { grid-template-columns: minmax(10rem, 1fr) minmax(0, 3fr); gap: var(--ds-space-4); }
     }
 }
+
+@layer components {
+    /* T3.2 dashboard widgets: shared rhythm, token surfaces, no ad-hoc colours. */
+    .fi-panel-admin .hl-admin-subheading { margin-block: var(--ds-space-6) var(--ds-space-2); font-size: var(--ds-type-h4-size); font-weight: var(--ds-font-weight-semibold); line-height: var(--ds-type-h4-leading); }
+    .fi-panel-admin .hl-admin-kpi-grid { display: grid; gap: var(--ds-space-4); margin: 0; }
+    .fi-panel-admin .hl-admin-kpi-grid > div { padding: var(--ds-space-4); border: var(--ds-border-width) solid var(--ds-border-subtle); border-radius: var(--ds-radius-md); background: var(--ds-bg-surface); }
+    .fi-panel-admin .hl-admin-kpi-grid dt { color: var(--ds-text-muted); font-size: var(--ds-type-label-size); }
+    .fi-panel-admin .hl-admin-kpi-grid dd { margin-block-start: var(--ds-space-1); color: var(--ds-text-primary); font-size: var(--ds-type-h3-size); font-weight: var(--ds-font-weight-semibold); font-variant-numeric: tabular-nums; }
+    .fi-panel-admin .hl-admin-kpi-grid span { display: block; margin-block-start: var(--ds-space-1); color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .fi-panel-admin .hl-admin-sparkline { margin-block-start: var(--ds-space-4); }
+    .fi-panel-admin .hl-admin-sparkline figcaption { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .fi-panel-admin .hl-admin-sparkline__bars { display: flex; align-items: flex-end; gap: var(--ds-space-2); block-size: 4rem; margin-block-start: var(--ds-space-2); padding: 0; list-style: none; }
+    .fi-panel-admin .hl-admin-sparkline__bars li { display: flex; align-items: flex-end; inline-size: 1.5rem; block-size: 100%; }
+    .fi-panel-admin .hl-admin-sparkline__bars li > span:first-child { inline-size: 100%; border-radius: var(--ds-radius-sm); background: var(--ds-action-primary); }
+    /* The admin theme does not import components.css, so the shared screen-reader
+       utility must exist here too; without it the sparkline values render as text. */
+    .fi-panel-admin .hl-visually-hidden { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+    .fi-panel-admin .hl-admin-service-list { display: grid; gap: var(--ds-space-3); margin-block-start: var(--ds-space-3); padding: 0; list-style: none; }
+    .fi-panel-admin .hl-admin-service-list li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2) var(--ds-space-3); }
+    .fi-panel-admin .hl-admin-service-name { min-inline-size: 4rem; font-weight: var(--ds-font-weight-medium); }
+    .fi-panel-admin .hl-admin-view-switch { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); margin-block-end: var(--ds-space-3); }
+    .fi-panel-admin .hl-admin-view-switch__item { min-block-size: 2.75rem; padding: var(--ds-space-1) var(--ds-space-3); border: var(--ds-border-width) solid var(--ds-border-control); border-radius: var(--ds-radius-md); background: var(--ds-bg-surface); color: var(--ds-text-body); font-size: var(--ds-type-label-size); cursor: pointer; transition: background-color var(--ds-motion-fast) var(--ds-ease-standard), border-color var(--ds-motion-fast) var(--ds-ease-standard); }
+    .fi-panel-admin .hl-admin-view-switch__item:focus-visible { outline: var(--ds-focus-width) solid var(--ds-focus); outline-offset: var(--ds-focus-offset); }
+    .fi-panel-admin .hl-admin-view-switch__item[aria-pressed="true"] { border-color: var(--ds-action-primary); background: var(--ds-bg-selected); color: var(--ds-action-primary); font-weight: var(--ds-font-weight-semibold); }
+    .fi-panel-admin .hl-admin-budget__amount { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ds-space-2); margin: 0; }
+    .fi-panel-admin .hl-admin-budget__amount strong { color: var(--ds-text-primary); font-size: var(--ds-type-h2-size); font-variant-numeric: tabular-nums; }
+    .fi-panel-admin .hl-admin-budget__amount span { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .fi-panel-admin .hl-admin-budget__bar { block-size: var(--ds-space-2); margin-block-start: var(--ds-space-3); border-radius: var(--ds-radius-sm); background: var(--ds-bg-subtle); overflow: hidden; }
+    .fi-panel-admin .hl-admin-budget__bar > span { display: block; block-size: 100%; background: var(--ds-action-primary); }
+    @media (min-width: 48rem) {
+        .fi-panel-admin .hl-admin-kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+}
