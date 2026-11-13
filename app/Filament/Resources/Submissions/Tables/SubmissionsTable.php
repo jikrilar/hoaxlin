@@ -25,7 +25,11 @@ class SubmissionsTable
                 TextColumn::make('input_type')->label('Jenis input')->formatStateUsing(fn (?string $state): string => DetectionPresentation::inputType($state))->sortable()->wrap(),
                 TextColumn::make('content')->label('Cuplikan input')->limit(60)->searchable(['raw_input', 'extracted_text', 'source_url'])->placeholder('Teks belum tersedia')->wrap(),
                 TextColumn::make('status')->label('Status pemeriksaan')->badge()->icon(fn (?string $state) => ReadOnlyPresentation::statusIcon($state))->color(fn (?string $state): string => ReadOnlyPresentation::statusColor($state))->formatStateUsing(ReadOnlyPresentation::status(...))->sortable(),
-                TextColumn::make('detectionResult.label')->label('Hasil classifier')->badge()->icon(fn (Submission $record) => ReadOnlyPresentation::submissionResultIcon($record))->color(fn (Submission $record): string => ReadOnlyPresentation::submissionResultColor($record))->state(fn (Submission $record): string => ReadOnlyPresentation::submissionResult($record))->wrap(),
+                TextColumn::make('detectionResult.label')->label('Hasil classifier')->badge()->icon(fn (Submission $record) => ReadOnlyPresentation::submissionResultIcon($record))->color(fn (Submission $record): string => ReadOnlyPresentation::submissionResultColor($record))->state(fn (Submission $record): string => ReadOnlyPresentation::submissionResult($record))
+                    // Searching by classifier model version used to live on the Hasil Deteksi
+                    // table; T3.6 moved that capability here rather than dropping it.
+                    ->searchable(query: fn ($query, string $search) => $query->whereHas('detectionResult', fn ($inner) => $inner->where('model_version', 'like', "%{$search}%")))
+                    ->wrap(),
                 TextColumn::make('processing_stage')->label('Tahap akhir')->formatStateUsing(ReadOnlyPresentation::stage(...))->placeholder('Tahap belum tercatat')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('last_error_code')->label('Kode kendala')->placeholder('Tidak tercatat')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')->label('Dikirim')->dateTime('d/m/Y H:i')->sortable(),

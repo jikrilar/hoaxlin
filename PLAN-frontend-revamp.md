@@ -397,9 +397,14 @@ Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data K
 - **Catatan agent:** `MonitoringPresentation::eventMetadata()` memang meredaksi `model_version` dan `input_trace` (allowlist lama, diuji `AdminMonitoringResourcesTest`); detail tidak melonggarkannya.
 
 ### T3.6 (M) Hapus resource duplikat
-- [ ] Setelah T3.5 lulus: hapus `DetectionResultResource` dan `SubmissionProcessingEventResource` beserta halaman/tabel/policy-nya, serta entri di `AdminPanelProvider` (scopes `read-only-notice`). Migrasikan test yang relevan ke Pemeriksaan (jangan menghapus assertion keamanan/otorisasi — pindahkan).
-- [ ] **Jangan** menghapus model/tabel (`DetectionResult`, `SubmissionProcessingEvent`) — hanya UI-nya.
+- [x] Setelah T3.5 lulus: hapus `DetectionResultResource` dan `SubmissionProcessingEventResource` beserta halaman/tabel/policy-nya, serta entri di `AdminPanelProvider` (scopes `read-only-notice`). Migrasikan test yang relevan ke Pemeriksaan (jangan menghapus assertion keamanan/otorisasi — pindahkan).
+  - 11 file dihapus (2 resource, 4 page, 3 schema/table). Tidak ada policy khusus untuk keduanya; otorisasi tetap lewat `SubmissionPolicy`. Scope `read-only-notice` tinggal Pemeriksaan, Umpan Balik, Log Admin.
+- [x] **Jangan** menghapus model/tabel (`DetectionResult`, `SubmissionProcessingEvent`) — hanya UI-nya.
+  - Model, tabel, relasi, dan `MonitoringPresentation` tidak disentuh; timeline detail memakai proyeksi yang sama.
 - **Penerimaan:** suite Laravel hijau; tidak ada rute/menu yang mengarah ke resource yang dihapus.
+  - `route:list --path=admin` tanpa `detection-results`/`submission-processing-events`; kedua URL 404; navigasi tetap 7 item; suite 1007 lulus.
+- **Bukti:** `tests/Feature/AdminSubmissionSecurityTest.php` (7 test, termasuk kelas/rute hilang dan proyeksi metadata), `reports/frontend-revamp/after-s3/resource-removal.md` + `t36-detail-*.png`.
+- **Catatan agent:** dua kapabilitas hilang bersama resource dan **dipulihkan di UI**, bukan dengan melonggarkan test — pencarian berdasarkan versi model classifier kini ada di kolom "Hasil classifier" daftar Pemeriksaan, dan tooltip glossary tahap/percobaan/kode kendala ditambahkan ke timeline detail. Tabel assertion yang dipindahkan didaftar di laporan bukti.
 
 ### T3.7 (M) Umpan Balik: alur tinjau
 - [ ] Migrasi **additive & reversible**: `feedback.reviewed_at` (nullable timestamp), `feedback.reviewed_by` (nullable FK `users`, `nullOnDelete`). Update model/factory.

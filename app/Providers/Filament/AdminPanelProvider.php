@@ -6,10 +6,8 @@ use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\AdminLogs\Pages\ListAdminLogs;
 use App\Filament\Resources\Datasets\Pages\CreateDataset;
 use App\Filament\Resources\Datasets\Pages\EditDataset;
-use App\Filament\Resources\DetectionResults\Pages\ListDetectionResults;
 use App\Filament\Resources\Feedback\Pages\ListFeedback;
 use App\Filament\Resources\ModelVersions\Pages\CreateModelVersion;
-use App\Filament\Resources\SubmissionProcessingEvents\Pages\ListSubmissionProcessingEvents;
 use App\Filament\Resources\Submissions\Pages\ListSubmissions;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
@@ -49,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE, fn () => view('filament.admin.auth.runtime-notice'))
             ->renderHook(PanelsRenderHook::PAGE_START, fn () => view('filament.admin.resources.runtime-notice'), scopes: [CreateUser::class, EditUser::class, CreateDataset::class, EditDataset::class, CreateModelVersion::class])
-            ->renderHook(PanelsRenderHook::PAGE_START, fn () => view('filament.admin.resources.read-only-notice'), scopes: [ListSubmissions::class, ListDetectionResults::class, ListFeedback::class, ListSubmissionProcessingEvents::class, ListAdminLogs::class])
+            ->renderHook(PanelsRenderHook::PAGE_START, fn () => view('filament.admin.resources.read-only-notice'), scopes: [ListSubmissions::class, ListFeedback::class, ListAdminLogs::class])
             ->colors([
                 // Filament needs concrete colors to calculate component contrast.
                 // Keep these bridges aligned with design-tokens.css; generating a

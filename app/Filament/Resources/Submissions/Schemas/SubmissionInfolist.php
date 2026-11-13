@@ -55,7 +55,7 @@ class SubmissionInfolist
                     ])->columns(2)->columnSpanFull(),
 
                 Section::make('Hasil')
-                    ->description('Prediksi model, bukan verifikasi kebenaran. Skor keyakinan bukan persentase kebenaran atau akurasi produk; meragukan adalah abstention.')
+                    ->description('Prediksi model, bukan verifikasi kebenaran. Skor keyakinan bukan persentase kebenaran, bukan bukti informasi benar atau palsu, dan bukan akurasi produk. Meragukan adalah abstention.')
                     ->schema([
                         TextEntry::make('result_context')->label('Konteks record')
                             ->state(fn (Submission $record): string => $record->detectionResult === null

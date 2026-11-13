@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Filament\Resources\Datasets\DatasetResource;
 use App\Filament\Resources\ModelVersions\ModelVersionResource;
 use App\Filament\Resources\ModelVersions\Pages\ListModelVersions;
-use App\Filament\Resources\SubmissionProcessingEvents\SubmissionProcessingEventResource;
 use App\Filament\Resources\Submissions\SubmissionResource;
 use App\Filament\Support\AdminGlossary;
 use App\Filament\Widgets\ModelVersionWidget;
@@ -73,16 +72,16 @@ class AdminJargonTest extends TestCase
         $this->assertStringContainsString(AdminGlossary::explain('active_inference_status'), $html);
     }
 
-    public function test_processing_event_screens_explain_stage_attempts_and_error_code(): void
+    public function test_submission_timeline_explains_stage_attempts_and_error_code(): void
     {
         $this->admin();
         $submission = Submission::factory()->create(['status' => 'processing']);
-        $event = $submission->processingEvents()->create([
+        $submission->processingEvents()->create([
             'stage' => 'classifying', 'outcome' => 'failed', 'service' => 'bert',
             'attempt' => 2, 'duration_ms' => 1200, 'error_code' => 'timeout',
         ]);
 
-        $this->get(SubmissionProcessingEventResource::getUrl('view', ['record' => $event]))
+        $this->get(SubmissionResource::getUrl('view', ['record' => $submission]))
             ->assertOk()
             ->assertSee(AdminGlossary::explain('pipeline_stage'))
             ->assertSee(AdminGlossary::explain('attempts'))

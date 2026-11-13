@@ -3,8 +3,6 @@
 namespace Tests\Feature;
 
 use App\Actions\Submissions\CreateSubmission;
-use App\Filament\Resources\DetectionResults\DetectionResultResource;
-use App\Filament\Resources\DetectionResults\Pages\ListDetectionResults;
 use App\Filament\Resources\Feedback\FeedbackResource;
 use App\Filament\Resources\Feedback\Pages\ListFeedback;
 use App\Filament\Resources\Submissions\Pages\ListSubmissions;
@@ -70,7 +68,6 @@ class AdminReadOnlyResourcesTest extends TestCase
     {
         return [
             'submissions' => [SubmissionResource::class, Submission::class, ListSubmissions::class],
-            'results' => [DetectionResultResource::class, DetectionResult::class, ListDetectionResults::class],
             'feedback' => [FeedbackResource::class, Feedback::class, ListFeedback::class],
         ];
     }
@@ -87,10 +84,13 @@ class AdminReadOnlyResourcesTest extends TestCase
         if ($status !== 'completed') {
             $response->assertDontSee(DetectionPresentation::label($label)['text']);
         }
-        $this->get(DetectionResultResource::getUrl('view', ['record' => $result]))->assertOk()
+        // The standalone result screen is gone (T3.6); its projection now renders on the
+        // submission detail and its security assertions live in AdminSubmissionSecurityTest.
+        $this->get(SubmissionResource::getUrl('view', ['record' => $submission]))->assertOk()
             ->assertSee($status === 'completed' ? 'Record classifier pada submission selesai' : 'Record classifier parsial; bukan hasil final')
-            ->assertSee(DetectionPresentation::label($label)['text'])->assertSee('bukan persentase kebenaran')
-            ->assertSee('bukan bukti informasi benar atau palsu')->assertSee('Penjelasan tidak tersedia.');
+            ->assertSee('bukan persentase kebenaran')
+            ->assertSee('bukan bukti informasi benar atau palsu')
+            ->assertSee('Penjelasan tidak tersedia.');
     }
 
     public static function pipelineStates(): array
@@ -175,15 +175,16 @@ class AdminReadOnlyResourcesTest extends TestCase
         return ['zero' => [0, '0%'], 'precision' => ['0.9234', '92,34%'], 'one' => [1, '100%'], 'missing' => [null, null], 'out of range' => [1.1, null]];
     }
 
-    public function test_result_detail_keeps_ready_pending_unavailable_and_full_escaped_explanation(): void
+    public function test_submission_detail_keeps_ready_pending_unavailable_and_full_escaped_explanation(): void
     {
         $this->admin();
         $text = '<script id="explanation-attack">literal</script>'.str_repeat("\nPenjelasan panjang.", 200).' ExplanationTailFixture';
         $record = DetectionResult::factory()->create(['explanation' => $text, 'explanation_status' => 'ready', 'confidence_score' => 0, 'model_version' => '']);
-        $url = DetectionResultResource::getUrl('view', ['record' => $record]);
+        $submission = $record->submission;
+        $submission->update(['status' => 'completed', 'processing_stage' => 'done']);
+        $url = SubmissionResource::getUrl('view', ['record' => $submission]);
         $this->get($url)->assertOk()->assertSee($text)->assertSee('0%')->assertSee('Versi model tidak tersedia')
-            ->assertDontSee('<script id="explanation-attack">', false)
-            ->assertSee(SubmissionResource::getUrl('view', ['record' => $record->submission]));
+            ->assertDontSee('<script id="explanation-attack">', false);
         foreach (['pending' => 'Penjelasan sedang disusun.', 'unavailable' => 'Penjelasan tidak tersedia.'] as $status => $message) {
             $record->update(['explanation_status' => $status]);
             $this->get($url)->assertOk()->assertSee($message)->assertDontSee('ExplanationTailFixture');
@@ -240,13 +241,14 @@ class AdminReadOnlyResourcesTest extends TestCase
         Livewire::test(ListSubmissions::class)->searchTable('UniqueSourceFixture')->assertCanSeeTableRecords([$videoUrl])->assertCanNotSeeTableRecords([$text, $done]);
         $page = Livewire::test(ListSubmissions::class)->filterTable('input_type', 'text')->assertCanSeeTableRecords([$text])->assertCanNotSeeTableRecords([$videoUrl, $done]);
         $this->assertSame(['text', 'image', 'video', 'url'], array_keys($page->instance()->getTable()->getFilter('input_type')->getOptions()));
+        Livewire::test(ListSubmissions::class)->removeTableFilters();
         Livewire::test(ListSubmissions::class)->removeTableFilters()->filterTable('status', 'completed')->assertCanSeeTableRecords([$done])->assertCanNotSeeTableRecords([$text, $videoUrl]);
         $low = DetectionResult::factory()->for($text)->create(['label' => 'valid', 'confidence_score' => 0.1250, 'model_version' => 'LowModelFixture']);
         $high = DetectionResult::factory()->for($done)->create(['label' => 'hoax', 'confidence_score' => 0.9234]);
-        Livewire::test(ListDetectionResults::class)->sortTable('confidence_percentage', 'desc')->assertCanSeeTableRecords([$high, $low], inOrder: true)
-            ->assertTableColumnStateSet('confidence_percentage', '92,34%', $high);
-        Livewire::test(ListDetectionResults::class)->filterTable('label', 'valid')->assertCanSeeTableRecords([$low])->assertCanNotSeeTableRecords([$high]);
-        Livewire::test(ListDetectionResults::class)->searchTable('LowModelFixture')->assertCanSeeTableRecords([$low])->assertCanNotSeeTableRecords([$high]);
+        // The result table is gone (T3.6): the same records are asserted through the
+        // submission list, where their classifier outcome is still searchable.
+        Livewire::test(ListSubmissions::class)->removeTableFilters()->searchTable('LowModelFixture')->assertCanSeeTableRecords([$low->submission]);
+        Livewire::test(ListSubmissions::class)->removeTableFilters()->searchTable('LowModelFixture')->assertCanNotSeeTableRecords([$high->submission]);
         $records = Submission::factory()->count(7)->create();
         Livewire::test(ListSubmissions::class)->removeTableFilters()->sortTable('id', 'asc')->set('tableRecordsPerPage', 5)->assertCanSeeTableRecords([$text, $videoUrl, $done, $records[0], $records[1]])
             ->assertCanNotSeeTableRecords([$records[2]])->call('gotoPage', 2)->assertCanSeeTableRecords($records->slice(2))->assertCanNotSeeTableRecords([$text]);
