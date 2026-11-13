@@ -3,10 +3,12 @@
 namespace App\Filament\Resources\Datasets\Tables;
 
 use App\Filament\Resources\Datasets\DatasetResource;
+use App\Filament\Support\ReadOnlyPresentation;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,8 +20,8 @@ class DatasetsTable
         return $table
             ->columns([
                 TextColumn::make('text')->label('Cuplikan teks')->limit(70)->searchable()->wrap(),
-                TextColumn::make('label')->label('Label katalog')->formatStateUsing(DatasetResource::labelText(...))->sortable(),
-                TextColumn::make('source')->label('Sumber')->limit(80)->searchable()->sortable()->placeholder('Sumber belum tercatat')->wrap(),
+                TextColumn::make('label')->label('Label katalog')->badge()->icon(fn (?string $state) => ReadOnlyPresentation::labelIcon($state))->color(fn (?string $state): string => ReadOnlyPresentation::labelColor($state))->formatStateUsing(DatasetResource::labelText(...))->sortable(),
+                TextColumn::make('source')->label('Sumber')->limit(80)->searchable()->sortable()->placeholder('Sumber belum tercatat')->wrap()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('verifier.name')->label('Diverifikasi oleh')->placeholder('Belum diverifikasi')->wrap(),
                 TextColumn::make('created_at')->label('Dibuat')->dateTime('d/m/Y H:i')->sortable(),
             ])
@@ -33,6 +35,8 @@ class DatasetsTable
                         modifyQueryUsing: fn (Builder $query): Builder => $query->admins(),
                     ),
             ])
+            ->filtersLayout(FiltersLayout::AboveContent)
+            ->persistFiltersInSession()
             ->recordActions([
                 ViewAction::make()->label('Lihat teks lengkap'),
                 EditAction::make()->label('Ubah'),
@@ -44,6 +48,7 @@ class DatasetsTable
                     ->modalDescription(fn (DeleteBulkAction $action): string => 'Anda memilih '.$action->getSelectedRecordsQuery()->count().' data kurasi. Data akan dihapus dari katalog. Tindakan ini tidak dapat dibatalkan dan tidak melatih ulang atau mengganti model BERT aktif.')
                     ->modalSubmitActionLabel('Hapus data kurasi terpilih'),
             ])
+            ->defaultSort('created_at', 'desc')
             ->emptyStateHeading('Tidak ada data kurasi yang ditampilkan')
             ->emptyStateDescription('Tambahkan data kurasi atau ubah pencarian dan filter untuk melihat referensi lain.');
     }

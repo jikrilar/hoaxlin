@@ -141,12 +141,14 @@ class AdminDatasetsResourceTest extends TestCase
         $first = Dataset::factory()->create(['text' => 'Teks pertama yang dapat ditemukan.', 'label' => 'valid', 'source' => 'Alpha source', 'verified_by' => $admin->id]);
         $second = Dataset::factory()->create(['label' => 'hoax', 'source' => 'Beta source', 'verified_by' => null]);
         $third = Dataset::factory()->create(['label' => 'meragukan', 'source' => 'Gamma source', 'verified_by' => null]);
-        Livewire::test(ListDatasets::class)->searchTable('pertama')->assertCanSeeTableRecords([$first])->assertCanNotSeeTableRecords([$second, $third]);
-        Livewire::test(ListDatasets::class)->searchTable('Beta source')->assertCanSeeTableRecords([$second])->assertCanNotSeeTableRecords([$first, $third]);
-        Livewire::test(ListDatasets::class)->filterTable('label', 'meragukan')->assertCanSeeTableRecords([$third])->assertCanNotSeeTableRecords([$first, $second]);
-        Livewire::test(ListDatasets::class)->filterTable('verified_by', $admin->id)->assertCanSeeTableRecords([$first])->assertCanNotSeeTableRecords([$second, $third]);
+        // Filters persist in the session (T3.3), so each independent population
+        // assertion clears them first instead of inheriting the previous mount.
+        Livewire::test(ListDatasets::class)->removeTableFilters()->searchTable('pertama')->assertCanSeeTableRecords([$first])->assertCanNotSeeTableRecords([$second, $third]);
+        Livewire::test(ListDatasets::class)->removeTableFilters()->searchTable('Beta source')->assertCanSeeTableRecords([$second])->assertCanNotSeeTableRecords([$first, $third]);
+        Livewire::test(ListDatasets::class)->removeTableFilters()->filterTable('label', 'meragukan')->assertCanSeeTableRecords([$third])->assertCanNotSeeTableRecords([$first, $second]);
+        Livewire::test(ListDatasets::class)->removeTableFilters()->filterTable('verified_by', $admin->id)->assertCanSeeTableRecords([$first])->assertCanNotSeeTableRecords([$second, $third]);
         Dataset::factory()->count(12)->create();
-        $page = Livewire::test(ListDatasets::class)->set('tableRecordsPerPage', 5)->sortTable('source');
+        $page = Livewire::test(ListDatasets::class)->removeTableFilters()->set('tableRecordsPerPage', 5)->sortTable('source');
         $this->assertCount(5, $page->instance()->getTableRecords());
         $page->assertCanSeeTableRecords(Dataset::orderBy('source')->limit(5)->get(), inOrder: true)->call('gotoPage', 2)
             ->assertCanSeeTableRecords(Dataset::orderBy('source')->skip(5)->limit(5)->get(), inOrder: true);

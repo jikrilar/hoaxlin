@@ -7,6 +7,7 @@ use App\Filament\Support\AdminGlossary;
 use App\Models\ModelVersion;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -24,13 +25,15 @@ class ModelVersionsTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
+                    ->icon(static fn (?string $state) => ModelVersionResource::statusIcon($state))
                     ->formatStateUsing(ModelVersionResource::statusText(...))
                     ->color(ModelVersionResource::statusColor(...))
                     ->sortable(),
                 TextColumn::make('total_rows')
                     ->label('Baris dataset')
                     ->formatStateUsing(static fn (?int $state): string => number_format((int) $state, 0, ',', '.'))
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('accuracy')
                     ->label('Akurasi')
                     ->formatStateUsing(ModelVersionResource::formatPercentage(...))
@@ -41,17 +44,22 @@ class ModelVersionsTable
                     ->tooltip(AdminGlossary::explain('f1_score'))
                     ->formatStateUsing(ModelVersionResource::formatPercentage(...))
                     ->placeholder('Belum tersedia')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('baseline_accuracy')
                     ->label('Perbandingan vs Baseline')
                     ->tooltip(AdminGlossary::explain('baseline_comparison'))
                     ->state(static fn (ModelVersion $record): ?string => ModelVersionResource::formatBaselineSummary($record))
-                    ->placeholder('Belum tersedia'),
+                    ->placeholder('Belum tersedia')
+                    // The longest derived value; hidden by default so the row actions stay
+                    // reachable at 1280px. T3.8 defines its own default column set.
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('training_duration')
                     ->label('Durasi')
                     ->formatStateUsing(ModelVersionResource::formatDuration(...))
                     ->placeholder('Belum tersedia')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('is_active')
                     ->label('Status aktif')
                     ->tooltip(AdminGlossary::explain('active_inference_status'))
@@ -72,6 +80,8 @@ class ModelVersionsTable
                     ->label('Status inferensi aktif')
                     ->placeholder(AdminGlossary::explain('active_inference_status')),
             ])
+            ->filtersLayout(FiltersLayout::AboveContent)
+            ->persistFiltersInSession()
             ->recordActions([
                 ViewAction::make()->label('Lihat detail'),
                 ModelVersionResource::makeActivateAction(),

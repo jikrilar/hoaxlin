@@ -7,6 +7,8 @@ use App\Enums\SubmissionStatus;
 use App\Models\DetectionResult;
 use App\Models\Submission;
 use App\View\Presenters\DetectionPresentation;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 
 /** Presentation of persisted admin records; never changes pipeline state. */
 final class ReadOnlyPresentation
@@ -60,6 +62,76 @@ final class ReadOnlyPresentation
     public static function assessment(bool $state): string
     {
         return $state ? 'Dinilai sesuai' : 'Dinilai tidak sesuai';
+    }
+
+    /**
+     * Operational status tone. Never the prediction tones: a failed run is not a hoax.
+     */
+    public static function statusColor(?string $state): string
+    {
+        return match (SubmissionStatus::tryFrom($state ?? '')) {
+            SubmissionStatus::Completed => 'success',
+            SubmissionStatus::Processing => 'warning',
+            SubmissionStatus::Failed => 'danger',
+            default => 'gray',
+        };
+    }
+
+    public static function statusIcon(?string $state): BackedEnum
+    {
+        return match (SubmissionStatus::tryFrom($state ?? '')) {
+            SubmissionStatus::Completed => Heroicon::OutlinedCheckCircle,
+            SubmissionStatus::Processing => Heroicon::OutlinedArrowPath,
+            SubmissionStatus::Failed => Heroicon::OutlinedXCircle,
+            default => Heroicon::OutlinedClock,
+        };
+    }
+
+    /**
+     * `valid` stays neutral, mirroring `DetectionPresentation::label()`: a neutral
+     * badge must not read as verification of the content.
+     */
+    public static function labelColor(?string $label): string
+    {
+        return match (strtolower($label ?? '')) {
+            'hoax' => 'danger',
+            'meragukan' => 'warning',
+            default => 'gray',
+        };
+    }
+
+    public static function labelIcon(?string $label): BackedEnum
+    {
+        return match (strtolower($label ?? '')) {
+            'hoax' => Heroicon::OutlinedXCircle,
+            'meragukan' => Heroicon::OutlinedQuestionMarkCircle,
+            'valid' => Heroicon::OutlinedCheckCircle,
+            default => Heroicon::OutlinedClock,
+        };
+    }
+
+    public static function submissionResultColor(Submission $record): string
+    {
+        return DetectionPresentation::finalResult($record, $record->detectionResult) === null
+            ? 'gray'
+            : self::labelColor($record->detectionResult?->label);
+    }
+
+    public static function submissionResultIcon(Submission $record): BackedEnum
+    {
+        return DetectionPresentation::finalResult($record, $record->detectionResult) === null
+            ? Heroicon::OutlinedClock
+            : self::labelIcon($record->detectionResult?->label);
+    }
+
+    public static function assessmentColor(bool $state): string
+    {
+        return $state ? 'success' : 'danger';
+    }
+
+    public static function assessmentIcon(bool $state): BackedEnum
+    {
+        return $state ? Heroicon::OutlinedCheckCircle : Heroicon::OutlinedXCircle;
     }
 
     public static function explanation(DetectionResult $record): string

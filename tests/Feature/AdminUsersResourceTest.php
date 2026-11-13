@@ -86,13 +86,14 @@ class AdminUsersResourceTest extends TestCase
         $admin = $this->admin();
         $verified = User::factory()->create(['name' => 'Alpha Fixture', 'is_admin' => false]);
         $unverified = User::factory()->unverified()->create(['name' => 'Beta Fixture', 'is_admin' => false]);
-        Livewire::test(ListUsers::class)->searchTable($verified->email)->assertCanSeeTableRecords([$verified])->assertCanNotSeeTableRecords([$admin, $unverified]);
-        Livewire::test(ListUsers::class)->filterTable('is_admin', true)->assertCanSeeTableRecords([$admin])->assertCanNotSeeTableRecords([$verified, $unverified]);
-        Livewire::test(ListUsers::class)->filterTable('email_verified_at', true)->assertCanSeeTableRecords([$verified])->assertCanNotSeeTableRecords([$admin, $unverified]);
-        Livewire::test(ListUsers::class)->filterTable('email_verified_at', false)->assertCanSeeTableRecords([$admin, $unverified])->assertCanNotSeeTableRecords([$verified]);
-        Livewire::test(ListUsers::class)->sortTable('name')->assertCanSeeTableRecords(User::orderBy('name')->get(), inOrder: true);
+        // Filters persist in the session (T3.3): clear them when a mount expects the full population.
+        Livewire::test(ListUsers::class)->removeTableFilters()->searchTable($verified->email)->assertCanSeeTableRecords([$verified])->assertCanNotSeeTableRecords([$admin, $unverified]);
+        Livewire::test(ListUsers::class)->removeTableFilters()->filterTable('is_admin', true)->assertCanSeeTableRecords([$admin])->assertCanNotSeeTableRecords([$verified, $unverified]);
+        Livewire::test(ListUsers::class)->removeTableFilters()->filterTable('email_verified_at', true)->assertCanSeeTableRecords([$verified])->assertCanNotSeeTableRecords([$admin, $unverified]);
+        Livewire::test(ListUsers::class)->removeTableFilters()->filterTable('email_verified_at', false)->assertCanSeeTableRecords([$admin, $unverified])->assertCanNotSeeTableRecords([$verified]);
+        Livewire::test(ListUsers::class)->removeTableFilters()->sortTable('name')->assertCanSeeTableRecords(User::orderBy('name')->get(), inOrder: true);
         User::factory()->count(12)->create();
-        $page = Livewire::test(ListUsers::class)->set('tableRecordsPerPage', 5)->sortTable('email');
+        $page = Livewire::test(ListUsers::class)->removeTableFilters()->set('tableRecordsPerPage', 5)->sortTable('email');
         $this->assertCount(5, $page->instance()->getTableRecords());
         $page->assertCanSeeTableRecords(User::orderBy('email')->limit(5)->get(), inOrder: true)
             ->call('gotoPage', 2)->assertCanSeeTableRecords(User::orderBy('email')->skip(5)->limit(5)->get(), inOrder: true);

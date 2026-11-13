@@ -61,6 +61,29 @@
         font-variant-numeric: tabular-nums;
     }
 
+    /* Row actions must never be clipped: let the browser size columns to their
+       content instead of squeezing the action cell to zero width. */
+    .fi-panel-admin .fi-ta-table {
+        table-layout: auto;
+    }
+
+    /* Actions wrap onto a second line rather than forcing the table wider than
+       its container (which would need an inner horizontal scrollbar at 1280px). */
+    .fi-panel-admin .fi-ta-cell:has(.fi-ta-actions) {
+        white-space: normal;
+        overflow-wrap: normal;
+    }
+
+    .fi-panel-admin .fi-ta-cell:has(.fi-ta-actions) > .fi-ta-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: flex-end;
+    }
+
+    .fi-panel-admin .fi-ta-cell:has(.fi-ta-actions) > .fi-ta-actions > * {
+        margin-inline-start: 0;
+    }
+
     .fi-panel-admin .fi-ta-row {
         transition: background-color var(--ds-motion-fast) var(--ds-ease-standard);
     }
@@ -117,6 +140,12 @@
             background-color var(--ds-motion-fast) var(--ds-ease-standard),
             border-color var(--ds-motion-fast) var(--ds-ease-standard),
             color var(--ds-motion-fast) var(--ds-ease-standard);
+    }
+
+    /* WCAG 2.5.5 / plan DoD: interactive controls stay at least 44px tall.
+       Filament's default button and filter-control heights are 36px. */
+    .fi-panel-admin :is(.fi-btn, .fi-icon-btn, .fi-input-wrp, .fi-select-input) {
+        min-block-size: 2.75rem;
     }
 
     .fi-panel-admin .fi-simple-main {

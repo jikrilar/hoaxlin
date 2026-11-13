@@ -357,11 +357,18 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 
 ### T3.3 (M) Standarisasi tabel admin
 Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data Kurasi:
-- [ ] ≤ 6 kolom default terlihat; kolom lain `toggleable(isToggledHiddenByDefault: true)`. ID teknis disembunyikan default.
-- [ ] Badge berwarna + ikon untuk status/label; urutan default `created_at desc`.
-- [ ] Filter di atas tabel, simpan di session (`persistFiltersInSession`); pencarian global tetap.
-- [ ] **Ekspor CSV** pada tabel yang relevan (Pemeriksaan: tanpa isi pengguna — hanya metadata; Umpan Balik; Pengguna: tanpa data sensitif). Reuse helper escape CSV yang ada (⚠ VERIFIKASI helper di `CsvExportTest` path) dan **escape formula** (`=`, `+`, `-`, `@`) untuk sel berasal dari pengguna.
-- [ ] Empty state informatif; notifikasi konsisten.
+- [x] ≤ 6 kolom default terlihat; kolom lain `toggleable(isToggledHiddenByDefault: true)`. ID teknis disembunyikan default.
+  - Pemeriksaan 5 kolom (ID, Pengguna, Tahap akhir, Kode kendala tersembunyi), Umpan Balik 4 (ID pemeriksaan), Pengguna 5, Log Admin 4 (ID catatan, ID target), Data Kurasi 4 (Sumber), Versi Model 5 (Perbandingan vs Baseline, Baris dataset, F1-score, Durasi). Email pengguna **tetap** default: itu identitas akun, bukan kolom teknis, dan `AdminPanelThemeTest` memakainya untuk mengenali akun.
+- [x] Badge berwarna + ikon untuk status/label; urutan default `created_at desc`.
+  - `ReadOnlyPresentation::statusColor/statusIcon/labelColor/labelIcon/assessmentColor/assessmentIcon/submissionResultColor/submissionResultIcon`, `MonitoringPresentation::actionColor/actionIcon`, `ModelVersionResource::statusIcon`. Record classifier parsial tetap `gray` + ikon jam.
+- [x] Filter di atas tabel, simpan di session (`persistFiltersInSession`); pencarian global tetap.
+  - `FiltersLayout::AboveContent` + `persistFiltersInSession()` pada keenam tabel; test lama yang mem-assert populasi independen kini memanggil `removeTableFilters()` lebih dulu (assertion tidak dilonggarkan).
+- [x] **Ekspor CSV** pada tabel yang relevan (Pemeriksaan: tanpa isi pengguna — hanya metadata; Umpan Balik; Pengguna: tanpa data sensitif). Reuse helper escape CSV yang ada (⚠ VERIFIKASI helper di `CsvExportTest` path) dan **escape formula** (`=`, `+`, `-`, `@`) untuk sel berasal dari pengguna.
+  - Verifikasi: helper adalah `App\Support\CsvCellSanitizer` (dipakai `SubmissionCsvExporter`, diuji `CsvExportTest`). `Filament\Actions\ExportAction` **tidak dipakai**: butuh class `Exporter` + tabel `exports` yang tidak ada di repo. Pengganti: `App\Filament\Support\TableCsvExport` (streamed, BOM + CRLF, sanitizer sama, mengikuti filter/pencarian tabel). Pemeriksaan hanya metadata; Pengguna tanpa hash/remember token; Umpan Balik memuat komentar yang memang sudah tampil ke admin.
+- [x] Empty state informatif; notifikasi konsisten.
+  - Heading/description dipertahankan dan diuji non-kosong untuk keenam tabel; ekspor yang gagal disiapkan memakai notifikasi danger yang sama dengan aksi admin lain.
+- **Bukti:** `tests/Feature/AdminTableStandardTest.php` (32 test: kolom default, toggleable, layout filter, persistensi session, badge+ikon, ekspor, empty state), `reports/frontend-revamp/after-s3/tables.md` + `table-*-{375,768,1280}.png`.
+- **Catatan agent:** ekspor Pemeriksaan sengaja tidak memuat `raw_input`/`source_url`/media, jadi tidak ada sel pengguna yang perlu disanitasi di tabel itu; sanitasi formula diverifikasi pada ekspor Pengguna dan Umpan Balik.
 
 ### T3.4 (M) Aksi "Coba lagi" tanpa terminal
 - [ ] Ekstrak logika dari `RecoverFailedSubmissions` / `RecoverStaleSubmissions` ke service bersama (mis. `App\Services\Pipeline\SubmissionRecovery`) yang dipakai **command dan UI** (perilaku command tidak berubah; test command tetap hijau).

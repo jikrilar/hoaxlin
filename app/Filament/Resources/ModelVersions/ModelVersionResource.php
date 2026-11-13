@@ -62,6 +62,16 @@ class ModelVersionResource extends Resource
         return static::statusOptions()[$state] ?? $state;
     }
 
+    public static function statusIcon(?string $state): BackedEnum
+    {
+        return match ($state) {
+            ModelVersion::STATUS_COMPLETED => Heroicon::OutlinedCheckCircle,
+            ModelVersion::STATUS_TRAINING => Heroicon::OutlinedArrowPath,
+            ModelVersion::STATUS_FAILED => Heroicon::OutlinedXCircle,
+            default => Heroicon::OutlinedClock,
+        };
+    }
+
     public static function statusColor(?string $state): string
     {
         return match ($state) {

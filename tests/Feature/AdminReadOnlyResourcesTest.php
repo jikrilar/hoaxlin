@@ -206,11 +206,11 @@ class AdminReadOnlyResourcesTest extends TestCase
         }
         $this->get(FeedbackResource::getUrl('view', ['record' => $yes]))->assertSee($text);
         $this->get(FeedbackResource::getUrl('view', ['record' => $no]))->assertSee('Tidak ada komentar');
-        Livewire::test(ListFeedback::class)->assertTableColumnStateSet('is_correct', true, $yes)->assertTableColumnFormattedStateSet('is_correct', 'Dinilai sesuai', $yes)
+        Livewire::test(ListFeedback::class)->removeTableFilters()->assertTableColumnStateSet('is_correct', true, $yes)->assertTableColumnFormattedStateSet('is_correct', 'Dinilai sesuai', $yes)
             ->assertTableColumnFormattedStateSet('is_correct', 'Dinilai tidak sesuai', $no)->assertDontSee($text)
             ->filterTable('is_correct', true)->assertCanSeeTableRecords([$yes])->assertCanNotSeeTableRecords([$no])
             ->filterTable('is_correct', false)->assertCanSeeTableRecords([$no])->assertCanNotSeeTableRecords([$yes]);
-        Livewire::test(ListFeedback::class)->searchTable('CommentTailFixture')->assertCanSeeTableRecords([$yes])->assertCanNotSeeTableRecords([$no]);
+        Livewire::test(ListFeedback::class)->removeTableFilters()->searchTable('CommentTailFixture')->assertCanSeeTableRecords([$yes])->assertCanNotSeeTableRecords([$no]);
     }
 
     public function test_video_filter_includes_normalized_links_without_adding_a_video_url_option(): void
@@ -224,7 +224,7 @@ class AdminReadOnlyResourcesTest extends TestCase
         ], auth()->user(), null);
         $separateType = Submission::factory()->create(['input_type' => 'video_url']);
 
-        $page = Livewire::test(ListSubmissions::class)->filterTable('input_type', 'video')
+        $page = Livewire::test(ListSubmissions::class)->removeTableFilters()->filterTable('input_type', 'video')
             ->assertCanSeeTableRecords([$upload, $link])->assertCanNotSeeTableRecords([$separateType])
             ->assertTableColumnFormattedStateSet('input_type', 'Video', $link);
         $this->assertSame('Video', $page->instance()->getTable()->getFilter('input_type')->getOptions()['video']);
@@ -240,7 +240,7 @@ class AdminReadOnlyResourcesTest extends TestCase
         Livewire::test(ListSubmissions::class)->searchTable('UniqueSourceFixture')->assertCanSeeTableRecords([$videoUrl])->assertCanNotSeeTableRecords([$text, $done]);
         $page = Livewire::test(ListSubmissions::class)->filterTable('input_type', 'text')->assertCanSeeTableRecords([$text])->assertCanNotSeeTableRecords([$videoUrl, $done]);
         $this->assertSame(['text', 'image', 'video', 'url'], array_keys($page->instance()->getTable()->getFilter('input_type')->getOptions()));
-        Livewire::test(ListSubmissions::class)->filterTable('status', 'completed')->assertCanSeeTableRecords([$done])->assertCanNotSeeTableRecords([$text, $videoUrl]);
+        Livewire::test(ListSubmissions::class)->removeTableFilters()->filterTable('status', 'completed')->assertCanSeeTableRecords([$done])->assertCanNotSeeTableRecords([$text, $videoUrl]);
         $low = DetectionResult::factory()->for($text)->create(['label' => 'valid', 'confidence_score' => 0.1250, 'model_version' => 'LowModelFixture']);
         $high = DetectionResult::factory()->for($done)->create(['label' => 'hoax', 'confidence_score' => 0.9234]);
         Livewire::test(ListDetectionResults::class)->sortTable('confidence_percentage', 'desc')->assertCanSeeTableRecords([$high, $low], inOrder: true)
@@ -248,7 +248,7 @@ class AdminReadOnlyResourcesTest extends TestCase
         Livewire::test(ListDetectionResults::class)->filterTable('label', 'valid')->assertCanSeeTableRecords([$low])->assertCanNotSeeTableRecords([$high]);
         Livewire::test(ListDetectionResults::class)->searchTable('LowModelFixture')->assertCanSeeTableRecords([$low])->assertCanNotSeeTableRecords([$high]);
         $records = Submission::factory()->count(7)->create();
-        Livewire::test(ListSubmissions::class)->sortTable('id', 'asc')->set('tableRecordsPerPage', 5)->assertCanSeeTableRecords([$text, $videoUrl, $done, $records[0], $records[1]])
+        Livewire::test(ListSubmissions::class)->removeTableFilters()->sortTable('id', 'asc')->set('tableRecordsPerPage', 5)->assertCanSeeTableRecords([$text, $videoUrl, $done, $records[0], $records[1]])
             ->assertCanNotSeeTableRecords([$records[2]])->call('gotoPage', 2)->assertCanSeeTableRecords($records->slice(2))->assertCanNotSeeTableRecords([$text]);
     }
 

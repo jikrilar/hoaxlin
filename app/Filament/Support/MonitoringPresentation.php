@@ -14,6 +14,8 @@ use App\Models\Submission;
 use App\Models\SubmissionProcessingEvent;
 use App\Models\User;
 use App\Services\Pipeline\PipelineFailureReporter;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 
 /** An explicit projection of operational data, never a dump of log payloads. */
 final class MonitoringPresentation
@@ -43,6 +45,27 @@ final class MonitoringPresentation
             'login' => 'Masuk', 'dataset_updated' => 'Pembaruan dataset', 'user_updated' => 'Pembaruan pengguna',
             'system_configuration_updated' => 'Pembaruan konfigurasi',
             default => 'Tindakan tidak dikenali',
+        };
+    }
+
+    public static function actionColor(?string $state): string
+    {
+        return match ($state) {
+            'delete' => 'danger',
+            'update', 'dataset_updated', 'user_updated', 'system_configuration_updated' => 'warning',
+            'create', 'login' => 'success',
+            default => 'gray',
+        };
+    }
+
+    public static function actionIcon(?string $state): BackedEnum
+    {
+        return match ($state) {
+            'create' => Heroicon::OutlinedPlusCircle,
+            'update', 'dataset_updated', 'user_updated', 'system_configuration_updated' => Heroicon::OutlinedPencilSquare,
+            'delete' => Heroicon::OutlinedTrash,
+            'login' => Heroicon::OutlinedShieldCheck,
+            default => Heroicon::OutlinedQuestionMarkCircle,
         };
     }
 
