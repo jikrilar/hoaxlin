@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Submissions\Tables;
 
 use App\Enums\SubmissionStatus;
+use App\Filament\Actions\RetrySubmissionAction;
 use App\Filament\Support\ReadOnlyPresentation;
 use App\Filament\Support\TableCsvExport;
 use App\Models\Submission;
@@ -37,6 +38,10 @@ class SubmissionsTable
             ->persistFiltersInSession()
             ->recordActions([
                 ViewAction::make()->label('Lihat detail'),
+                RetrySubmissionAction::make(),
+            ])
+            ->toolbarActions([
+                RetrySubmissionAction::bulk(),
             ])
             ->headerActions([
                 // Metadata only: the raw input, extracted text and media stay out of the file.

@@ -105,7 +105,7 @@ class AdminMonitoringResourcesTest extends TestCase
             Livewire::test(ListAdminLogs::class)->filterTable('action', $record->action)->assertCanSeeTableRecords([$record])->assertCanNotSeeTableRecords($records->reject(fn ($other) => $other->is($record)));
         }
         $this->get(AdminLogResource::getUrl('view', ['record' => $records[0]]))->assertOk()->assertSee('ID target tidak tercatat');
-        $this->assertSame(['create', 'update', 'delete'], array_keys(Livewire::test(ListAdminLogs::class)->instance()->getTable()->getFilter('action')->getOptions()));
+        $this->assertSame(['create', 'update', 'delete', 'submission_retried'], array_keys(Livewire::test(ListAdminLogs::class)->instance()->getTable()->getFilter('action')->getOptions()));
     }
 
     public function test_event_detail_uses_safe_operational_projection_without_disclosing_payload_in_html_or_hydration(): void

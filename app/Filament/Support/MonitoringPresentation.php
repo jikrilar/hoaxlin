@@ -44,6 +44,7 @@ final class MonitoringPresentation
             'create' => 'Buat', 'update' => 'Ubah', 'delete' => 'Hapus',
             'login' => 'Masuk', 'dataset_updated' => 'Pembaruan dataset', 'user_updated' => 'Pembaruan pengguna',
             'system_configuration_updated' => 'Pembaruan konfigurasi',
+            'submission_retried' => 'Pemeriksaan dicoba ulang',
             default => 'Tindakan tidak dikenali',
         };
     }
@@ -52,7 +53,7 @@ final class MonitoringPresentation
     {
         return match ($state) {
             'delete' => 'danger',
-            'update', 'dataset_updated', 'user_updated', 'system_configuration_updated' => 'warning',
+            'update', 'dataset_updated', 'user_updated', 'system_configuration_updated', 'submission_retried' => 'warning',
             'create', 'login' => 'success',
             default => 'gray',
         };
@@ -63,6 +64,7 @@ final class MonitoringPresentation
         return match ($state) {
             'create' => Heroicon::OutlinedPlusCircle,
             'update', 'dataset_updated', 'user_updated', 'system_configuration_updated' => Heroicon::OutlinedPencilSquare,
+            'submission_retried' => Heroicon::OutlinedArrowPath,
             'delete' => Heroicon::OutlinedTrash,
             'login' => Heroicon::OutlinedShieldCheck,
             default => Heroicon::OutlinedQuestionMarkCircle,
@@ -132,6 +134,15 @@ final class MonitoringPresentation
         }
         if (is_array($metadata) && array_key_exists('changes', $metadata)) {
             $safe['changes'] = self::changes($record->target_table, $metadata['changes']);
+        }
+        if (is_array($metadata) && array_key_exists('count', $metadata)) {
+            $safe['count'] = self::unsignedInteger($metadata['count']) ?? self::HIDDEN;
+        }
+        if (is_array($metadata) && array_key_exists('submission_ids', $metadata)) {
+            $ids = $metadata['submission_ids'];
+            $safe['submission_ids'] = is_array($ids) && $ids !== [] && array_is_list($ids)
+                ? array_values(array_filter(array_map(fn ($id): ?int => self::unsignedInteger($id), $ids), fn (?int $id): bool => $id !== null))
+                : self::HIDDEN;
         }
 
         return self::metadataText($metadata, $safe);

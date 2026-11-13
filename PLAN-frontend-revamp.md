@@ -371,10 +371,16 @@ Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data K
 - **Catatan agent:** ekspor Pemeriksaan sengaja tidak memuat `raw_input`/`source_url`/media, jadi tidak ada sel pengguna yang perlu disanitasi di tabel itu; sanitasi formula diverifikasi pada ekspor Pengguna dan Umpan Balik.
 
 ### T3.4 (M) Aksi "Coba lagi" tanpa terminal
-- [ ] Ekstrak logika dari `RecoverFailedSubmissions` / `RecoverStaleSubmissions` ke service bersama (mis. `App\Services\Pipeline\SubmissionRecovery`) yang dipakai **command dan UI** (perilaku command tidak berubah; test command tetap hijau).
-- [ ] Aksi Filament di daftar & detail Pemeriksaan: **Coba lagi** (hanya status `failed`/tertahan), konfirmasi modal dengan penjelasan, **bulk action**, hanya admin (policy), idempoten (pemanggilan ganda tidak membuat job ganda), menghormati state machine.
-- [ ] Catat ke Log Admin dengan **allowlist** (aksi, target id, jumlah) — tanpa isi pengguna. Perbarui `MonitoringPresentation` dan `FilamentAuditObserver`/log untuk aksi baru.
-- [ ] Test: otorisasi, idempotensi, audit tanpa payload pengguna, status akhir.
+- [x] Ekstrak logika dari `RecoverFailedSubmissions` / `RecoverStaleSubmissions` ke service bersama (mis. `App\Services\Pipeline\SubmissionRecovery`) yang dipakai **command dan UI** (perilaku command tidak berubah; test command tetap hijau).
+  - `App\Services\Pipeline\SubmissionRecovery`: `failedQuery()`, `retry()`, `retryQuery()`, `isRetryable()`, `isStalled()`. `RecoverFailedSubmissions` kini hanya memanggil service (signature, output, dan `--dry-run` tidak berubah). Jalur tertahan tetap didelegasikan ke `StaleSubmissionRecovery::recover()` supaya tahap pipeline yang dilanjutkan sama dengan watchdog — perilaku `submissions:recover-stale` tidak disentuh.
+- [x] Aksi Filament di daftar & detail Pemeriksaan: **Coba lagi** (hanya status `failed`/tertahan), konfirmasi modal dengan penjelasan, **bulk action**, hanya admin (policy), idempoten (pemanggilan ganda tidak membuat job ganda), menghormati state machine.
+  - `App\Filament\Actions\RetrySubmissionAction` (`make()` + `bulk()`), dipakai di `SubmissionsTable` (record + toolbar) dan `ViewSubmission` (header). Otorisasi: `App\Policies\SubmissionPolicy::retry` (admin) + `authorizeIndividualRecords('retry')` untuk bulk. Idempotensi: conditional `UPDATE ... WHERE status='failed' AND updated_at=<snapshot>` sehingga hanya satu pemanggil yang menang; baris tertahan memakai klaim atomik watchdog.
+- [x] Catat ke Log Admin dengan **allowlist** (aksi, target id, jumlah) — tanpa isi pengguna. Perbarui `MonitoringPresentation` dan `FilamentAuditObserver`/log untuk aksi baru.
+  - `AdminLog` ditulis eksplisit (`FilamentAuditObserver` hanya mencatat request `/admin*`, sedangkan aksi Livewire berjalan di `/livewire/update`). Metadata hanya `count` + `submission_ids`; `MonitoringPresentation::action/actionColor/actionIcon` dan filter Log Admin mengenali `submission_retried`.
+- [x] Test: otorisasi, idempotensi, audit tanpa payload pengguna, status akhir.
+  - `tests/Feature/AdminSubmissionRetryTest.php` (12 test), termasuk perilaku command `submissions:recover` (`--days`, `--id`, `--dry-run`) setelah ekstraksi.
+- **Bukti:** `reports/frontend-revamp/after-s3/tables.md` bagian T3.4 + `retry-*.png`.
+- **Catatan agent:** cacat visual ditemukan saat verifikasi browser dan diperbaiki — sel tabel menyusut di bawah kontennya sehingga tanggal/aksi terpotong ("13:4"); kini `min-inline-size: max-content` dan overflow tetap di dalam kartu.
 
 ### T3.5 (L) Pemeriksaan: tab & detail (menggantikan Hasil Deteksi + Processing Events)
 - [ ] Daftar Pemeriksaan: tab **Perlu tindakan** (gagal/tertahan) · Diproses · Selesai · Semua, dengan badge jumlah.

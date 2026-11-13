@@ -61,10 +61,15 @@
         font-variant-numeric: tabular-nums;
     }
 
-    /* Row actions must never be clipped: let the browser size columns to their
-       content instead of squeezing the action cell to zero width. */
+    /* Cells must never be squeezed below their own content: with seven columns
+       plus a selection checkbox the table is wider than the card, and shrinking
+       cells clips the date and the row actions. Overflow stays inside the card. */
     .fi-panel-admin .fi-ta-table {
         table-layout: auto;
+    }
+
+    .fi-panel-admin .fi-ta-table :is(th, td) {
+        min-inline-size: max-content;
     }
 
     /* Actions wrap onto a second line rather than forcing the table wider than

@@ -44,3 +44,28 @@ Env sementara: SQLite, `APP_DEBUG=false`, `APP_LOCALE=id`, 25 pemeriksaan, 6 pen
   Isi input pengguna tidak pernah masuk file, sesuai AGENTS §3.
 - Kontras diukur lewat token (`--ds-*`), bukan sampling piksel.
 - `prefers-reduced-motion` diuji sebagai kontrak stylesheet, bukan emulasi media.
+
+## T3.4 - Aksi "Coba lagi"
+
+Screenshot `retry-list-{375,768,1280}.png`, `retry-modal-1280.png`,
+`retry-bulk-1280.png`, `retry-bulk-after-1280.png`, `retry-log-1280.png`,
+`retry-detail-1280.png`.
+
+Fixture: 5 pemeriksaan (2 gagal, 1 diproses tertahan, 1 selesai, 1 menunggu
+tertahan), ambang `PIPELINE_STALE_AFTER_MINUTES=45`.
+
+| Yang diperiksa | Hasil |
+|---|---|
+| Tombol "Coba lagi" per baris | muncul hanya untuk `failed` dan tertahan (menunggu/diproses melewati ambang) |
+| Baris selesai / masih berjalan normal | tombol tidak dirender |
+| Modal konfirmasi | judul, penjelasan state, dan tombol "Coba lagi" |
+| Setelah retry (daftar) | baris `Gagal` menjadi `Menunggu`, notifikasi sukses |
+| Setelah retry (detail) | status langsung menjadi "Menunggu" tanpa reload manual |
+| Bulk action | tampil setelah baris dipilih; 5 dipilih -> "1 pemeriksaan dimasukkan kembali ke antrean, 4 pemeriksaan dilewati karena sudah selesai atau masih berjalan normal" |
+| Log Admin | dua entri "Pemeriksaan dicoba ulang" pada `submissions` |
+| Fokus keyboard | outline 3px solid `rgb(35, 92, 80)`, tinggi tombol 44px |
+| Overflow halaman | 0 pada 375/768/1280; tabel menggulir di dalam kartu, bukan halaman |
+
+Cacat yang ditemukan lewat screenshot dan diperbaiki: kolom tanggal dan aksi
+terpotong ("13:4") karena sel boleh menyusut di bawah kontennya. Sel kini
+memakai `min-inline-size: max-content` sehingga teks utuh.
