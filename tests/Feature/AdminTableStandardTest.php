@@ -61,7 +61,9 @@ class AdminTableStandardTest extends TestCase
             'users' => [ListUsers::class, User::class, []],
             'logs' => [ListAdminLogs::class, AdminLog::class, ['id', 'target_id']],
             'datasets' => [ListDatasets::class, Dataset::class, ['source']],
-            'model versions' => [ListModelVersions::class, ModelVersion::class, ['baseline_accuracy', 'total_rows', 'f1_score', 'training_duration']],
+            // T3.8 supersedes T3.3 here: "Dibanding baseline" is a default column now,
+            // and only these three stay behind the toggle.
+            'model versions' => [ListModelVersions::class, ModelVersion::class, ['total_rows', 'f1_score', 'training_duration']],
         ];
     }
 

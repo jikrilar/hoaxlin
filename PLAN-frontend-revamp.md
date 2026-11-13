@@ -421,12 +421,20 @@ Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data K
 - **Catatan agent:** cacat ditemukan saat verifikasi browser dan diperbaiki — badge "Status tinjau" tidak merender teks karena closure `?string` tidak cocok dengan state `Carbon` dari cast `reviewed_at`; kini memakai `mixed`.
 
 ### T3.8 (M) Versi Model: ringkas & jelas
-- [ ] Kolom default: Versi · Status (badge) · Akurasi · Dibanding baseline · Aktif · Dibuat. Kolom lain (Baris dataset, F1, Durasi) toggleable-hidden.
-- [ ] Tooltip untuk semua istilah (Akurasi, F1, Baseline, Aktif). Notice pelatihan diganti bahasa awam tetapi akurat (tidak otomatis menggantikan model aktif; aktivasi manual).
-- [ ] Aksi "Aktifkan Baseline v1.0.0" dipindah ke menu overflow (`ActionGroup`) agar tidak bersaing dengan "Latih Versi Baru".
-- [ ] Tambahkan tautan **unduh templat CSV** (`text,label`, 3 baris contoh fiktif) di form unggah.
-- [ ] Modal aktivasi: tambahkan peringatan bahwa metrik berasal dari data validasi internal dan tidak menjamin kualitas pada data baru; sarankan evaluasi eksternal sebelum aktivasi (teks saja; tanpa mengubah logika aktivasi).
-- [ ] **Jangan** mengubah `BertTrainingService::activateModelVersion/activateBaseline` atau kontrak ke layanan BERT.
+- [x] Kolom default: Versi · Status (badge) · Akurasi · Dibanding baseline · Aktif · Dibuat. Kolom lain (Baris dataset, F1, Durasi) toggleable-hidden.
+  - Urutan nyata: `version_name`, `status`, `accuracy`, `baseline_accuracy`, `is_active`, `created_at`; `total_rows`, `f1_score`, `training_duration` tetap toggleable-hidden. Test T3.3 yang menegaskan `baseline_accuracy` tersembunyi diperbarui karena T3.8 menetapkannya sebagai kolom default.
+- [x] Tooltip untuk semua istilah (Akurasi, F1, Baseline, Aktif). Notice pelatihan diganti bahasa awam tetapi akurat (tidak otomatis menggantikan model aktif; aktivasi manual).
+  - Tooltip memakai `AdminGlossary`; dua istilah baru ditambahkan (`accuracy`, `model_status`). `TRAINING_NOTICE` menyebut "tidak otomatis", "model aktif", "manual", dan "tidak dihapus".
+- [x] Aksi "Aktifkan Baseline v1.0.0" dipindah ke menu overflow (`ActionGroup`) agar tidak bersaing dengan "Latih Versi Baru".
+  - `ActionGroup` berlabel "Aksi lain"; aksi tetap dapat dipanggil lewat `getFlatActions()` sehingga test perilaku lama tetap hijau.
+- [x] Tambahkan tautan **unduh templat CSV** (`text,label`, 3 baris contoh fiktif) di form unggah.
+  - `ModelVersionCsvTemplateController` + route `admin.model-versions.template` (auth + throttle, hanya admin), dipasang sebagai `hintAction` "Unduh templat CSV" pada `FileUpload`. Templat lolos `BertCsvValidator` (3 baris, label `valid`/`hoax`).
+- [x] Modal aktivasi: tambahkan peringatan bahwa metrik berasal dari data validasi internal dan tidak menjamin kualitas pada data baru; sarankan evaluasi eksternal sebelum aktivasi (teks saja; tanpa mengubah logika aktivasi).
+  - `ModelVersionResource::activationDescription()` kini memuat ketiga kalimat itu; modal baseline tetap menjelaskan versi tidak dihapus.
+- [x] **Jangan** mengubah `BertTrainingService::activateModelVersion/activateBaseline` atau kontrak ke layanan BERT.
+  - Service tidak disentuh; test memastikan kedua method masih ada dan aksi aktivasi tetap muncul untuk versi selesai.
+- **Bukti:** `tests/Feature/AdminModelVersionClarityTest.php` (11 test), `reports/frontend-revamp/after-s3/model-versions.md` + `t38-*.png`.
+- **Catatan agent:** route templat tidak boleh berada di bawah `/admin/model-versions/` — Filament mendaftarkan wildcard `{record}` lebih dulu sehingga path saudara tertangkap route detail (ditemukan lewat 404 di test).
 
 ### T3.9 (S) Pengguna
 - [ ] Perbaiki kolom verifikasi email (T1.7), tambah filter Peran/Verifikasi, ekspor opsional. Aturan "admin verifier tidak bisa di-demote" tetap berlaku (disesuaikan ke alur Data Kurasi pada Tahap 4 bila relasi berubah).

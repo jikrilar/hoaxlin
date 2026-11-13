@@ -25,6 +25,7 @@ class ModelVersionsTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
+                    ->tooltip(AdminGlossary::explain('model_status'))
                     ->icon(static fn (?string $state) => ModelVersionResource::statusIcon($state))
                     ->formatStateUsing(ModelVersionResource::statusText(...))
                     ->color(ModelVersionResource::statusColor(...))
@@ -36,6 +37,7 @@ class ModelVersionsTable
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('accuracy')
                     ->label('Akurasi')
+                    ->tooltip(AdminGlossary::explain('accuracy'))
                     ->formatStateUsing(ModelVersionResource::formatPercentage(...))
                     ->placeholder('Belum tersedia')
                     ->sortable(),
@@ -50,10 +52,7 @@ class ModelVersionsTable
                     ->label('Perbandingan vs Baseline')
                     ->tooltip(AdminGlossary::explain('baseline_comparison'))
                     ->state(static fn (ModelVersion $record): ?string => ModelVersionResource::formatBaselineSummary($record))
-                    ->placeholder('Belum tersedia')
-                    // The longest derived value; hidden by default so the row actions stay
-                    // reachable at 1280px. T3.8 defines its own default column set.
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->placeholder('Belum tersedia'),
                 TextColumn::make('training_duration')
                     ->label('Durasi')
                     ->formatStateUsing(ModelVersionResource::formatDuration(...))
