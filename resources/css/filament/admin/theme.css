@@ -148,9 +148,36 @@
     }
 
     /* WCAG 2.5.5 / plan DoD: interactive controls stay at least 44px tall.
-       Filament's default button and filter-control heights are 36px. */
-    .fi-panel-admin :is(.fi-btn, .fi-icon-btn, .fi-input-wrp, .fi-select-input) {
+       Filament's default button and filter-control heights are 36px, and its
+       tab, sort-header and row-action affordances are 20-40px. */
+    .fi-panel-admin :is(.fi-btn, .fi-icon-btn, .fi-input-wrp, .fi-select-input, .fi-tabs-item) {
         min-block-size: 2.75rem;
+    }
+
+    /* Column sort headers, inline row actions, breadcrumbs and the filter reset are
+       text affordances; give them a full-height hit area without changing how they look. */
+    .fi-panel-admin :is(
+        .fi-ta-header-cell-sort-btn,
+        .fi-ta-col-btn,
+        .fi-ta-actions .fi-btn,
+        .fi-ta-actions .fi-link,
+        a.fi-ta-col,
+        .fi-breadcrumbs-item-label,
+        .fi-ta-filters .fi-link,
+        .fi-ta-filters button.fi-link,
+        .fi-topbar-start a,
+        .fi-select-input-btn,
+        .fi-user-menu-trigger,
+        .fi-sidebar-item-btn
+    ) {
+        min-block-size: 2.75rem;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .fi-panel-admin .fi-sidebar-item-btn {
+        display: flex;
+        inline-size: 100%;
     }
 
     .fi-panel-admin .fi-simple-main {

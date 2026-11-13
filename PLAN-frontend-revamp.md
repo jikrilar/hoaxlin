@@ -444,8 +444,13 @@ Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data K
 - **Catatan agent:** dua cacat ditemukan lewat test/browser dan diperbaiki di UI: formatter `?string` vs state Carbon, lalu state `null` yang tidak diformat Filament.
 
 ### T3.10 (M) QA tahap 3
-- [ ] Screenshot "after-s3" (375/768/1280 untuk dashboard & tiap resource). Uji keyboard, kontras, dan empty/error state (BERT mati, DB lambat).
-- [ ] Suite Laravel penuh + Pint + `npm run build` hijau.
+- [x] Screenshot "after-s3" (375/768/1280 untuk dashboard & tiap resource). Uji keyboard, kontras, dan empty/error state (BERT mati, DB lambat).
+  - 49 screenshot di `reports/frontend-revamp/after-s3/qa/` (21 publik, 24 admin, 4 state). Semua 200/404-sesuai-uji, satu `h1`, overflow horizontal 0 pada 375/768/1280. Keyboard: outline 3px, 0 tombol tanpa nama, 0 `img` tanpa `alt`, grafik `canvas[role=img]` berlabel. Kontras ter-render 5.73–13.52:1. BERT/RAG/OpenAI mati → badge "Belum tersedia" tanpa stack trace; daftar kosong → empty state informatif.
+  - **Temuan yang diperbaiki:** 10 jenis kontrol admin di bawah 44px (tab 40, header sort 20, aksi baris 20, tautan sel 32, breadcrumb 20, "Atur ulang filter" 20, wordmark 20, menu pengguna 32, select non-native 36, item sidebar 40). Semua dinaikkan ke 44px di `theme.css`; audit ulang menghasilkan daftar kosong.
+- [x] Suite Laravel penuh + Pint + `npm run build` hijau.
+  - 1037 lulus / 4 skip / 25 warning; Pint PASS; `node --test` 124 lulus; `npm run build` lulus.
+- **Bukti:** `reports/frontend-revamp/after-s3/qa/README.md` + 49 PNG.
+- **Catatan agent:** "DB lambat" tidak dapat disimulasikan lewat lock SQLite (lock total memblokir login dan semua request, sehingga bukan state UI yang sah); penanganan `PDOException` per widget sudah tercakup `AdminDashboardTest`/`AdminDashboardMetricsTest`. Pembaca layar diuji lewat struktur DOM, bukan NVDA/VoiceOver.
 
 **Selesai Tahap 3 bila:** T3.1–T3.10 centang.
 
