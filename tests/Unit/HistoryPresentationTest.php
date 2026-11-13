@@ -166,6 +166,69 @@ class HistoryPresentationTest extends TestCase
         }
     }
 
+    public function test_filters_are_collapsed_with_a_count_and_remain_inside_the_get_form(): void
+    {
+        $this->submissions = new LengthAwarePaginator([$this->submission()], 1, 15, 1, ['path' => 'http://localhost/riwayat']);
+        $dom = $this->render('riwayat', '/riwayat?label=valid&status=completed&search=informasi');
+
+        // A native <details> keeps every control in the DOM, so the form still submits all five fields.
+        $this->assertSame(1, $dom->query('//form[@id="history-filter-form"]/details[contains(concat(" ", normalize-space(@class), " "), " hl-disclosure ")]')->length);
+        $this->assertSame(1, $dom->query('//form[@id="history-filter-form"]//summary[contains(., "Filter") and contains(., "3")]')->length, 'summary states how many filters are active');
+        $this->assertSame(5, $dom->query('//form[@id="history-filter-form"]//*[@name]')->length);
+        $this->assertSame(0, $dom->query('//form[@id="history-filter-form"]/details/@open')->length, 'filters start collapsed');
+    }
+
+    public function test_filter_disclosure_stays_open_when_filters_are_invalid(): void
+    {
+        $this->session->put('_old_input', ['label' => 'hoax']);
+        $errors = new ViewErrorBag;
+        $errors->put('default', new MessageBag(['label' => ['Label tidak valid.']]));
+        $this->app['view']->share('errors', $errors);
+        $this->submissions = new LengthAwarePaginator([], 0, 15, 1, ['path' => 'http://localhost/riwayat']);
+        $dom = $this->render('riwayat', '/riwayat?label=invalid');
+
+        $this->assertSame(1, $dom->query('//form[@id="history-filter-form"]/details/@open')->length, 'errors must not hide the fields they link to');
+        $this->assertSame(1, $dom->query('//*[@id="history-errors"]//a[@href="#history-label"]')->length);
+    }
+
+    public function test_summary_labels_render_as_chips_above_the_list(): void
+    {
+        $this->submissions = new LengthAwarePaginator([$this->submission()], 1, 15, 1, ['path' => 'http://localhost/riwayat']);
+        $dom = $this->render('riwayat', '/riwayat');
+
+        $this->assertSame(1, $dom->query('//section[@aria-labelledby="history-summary-title"]//*[contains(concat(" ", normalize-space(@class), " "), " hl-history-chips ")]')->length);
+        $this->assertSame(3, $dom->query('//section[@aria-labelledby="history-summary-title"]//li[contains(concat(" ", normalize-space(@class), " "), " hl-history-chip ")]')->length);
+        foreach (['13', '4', '2'] as $count) {
+            $this->assertSame(1, $dom->query('//li[contains(concat(" ", normalize-space(@class), " "), " hl-history-chip ")]//*[contains(concat(" ", normalize-space(@class), " "), " hl-history-chip__count ")][normalize-space(.)="'.$count.'"]')->length);
+        }
+        $this->assertStringContainsString('Angka ini tidak mengikuti filter atau halaman aktif', $dom->evaluate('string(//section[@aria-labelledby="history-summary-title"])'));
+    }
+
+    public function test_history_rows_are_cards_with_badges_and_a_single_result_link(): void
+    {
+        $this->submissions = new LengthAwarePaginator([$this->submission('completed', 'hoax', 0.91, 101)], 1, 15, 1, ['path' => 'http://localhost/riwayat']);
+        $dom = $this->render('riwayat', '/riwayat');
+
+        $this->assertSame(1, $dom->query('//ul[@id="history-list"]/li[contains(concat(" ", normalize-space(@class), " "), " hl-card ") and @data-history-id="101"]')->length);
+        $this->assertSame(1, $dom->query('//*[@data-history-label and contains(@class,"hl-badge") and @data-tone="danger"]')->length);
+        $this->assertSame('Prediksi model: Hoaks', trim($dom->evaluate('string(//*[@data-history-label])')));
+        $this->assertSame('91%', $dom->evaluate('string(//*[@data-history-confidence])'));
+        $this->assertSame(1, $dom->query('//ul[@id="history-list"]/li//a[@href="http://localhost/riwayat/101"]')->length);
+        $this->assertStringContainsString('Lihat hasil', $dom->evaluate('string(//ul[@id="history-list"]/li//a[@href="http://localhost/riwayat/101"])'));
+        // Status is still readable as text, not only via colour.
+        $this->assertStringContainsString('Selesai', $dom->evaluate('string(//ul[@id="history-list"]/li)'));
+    }
+
+    public function test_csv_download_is_explained_as_whole_account_history(): void
+    {
+        $this->submissions = new LengthAwarePaginator([$this->submission()], 1, 15, 1, ['path' => 'http://localhost/riwayat']);
+        $dom = $this->render('riwayat', '/riwayat');
+
+        $this->assertSame(1, $dom->query('//main//a[@href="http://localhost/riwayat-export/csv" and contains(., "Unduh seluruh riwayat")]')->length);
+        $this->assertStringContainsString('seluruh riwayat akun', $dom->evaluate('string(//main/header | //main//header)'));
+        $this->assertSame(0, $dom->query('//main//a[contains(@href,"csv") and contains(., "halaman")]')->length, 'the CSV link never implies a filtered subset');
+    }
+
     #[DataProvider('paginationEdges')]
     public function test_pagination_edges_use_real_links_and_noninteractive_disabled_text(int $page, string $available, string $disabled): void
     {
@@ -218,7 +281,7 @@ class HistoryPresentationTest extends TestCase
         $this->assertStringContainsString($heading, $dom->evaluate('string(//section[@aria-labelledby="history-results-title"])'));
         $this->assertSame(1, $dom->query('//*[contains(@class,"hl-empty-state")]//a[@href="'.$href.'"]')->length);
         $this->assertSame(1, $dom->query('//section[@aria-labelledby="history-summary-title"]')->length);
-        $this->assertSame('13', $dom->evaluate('string(//section[@aria-labelledby="history-summary-title"]//dd[1])'));
+        $this->assertSame('13', trim($dom->evaluate('string(//section[@aria-labelledby="history-summary-title"]//*[contains(@class,"hl-history-chip__count")][1])')));
         $this->assertSame(0, $dom->query('//nav[@aria-label="Navigasi halaman riwayat"]')->length);
     }
 

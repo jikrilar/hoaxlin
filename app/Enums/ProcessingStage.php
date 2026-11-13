@@ -41,6 +41,61 @@ enum ProcessingStage: string
         };
     }
 
+    /**
+     * Human-facing checklist for the progress stepper (T2.6).
+     *
+     * The translation step is always listed because the pipeline description is
+     * the same for every input type; it is only marked "skipped" once the data
+     * proves the submission moved past it without one.
+     *
+     * @return list<array{key: string, label: string, stage: self}>
+     */
+    public static function steps(): array
+    {
+        return [
+            ['key' => 'extracting', 'label' => 'Ekstraksi', 'stage' => self::Extracting],
+            ['key' => 'translating', 'label' => 'Terjemahan', 'stage' => self::Translating],
+            ['key' => 'classifying', 'label' => 'Analisis', 'stage' => self::Classifying],
+            ['key' => 'retrieving', 'label' => 'Rujukan', 'stage' => self::Retrieving],
+            ['key' => 'explaining', 'label' => 'Penjelasan', 'stage' => self::Explaining],
+        ];
+    }
+
+    /**
+     * Stepper status for each step, derived only from the recorded stage.
+     *
+     * @return list<array{key: string, label: string, status: string}>
+     */
+    public static function stepStates(?self $current, bool $completed = false, bool $failed = false): array
+    {
+        $currentIndex = $current === null ? null : array_search(
+            $current,
+            array_map(fn (array $step): self => $step['stage'], self::steps()),
+            true,
+        );
+        if ($current === self::Queued) {
+            $currentIndex = null;
+        }
+
+        $states = [];
+        foreach (self::steps() as $index => $step) {
+            $status = 'todo';
+            if ($completed) {
+                $status = 'done';
+            } elseif ($failed) {
+                // The recorded stage is the one that failed; later steps were never reached.
+                $status = $index === $currentIndex && $current !== null
+                    ? 'error'
+                    : ($currentIndex !== null && $index < $currentIndex ? 'done' : 'todo');
+            } elseif ($currentIndex !== null) {
+                $status = $index < $currentIndex ? 'done' : ($index === $currentIndex ? 'current' : 'todo');
+            }
+            $states[] = ['key' => $step['key'], 'label' => $step['label'], 'status' => $status];
+        }
+
+        return $states;
+    }
+
     public function next(): ?self
     {
         return match ($this) {

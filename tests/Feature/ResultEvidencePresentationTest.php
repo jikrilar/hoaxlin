@@ -43,7 +43,10 @@ class ResultEvidencePresentationTest extends TestCase
             ->assertSee('Prediksi model: Valid')
             ->assertSee('Skor Keyakinan Model')
             ->assertSee('63%')
-            ->assertDontSee('99%')
+            // Evidence similarity is allowed, but only under the relevance label, never as confidence.
+            ->assertSee('Kemiripan dengan teks Anda')
+            ->assertSee('99%')
+            ->assertDontSee('99% keyakinan')
             ->assertDontSee('role="progressbar"', false)
             ->assertSee('Referensi terkait')
             ->assertSee($first->title)

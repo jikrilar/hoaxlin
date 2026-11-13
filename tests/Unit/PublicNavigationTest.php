@@ -217,6 +217,51 @@ class PublicNavigationTest extends TestCase
         $this->assertStringContainsString('<script id="attack">x</script> & teks', $dom->document->textContent);
     }
 
+    public function test_shared_header_is_sticky_with_one_accessible_mobile_menu_control(): void
+    {
+        $dom = $this->render('@include("partials.navigation")');
+        $header = $dom->query('//header[contains(concat(" ", normalize-space(@class), " "), " hl-header ")]')->item(0);
+
+        $this->assertNotNull($header);
+        $this->assertSame(1, $dom->query('//header[@data-navigation]')->length);
+        $toggle = $dom->query('//button[@data-mobile-toggle]')->item(0);
+        $this->assertSame('button', $toggle->getAttribute('type'));
+        $this->assertSame('public-navigation', $toggle->getAttribute('aria-controls'));
+        $this->assertSame('false', $toggle->getAttribute('aria-expanded'));
+        $this->assertSame(1, $dom->query('//button[@data-mobile-toggle]/@hidden')->length);
+        // The menu label is real text; the chevron is decorative.
+        $this->assertSame('Menu', trim($dom->evaluate('string(//button[@data-mobile-toggle]/text()[1])')));
+        $this->assertSame(1, $dom->query('//button[@data-mobile-toggle]/svg[@aria-hidden="true"]')->length);
+        $this->assertSame(0, $dom->query('//button[@data-mobile-toggle]/@aria-label')->length);
+    }
+
+    public function test_flash_dismiss_buttons_are_optional_and_never_the_only_way_to_read_a_message(): void
+    {
+        $this->session->put('success', 'Tersimpan');
+        $dom = $this->render('@include("partials.flash")');
+
+        $dismiss = $dom->query('//button[@data-dismiss-flash]')->item(0);
+        $this->assertSame('Tutup', trim($dismiss->textContent));
+        $this->assertSame('Tutup pesan: Berhasil', $dismiss->getAttribute('aria-label'));
+        $this->assertSame('button', $dismiss->getAttribute('type'));
+        // Hidden until the JS enhancement is present, so no dead control without JS.
+        $this->assertSame(1, $dom->query('//button[@data-dismiss-flash and @hidden]')->length);
+        $this->assertSame(1, $dom->query('//*[@data-flash]//*[contains(@class,"hl-flash__message")]')->length);
+    }
+
+    public function test_public_layout_is_the_only_shell_with_navigation_and_footer(): void
+    {
+        $dom = $this->render('@extends("layouts.app")@section("content")<p>Isi</p>@endsection');
+
+        $this->assertSame(1, $dom->query('//a[@class="hl-skip-link" and @href="#main-content"]')->length);
+        $this->assertSame(1, $dom->query('//header[@data-navigation]')->length);
+        $this->assertSame(1, $dom->query('//*[@class="hl-footer"]')->length);
+        $this->assertSame(1, $dom->query('//main[@id="main-content" and @tabindex="-1"]')->length);
+        // The header markup is shared, not duplicated by the page.
+        $this->assertSame(1, $dom->query('//header[@data-navigation]//nav[@id="public-navigation"]')->length);
+        $this->assertSame(0, $dom->query('//main//header[@data-navigation] | //main//*[@class="hl-footer"]')->length);
+    }
+
     private function render(string $template): DOMXPath
     {
         $html = Blade::render($template, deleteCachedView: true);

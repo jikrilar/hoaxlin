@@ -134,6 +134,27 @@ class DetectionPresentationTest extends TestCase
         parent::tearDown();
     }
 
+    #[DataProvider('labelDescriptions')]
+    public function test_each_label_carries_a_plain_language_description_without_claiming_truth(?string $label, string $description): void
+    {
+        $prediction = DetectionPresentation::label($label);
+
+        $this->assertSame($description, $prediction['description']);
+        // The canonical label strings never change.
+        $this->assertStringNotContainsString('terbukti', mb_strtolower($prediction['description']));
+        $this->assertStringNotContainsString('dijamin', mb_strtolower($prediction['description']));
+    }
+
+    public static function labelDescriptions(): array
+    {
+        return [
+            'valid' => ['valid', 'Pola teks ini mirip dengan informasi yang valid. Ini belum menjamin isinya benar — tetap cek sumbernya.'],
+            'hoax' => ['hoax', 'Pola teks ini mirip dengan hoaks. Cek di sumber terpercaya sebelum membagikannya.'],
+            'abstained' => ['meragukan', 'Model belum cukup yakin. Ini bukan bukti bahwa informasi benar atau palsu. Cari konfirmasi dari sumber resmi.'],
+            'unknown' => [null, 'Model belum dapat memilih label untuk input ini. Anggap hasil ini belum tersedia dan cek ulang nanti.'],
+        ];
+    }
+
     #[DataProvider('labels')]
     public function test_label_score_and_disclaimer_never_imply_verification(?string $label, mixed $score, string $text, string $tone, string $percentage): void
     {
@@ -240,9 +261,13 @@ class DetectionPresentationTest extends TestCase
         $dom = $this->renderResult($submission, $result);
         $this->assertSame(['doc-a', 'doc-z', 'doc-b'], array_map(fn ($node) => $node->getAttribute('data-evidence-document'), iterator_to_array($dom->query('//*[@data-evidence-document]'))));
         $this->assertSame(0, $dom->query('//*[@id="attack"]')->length);
-        $this->assertSame(3, $dom->query('//a[@rel="noopener noreferrer" and @target="_blank" and starts-with(@href,"https://reference.test/")]')->length);
+        // Each reference renders its URL link plus one "Buka sumber" button.
+        $this->assertSame(3, $dom->query('//a[@rel="noopener noreferrer" and @target="_blank" and starts-with(@href,"https://reference.test/") and contains(concat(" ", normalize-space(@class), " "), " hl-result-evidence__open ")]')->length);
+        $this->assertSame(6, $dom->query('//a[@rel="noopener noreferrer" and @target="_blank" and starts-with(@href,"https://reference.test/")]')->length);
         $this->assertSame('63%', $dom->evaluate('string(//*[@data-result-confidence])'));
-        $this->assertStringNotContainsString('99%', $dom->evaluate('string(//main)'));
+        // Similarity is shown as relevance ("Kemiripan dengan teks Anda"), never as model confidence.
+        $this->assertStringContainsString('Kemiripan dengan teks Anda', $dom->evaluate('string(//main)'));
+        $this->assertStringNotContainsString('99% keyakinan', $dom->evaluate('string(//main)'));
         $this->assertStringContainsString('Tanggal publikasi tidak tersedia', $dom->evaluate('string(//main)'));
     }
 

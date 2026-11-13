@@ -193,33 +193,39 @@ Gunakan **Lampiran A** sebagai satu-satunya kamus. Prinsip: kalimat pendek, sudu
 **Tujuan:** tampilan rapi, konsisten, informatif, dan ramah pengguna umum. Palet tetap.
 
 ### T2.1 (M) Tipografi dan ritme
-- [ ] Definisikan ulang skala di `resources/css/design-tokens.css`: ukuran, line-height, bobot, tracking untuk `display`, `h1–h4`, `lead`, `body`, `small`, `meta`; ukuran dasar ≥ 16px; panjang baris baca 60–75 karakter (`--ds-reading-measure`).
-- [ ] Pertahankan pasangan Newsreader (judul editorial) + Inter (UI). Ubah **peran**-nya bila perlu (mis. judul hero & judul bagian = Newsreader; label, tombol, tabel = Inter). Tidak menambah font baru kecuali sesuai guardrail.
-- [ ] Skala spasi vertikal konsisten antar bagian (token `--ds-space-*`); hapus nilai ad-hoc di CSS halaman.
+- [x] Definisikan ulang skala di `resources/css/design-tokens.css`: ukuran, line-height, bobot, tracking untuk `display`, `h1–h4`, `lead`, `body`, `small`, `meta`; ukuran dasar ≥ 16px; panjang baris baca 60–75 karakter (`--ds-reading-measure`).
+- [x] Pertahankan pasangan Newsreader (judul editorial) + Inter (UI). Ubah **peran**-nya bila perlu (mis. judul hero & judul bagian = Newsreader; label, tombol, tabel = Inter). Tidak menambah font baru kecuali sesuai guardrail.
+- [x] Skala spasi vertikal konsisten antar bagian (token `--ds-space-*`); hapus nilai ad-hoc di CSS halaman.
+- **Bukti:** `tests/Frontend/typography.test.mjs` (8 test), screenshots 375/768/1280 di `reports/frontend-revamp/after-s2/`.
 - **Penerimaan:** satu skala tipografi dipakai semua halaman; tidak ada ukuran font hard-coded di `result.css/history.css/statistics.css/information.css` yang menyimpang.
 
 ### T2.2 (S) Gerak (motion)
-- [ ] Tambahkan token: `--ds-motion-fast: 120ms`, `--ds-motion-base: 200ms`, `--ds-motion-slow: 320ms`, `--ds-ease-standard`, `--ds-ease-emphasis`.
-- [ ] Terapkan: hover/focus tombol & kartu, buka/tutup disclosure/FAQ, pergantian tab input, kemunculan hasil (fade+translateY ≤ 8px), transisi bar progres/stepper, toast/flash masuk-keluar.
-- [ ] **Wajib** `@media (prefers-reduced-motion: reduce)` mematikan/mengurangi semua gerak non-esensial. Tidak ada animasi berulang tanpa henti selain indikator "sedang memproses".
+- [x] Tambahkan token: `--ds-motion-fast: 120ms`, `--ds-motion-base: 200ms`, `--ds-motion-slow: 320ms`, `--ds-ease-standard`, `--ds-ease-emphasis`.
+- [x] Terapkan: hover/focus tombol & kartu, buka/tutup disclosure/FAQ, pergantian tab input, kemunculan hasil (fade+translateY ≤ 8px), transisi bar progres/stepper, toast/flash masuk-keluar.
+- [x] **Wajib** `@media (prefers-reduced-motion: reduce)` mematikan/mengurangi semua gerak non-esensial. Tidak ada animasi berulang tanpa henti selain indikator "sedang memproses".
+- **Bukti:** `tests/Frontend/motion.test.mjs` (8 test) dan `reports/frontend-revamp/after-s2/motion-verification.md` (nilai computed style mode normal dan reduced).
 - **Penerimaan:** tidak ada animasi yang mengganggu keterbacaan; reduced-motion diuji.
 
 ### T2.3 (L) Pustaka komponen
 Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.css` (pecah file bila terlalu besar):
-- [ ] `button` (primary/secondary/tertiary/danger, ukuran, state loading & disabled), `link`.
-- [ ] `field`, `forms/input|select|password|upload-field`: ukuran, state error/hint konsisten.
-- [ ] **`card`** (baru): header, body, footer, varian `interactive`.
-- [ ] **`badge`** (baru): tone `neutral|success|danger|warning|info`; dipakai untuk label prediksi (valid/hoax/meragukan) dengan **ikon + teks** (bukan warna saja).
-- [ ] **`tabs`** (baru, aksesibel: `role=tablist/tab/tabpanel`, panah kiri/kanan, Home/End). Ganti pola "tab = tautan #anchor" pada `partials/submission/input-types.blade.php` (T2.5).
-- [ ] **`stat`** (baru): angka + label + `x-ui.term` + deskripsi.
-- [ ] **`stepper`** (baru): daftar langkah bernomor, status `done|current|todo|error`.
-- [ ] `alert`, `disclosure`, `empty-state`, `pagination` disesuaikan gaya baru.
-- [ ] Halaman katalog internal opsional `/_ui` **jangan** dibuat di produksi; dokumentasikan komponen di `reports/frontend-revamp/components.md` dengan contoh pemakaian.
+- [x] `button` (primary/secondary/tertiary/danger, ukuran, state loading & disabled), `link`.
+- [x] `field`, `forms/input|select|password|upload-field`: ukuran, state error/hint konsisten.
+- [x] **`card`** (baru): header, body, footer, varian `interactive`.
+- [x] **`badge`** (baru): tone `neutral|success|danger|warning|info`; dipakai untuk label prediksi (valid/hoax/meragukan) dengan **ikon + teks** (bukan warna saja).
+- [x] **`tabs`** (baru, aksesibel: `role=tablist/tab/tabpanel`, panah kiri/kanan, Home/End). Ganti pola "tab = tautan #anchor" pada `partials/submission/input-types.blade.php` (T2.5).
+- [x] **`stat`** (baru): angka + label + `x-ui.term` + deskripsi.
+- [x] **`stepper`** (baru): daftar langkah bernomor, status `done|current|todo|error`.
+- [x] `alert`, `disclosure`, `empty-state`, `pagination` disesuaikan gaya baru.
+- [x] Halaman katalog internal opsional `/_ui` **jangan** dibuat di produksi; dokumentasikan komponen di `reports/frontend-revamp/components.md` dengan contoh pemakaian.
+- **Bukti:** `tests/Unit/UiComponentsTest.php` (render tiap komponen + kontrak gagal-tertutup), `tests/Frontend/tabs.test.mjs` (keyboard: klik, `←`/`→` berputar, `Home`/`End`, `Space`, roving tabindex, dispose), `tests/Frontend/components-style.test.mjs` (satu blok gaya per komponen, tanpa restyle tombol per halaman), katalog `reports/frontend-revamp/components.md`.
+- **Catatan migrasi:** pola tab masih `#anchor` di `partials/submission/input-types.blade.php`; penggantian ke `x-ui.tabs` milik T2.5 (form tunggal + `?tab=`), sehingga komponen tersedia tanpa memaksa perubahan kontrak backend sekarang.
 - **Penerimaan:** komponen baru punya test render + test keyboard (untuk tabs); tidak ada duplikasi gaya tombol/kartu antar halaman.
 
 ### T2.4 (M) Layout bersama
-- [ ] `layouts/app.blade.php`, `partials/navigation|footer|flash`: header sticky sederhana, navigasi mobile (menu tombol aksesibel), footer ringkas (tautan + kredit sesuai E-1), flash dengan tombol tutup.
-- [ ] `container-app` & grid: lebar konten per jenis halaman (form sempit, bacaan sedang, statistik lebar).
+- [x] `layouts/app.blade.php`, `partials/navigation|footer|flash`: header sticky sederhana, navigasi mobile (menu tombol aksesibel), footer ringkas (tautan + kredit sesuai E-1), flash dengan tombol tutup.
+- [x] `container-app` & grid: lebar konten per jenis halaman (form sempit, bacaan sedang, statistik lebar).
+- **Bukti:** `tests/Unit/PublicNavigationTest.php` (header sticky-ready, tombol Menu aksesibel, flash tutup opsional, satu shell), `tests/Frontend/layout.test.mjs` (token lebar per jenis halaman, header fixed hanya saat ready, tanpa lebar literal), `reports/frontend-revamp/after-s2/components/layout-verification.md`.
+- **Catatan:** shell auth tidak memakai nav publik (disengaja); kredit footer tetap TODO(E-1) sesuai keputusan plan.
 - **Penerimaan:** nav konsisten di semua halaman publik & auth; skip-link tetap ada.
 
 ### T2.5 (L) Landing page + form pemeriksaan
@@ -234,18 +240,22 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 8. **Batasan & privasi:** ringkas + tautan Kebijakan Privasi.
 
 **Form (kontrak backend tidak berubah):**
-- [ ] Ubah dari 4 form terpisah (masing-masing dengan CAPTCHA) menjadi **satu form** dengan `tabs` jenis input dan **satu CAPTCHA**. `input_type` dikirim sesuai tab aktif; kontrol pada panel tidak aktif **di-`disabled`** oleh JS (agar tidak ikut terkirim dan tidak memblokir validasi `required`). Pertahankan nama field, honeypot, CSRF, `enctype="multipart/form-data"`, dan preservasi input saat error (`old()`).
-- [ ] Tanpa JS (progressive enhancement): tampilkan hanya panel Teks (tamu) atau panel terpilih via `?tab=`; pastikan form tetap dapat dikirim.
-- [ ] Hitung karakter live, preview URL, preview gambar, validasi ukuran/durasi sisi klien (tetap divalidasi ulang server) — pertahankan perilaku yang sudah ada di `resources/js/pages/submission-form.js` & `submission-media.js`, sesuaikan selector.
-- [ ] Hint batas (ukuran/durasi/format) berasal dari `SubmissionFormOptions` seperti sekarang; **jangan hard-code angka**.
-- [ ] Pesan error: ringkasan di atas form dengan tautan ke field (sudah ada) tetap; perjelas bahasa.
-- [ ] CAPTCHA: tetap soal atomik yang sama (backend tak berubah); tampilkan sekali di bawah panel, label jelas ("Jawab soal singkat ini agar kami tahu Anda bukan robot").
+- [x] Ubah dari 4 form terpisah (masing-masing dengan CAPTCHA) menjadi **satu form** dengan `tabs` jenis input dan **satu CAPTCHA**. `input_type` dikirim sesuai tab aktif; kontrol pada panel tidak aktif **di-`disabled`** oleh JS (agar tidak ikut terkirim dan tidak memblokir validasi `required`). Pertahankan nama field, honeypot, CSRF, `enctype="multipart/form-data"`, dan preservasi input saat error (`old()`).
+- [x] Tanpa JS (progressive enhancement): tampilkan hanya panel Teks (tamu) atau panel terpilih via `?tab=`; pastikan form tetap dapat dikirim.
+- [x] Hitung karakter live, preview URL, preview gambar, validasi ukuran/durasi sisi klien (tetap divalidasi ulang server) — pertahankan perilaku yang sudah ada di `resources/js/pages/submission-form.js` & `submission-media.js`, sesuaikan selector.
+- [x] Hint batas (ukuran/durasi/format) berasal dari `SubmissionFormOptions` seperti sekarang; **jangan hard-code angka**.
+- [x] Pesan error: ringkasan di atas form dengan tautan ke field (sudah ada) tetap; perjelas bahasa.
+- [x] CAPTCHA: tetap soal atomik yang sama (backend tak berubah); tampilkan sekali di bawah panel, label jelas ("Jawab soal singkat ini agar kami tahu Anda bukan robot").
 - **Pengujian wajib hijau tanpa melonggarkan assertion:** `SubmissionTest`, `AtomicCaptchaQuotaTest`, `VideoMediaContractTest`, `ExternalUrlSecurityTest`, `tests/Frontend/submission-form.test.mjs`, `submission-media.test.mjs`. Tambahkan test: submit tiap jenis input dari form tunggal; panel tidak aktif tidak ikut terkirim; error mempertahankan tab & input.
+- **Bukti:** `SubmissionTest` (satu form/ satu CAPTCHA/ satu honeypot, 5 tab untuk pengguna login, fieldset non-aktif `disabled`, `?tab=` dan `old()` memilih panel), `SubmissionFormPresentationTest`, `GuestSubmissionAccessTest`, `tabs.test.mjs` (+`tabchange`), `submission-media.test.mjs` (sinkronisasi panel), `reports/frontend-revamp/after-s2/t25/`.
+- **Catatan:** panel Teks selalu menjadi panel pertama terpilih untuk tamu; `enctype="multipart/form-data"` tunggal dipakai semua tab sehingga unggahan tidak butuh form kedua.
 - **Penerimaan:** pengunjung memahami apa itu Hoaxlin dalam ±10 detik tanpa membuka halaman lain; satu CAPTCHA per kirim.
 
 ### T2.6 (M) Halaman progres
-- [ ] `livewire/submission-progress.blade.php`: tampilkan `stepper` tahap (Ekstraksi → Terjemahan bila perlu → Analisis → Rujukan → Penjelasan) dengan status tiap tahap dari data backend (`ProcessingStage`). Pertahankan: polling `wire:poll.2s.visible`, `aria-live`, **tanpa persen/ETA palsu**; bila indikator persen tetap dipakai, pertahankan teks bahwa itu mengikuti tahap tercatat.
-- [ ] Status gagal: pesan ramah + tombol "Periksa informasi baru"; tombol "Muat ulang status" dijadikan tertiary (polling sudah otomatis).
+- [x] `livewire/submission-progress.blade.php`: tampilkan `stepper` tahap (Ekstraksi → Terjemahan bila perlu → Analisis → Rujukan → Penjelasan) dengan status tiap tahap dari data backend (`ProcessingStage`). Pertahankan: polling `wire:poll.2s.visible`, `aria-live`, **tanpa persen/ETA palsu**; bila indikator persen tetap dipakai, pertahankan teks bahwa itu mengikuti tahap tercatat.
+- [x] Status gagal: pesan ramah + tombol "Periksa informasi baru"; tombol "Muat ulang status" dijadikan tertiary (polling sudah otomatis).
+- **Bukti:** `SubmissionProgressTest` (5 langkah, status dari `ProcessingStage::stepStates`, `aria-current`, gagal→`error` tanpa meter), `progress.test.mjs` (stepper diperbarui dari payload fallback), `reports/frontend-revamp/after-s2/t26/`.
+- **Catatan:** persen indikator dipertahankan dengan teks "mengikuti tahap yang tercatat"; stepper menggambarkan tahap, bukan waktu.
 - **Penerimaan:** `SubmissionProgressTest`, `PublicPipelineErrorTest`, `tests/Frontend/progress.test.mjs` hijau.
 
 ### T2.7 (L) Halaman hasil
@@ -261,38 +271,50 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 5. **Input Anda** (disclosure): input asli, terjemahan (bila ada), teks hasil ekstraksi, media privat (tetap lewat route `hasil.media`).
 6. **Umpan balik satu klik:** "Apakah hasil ini sesuai?" → Sesuai / Tidak sesuai; komentar opsional muncul setelah memilih. Aturan tetap: hanya pemilik dengan email terverifikasi, sekali kirim.
 7. **Aksi:** Periksa informasi lain · Unduh PDF · **Salin ringkasan** (clipboard saja; isi: label, kalimat penjelas, tanggal; tanpa ID/URL hasil) · Kembali ke riwayat (bila terverifikasi).
-- [ ] Tambahkan struktur & copy; hapus tombol CSV dari halaman ini (T1.5).
-- [ ] PDF (`hasil-pdf.blade.php`) disesuaikan copy-nya; PDF tidak memakai Vite/JS → uji terpisah.
+- [x] Tambahkan struktur & copy; hapus tombol CSV dari halaman ini (T1.5).
+- [x] PDF (`hasil-pdf.blade.php`) disesuaikan copy-nya; PDF tidak memakai Vite/JS → uji terpisah.
 - **Pengujian wajib:** `FinalResultStateTest`, `ResultEvidencePresentationTest`, `GroundedExplanationTest`, `ExplanationDegradationTest`, `GuestSubmissionAccessTest`, `ResultEndpointAuthorizationTest`, `RagRetrieverTest`, test PDF. Tambah test: salin ringkasan tidak memuat ID submission/URL.
+- **Bukti:** `ResultSummaryPresentationTest` (badge + kalimat penjelas + skor tanpa pita, langkah selanjutnya tanpa tautan eksternal, kemiripan rujukan, payload salin tanpa ID/URL, komentar tersembunyi), `PdfResultPresentationTest` (copy PDF + tetap satu halaman), `submission-form.test.mjs`/`result-actions.test.mjs` (sanitasi clipboard), `reports/frontend-revamp/after-s2/t27/`.
+- **Catatan:** kalimat abstention kanonik tetap verbatim di dalam deskripsi; PDF hanya memuat dua langkah pertama agar kontrak satu halaman terjaga.
 - **Penerimaan:** pengguna awam dapat menyebutkan arti hasil & langkah berikutnya; tidak ada klaim kebenaran.
 
 ### T2.8 (M) Riwayat
-- [ ] Daftar berbentuk kartu: cuplikan input, jenis, tanggal, `badge` hasil, tombol "Lihat hasil". Filter dilipat (disclosure "Filter") dengan jumlah filter aktif; ringkasan label sebagai chip di atas daftar.
-- [ ] Tombol "Unduh seluruh riwayat (CSV)" tetap di sini dengan penjelasan bahwa isi = seluruh riwayat akun.
-- [ ] Pertahankan validasi filter, pagination, empty state, `data-history-*` yang dipakai test.
+- [x] Daftar berbentuk kartu: cuplikan input, jenis, tanggal, `badge` hasil, tombol "Lihat hasil". Filter dilipat (disclosure "Filter") dengan jumlah filter aktif; ringkasan label sebagai chip di atas daftar.
+- [x] Tombol "Unduh seluruh riwayat (CSV)" tetap di sini dengan penjelasan bahwa isi = seluruh riwayat akun.
+- [x] Pertahankan validasi filter, pagination, empty state, `data-history-*` yang dipakai test.
+- **Bukti:** `HistoryPresentationTest` (chip ringkasan, filter `<details>` + jumlah aktif, auto-open saat error, kartu + badge, CSV seluruh riwayat), `SubmissionHistoryTest` tetap hijau, `reports/frontend-revamp/after-s2/t28/`.
+- **Catatan:** filter dibuka otomatis hanya ketika validasi gagal agar tautan ringkasan error tidak menunjuk field tersembunyi; tanpa JS tidak ada perubahan perilaku.
 - **Penerimaan:** test riwayat hijau; 375px nyaman dipakai.
 
 ### T2.9 (M) Statistik publik
-- [ ] Grafik tren (Chart.js sudah menjadi dependency; `resources/js/pages/statistics*.js`) tampil **utama**, tabel menjadi fallback/`disclosure` "Lihat data tabel" (tetap ada untuk aksesibilitas).
-- [ ] Tambahkan donut/bar distribusi label (data sama dengan tabel; warna dari token; pola/ikon agar tidak hanya warna).
-- [ ] Penjelasan metodologi (periode, zona waktu, definisi hitungan) dilipat di "Cara angka ini dihitung".
-- [ ] Tambahkan disclosure "Tentang model" (model aktif, tanggal evaluasi) bila data runtime tersedia; **tanpa** klaim akurasi produk.
-- [ ] Tetap menyatakan: ini aktivitas aplikasi, bukan prevalensi hoaks.
+- [x] Grafik tren (Chart.js sudah menjadi dependency; `resources/js/pages/statistics*.js`) tampil **utama**, tabel menjadi fallback/`disclosure` "Lihat data tabel" (tetap ada untuk aksesibilitas).
+- [x] Tambahkan donut/bar distribusi label (data sama dengan tabel; warna dari token; pola/ikon agar tidak hanya warna).
+- [x] Penjelasan metodologi (periode, zona waktu, definisi hitungan) dilipat di "Cara angka ini dihitung".
+- [x] Tambahkan disclosure "Tentang model" (model aktif, tanggal evaluasi) bila data runtime tersedia; **tanpa** klaim akurasi produk.
+- [x] Tetap menyatakan: ini aktivitas aplikasi, bukan prevalensi hoaks.
+- **Bukti:** `ModelStatisticsClaimsTest` (chart utama sebelum tabel, tabel dalam disclosure, data donut = tabel, disclosure metodologi & model tanpa klaim akurasi), `MonthlyStatisticsBoundaryTest` tetap hijau, `lifecycle.test.mjs` (donut + degradasi independen), `reports/frontend-revamp/after-s2/t29/`.
+- **Catatan:** "Tentang model" memakai `ModelVersion::currentActive()` (bukan panggilan runtime BERT) agar halaman publik tetap tanpa HTTP keluar; angka akurasi sengaja tidak ditampilkan.
 - **Penerimaan:** `MonthlyStatisticsBoundaryTest`, `ModelStatisticsClaimsTest` hijau.
 
 ### T2.10 (M) Cara kerja & Tentang
-- [ ] **Pertahankan kedua URL** (`cara-kerja`, `tentang`). Hilangkan duplikasi isi.
-- [ ] **Cara kerja:** `stepper` visual 5 langkah dalam bahasa awam (kirim → ubah jadi teks → terjemahkan bila perlu → analisis model → cari rujukan → penjelasan), bagian "Cara membaca hasil", bagian "Istilah" (render dari glosarium Lampiran A).
-- [ ] **Tentang:** tujuan, siapa yang bisa memakai (tamu vs akun), privasi & akses data ringkas, keterbatasan, konteks proyek (Tugas Akhir), FAQ.
+- [x] **Pertahankan kedua URL** (`cara-kerja`, `tentang`). Hilangkan duplikasi isi.
+- [x] **Cara kerja:** `stepper` visual 5 langkah dalam bahasa awam (kirim → ubah jadi teks → terjemahkan bila perlu → analisis model → cari rujukan → penjelasan), bagian "Cara membaca hasil", bagian "Istilah" (render dari glosarium Lampiran A).
+- [x] **Tentang:** tujuan, siapa yang bisa memakai (tamu vs akun), privasi & akses data ringkas, keterbatasan, konteks proyek (Tugas Akhir), FAQ.
+- **Bukti:** `DocumentationWorkflowContractTest` (stepper 5 langkah tanpa status berjalan, glosarium publik dari `config/glossary.php` tanpa istilah admin, struktur Tentang + 4 FAQ, tidak ada paragraf identik), `reports/frontend-revamp/after-s2/t210/`.
+- **Catatan:** disclaimer model bersama dikecualikan dari aturan "tanpa paragraf identik" karena memang notice legal yang sama di setiap halaman; kalimat batas bukti ("tidak otomatis mendukung prediksi", "tidak membatalkan klasifikasi") dipertahankan di Tentang.
 - **Penerimaan:** tidak ada paragraf yang identik di dua halaman.
 
 ### T2.11 (S) Auth, profil, error
-- [ ] Terapkan komponen/tipografi baru pada `auth/*`, `profile.blade.php`, `errors/*`; copy ramah; tetap aksesibel. Uji `AuthenticationTest`, `ProfileTest`.
+- [x] Terapkan komponen/tipografi baru pada `auth/*`, `profile.blade.php`, `errors/*`; copy ramah; tetap aksesibel. Uji `AuthenticationTest`, `ProfileTest`.
+- **Bukti:** `AuthShellTest` (heading `hl-auth-heading` Inter, satu aksi utama + jalan keluar tamu, tanpa jargon), `ErrorPageTest` (kode HTTP sebagai catatan, tanpa bocoran path), `AuthenticationTest`/`ProfileTest` hijau, `reports/frontend-revamp/after-s2/t211/`.
+- **Catatan:** copy yang sudah dikontrak test dokumentasi dipertahankan verbatim; badge status email di profil memakai teks sebagai pembeda utama.
 
 ### T2.12 (M) QA visual & aksesibilitas tahap 2
-- [ ] Screenshot "after-s2" 375/768/1280 untuk semua halaman publik, simpan di `reports/frontend-revamp/after-s2/`.
-- [ ] Audit: keyboard-only (Tab/Shift+Tab/Enter/Esc), pembaca layar (label/role), zoom 200%, reduced-motion, kontras AA (cek token `--ds-text-muted` pada latar `--ds-bg-subtle`), konsol bebas error, jaringan tanpa 404 aset.
-- [ ] `npm run build` + `node --test tests/Frontend/*.test.mjs` + suite Laravel terkait hijau.
+- [x] Screenshot "after-s2" 375/768/1280 untuk semua halaman publik, simpan di `reports/frontend-revamp/after-s2/`.
+- [x] Audit: keyboard-only (Tab/Shift+Tab/Enter/Esc), pembaca layar (label/role), zoom 200%, reduced-motion, kontras AA (cek token `--ds-text-muted` pada latar `--ds-bg-subtle`), konsol bebas error, jaringan tanpa 404 aset.
+- [x] `npm run build` + `node --test tests/Frontend/*.test.mjs` + suite Laravel terkait hijau.
+- **Bukti:** `reports/frontend-revamp/after-s2/qa/` (27 screenshot 375/768/1280 untuk 9 halaman publik + laporan audit), 117/117 frontend, 917 Laravel lulus, Pint PASS.
+- **Batas:** pembaca layar diuji lewat struktur DOM (bukan NVDA/JAWS), zoom via emulasi 640px@2x, kontras dihitung dari nilai token; halaman admin milik Tahap 3.
 
 **Selesai Tahap 2 bila:** T2.1–T2.12 centang dan bukti screenshot/QA tersimpan.
 

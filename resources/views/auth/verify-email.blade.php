@@ -5,8 +5,8 @@
 
 @section('content')
 <div class="hl-auth-title">
-    <h1>Verifikasi email</h1>
-    <p>Verifikasi email untuk mengakses riwayat dan mengirim umpan balik.</p>
+    <h1 class="hl-auth-heading">Verifikasi email</h1>
+    <p>Verifikasi email untuk membuka riwayat dan mengirim umpan balik.</p>
     <p>Alamat email akun: <strong>{{ auth()->user()->email }}</strong></p>
     <p>Buka tautan verifikasi dari email Anda. Periksa kotak masuk dan folder spam. Jika tautan belum terlihat atau sudah kedaluwarsa, minta tautan baru.</p>
 </div>

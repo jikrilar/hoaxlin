@@ -1,4 +1,5 @@
 import { createScope, defineModule } from '../core/scope.js';
+import { mountCommentReveal, mountCopy } from './result-actions.js';
 import { createFallback, isTerminal, responseError } from '../progress/fallback.js';
 import { observeLivewire } from '../progress/livewire.js';
 
@@ -14,6 +15,9 @@ export function createProgress(root, { clock = root.ownerDocument.defaultView,
     const id = root.dataset.submissionId;
     const initialTerminal = isTerminal(root.dataset.initialStatus);
     const stages = new Set(JSON.parse(root.dataset.progressStages));
+    // Mirrors ProcessingStage::steps(): the checklist only ever reflects the recorded stage.
+    const stepKeys = ['extracting', 'translating', 'classifying', 'retrieving', 'explaining'];
+    const stepOf = stage => stepKeys.indexOf(stage);
     const now = () => clock.Date?.now() ?? Date.now();
     let fallback;
     let native;
@@ -79,6 +83,17 @@ export function createProgress(root, { clock = root.ownerDocument.defaultView,
             bar.setAttribute('aria-valuetext', `${data.progress} persen; ${stageLabel}; status ${knownStatus ? data.status : 'belum tersedia'}`);
             bar.firstElementChild.style.width = `${data.progress}%`;
         }
+        const stepper = element.querySelector('[data-progress-stepper]');
+        if (stepper) {
+            const index = knownStage ? stepOf(data.stage) : -1;
+            for (const [position, step] of [...stepper.querySelectorAll('[data-step]')].entries()) {
+                const status = index === -1 ? 'todo' : (position < index ? 'done' : (position === index ? 'current' : 'todo'));
+                if (step.dataset.status === status) continue;
+                step.dataset.status = status;
+                if (status === 'current') step.setAttribute('aria-current', 'step');
+                else step.removeAttribute('aria-current');
+            }
+        }
         const unavailable = element.querySelector('[data-progress-stage-unavailable]');
         if (unavailable) unavailable.hidden = knownStage;
         const notFinal = element.querySelector('[data-progress-not-final-done]');
@@ -132,4 +147,6 @@ export function createProgress(root, { clock = root.ownerDocument.defaultView,
 
 export const mount = defineModule((body, scope) => {
     for (const root of body.querySelectorAll('[data-page="result"] [data-progress-root]')) scope.own(createProgress(root));
+    for (const button of body.querySelectorAll('[data-page="result"] [data-copy-summary]')) mountCopy(scope, button);
+    for (const section of body.querySelectorAll('[data-page="result"] .hl-result-feedback')) mountCommentReveal(scope, section);
 });

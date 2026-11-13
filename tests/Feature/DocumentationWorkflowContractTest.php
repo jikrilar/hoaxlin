@@ -127,6 +127,123 @@ class DocumentationWorkflowContractTest extends TestCase
         }
     }
 
+    public function test_how_it_works_renders_a_plain_language_five_step_stepper(): void
+    {
+        $html = $this->get(route('cara-kerja'))->assertOk()->getContent();
+        $dom = $this->dom($html);
+
+        $stepper = $dom->query('//ol[@data-stepper]')->item(0);
+        $this->assertNotNull($stepper, 'how-it-works shows the pipeline as a stepper');
+
+        $labels = array_map(
+            fn ($node) => trim($node->textContent),
+            iterator_to_array($dom->query('//ol[@data-stepper]/li//*[contains(@class,"hl-stepper__label")]')),
+        );
+        $this->assertSame(['Ubah jadi teks', 'Terjemahkan bila perlu', 'Analisis model', 'Cari rujukan', 'Penjelasan'], $labels);
+
+        // Plain numbers ("1." … "5."), not badges or shape-wrapped glyphs.
+        $numbers = array_map(
+            fn ($node) => trim($node->textContent),
+            iterator_to_array($dom->query('//ol[@data-stepper]/li//*[contains(@class,"hl-stepper__number")]')),
+        );
+        $this->assertSame(['1.', '2.', '3.', '4.', '5.'], $numbers);
+        $this->assertSame(0, $dom->query('//ol[@data-stepper]//*[contains(@class,"hl-badge")]')->length);
+
+        // A static explainer never marks a step as in progress.
+        $this->assertSame(0, $dom->query('//ol[@data-stepper]/li[@aria-current]')->length);
+        $this->assertSame(5, $dom->query('//ol[@data-stepper]/li')->length);
+    }
+
+    public function test_how_it_works_lists_public_glossary_terms_from_the_single_source(): void
+    {
+        $glossary = config('glossary');
+        $public = array_filter($glossary, fn (string $key) => ! in_array($key, [
+            'f1_score', 'evaluation_accuracy', 'baseline', 'baseline_comparison', 'hot_swap',
+            'incremental_fine_tuning', 'active_inference_status', 'failed_jobs', 'attempts',
+            'error_code', 'curation_data',
+        ], true), ARRAY_FILTER_USE_KEY);
+
+        $html = $this->get(route('cara-kerja'))->assertOk()->getContent();
+        $dom = $this->dom($html);
+
+        $section = $dom->query('//section[.//h2[contains(., "Istilah")]]')->item(0);
+        $this->assertNotNull($section, 'how-it-works explains its terms');
+        $text = $section->textContent;
+        foreach ($public as $entry) {
+            $this->assertStringContainsString($entry['label'], $text);
+            $this->assertStringContainsString($entry['description'], $text);
+        }
+        // Admin-only jargon never leaks into the public glossary.
+        foreach (['F1-score', 'Baseline', 'Data Kurasi', 'Tugas latar belakang gagal'] as $adminOnly) {
+            $this->assertStringNotContainsString($adminOnly, $text);
+        }
+    }
+
+    public function test_about_page_covers_scope_limits_and_faq_without_repeating_how_it_works(): void
+    {
+        $html = $this->get(route('tentang'))->assertOk()->getContent();
+        $dom = $this->dom($html);
+
+        $headings = array_map(
+            fn ($node) => trim($node->textContent),
+            iterator_to_array($dom->query('//main//h2')),
+        );
+        $this->assertSame([
+            'Tujuan Hoaxlin',
+            'Siapa yang dapat menggunakan?',
+            'Privasi dan akses data',
+            'Keterbatasan',
+            'Konteks proyek',
+            'Pertanyaan umum',
+        ], $headings);
+
+        $this->assertSame(4, $dom->query('//main//details[contains(@class,"hl-disclosure")]')->length, 'FAQ answers stay collapsed');
+        $this->assertStringContainsString('Tugas Akhir', $dom->evaluate('string(//main)'));
+
+        // No accuracy or certainty marketing may appear.
+        $main = $dom->evaluate('string(//main)');
+        $this->assertStringNotContainsString('95%+', $main);
+        $this->assertStringNotContainsString('100% akurat', $main);
+        $this->assertDoesNotMatchRegularExpression('/akurasi\s*[:=]\s*\d/i', $main);
+    }
+
+    public function test_how_it_works_and_about_share_no_identical_paragraph(): void
+    {
+        $paragraphs = function (string $route): array {
+            $dom = $this->dom($this->get(route($route))->assertOk()->getContent());
+            $text = [];
+            // The shared model disclaimer is a legal notice and is expected to match verbatim.
+            foreach ($dom->query('//main//p[not(ancestor::*[@data-disclaimer])]') as $node) {
+                $normalized = trim(preg_replace('/\s+/u', ' ', $node->textContent));
+                if (mb_strlen($normalized) > 40) {
+                    $text[] = $normalized;
+                }
+            }
+
+            return $text;
+        };
+
+        $how = $paragraphs('cara-kerja');
+        $about = $paragraphs('tentang');
+        $this->assertNotEmpty($how);
+        $this->assertNotEmpty($about);
+        $this->assertSame([], array_values(array_intersect($how, $about)), 'the two pages must not duplicate a paragraph');
+    }
+
+    private function dom(string $html): DOMXPath
+    {
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document = new DOMDocument;
+            $document->loadHTML('<?xml encoding="UTF-8">'.$html, LIBXML_NONET);
+
+            return new DOMXPath($document);
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+    }
+
     public function test_documented_media_limits_follow_the_same_contract_as_the_examination_form(): void
     {
         config(['media.transcription.max_bytes' => 7 * 1048576, 'media.transcription.max_duration_seconds' => 93]);

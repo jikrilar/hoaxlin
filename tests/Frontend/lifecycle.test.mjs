@@ -435,3 +435,55 @@ test('cancelled reset retains the double-submit guard', async () => {
     assert.equal(form.dispatchEvent(submitEvent()), false);
     cleanup();
 });
+
+test('label distribution chart renders the table values and degrades independently', async () => {
+    const charts = [];
+    const canvas = { isConnected: true, dataset: { statisticsTrend: JSON.stringify([{ label: 'Januari 2026', total: 3, hoax: 1, valid: 1 }]) } };
+    const labelsCanvas = { isConnected: true, dataset: { statisticsLabels: JSON.stringify([
+        { label: 'Prediksi model: Valid', count: 3, tone: 'neutral' },
+        { label: 'Prediksi model: Hoaks', count: 2, tone: 'danger' },
+    ]) } };
+    const panel = { hidden: true }, labelsPanel = { hidden: true };
+    const root = {
+        querySelector: selector => selector === '[data-statistics-trend]' ? canvas
+            : selector === '[data-statistics-labels]' ? labelsCanvas
+                : selector === '[data-statistics-labels-panel]' ? labelsPanel : panel,
+        ownerDocument: { documentElement: {}, defaultView: { getComputedStyle: () => ({ getPropertyValue: () => 'fixture-token' }) } },
+    };
+    const Chart = class {
+        constructor(target, config) { this.target = target; this.config = config; this.destroyed = 0; charts.push(this); }
+        destroy() { this.destroyed++; }
+    };
+    const dispose = createStatisticsModule(async () => ({ default: Chart }))(root);
+    await settle();
+
+    const labelsChart = charts.find(chart => chart.target === labelsCanvas);
+    assert.ok(labelsChart, 'label chart is created');
+    assert.equal(labelsChart.config.type, 'doughnut');
+    assert.deepEqual(labelsChart.config.data.datasets[0].data, [3, 2]);
+    assert.equal(labelsPanel.hidden, false);
+    dispose();
+    assert.equal(labelsChart.destroyed, 1);
+    assert.equal(labelsPanel.hidden, true);
+});
+
+test('invalid label payload keeps the label chart hidden while the trend chart renders', async () => {
+    const charts = [];
+    const canvas = { isConnected: true, dataset: { statisticsTrend: JSON.stringify([{ label: 'Januari 2026', total: 3, hoax: 1, valid: 1 }]) } };
+    const labelsCanvas = { isConnected: true, dataset: { statisticsLabels: JSON.stringify([{ label: '', count: -1, tone: 'purple' }]) } };
+    const panel = { hidden: true }, labelsPanel = { hidden: true };
+    const root = {
+        querySelector: selector => selector === '[data-statistics-trend]' ? canvas
+            : selector === '[data-statistics-labels]' ? labelsCanvas
+                : selector === '[data-statistics-labels-panel]' ? labelsPanel : panel,
+        ownerDocument: { documentElement: {}, defaultView: { getComputedStyle: () => ({ getPropertyValue: () => 'fixture-token' }) } },
+    };
+    const Chart = class { constructor(target) { this.target = target; charts.push(this); } destroy() {} };
+    const dispose = createStatisticsModule(async () => ({ default: Chart }))(root);
+    await settle();
+
+    assert.equal(labelsPanel.hidden, true, 'invalid data never renders a chart');
+    assert.ok(charts.every(chart => chart.target !== labelsCanvas));
+    assert.equal(panel.hidden, false);
+    dispose();
+});

@@ -134,19 +134,21 @@ class SubmissionFormPresentationTest extends TestCase
         $rules = $request->rules()['raw_input'];
         $this->assertContains('min:'.$dom->evaluate('string(//textarea/@minlength)'), $rules);
         $this->assertContains('max:'.$dom->evaluate('string(//textarea/@maxlength)'), $rules);
-        $this->assertSame('POST', $dom->evaluate('string(//form[@id="form-teks"]/@method)'));
-        $this->assertSame('http://localhost/deteksi', $dom->evaluate('string(//form[@id="form-teks"]/@action)'));
-        $this->assertSame('text', $dom->evaluate('string(//form[@id="form-teks"]//input[@name="input_type"]/@value)'));
-        $this->assertSame('fixture-token', $dom->evaluate('string(//form[@id="form-teks"]/input[@name="_token"]/@value)'));
-        $this->assertSame(1, $dom->query('//form[@id="form-teks"]//textarea[@name="raw_input" and @required]')->length);
+        $this->assertSame('POST', $dom->evaluate('string(//form[@id="form-submission"]/@method)'));
+        $this->assertSame('http://localhost/deteksi', $dom->evaluate('string(//form[@id="form-submission"]/@action)'));
+        $this->assertSame('multipart/form-data', $dom->evaluate('string(//form[@id="form-submission"]/@enctype)'));
+        $this->assertSame('text', $dom->evaluate('string(//form[@id="form-submission"]//input[@name="input_type"]/@value)'));
+        $this->assertSame('fixture-token', $dom->evaluate('string(//form[@id="form-submission"]/input[@name="_token"]/@value)'));
+        $this->assertSame(1, $dom->query('//form[@id="form-submission"]//textarea[@name="raw_input" and @required]')->length);
+        $this->assertSame(1, $dom->query('//form[@id="form-submission"]')->length, 'guest gets one form');
         $this->assertSame(1, $dom->query('//input[@name="captcha_answer" and @required and @autocomplete="off"]')->length);
         $this->assertSame(1, $dom->query('//input[@name="website" and @tabindex="-1" and @aria-hidden="true"]')->length);
         $this->assertSame(0, $dom->query('//input[@name="source_url" or @name="media_file"]')->length);
-        $this->assertSame(0, $dom->query('//*[@role="tab" or @role="tabpanel"]')->length);
-        $this->assertSame(1, $dom->query('//button[@type="submit" and @id="submit-teks"]')->length);
+        $this->assertSame(0, $dom->query('//*[@role="tablist" or @role="tab"]')->length, 'guest sees no type chooser');
+        $this->assertSame(1, $dom->query('//form[@id="form-submission"]//button[@type="submit"]')->length);
         $this->assertSame(0, $dom->query('//*[@onsubmit or @onclick or @onchange] | //*[@id="loading-overlay"]')->length);
         $this->assertStringContainsString('bukan verifikasi kebenaran yang definitif', $dom->evaluate('string(//meta[@name="description"]/@content)'));
-        $this->assertSame(1, $dom->query('//*[@id="cara-kerja"]/preceding::*[@id="form-teks"]')->length);
+        $this->assertSame('cek-berita', $dom->evaluate('string(//*[@id="form-submission"]/ancestor::*[@id="cek-berita"]/@id)'), 'the form lives inside the check section');
         $this->assertSame(0, $dom->query('//*[@id="submission-model"]')->length);
     }
 
@@ -163,12 +165,17 @@ class SubmissionFormPresentationTest extends TestCase
         $this->assertSame(0, $dom->query('//script[@id="attack"]')->length);
         $this->assertSame(1, $dom->query('//*[@id="submission-errors" and @role="alert" and @autofocus]')->length);
         $this->assertSame(1, $dom->query('//*[@id="submission-errors"]//a[@href="#teks-input"]')->length);
-        $this->assertSame(1, $dom->query('//*[@id="submission-errors"]//a[@href="#captcha-teks"]')->length);
+        $this->assertSame(1, $dom->query('//*[@id="submission-errors"]//a[@href="#captcha-answer"]')->length);
+        // Errors without a known target stay plain text rather than a dead link.
+        $this->assertSame(2, $dom->query('//*[@id="submission-errors"]//a')->length, 'raw_input and captcha both link to visible fields');
         $this->assertSame('true', $dom->evaluate('string(//textarea/@aria-invalid)'));
         $this->assertStringContainsString('teks-input-error', $dom->evaluate('string(//textarea/@aria-describedby)'));
-        $this->assertSame('captcha-teks-hint captcha-teks-error', $dom->evaluate('string(//input[@name="captcha_answer"]/@aria-describedby)'));
-        $this->assertSame(0, $dom->query('//input[@name="captcha_answer" or @name="website"]/@value')->length);
+        $this->assertSame('captcha-answer-hint captcha-answer-error', $dom->evaluate('string(//input[@name="captcha_answer"]/@aria-describedby)'));
+        // Neither the CAPTCHA answer nor the honeypot may be restored from old input.
+        $this->assertSame('', $dom->evaluate('string(//input[@name="captcha_answer"]/@value)'));
+        $this->assertSame('', $dom->evaluate('string(//input[@name="website"]/@value)'));
         $this->assertStringNotContainsString('spam-marker', $dom->document->saveHTML());
+        $this->assertStringNotContainsString('999', $dom->document->saveHTML());
     }
 
     public static function oldText(): array
@@ -181,14 +188,16 @@ class SubmissionFormPresentationTest extends TestCase
         $this->user = new User;
         $this->session->put('_old_input', ['input_type' => 'video_url', 'source_url' => 'https://example.test/video.mp4']);
         $dom = $this->render();
-        $this->assertSame(4, $dom->query('//*[@data-input-tab]')->length);
-        $this->assertSame('video', $dom->evaluate('string(//*[@data-submission-selector]/@data-active-input)'));
-        $this->assertSame('url', $dom->evaluate('string(//*[@data-submission-selector]/@data-active-video)'));
-        $this->assertSame(0, $dom->query('//*[@data-input-panel or @data-video-panel]/@hidden')->length);
-        $this->assertSame('video_url', $dom->evaluate('string(//form[@id="form-video-url"]//input[@name="input_type"]/@value)'));
+        $this->assertSame(5, $dom->query('//*[@role="tab"]')->length);
+        $this->assertSame(1, $dom->query('//form[@id="form-submission"]')->length, 'one form for every input type');
+        $this->assertSame('video-url', $dom->evaluate('string(//form[@id="form-submission"]/@data-active-tab)'));
+        $this->assertSame('true', $dom->evaluate('string(//*[@id="input-tab-video-url"]/@aria-selected)'));
+        $this->assertSame(0, $dom->query('//*[@id="input-panel-video-url"]/@hidden')->length, 'restored panel is visible');
+        $this->assertSame(0, $dom->query('//*[@id="input-panel-video-url"]//fieldset[@disabled]')->length, 'restored panel is enabled');
+        $this->assertSame('video_url', $dom->evaluate('string(//*[@id="input-panel-video-url"]//input[@name="input_type"]/@value)'));
         $this->assertSame('https://example.test/video.mp4', $dom->evaluate('string(//*[@id="video-url-input"]/@value)'));
-        $this->assertSame(2, $dom->query('//form[@enctype="multipart/form-data"]')->length);
-        $this->assertSame(5, $dom->query('//main//form[@method="POST" and @action="http://localhost/deteksi" and @data-submit-label]/input[@name="_token"]')->length);
+        $this->assertSame(1, $dom->query('//form[@enctype="multipart/form-data"]')->length);
+        $this->assertSame(1, $dom->query('//main//form[@method="POST" and @action="http://localhost/deteksi" and @data-submit-label]/input[@name="_token"]')->length);
     }
 
     public function test_media_presentation_follows_config_and_request_rules_without_restoring_files(): void
@@ -214,14 +223,17 @@ class SubmissionFormPresentationTest extends TestCase
         $this->assertContains('.heic', $image['accept']);
         $this->assertContains('.heif', $image['accept']);
         $this->assertSame(2, $dom->query('//input[@type="url" and @maxlength="2048" and @required]')->length);
+        $this->assertSame(1, $dom->query('//form[@id="form-submission"]//input[@name="captcha_answer" and @required]')->length);
+        $this->assertSame(1, $dom->query('//form[@id="form-submission"]//input[@name="website"]')->length);
         $this->assertSame(0, $dom->query('//input[@type="file"]/@value')->length);
         $this->assertStringNotContainsString('secret-file-marker', $dom->document->saveHTML());
-        foreach (['form-teks' => 'text', 'form-url' => 'url', 'form-gambar' => 'image', 'form-video' => 'video', 'form-video-url' => 'video_url'] as $id => $domain) {
-            $this->assertSame($domain, $dom->evaluate('string(//form[@id="'.$id.'"]//input[@name="input_type"]/@value)'));
-            $this->assertSame(1, $dom->query('//form[@id="'.$id.'"]//input[@name="captcha_answer" and @required]')->length);
-            $this->assertSame(1, $dom->query('//form[@id="'.$id.'"]//input[@name="website"]')->length);
-            $this->assertSame(0, $dom->query('//form[@id="'.$id.'"]//fieldset/@disabled')->length);
+        foreach (['input-panel-text' => 'text', 'input-panel-url' => 'url', 'input-panel-image' => 'image', 'input-panel-video' => 'video', 'input-panel-video-url' => 'video_url'] as $panel => $domain) {
+            $this->assertSame($domain, $dom->evaluate('string(//*[@id="'.$panel.'"]//input[@name="input_type"]/@value)'));
+            $this->assertSame(1, $dom->query('//*[@id="'.$panel.'"]//fieldset[@data-input-fields]')->length);
         }
+        // Exactly one panel is enabled for the no-JS render; the rest cannot be submitted.
+        $this->assertSame(1, $dom->query('//fieldset[@data-input-fields][not(@disabled)]')->length);
+        $this->assertSame(4, $dom->query('//fieldset[@data-input-fields][@disabled]')->length);
     }
 
     #[DataProvider('oldUrls')]
@@ -235,9 +247,10 @@ class SubmissionFormPresentationTest extends TestCase
         $dom = $this->render();
         $this->assertSame($expected, $dom->evaluate('string(//*[@id="video-url-input"]/@value)'));
         $this->assertSame(0, $dom->query('//script[@id="attack"]')->length);
-        $this->assertSame(1, $dom->query('//*[@id="submission-errors"]//a[@href="#captcha-video-url"]')->length);
-        $this->assertSame('true', $dom->evaluate('string(//*[@id="video-url-input"]/@aria-invalid)'));
-        $this->assertStringContainsString('video-url-input-error', $dom->evaluate('string(//*[@id="video-url-input"]/@aria-describedby)'));
+        $this->assertSame(1, $dom->query('//*[@id="submission-errors"]//a[@href="#captcha-answer"]')->length);
+        // URL panels render the raw input element, so only the describedby/error wiring applies.
+        $this->assertSame(1, $dom->query('//*[@id="video-url-input-client-error" and @role="alert"]')->length);
+        $this->assertSame('video-url-input-client-error', $dom->evaluate('string(//*[@id="video-url-input"]/@aria-describedby)'));
         $this->assertSame(0, $dom->query('//input[@name="captcha_answer"]/@value')->length);
     }
 
@@ -246,9 +259,29 @@ class SubmissionFormPresentationTest extends TestCase
         return ['array' => [['invalid'], ''], 'markup' => ['" /><script id="attack">x</script>', '" /><script id="attack">x</script>']];
     }
 
+    private function activeTabKey(): string
+    {
+        $type = $this->session?->get('_old_input')['input_type'] ?? 'text';
+
+        return match ($type) {
+            'url' => 'url', 'image' => 'image', 'video' => 'video', 'video_url' => 'video-url', default => 'text',
+        };
+    }
+
     private function render(): DOMXPath
     {
-        $html = $this->app['view']->make('welcome', ['captchaQuestion' => '2 + 3', 'submissionOptions' => SubmissionFormOptions::from(new TranscriptionMediaContract)])->render();
+        $html = $this->app['view']->make('welcome', [
+            'captchaQuestion' => '2 + 3',
+            'submissionOptions' => SubmissionFormOptions::from(new TranscriptionMediaContract),
+            'activeTabKey' => $this->activeTabKey(),
+            'inputTabs' => [
+                ['key' => 'text', 'label' => 'Teks'],
+                ['key' => 'url', 'label' => 'Tautan artikel'],
+                ['key' => 'image', 'label' => 'Gambar'],
+                ['key' => 'video', 'label' => 'Video'],
+                ['key' => 'video-url', 'label' => 'Tautan video'],
+            ],
+        ])->render();
         $previous = libxml_use_internal_errors(true);
         try {
             $document = new DOMDocument;

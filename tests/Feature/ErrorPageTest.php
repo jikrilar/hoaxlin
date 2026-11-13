@@ -32,6 +32,24 @@ class ErrorPageTest extends TestCase
         config(['app.debug' => false]);
     }
 
+    public function test_error_pages_speak_plainly_and_never_leak_technical_detail(): void
+    {
+        foreach ([403 => 'Akses tidak diizinkan', 404 => 'Halaman atau hasil tidak ditemukan', 500 => 'Layanan mengalami kendala'] as $code => $title) {
+            Route::get('/_fixture/status-'.$code, fn () => throw new HttpException($code, 'Existing HTTP message'));
+            $response = $this->get('/_fixture/status-'.$code);
+            $html = $response->getContent();
+
+            $response->assertSee($title);
+            // The status code stays as a small technical footnote, not the headline.
+            $this->assertStringContainsString('Kode HTTP '.$code, $html);
+            $this->assertStringContainsString('hl-error-code', $html);
+            $this->assertStringContainsString('class="hl-heading-editorial"', $html);
+            $this->assertStringContainsString('hl-error-actions', $html);
+            // Friendly recovery text is present and no stack trace or path leaks.
+            $this->assertDoesNotMatchRegularExpression('/\.php|vendor\/|Trace|Exception/i', strip_tags($html));
+        }
+    }
+
     #[DataProvider('errorCodes')]
     public function test_html_errors_keep_their_status_and_headers_with_safe_native_recovery(int $code, string $title): void
     {

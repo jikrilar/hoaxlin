@@ -38,3 +38,37 @@ test('upload extension/MIME pairs differ from remote formats; unknown MIME stays
     assert.equal(fileError({ name: 'file.heic', type: 'image/heic', size: 10 }, 'image', image), '');
     assert.match(fileError({ name: 'file.svg', type: 'image/svg+xml', size: 10 }, 'image', image), /Format gambar/);
 });
+
+function singleFormFixture() {
+    const make = id => ({
+        id, hidden: false, disabled: false,
+        closest: () => null,
+    });
+    const panels = ['text', 'url', 'image'].map(key => {
+        const panel = make(`input-panel-${key}`);
+        const fields = Object.assign(new EventTarget(), { disabled: false });
+        fields.closest = () => panel;
+        return { panel, fields };
+    });
+    const form = Object.assign(new EventTarget(), {
+        dataset: { activeTab: 'url' },
+        querySelectorAll: () => panels.map(p => p.fields),
+    });
+    const root = { querySelector: selector => selector === '[data-submission-form]' ? form : null, querySelectorAll: () => [] };
+    return { root, form, panels };
+}
+
+test('single-form tab sync keeps exactly one panel enabled', async () => {
+    const { mountMediaInputs } = await import('../../resources/js/pages/submission-media.js');
+    const { root, form, panels } = singleFormFixture();
+    const scope = { listen: (target, type, handler) => target.addEventListener(type, handler), own: () => {} };
+    mountMediaInputs(root, scope);
+
+    assert.deepEqual(panels.map(p => p.fields.disabled), [true, false, true]);
+    assert.deepEqual(panels.map(p => p.panel.hidden), [true, false, true]);
+
+    form.dispatchEvent(new CustomEvent('tabchange', { detail: { key: 'image' } }));
+    assert.equal(form.dataset.activeTab, 'image');
+    assert.deepEqual(panels.map(p => p.fields.disabled), [true, true, false]);
+    assert.deepEqual(panels.map(p => p.panel.hidden), [true, true, false]);
+});

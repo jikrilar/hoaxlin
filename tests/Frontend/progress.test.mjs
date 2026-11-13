@@ -243,3 +243,25 @@ test('module mount is idempotent and cleanup removes every resource before remou
     const body = new Node(); body.querySelectorAll = () => [f.root]; const cleanup = mount(body); assert.equal(mount(body), cleanup); await f.clock.advance(2000); assert.equal(f.requests.length, 1);
     cleanup(); assert.equal(f.clock.jobs.size, 0); assert.equal(f.observers.size, 0); const again = mount(body); await f.clock.advance(2000); assert.equal(f.requests.length, 2); again();
 });
+
+test('fallback polling advances the stepper from the recorded stage only', async () => {
+    const f = fixture({
+        fetch: async () => response(payload(101, { status: 'processing', processing_stage: 'retrieving', stage_label: 'Mencari rujukan terkait', progress: 60 })),
+    });
+    const elements = ['extracting', 'translating', 'classifying', 'retrieving', 'explaining'].map(key => ({
+        dataset: { status: 'todo' }, attributes: {},
+        setAttribute(name, value) { this.attributes[name] = value; },
+        removeAttribute(name) { delete this.attributes[name]; },
+    }));
+    const stepper = { querySelectorAll: () => elements };
+    f.el.nodes.set('[data-progress-stepper]', stepper);
+    runtime(f, { registered: false });
+    const dispose = f.mountProgress();
+    await f.clock.advance(2000);
+
+    const steps = elements;
+    assert.deepEqual(steps.map(s => s.dataset.status), ['done', 'done', 'done', 'current', 'todo']);
+    assert.equal(steps[3].attributes['aria-current'], 'step');
+    assert.equal(steps[0].attributes['aria-current'], undefined);
+    dispose();
+});

@@ -128,12 +128,13 @@ class GuestSubmissionAccessTest extends TestCase
     {
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('id="form-teks"', false)
+            ->assertSee('id="form-submission"', false)
             ->assertSee('name="input_type" value="text"', false)
-            ->assertDontSee('id="tab-teks"', false)
-            ->assertDontSee('id="tab-gambar"', false)
-            ->assertDontSee('id="tab-video"', false)
-            ->assertDontSee('id="tab-url"', false)
+            ->assertDontSee('id="input-tab-text"', false)
+            ->assertDontSee('id="input-tab-image"', false)
+            ->assertDontSee('id="input-tab-video"', false)
+            ->assertDontSee('id="input-tab-url"', false)
+            ->assertDontSee('role="tablist"', false)
             ->assertDontSee('name="input_type" value="image"', false)
             ->assertDontSee('name="input_type" value="video"', false)
             ->assertDontSee('name="input_type" value="video_url"', false)
@@ -142,9 +143,9 @@ class GuestSubmissionAccessTest extends TestCase
         $this->actingAs(User::factory()->create())
             ->get(route('home'))
             ->assertOk()
-            ->assertSee('id="tab-gambar"', false)
-            ->assertSee('id="tab-video"', false)
-            ->assertSee('id="tab-url"', false);
+            ->assertSee('id="input-tab-image"', false)
+            ->assertSee('id="input-tab-video"', false)
+            ->assertSee('id="input-tab-url"', false);
     }
 
     /** @return array{Submission, string} */

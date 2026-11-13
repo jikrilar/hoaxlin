@@ -7,8 +7,8 @@
 
 @section('content')
 <div class="hl-auth-title">
-    <h1>Lupa kata sandi?</h1>
-    <p>Masukkan alamat email akun Anda untuk meminta tautan reset kata sandi.</p>
+    <h1 class="hl-auth-heading">Lupa kata sandi?</h1>
+    <p>Masukkan email akun Anda. Kami akan mengirim tautan untuk membuat kata sandi baru.</p>
 </div>
 
 <form method="POST" action="{{ route('password.email') }}" id="forgot-form" class="hl-auth-form" data-submit-label="Mengirim...">

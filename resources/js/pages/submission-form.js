@@ -12,9 +12,9 @@ export function textError(value, minimum, maximum) {
 
 export const mount = defineModule((root, scope) => {
     mountMediaInputs(root, scope);
-    const form = root.querySelector('[data-text-submission]');
-    if (!form) return;
-    const input = form.querySelector('[name="raw_input"]');
+    const form = root.querySelector('[data-submission-form]');
+    const input = form?.querySelector('[data-text-input]');
+    if (!form || !input) return;
     const counter = form.querySelector('[data-text-count]');
     const error = form.querySelector('[data-text-error]');
     const status = form.querySelector('[data-submission-status]');
@@ -38,7 +38,7 @@ export const mount = defineModule((root, scope) => {
         input.setAttribute('aria-invalid', result || serverInvalid === 'true' ? 'true' : 'false');
     });
     scope.listen(form, 'submit', event => {
-        if (event.defaultPrevented) return;
+        if (event.defaultPrevented || input.disabled) return;
         if (validate()) {
             event.preventDefault();
             input.reportValidity();

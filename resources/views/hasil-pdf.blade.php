@@ -38,6 +38,7 @@
         .metadata th { width: 35%; font-weight: normal; color: #596159; padding-right: 10pt; }
         .text { white-space: pre-wrap; }
         .footer { margin-top: 12pt; padding-top: 8pt; border-top: 0.5pt solid #DADDD7; page-break-inside: avoid; }
+
     </style>
 </head>
 <body>
@@ -50,16 +51,16 @@
 
     <div class="prediction {{ $prediction['tone'] }}">
         <p class="prediction-label">{{ $prediction['text'] }}</p>
-        @if($prediction['abstained'])
-            <p>Ini bukan bukti bahwa informasi benar atau palsu.</p>
-        @endif
+        {{-- Same plain-language sentence as the web page (T2.7); no extra truth claims. --}}
+        <p>{{ $prediction['description'] }}</p>
     </div>
     <p>Hasil merupakan prediksi model, bukan verifikasi kebenaran yang definitif.</p>
     <table class="metadata">
         <tr><th>Skor Keyakinan Model</th><td>{{ $score ?? 'Tidak tersedia' }}</td></tr>
         <tr><th>Versi model analisis</th><td>{{ filled($result->model_version) ? $result->model_version : 'Tidak tersedia' }}</td></tr>
     </table>
-    <p class="hint">Skor ini menunjukkan keyakinan model analisis pada prediksinya, bukan persentase kebenaran berita.</p>
+    <p class="hint">Skor ini menunjukkan keyakinan model analisis pada prediksinya, bukan persentase kebenaran berita. {{-- Compact next steps keep the one-page contract. --}}<strong>Langkah selanjutnya:</strong> {{ implode(' ', array_slice(DetectionPresentation::nextSteps($result->label), 0, 2)) }}</p>
+    {{-- Same static steps as the web page, compacted so the PDF keeps its one-page contract. --}}
 
     <h2>Input dan asal data</h2>
     <p>Jenis input: {{ DetectionPresentation::inputType($submission->input_type) }}</p>
