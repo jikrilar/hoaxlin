@@ -407,11 +407,18 @@ Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data K
 - **Catatan agent:** dua kapabilitas hilang bersama resource dan **dipulihkan di UI**, bukan dengan melonggarkan test — pencarian berdasarkan versi model classifier kini ada di kolom "Hasil classifier" daftar Pemeriksaan, dan tooltip glossary tahap/percobaan/kode kendala ditambahkan ke timeline detail. Tabel assertion yang dipindahkan didaftar di laporan bukti.
 
 ### T3.7 (M) Umpan Balik: alur tinjau
-- [ ] Migrasi **additive & reversible**: `feedback.reviewed_at` (nullable timestamp), `feedback.reviewed_by` (nullable FK `users`, `nullOnDelete`). Update model/factory.
-- [ ] Daftar: tab **Perlu ditinjau** (belum `reviewed_at`) · Tidak sesuai · Semua. Aksi: **Tandai sudah ditinjau** (single & bulk), lihat Pemeriksaan terkait, ekspor CSV.
-- [ ] Aksi **Tambahkan ke Data Kurasi** disiapkan sebagai tombol (diimplementasikan penuh di T4.3); sampai T4.3 selesai, tombol tidak ditampilkan.
-- [ ] Audit log untuk "Tandai ditinjau" (allowlist).
+- [x] Migrasi **additive & reversible**: `feedback.reviewed_at` (nullable timestamp), `feedback.reviewed_by` (nullable FK `users`, `nullOnDelete`). Update model/factory.
+  - `2026_11_13_000002_add_review_columns_to_feedback_table.php` (`dropConstrainedForeignId` + `dropColumn` di `down`, data lama tidak disentuh). Model: `reviewed_at` cast datetime, scope `pendingReview()`/`reviewed()`, relasi `reviewer()`. Factory: default `null` + state `reviewed()`.
+- [x] Daftar: tab **Perlu ditinjau** (belum `reviewed_at`) · Tidak sesuai · Semua. Aksi: **Tandai sudah ditinjau** (single & bulk), lihat Pemeriksaan terkait, ekspor CSV.
+  - `ListFeedback::getTabs()` (Perlu ditinjau default, badge jumlah), `MarkFeedbackReviewedAction` di record + toolbar + header detail, kolom "Status tinjau" (badge+ikon+tooltip peninjau). Tautan Pemeriksaan dan ekspor CSV dari T3.3 dipertahankan.
+- [x] Aksi **Tambahkan ke Data Kurasi** disiapkan sebagai tombol (diimplementasikan penuh di T4.3); sampai T4.3 selesai, tombol tidak ditampilkan.
+  - Tidak dirender sama sekali; diuji `assertTableActionDoesNotExist('addToCuration')` pada daftar dan detail.
+- [x] Audit log untuk "Tandai ditinjau" (allowlist).
+  - `App\Services\Admin\FeedbackReview` menulis `feedback_reviewed` dengan metadata hanya `count` + `feedback_ids`; komentar pengguna tidak pernah disalin. `MonitoringPresentation` (label/warna/ikon/target/metadata) dan filter Log Admin diperbarui.
 - **Penerimaan:** `FeedbackTest`/test terkait + test baru hijau.
+  - `tests/Feature/AdminFeedbackReviewTest.php` (16 test) + `FeedbackTest`, `AdminReadOnlyResourcesTest`, `AdminMonitoringResourcesTest`, `AdminTableStandardTest` hijau; suite penuh 1023 lulus.
+- **Bukti:** `reports/frontend-revamp/after-s3/feedback-review.md` + `t37-*.png`.
+- **Catatan agent:** cacat ditemukan saat verifikasi browser dan diperbaiki — badge "Status tinjau" tidak merender teks karena closure `?string` tidak cocok dengan state `Carbon` dari cast `reviewed_at`; kini memakai `mixed`.
 
 ### T3.8 (M) Versi Model: ringkas & jelas
 - [ ] Kolom default: Versi · Status (badge) · Akurasi · Dibanding baseline · Aktif · Dibuat. Kolom lain (Baris dataset, F1, Durasi) toggleable-hidden.

@@ -56,6 +56,7 @@ class AdminLogResource extends Resource
                 SelectFilter::make('action')->label('Tindakan')->options([
                     'create' => 'Buat', 'update' => 'Ubah', 'delete' => 'Hapus',
                     'submission_retried' => 'Pemeriksaan dicoba ulang',
+                    'feedback_reviewed' => 'Umpan balik ditinjau',
                 ]),
             ])
             ->filtersLayout(FiltersLayout::AboveContent)

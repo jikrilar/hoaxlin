@@ -19,12 +19,15 @@ class Feedback extends Model
         'user_id',
         'is_correct',
         'comment',
+        'reviewed_at',
+        'reviewed_by',
     ];
 
     protected function casts(): array
     {
         return [
             'is_correct' => 'boolean',
+            'reviewed_at' => 'datetime',
         ];
     }
 
@@ -36,6 +39,22 @@ class Feedback extends Model
     public function scopeIncorrect(Builder $query): void
     {
         $query->where('is_correct', false);
+    }
+
+    /** Feedback nobody has reviewed yet (T3.7). */
+    public function scopePendingReview(Builder $query): void
+    {
+        $query->whereNull('reviewed_at');
+    }
+
+    public function scopeReviewed(Builder $query): void
+    {
+        $query->whereNotNull('reviewed_at');
+    }
+
+    public function isReviewed(): bool
+    {
+        return $this->reviewed_at !== null;
     }
 
     public function scopeForUser(Builder $query, User|int $user): void
@@ -51,5 +70,10 @@ class Feedback extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

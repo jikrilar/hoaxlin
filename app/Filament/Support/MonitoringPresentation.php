@@ -45,6 +45,7 @@ final class MonitoringPresentation
             'login' => 'Masuk', 'dataset_updated' => 'Pembaruan dataset', 'user_updated' => 'Pembaruan pengguna',
             'system_configuration_updated' => 'Pembaruan konfigurasi',
             'submission_retried' => 'Pemeriksaan dicoba ulang',
+            'feedback_reviewed' => 'Umpan balik ditinjau',
             default => 'Tindakan tidak dikenali',
         };
     }
@@ -53,7 +54,7 @@ final class MonitoringPresentation
     {
         return match ($state) {
             'delete' => 'danger',
-            'update', 'dataset_updated', 'user_updated', 'system_configuration_updated', 'submission_retried' => 'warning',
+            'update', 'dataset_updated', 'user_updated', 'system_configuration_updated', 'submission_retried', 'feedback_reviewed' => 'warning',
             'create', 'login' => 'success',
             default => 'gray',
         };
@@ -65,6 +66,7 @@ final class MonitoringPresentation
             'create' => Heroicon::OutlinedPlusCircle,
             'update', 'dataset_updated', 'user_updated', 'system_configuration_updated' => Heroicon::OutlinedPencilSquare,
             'submission_retried' => Heroicon::OutlinedArrowPath,
+            'feedback_reviewed' => Heroicon::OutlinedCheckCircle,
             'delete' => Heroicon::OutlinedTrash,
             'login' => Heroicon::OutlinedShieldCheck,
             default => Heroicon::OutlinedQuestionMarkCircle,
@@ -73,7 +75,7 @@ final class MonitoringPresentation
 
     public static function target(?string $state): string
     {
-        return in_array($state, ['users', 'datasets', 'submissions', 'model_versions', 'system'], true) ? $state : 'Target tidak dikenali';
+        return in_array($state, ['users', 'datasets', 'submissions', 'model_versions', 'feedback', 'system'], true) ? $state : 'Target tidak dikenali';
     }
 
     public static function service(?string $state): string
@@ -141,6 +143,12 @@ final class MonitoringPresentation
         if (is_array($metadata) && array_key_exists('submission_ids', $metadata)) {
             $ids = $metadata['submission_ids'];
             $safe['submission_ids'] = is_array($ids) && $ids !== [] && array_is_list($ids)
+                ? array_values(array_filter(array_map(fn ($id): ?int => self::unsignedInteger($id), $ids), fn (?int $id): bool => $id !== null))
+                : self::HIDDEN;
+        }
+        if (is_array($metadata) && array_key_exists('feedback_ids', $metadata)) {
+            $ids = $metadata['feedback_ids'];
+            $safe['feedback_ids'] = is_array($ids) && $ids !== [] && array_is_list($ids)
                 ? array_values(array_filter(array_map(fn ($id): ?int => self::unsignedInteger($id), $ids), fn (?int $id): bool => $id !== null))
                 : self::HIDDEN;
         }
