@@ -280,3 +280,18 @@
         .fi-panel-admin .hl-admin-kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
 }
+
+@layer components {
+    /* T3.5 submission detail: evidence list and processing timeline. */
+    .fi-panel-admin .hl-admin-evidence, .fi-panel-admin .hl-admin-timeline { display: grid; gap: var(--ds-space-3); margin: 0; padding: 0; list-style: none; }
+    .fi-panel-admin .hl-admin-evidence__item, .fi-panel-admin .hl-admin-timeline__item { padding: var(--ds-space-4); border: var(--ds-border-width) solid var(--ds-border-subtle); border-radius: var(--ds-radius-md); background: var(--ds-bg-surface); }
+    .fi-panel-admin .hl-admin-evidence__title, .fi-panel-admin .hl-admin-timeline__heading { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2); margin: 0; color: var(--ds-text-primary); }
+    .fi-panel-admin .hl-admin-evidence__facts, .fi-panel-admin .hl-admin-timeline__facts { display: grid; gap: var(--ds-space-2); margin-block: var(--ds-space-3); }
+    .fi-panel-admin .hl-admin-evidence__facts dt, .fi-panel-admin .hl-admin-timeline__facts dt { color: var(--ds-text-muted); font-size: var(--ds-type-label-size); }
+    .fi-panel-admin .hl-admin-evidence__facts dd, .fi-panel-admin .hl-admin-timeline__facts dd { margin: 0; color: var(--ds-text-body); font-size: var(--ds-type-body-sm-size); overflow-wrap: anywhere; }
+    .fi-panel-admin .hl-admin-evidence__snippet { margin: 0; padding-inline-start: var(--ds-space-3); border-inline-start: var(--ds-border-width) solid var(--ds-border-subtle); color: var(--ds-text-body); font-size: var(--ds-type-body-sm-size); }
+    .fi-panel-admin .hl-admin-timeline__metadata { margin-block-start: var(--ds-space-2); max-inline-size: 100%; overflow-x: auto; color: var(--ds-text-muted); font-family: var(--ds-font-mono); font-size: var(--ds-type-body-sm-size); white-space: pre-wrap; overflow-wrap: anywhere; }
+    @media (min-width: 48rem) {
+        .fi-panel-admin .hl-admin-evidence__facts, .fi-panel-admin .hl-admin-timeline__facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+}

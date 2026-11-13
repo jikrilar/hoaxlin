@@ -35,6 +35,21 @@ class SubmissionRecovery
             );
     }
 
+    /**
+     * Failed or stalled rows: the same population the "Perlu tindakan" tab and the
+     * retry action use, so the count, the list, and the button never disagree.
+     */
+    public function actionableQuery(): Builder
+    {
+        $cutoff = now()->subMinutes($this->stale->staleAfterMinutes());
+
+        return Submission::query()->where(fn (Builder $query) => $query
+            ->where('status', 'failed')
+            ->orWhere(fn (Builder $inner) => $inner
+                ->whereIn('status', ['pending', 'processing'])
+                ->where('updated_at', '<=', $cutoff)));
+    }
+
     public function isRetryable(Submission $submission): bool
     {
         return $submission->isFailed() || $this->isStalled($submission);

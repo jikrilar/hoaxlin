@@ -383,11 +383,18 @@ Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data K
 - **Catatan agent:** cacat visual ditemukan saat verifikasi browser dan diperbaiki — sel tabel menyusut di bawah kontennya sehingga tanggal/aksi terpotong ("13:4"); kini `min-inline-size: max-content` dan overflow tetap di dalam kartu.
 
 ### T3.5 (L) Pemeriksaan: tab & detail (menggantikan Hasil Deteksi + Processing Events)
-- [ ] Daftar Pemeriksaan: tab **Perlu tindakan** (gagal/tertahan) · Diproses · Selesai · Semua, dengan badge jumlah.
-- [ ] Halaman detail (infolist): Ringkasan (pengguna/tamu, jenis, waktu, status) · **Hasil** (label, skor, versi model, waktu inferensi, cache — data yang dipindah dari publik di T1.4) · **Rujukan** (daftar evidence) · **Timeline pemrosesan** (relation manager/infolist dari `SubmissionProcessingEvent`: tahap, hasil operasi, layanan, percobaan, durasi, kode kendala) · **Terjemahan** (provider/model/cache) · tindakan (Coba lagi).
-- [ ] **Tidak menambah eksposur** isi pengguna melebihi yang sudah diizinkan sekarang (AGENTS §3: jangan membaca/mengekspor payload pengguna untuk laporan). Pertahankan `read-only`.
-- [ ] Tautan "Buka tampilan pengguna" (hasil publik) hanya untuk admin sesuai `SubmissionAccess`.
+- [x] Daftar Pemeriksaan: tab **Perlu tindakan** (gagal/tertahan) · Diproses · Selesai · Semua, dengan badge jumlah.
+  - `ListSubmissions::getTabs()` memakai `HasTabs` bawaan Filament 5 (`#[Url(as: 'tab')]`). "Perlu tindakan" memakai `SubmissionRecovery::actionableQuery()` — definisi yang sama dengan aksi "Coba lagi" (T3.4) dan widget dashboard. Default tetap **Semua** agar populasi yang sudah diuji tidak berubah; "Diproses" sengaja memuat baris tertahan juga.
+- [x] Halaman detail (infolist): Ringkasan (pengguna/tamu, jenis, waktu, status) · **Hasil** (label, skor, versi model, waktu inferensi, cache — data yang dipindah dari publik di T1.4) · **Rujukan** (daftar evidence) · **Timeline pemrosesan** (relation manager/infolist dari `SubmissionProcessingEvent`: tahap, hasil operasi, layanan, percobaan, durasi, kode kendala) · **Terjemahan** (provider/model/cache) · tindakan (Coba lagi).
+  - `SubmissionInfolist` kini berisi enam bagian itu; Rujukan dan Timeline memakai `ViewEntry` + view khusus (`submission-evidence`, `submission-timeline`). Aksi "Coba lagi" sudah ada di header sejak T3.4. Field `DetectionResult` yang dulu hanya ada di resource Hasil Deteksi (konteks record, status & isi penjelasan, model penjelasan, cache) dan kolom Processing Events (tahap, hasil, layanan, percobaan, durasi, kode kendala, metadata allowlist) kini tersedia di halaman ini.
+- [x] **Tidak menambah eksposur** isi pengguna melebihi yang sudah diizinkan sekarang (AGENTS §3: jangan membaca/mengekspor payload pengguna untuk laporan). Pertahankan `read-only`.
+  - Halaman tetap read-only (tanpa aksi edit/hapus); `guest_access_token_hash` tidak pernah dipilih, media tetap teks path privat tanpa URL publik, dan timeline memakai `MonitoringPresentation::eventMetadata()` yang sudah meredaksi nilai tak dikenal.
+- [x] Tautan "Buka tampilan pengguna" (hasil publik) hanya untuk admin sesuai `SubmissionAccess`.
+  - Hanya dirender untuk submission dengan `user_id` (admin diizinkan membuka submission terdaftar). Submission tamu tidak diberi tautan karena admin tidak memegang capability tamu — tautan itu akan selalu 404 (`ResultEndpointAuthorizationTest`).
 - **Penerimaan:** semua data yang sebelumnya hanya tersedia di Hasil Deteksi/Processing Events dapat diakses dari detail Pemeriksaan.
+  - Terverifikasi di browser: tab badge 2/1/2/4 dan populasi tiap tab cocok; detail menampilkan 6 bagian, 3 rujukan urut peringkat 1-2-3, 4 event timeline urut waktu, tanpa overflow di 375/768/1280.
+- **Bukti:** `tests/Feature/AdminSubmissionDetailTest.php` (15 test), `reports/frontend-revamp/after-s3/submission-detail.md` + `detail-*.png`.
+- **Catatan agent:** `MonitoringPresentation::eventMetadata()` memang meredaksi `model_version` dan `input_trace` (allowlist lama, diuji `AdminMonitoringResourcesTest`); detail tidak melonggarkannya.
 
 ### T3.6 (M) Hapus resource duplikat
 - [ ] Setelah T3.5 lulus: hapus `DetectionResultResource` dan `SubmissionProcessingEventResource` beserta halaman/tabel/policy-nya, serta entri di `AdminPanelProvider` (scopes `read-only-notice`). Migrasikan test yang relevan ke Pemeriksaan (jangan menghapus assertion keamanan/otorisasi — pindahkan).
