@@ -325,8 +325,10 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 **Tujuan:** admin melihat kondisi sistem sekilas, menemukan yang perlu ditindak, dan menindaklanjutinya tanpa terminal. Konten pengguna tidak diekspos lebih dari yang sudah ada.
 
 ### T3.1 (M) Tema admin
-- [ ] `resources/css/filament/admin/theme.css`: terapkan token tipografi/gerak Tahap 2 (palet tetap; peta `colors()` di `AdminPanelProvider` harus tetap selaras dengan `design-tokens.css`). Jangan menyentuh aset vendor Filament.
-- [ ] Standar tabel/form/badge/notification admin; reduced-motion dihormati.
+- [x] `resources/css/filament/admin/theme.css`: terapkan token tipografi/gerak Tahap 2 (palet tetap; peta `colors()` di `AdminPanelProvider` harus tetap selaras dengan `design-tokens.css`). Jangan menyentuh aset vendor Filament.
+- [x] Standar tabel/form/badge/notification admin; reduced-motion dihormati.
+- **Bukti:** `tests/Frontend/admin-theme.test.mjs` (import token, skala tipografi, motion, palet selaras, tone badge), `AdminThemeTokensTest` (colors() = token, font lokal, mode terang, entry Vite), `reports/frontend-revamp/after-s3/`.
+- **Catatan:** selektor mengikuti kelas Filament yang nyata (`fi-ta-header-cell`, `fi-fo-field-label`, `fi-badge.fi-color-*`); aset vendor tidak diubah.
 
 ### T3.2 (L) Dashboard
 **Tata letak (urut):**

@@ -22,9 +22,101 @@
         font-weight: var(--ds-font-weight-semibold);
     }
 
+    /* Stage-2 type roles apply to admin chrome: UI face, h2 step for page titles. */
     .fi-panel-admin :is(.fi-header-heading, .fi-simple-header-heading) {
         color: var(--ds-text-primary);
+        font-family: var(--ds-font-ui);
+        font-size: var(--ds-type-h2-size);
         font-weight: var(--ds-font-weight-semibold);
+        line-height: var(--ds-type-h2-leading);
+        letter-spacing: var(--ds-type-h2-tracking);
+    }
+
+    .fi-panel-admin :is(.fi-section-header-heading, .fi-ta-header-heading) {
+        font-family: var(--ds-font-ui);
+        font-size: var(--ds-type-h3-size);
+        font-weight: var(--ds-font-weight-semibold);
+        line-height: var(--ds-type-h3-leading);
+        letter-spacing: var(--ds-type-h3-tracking);
+    }
+
+    .fi-panel-admin :is(.fi-sidebar-group-label, .fi-ta-header-cell, .fi-fo-field-label) {
+        font-size: var(--ds-type-label-size);
+        font-weight: var(--ds-font-weight-medium);
+        line-height: var(--ds-type-label-leading);
+        letter-spacing: var(--ds-type-label-tracking);
+    }
+
+    /* Tables: same rhythm and numerals as the public data tables. */
+    .fi-panel-admin .fi-ta {
+        font-size: var(--ds-type-body-sm-size);
+        line-height: var(--ds-type-body-sm-leading);
+    }
+
+    .fi-panel-admin .fi-ta-table :is(th, td) {
+        padding-block: var(--ds-space-3);
+    }
+
+    .fi-panel-admin .fi-ta-cell {
+        font-variant-numeric: tabular-nums;
+    }
+
+    .fi-panel-admin .fi-ta-row {
+        transition: background-color var(--ds-motion-fast) var(--ds-ease-standard);
+    }
+
+    /* Badges: token tones, icon+text is enforced in PHP; colour never alone.
+       Filament paints `.fi-color` badges from its `--color-*` scale, so the
+       success/danger/warning/info tones are remapped to the shared tokens. */
+    .fi-panel-admin .fi-badge {
+        border-radius: var(--ds-radius-sm);
+        font-size: var(--ds-type-meta-size);
+        font-weight: var(--ds-font-weight-medium);
+        line-height: var(--ds-type-meta-leading);
+    }
+
+    .fi-panel-admin .fi-badge.fi-color-success {
+        background: var(--ds-success-bg);
+        color: var(--ds-success-fg);
+        --tw-ring-color: var(--ds-success-fg);
+    }
+
+    .fi-panel-admin .fi-badge.fi-color-danger {
+        background: var(--ds-danger-bg);
+        color: var(--ds-danger-fg);
+        --tw-ring-color: var(--ds-danger-fg);
+    }
+
+    .fi-panel-admin .fi-badge.fi-color-warning {
+        background: var(--ds-warning-bg);
+        color: var(--ds-warning-fg);
+        --tw-ring-color: var(--ds-warning-fg);
+    }
+
+    .fi-panel-admin .fi-badge.fi-color-info {
+        background: var(--ds-info-bg);
+        color: var(--ds-info-fg);
+        --tw-ring-color: var(--ds-info-fg);
+    }
+
+    /* Notifications share the alert surface of the public app. */
+    .fi-panel-admin .fi-no-notification {
+        border: var(--ds-border-width) solid var(--ds-border-subtle);
+        border-radius: var(--ds-radius-md);
+        box-shadow: none;
+        font-size: var(--ds-type-body-sm-size);
+        line-height: var(--ds-type-body-sm-leading);
+    }
+
+    .fi-panel-admin .fi-no-notification .fi-no-notification-title {
+        font-weight: var(--ds-font-weight-semibold);
+    }
+
+    .fi-panel-admin :is(.fi-btn, .fi-link, .fi-ta-col, .fi-dropdown-list-item) {
+        transition:
+            background-color var(--ds-motion-fast) var(--ds-ease-standard),
+            border-color var(--ds-motion-fast) var(--ds-ease-standard),
+            color var(--ds-motion-fast) var(--ds-ease-standard);
     }
 
     .fi-panel-admin .fi-simple-main {
