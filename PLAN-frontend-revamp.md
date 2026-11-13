@@ -437,7 +437,11 @@ Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data K
 - **Catatan agent:** route templat tidak boleh berada di bawah `/admin/model-versions/` — Filament mendaftarkan wildcard `{record}` lebih dulu sehingga path saudara tertangkap route detail (ditemukan lewat 404 di test).
 
 ### T3.9 (S) Pengguna
-- [ ] Perbaiki kolom verifikasi email (T1.7), tambah filter Peran/Verifikasi, ekspor opsional. Aturan "admin verifier tidak bisa di-demote" tetap berlaku (disesuaikan ke alur Data Kurasi pada Tahap 4 bila relasi berubah).
+- [x] Perbaiki kolom verifikasi email (T1.7), tambah filter Peran/Verifikasi, ekspor opsional. Aturan "admin verifier tidak bisa di-demote" tetap berlaku (disesuaikan ke alur Data Kurasi pada Tahap 4 bila relasi berubah).
+  - Kolom kini memakai `state()` eksplisit (badge + ikon + tooltip tanggal) karena Filament melewati formatting untuk state `null` dan model meng-cast timestamp ke Carbon; sebelumnya badge "Belum" tidak pernah dirender. Filter `is_admin` dan `email_verified_at` (Ternary) sudah ada sejak T3.3 dan diuji ulang di sini; ekspor CSV (nama, email, peran, verifikasi, terdaftar — tanpa hash/remember token) juga dari T3.3.
+  - Aturan demote tetap di `User::booted()`; test baru memastikan `update(['is_admin' => false])` untuk verifier tetap ditolak dengan pesan yang sama, sehingga perubahan tabel tidak memindahkan guard.
+- **Bukti:** `tests/Feature/AdminUsersResourceTest.php` (17 test), `reports/frontend-revamp/after-s3/users.md` + `t39-users-*.png`.
+- **Catatan agent:** dua cacat ditemukan lewat test/browser dan diperbaiki di UI: formatter `?string` vs state Carbon, lalu state `null` yang tidak diformat Filament.
 
 ### T3.10 (M) QA tahap 3
 - [ ] Screenshot "after-s3" (375/768/1280 untuk dashboard & tiap resource). Uji keyboard, kontras, dan empty/error state (BERT mati, DB lambat).

@@ -22,12 +22,15 @@ class UsersTable
                 TextColumn::make('name')->label('Nama')->searchable()->sortable()->limit(60)->wrap(),
                 TextColumn::make('email')->label('Email')->searchable()->sortable()->limit(80)->wrap(),
                 TextColumn::make('is_admin')->label('Peran')->badge()->icon(fn (bool $state) => $state ? Heroicon::OutlinedShieldCheck : Heroicon::OutlinedUsers)->color(fn (bool $state): string => $state ? 'warning' : 'gray')->formatStateUsing(fn (bool $state): string => $state ? 'Administrator' : 'Pengguna'),
+                // Filament skips formatting for a null state, which left the "Belum" badge
+                // empty. Derive an explicit state from the record instead of the timestamp.
                 TextColumn::make('email_verified_at')
                     ->label('Verifikasi email')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => filled($state) ? 'Terverifikasi' : 'Belum')
-                    ->color(fn (?string $state): string => filled($state) ? 'success' : 'gray')
-                    ->tooltip(fn (?string $state, User $record): string => $record->email_verified_at !== null
+                    ->state(fn (User $record): string => $record->email_verified_at !== null ? 'Terverifikasi' : 'Belum')
+                    ->color(fn (string $state): string => $state === 'Terverifikasi' ? 'success' : 'gray')
+                    ->icon(fn (string $state) => $state === 'Terverifikasi' ? Heroicon::OutlinedCheckBadge : Heroicon::OutlinedClock)
+                    ->tooltip(fn (User $record): string => $record->email_verified_at !== null
                         ? 'Terverifikasi pada '.$record->email_verified_at->format('d/m/Y H:i')
                         : 'Belum terverifikasi')
                     ->sortable()

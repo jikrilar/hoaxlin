@@ -10,10 +10,12 @@ use App\Models\Dataset;
 use App\Models\Submission;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Filament\Tables\Filters\TernaryFilter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -79,6 +81,64 @@ class AdminUsersResourceTest extends TestCase
         $this->assertSame('Terverifikasi pada 14/10/2026 09:30', $this->tooltipFor($column, $verified));
         $this->assertSame('Belum terverifikasi', $this->tooltipFor($column, $pending));
         $page->assertSeeHtml('fi-badge');
+    }
+
+    public function test_verification_badge_renders_its_text_not_only_a_tooltip(): void
+    {
+        $this->admin();
+        $verified = User::factory()->create(['name' => 'Verified Badge Fixture', 'email_verified_at' => '2026-10-14 09:30:00']);
+        $pending = User::factory()->unverified()->create(['name' => 'Pending Badge Fixture']);
+
+        // The column state is a Carbon instance (the model casts the timestamp), so a
+        // `?string` formatter would leave the badge empty. Assert the rendered HTML.
+        Livewire::test(ListUsers::class)
+            ->assertSee('Terverifikasi')
+            ->assertSee('Belum')
+            ->assertSeeHtml('fi-badge')
+            ->assertTableColumnFormattedStateSet('email_verified_at', 'Terverifikasi', $verified)
+            ->assertTableColumnFormattedStateSet('email_verified_at', 'Belum', $pending);
+    }
+
+    public function test_role_and_verification_filters_are_available_and_persist(): void
+    {
+        $admin = $this->admin();
+        $verified = User::factory()->create(['is_admin' => false]);
+        $unverifiedAdmin = User::factory()->unverified()->create(['is_admin' => true]);
+
+        $page = Livewire::test(ListUsers::class);
+        $table = $page->instance()->getTable();
+
+        $this->assertTrue($table->getFilter('is_admin') instanceof TernaryFilter);
+        $this->assertTrue($table->getFilter('email_verified_at') instanceof TernaryFilter);
+        $this->assertTrue($table->persistsFiltersInSession());
+
+        Livewire::test(ListUsers::class)->removeTableFilters()->filterTable('is_admin', true)
+            ->assertCanSeeTableRecords([$admin, $unverifiedAdmin])
+            ->assertCanNotSeeTableRecords([$verified]);
+        Livewire::test(ListUsers::class)->removeTableFilters()->filterTable('is_admin', false)
+            ->assertCanSeeTableRecords([$verified])
+            ->assertCanNotSeeTableRecords([$admin, $unverifiedAdmin]);
+    }
+
+    public function test_verifier_demotion_rule_survives_the_table_changes(): void
+    {
+        $this->admin();
+        $verifier = User::factory()->create(['is_admin' => true]);
+        Dataset::factory()->create(['verified_by' => $verifier->id]);
+
+        // The guard lives on the model, not in the table, so a demotion through any
+        // path (form, tinker, future bulk action) is still refused.
+        try {
+            $verifier->update(['is_admin' => false]);
+            $this->fail('A verifier must not be demoted.');
+        } catch (ValidationException $exception) {
+            $this->assertSame(
+                'Administrator masih tercatat sebagai verifier katalog dataset.',
+                $exception->errors()['is_admin'][0],
+            );
+        }
+
+        $this->assertTrue($verifier->fresh()->is_admin);
     }
 
     public function test_native_search_sort_filters_and_pagination_keep_their_populations(): void
