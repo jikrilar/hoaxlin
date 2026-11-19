@@ -2,6 +2,7 @@
 
 namespace App\Filament\Support;
 
+use App\Models\AdminLog;
 use App\Support\CsvCellSanitizer;
 use Closure;
 use Filament\Actions\Action;
@@ -22,6 +23,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 final class TableCsvExport
 {
+    public const ACTION = 'table_exported';
+
     public const CHUNK_SIZE = 500;
 
     public function __construct(private readonly CsvCellSanitizer $sanitizer) {}
@@ -31,14 +34,14 @@ final class TableCsvExport
      * @param  Closure(Builder): Builder  $query
      * @param  Closure(object): list<int|float|string|null>  $row
      */
-    public static function action(string $name, string $label, string $fileName, array $header, Closure $query, Closure $row): Action
+    public static function action(string $name, string $label, string $fileName, array $header, Closure $query, Closure $row, string $targetTable): Action
     {
         return Action::make($name)
             ->label($label)
             ->icon(Heroicon::OutlinedArrowDownTray)
             ->color('gray')
             ->authorize(static fn (): bool => auth()->user()?->is_admin === true)
-            ->action(static function (Component $livewire) use ($fileName, $header, $query, $row): ?StreamedResponse {
+            ->action(static function (Component $livewire) use ($fileName, $header, $query, $row, $targetTable): ?StreamedResponse {
                 $base = $livewire->getFilteredTableQuery();
 
                 if ($base === null) {
@@ -47,7 +50,11 @@ final class TableCsvExport
                     return null;
                 }
 
-                return app(self::class)->stream($fileName, $header, $query($base), $row);
+                // The streamed body runs after the response starts, where the global
+                // auth guard may already be gone; capture the admin now.
+                $adminId = auth()->id();
+
+                return app(self::class)->stream($fileName, $header, $query($base), $row, $targetTable, $adminId);
             });
     }
 
@@ -55,20 +62,45 @@ final class TableCsvExport
      * @param  list<string>  $header
      * @param  Closure(object): list<int|float|string|null>  $row
      */
-    public function stream(string $fileName, array $header, Builder $query, Closure $row): StreamedResponse
+    public function stream(string $fileName, array $header, Builder $query, Closure $row, string $targetTable = '', ?int $adminId = null): StreamedResponse
     {
-        return response()->streamDownload(function () use ($header, $query, $row): void {
+        $adminId ??= auth()->id();
+
+        return response()->streamDownload(function () use ($header, $query, $row, $targetTable, $adminId): void {
             $stream = fopen('php://output', 'w');
 
             fwrite($stream, "\xEF\xBB\xBF");
             $this->writeRow($stream, $header);
 
+            $rows = 0;
             foreach ($query->lazy(self::CHUNK_SIZE) as $record) {
                 $this->writeRow($stream, $row($record));
+                $rows++;
             }
 
             fclose($stream);
+
+            $this->recordAudit($targetTable, $rows, $adminId);
         }, $fileName, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    /**
+     * Record that an export happened: which table and how many rows left the
+     * panel. The file contents are never copied into the log.
+     */
+    private function recordAudit(string $targetTable, int $rows, ?int $adminId): void
+    {
+        if ($targetTable === '' || $adminId === null) {
+            return;
+        }
+
+        AdminLog::create([
+            'admin_id' => $adminId,
+            'action' => self::ACTION,
+            'target_table' => $targetTable,
+            'target_id' => null,
+            'metadata' => ['rows' => $rows],
+        ]);
     }
 
     /**

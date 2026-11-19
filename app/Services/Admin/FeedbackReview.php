@@ -27,25 +27,37 @@ final class FeedbackReview
     {
         $admin = auth()->user();
 
+        if ($admin === null || ! $admin->is_admin || ! $this->claim($feedback)) {
+            return false;
+        }
+
+        $this->recordAudit([$feedback->getKey()], $admin->getKey());
+        DashboardMetrics::forget(['needs-action', 'kpis', 'breakdown']);
+
+        return true;
+    }
+
+    /**
+     * Claim one row without writing an audit entry.
+     *
+     * Bulk review uses this so the whole action produces a single audit row
+     * instead of one per record.
+     */
+    private function claim(Feedback $feedback): bool
+    {
+        $admin = auth()->user();
+
         if ($admin === null || ! $admin->is_admin) {
             return false;
         }
 
-        $claimed = Feedback::query()
+        return Feedback::query()
             ->whereKey($feedback->getKey())
             ->whereNull('reviewed_at')
             ->update([
                 'reviewed_at' => now(),
                 'reviewed_by' => $admin->getKey(),
-            ]);
-
-        if ($claimed !== 1) {
-            return false;
-        }
-
-        $this->recordAudit([$feedback->getKey()], $admin->getKey());
-
-        return true;
+            ]) === 1;
     }
 
     /**
@@ -58,11 +70,17 @@ final class FeedbackReview
         $skipped = 0;
 
         foreach ($records as $record) {
-            if ($record instanceof Feedback && $this->markReviewed($record)) {
+            if ($record instanceof Feedback && $this->claim($record)) {
                 $reviewed[] = $record->getKey();
             } else {
                 $skipped++;
             }
+        }
+
+        // One audit row per bulk action, not one per record.
+        if ($reviewed !== []) {
+            $this->recordAudit($reviewed, (int) auth()->id());
+            DashboardMetrics::forget(['needs-action', 'kpis', 'breakdown']);
         }
 
         return ['reviewed' => $reviewed, 'skipped' => $skipped];

@@ -64,6 +64,7 @@ class UsersTable
                         $record->email_verified_at === null ? 'Belum' : 'Terverifikasi '.$record->email_verified_at->format('Y-m-d H:i'),
                         $record->created_at?->format('Y-m-d H:i') ?? '',
                     ],
+                    targetTable: 'users',
                 ),
             ])
             ->toolbarActions([

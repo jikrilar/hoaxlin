@@ -11,6 +11,7 @@ use App\Jobs\ProcessSubmission;
 use App\Models\AdminLog;
 use App\Models\Submission;
 use App\Models\User;
+use App\Services\Admin\DashboardMetrics;
 use App\Services\Pipeline\SubmissionRecovery;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -138,6 +139,46 @@ class AdminSubmissionRetryTest extends TestCase
         $this->get(AdminLogResource::getUrl('view', ['record' => $log]))->assertOk()
             ->assertSee('Pemeriksaan dicoba ulang')
             ->assertDontSee('PRIVATE_RETRY_INPUT');
+    }
+
+    public function test_retry_invalidates_the_dashboard_cache_so_numbers_change_immediately(): void
+    {
+        $this->admin();
+        $submission = $this->failed();
+
+        // Warm the aggregates the dashboard reads.
+        $metrics = app(DashboardMetrics::class);
+        $this->assertSame(1, $metrics->needsAction()['failed']);
+        $this->assertSame(1, $metrics->kpis(30)['failed']);
+
+        Livewire::test(ListSubmissions::class)->callTableAction('retry', $submission);
+
+        // No waiting for the 60-second window: the next read is already fresh.
+        $this->assertSame(0, $metrics->needsAction()['failed']);
+        $this->assertSame(0, $metrics->kpis(30)['failed']);
+    }
+
+    public function test_retry_modal_copy_matches_the_real_behaviour(): void
+    {
+        $this->admin();
+        $failed = $this->failed();
+        $stalled = Submission::factory()->create([
+            'status' => 'processing',
+            'processing_stage' => ProcessingStage::Classifying->value,
+            'updated_at' => now()->subMinutes(11),
+        ]);
+
+        $page = Livewire::test(ListSubmissions::class);
+        $page->mountTableAction('retry', $failed);
+        $failedCopy = $page->instance()->getMountedAction()->getModalDescription();
+        $page->unmountAction();
+
+        $page->mountTableAction('retry', $stalled);
+        $stalledCopy = $page->instance()->getMountedAction()->getModalDescription();
+
+        $this->assertStringContainsString('diulang dari awal', $failedCopy);
+        $this->assertStringContainsString('dilanjutkan dari tahap terakhir', $stalledCopy);
+        $this->assertNotSame($failedCopy, $stalledCopy);
     }
 
     public function test_retry_requires_an_admin(): void

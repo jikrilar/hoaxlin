@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\AdminLogs\AdminLogResource;
 use App\Filament\Resources\AdminLogs\Pages\ListAdminLogs;
 use App\Filament\Resources\Datasets\Pages\ListDatasets;
 use App\Filament\Resources\Feedback\Pages\ListFeedback;
@@ -186,6 +187,27 @@ class AdminTableStandardTest extends TestCase
 
         $this->assertStringContainsString("'=cmd|calc", $csv);
         $this->assertStringNotContainsString('$2y$', $csv);
+    }
+
+    public function test_export_writes_an_allowlisted_audit_entry_with_the_row_count(): void
+    {
+        $this->admin();
+        $admin = User::factory()->create(['is_admin' => true]);
+        $this->actingAs($admin);
+        Submission::factory()->count(3)->create(['status' => 'failed', 'raw_input' => 'PRIVATE_EXPORT_INPUT']);
+
+        Livewire::test(ListSubmissions::class)->callTableAction('exportCsv')->assertFileDownloaded();
+
+        $log = AdminLog::query()->withAction('table_exported')->sole();
+        $this->assertSame($admin->id, $log->admin_id);
+        $this->assertSame('submissions', $log->target_table);
+        $this->assertSame(3, $log->metadata['rows']);
+        $encoded = json_encode($log->metadata, JSON_THROW_ON_ERROR);
+        $this->assertStringNotContainsString('PRIVATE_EXPORT_INPUT', $encoded);
+        $this->assertArrayNotHasKey('ids', $log->metadata);
+
+        $this->get(AdminLogResource::getUrl('view', ['record' => $log]))
+            ->assertOk()->assertSee('Tabel diekspor');
     }
 
     public function test_export_is_admin_only_and_absent_where_it_is_not_offered(): void

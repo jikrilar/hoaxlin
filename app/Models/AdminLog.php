@@ -29,20 +29,20 @@ class AdminLog extends Model
         ];
     }
 
-    public function scopeByAdmin(Builder $query, User|int $admin): void
+    public function scopeByAdmin(Builder $query, User|int $admin): Builder
     {
-        $query->where('admin_id', $admin instanceof User ? $admin->getKey() : $admin);
+        return $query->where('admin_id', $admin instanceof User ? $admin->getKey() : $admin);
     }
 
-    public function scopeForTarget(Builder $query, string $table, ?int $id = null): void
+    public function scopeForTarget(Builder $query, string $table, ?int $id = null): Builder
     {
-        $query->where('target_table', $table)
+        return $query->where('target_table', $table)
             ->when($id !== null, fn (Builder $targetQuery) => $targetQuery->where('target_id', $id));
     }
 
-    public function scopeWithAction(Builder $query, string $action): void
+    public function scopeWithAction(Builder $query, string $action): Builder
     {
-        $query->where('action', $action);
+        return $query->where('action', $action);
     }
 
     public function admin(): BelongsTo

@@ -46,6 +46,7 @@ final class MonitoringPresentation
             'system_configuration_updated' => 'Pembaruan konfigurasi',
             'submission_retried' => 'Pemeriksaan dicoba ulang',
             'feedback_reviewed' => 'Umpan balik ditinjau',
+            'table_exported' => 'Tabel diekspor',
             default => 'Tindakan tidak dikenali',
         };
     }
@@ -67,6 +68,7 @@ final class MonitoringPresentation
             'update', 'dataset_updated', 'user_updated', 'system_configuration_updated' => Heroicon::OutlinedPencilSquare,
             'submission_retried' => Heroicon::OutlinedArrowPath,
             'feedback_reviewed' => Heroicon::OutlinedCheckCircle,
+            'table_exported' => Heroicon::OutlinedArrowDownTray,
             'delete' => Heroicon::OutlinedTrash,
             'login' => Heroicon::OutlinedShieldCheck,
             default => Heroicon::OutlinedQuestionMarkCircle,
@@ -136,6 +138,9 @@ final class MonitoringPresentation
         }
         if (is_array($metadata) && array_key_exists('changes', $metadata)) {
             $safe['changes'] = self::changes($record->target_table, $metadata['changes']);
+        }
+        if (is_array($metadata) && array_key_exists('rows', $metadata)) {
+            $safe['rows'] = self::unsignedInteger($metadata['rows']) ?? self::HIDDEN;
         }
         if (is_array($metadata) && array_key_exists('count', $metadata)) {
             $safe['count'] = self::unsignedInteger($metadata['count']) ?? self::HIDDEN;

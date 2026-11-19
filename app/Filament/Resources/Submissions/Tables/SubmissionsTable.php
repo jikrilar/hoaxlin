@@ -63,6 +63,7 @@ class SubmissionsTable
                         ReadOnlyPresentation::stage($record->processing_stage),
                         $record->last_error_code ?? '',
                     ],
+                    targetTable: 'submissions',
                 ),
             ])
             ->defaultSort('created_at', 'desc')

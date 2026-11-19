@@ -11,9 +11,11 @@ use App\Models\AdminLog;
 use App\Models\Feedback;
 use App\Models\Submission;
 use App\Models\User;
+use App\Services\Admin\DashboardMetrics;
 use App\Services\Admin\FeedbackReview;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
@@ -178,6 +180,37 @@ class AdminFeedbackReviewTest extends TestCase
         $this->get(AdminLogResource::getUrl('view', ['record' => $log]))->assertOk()
             ->assertSee('Umpan balik ditinjau')
             ->assertDontSee('PRIVATE_REVIEW_COMMENT');
+    }
+
+    public function test_bulk_review_writes_one_audit_row_not_one_per_record(): void
+    {
+        $admin = $this->admin();
+        $records = Feedback::factory()->count(3)->create();
+
+        Livewire::test(ListFeedback::class)->callTableBulkAction('markReviewedSelected', $records);
+
+        $logs = AdminLog::query()->withAction('feedback_reviewed')->get();
+        $this->assertCount(1, $logs, 'a bulk action is one audit entry');
+        $this->assertSame(3, $logs->first()->metadata['count']);
+        $this->assertSame($records->pluck('id')->sort()->values()->all(), collect($logs->first()->metadata['feedback_ids'])->sort()->values()->all());
+        $this->assertSame($admin->id, $logs->first()->admin_id);
+        $this->assertSame(3, Feedback::query()->reviewed()->count());
+    }
+
+    public function test_review_invalidates_the_dashboard_cache_so_numbers_change_immediately(): void
+    {
+        $this->admin();
+        $feedback = Feedback::factory()->create();
+
+        $metrics = app(DashboardMetrics::class);
+        $metrics->needsAction();
+        $metrics->kpis(30);
+        $this->assertNotNull(Cache::get('admin:dashboard:kpis:30'));
+
+        Livewire::test(ListFeedback::class)->callTableAction('markReviewed', $feedback);
+
+        $this->assertNull(Cache::get('admin:dashboard:needs-action'));
+        $this->assertNull(Cache::get('admin:dashboard:kpis:30'));
     }
 
     public function test_review_actions_require_an_admin(): void

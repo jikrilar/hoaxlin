@@ -63,6 +63,7 @@ class FeedbackTable
                         $record->comment ?? '',
                         $record->created_at?->format('Y-m-d H:i') ?? '',
                     ],
+                    targetTable: 'feedback',
                 ),
             ])
             ->defaultSort('created_at', 'desc')

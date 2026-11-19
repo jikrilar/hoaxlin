@@ -180,6 +180,57 @@ class AdminDashboardMetricsTest extends TestCase
         $this->assertSame(2, $metrics->kpis(7)['week']);
     }
 
+    public function test_window_predicates_bound_timestamps_instead_of_wrapping_the_column(): void
+    {
+        // A function on the column (whereDate/DATE()) disables the index; the window
+        // must be a plain range on created_at.
+        $queries = [];
+        DB::listen(function ($query) use (&$queries): void {
+            if (str_contains($query->sql, 'created_at')) {
+                $queries[] = $query->sql;
+            }
+        });
+
+        $metrics = app(DashboardMetrics::class);
+        $metrics->trend(7);
+        $metrics->kpis(7);
+        $metrics->breakdown(7);
+
+        $this->assertNotEmpty($queries);
+        foreach ($queries as $sql) {
+            $lower = strtolower($sql);
+            // GROUP BY DATE(created_at) is allowed: it shapes already-filtered rows.
+            $where = str_contains($lower, ' where ') ? explode(' where ', $lower, 2)[1] : $lower;
+            $where = str_contains($where, ' group by ') ? explode(' group by ', $where, 2)[0] : $where;
+
+            foreach (['date(created_at)', 'date("created_at")', 'strftime', 'date(`created_at`)'] as $wrapped) {
+                $this->assertStringNotContainsString($wrapped, $where, 'the WHERE clause must not wrap created_at: '.$sql);
+            }
+        }
+    }
+
+    public function test_forget_drops_every_range_keyed_entry_and_the_needs_action_key(): void
+    {
+        $metrics = app(DashboardMetrics::class);
+        foreach ([7, 30, 90] as $days) {
+            $metrics->kpis($days);
+            $metrics->breakdown($days);
+        }
+        $metrics->needsAction();
+
+        $this->assertNotNull(Cache::get('admin:dashboard:kpis:7'));
+        $this->assertNotNull(Cache::get('admin:dashboard:breakdown:90'));
+        $this->assertNotNull(Cache::get('admin:dashboard:needs-action'));
+
+        DashboardMetrics::forget(['needs-action', 'kpis', 'breakdown']);
+
+        foreach ([7, 30, 90] as $days) {
+            $this->assertNull(Cache::get('admin:dashboard:kpis:'.$days));
+            $this->assertNull(Cache::get('admin:dashboard:breakdown:'.$days));
+        }
+        $this->assertNull(Cache::get('admin:dashboard:needs-action'));
+    }
+
     public function test_missing_tables_degrade_to_unavailable_instead_of_throwing(): void
     {
         $metrics = app(DashboardMetrics::class);

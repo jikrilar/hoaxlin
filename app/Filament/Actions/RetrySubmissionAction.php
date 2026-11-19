@@ -4,6 +4,7 @@ namespace App\Filament\Actions;
 
 use App\Models\AdminLog;
 use App\Models\Submission;
+use App\Services\Admin\DashboardMetrics;
 use App\Services\Pipeline\SubmissionRecovery;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -31,7 +32,9 @@ final class RetrySubmissionAction
             ->visible(fn (Submission $record): bool => app(SubmissionRecovery::class)->isRetryable($record))
             ->requiresConfirmation()
             ->modalHeading('Coba lagi pemeriksaan ini?')
-            ->modalDescription('Pemeriksaan akan dikembalikan ke antrean dan diproses ulang dari tahap yang aman. Hasil sebelumnya tidak dihapus, dan pemeriksaan yang sudah selesai tidak akan diulang.')
+            ->modalDescription(fn (Submission $record): string => app(SubmissionRecovery::class)->isStalled($record)
+                ? 'Pemeriksaan ini tertahan di tengah proses. Pemrosesan dilanjutkan dari tahap terakhir yang tercatat, bukan diulang dari awal. Hasil yang sudah tersimpan tidak dihapus.'
+                : 'Pemeriksaan ini berstatus gagal. Pemrosesan diulang dari awal antrean dengan input yang sama; hasil sebelumnya tidak dihapus, dan pemeriksaan yang sudah selesai tidak akan diulang.')
             ->modalSubmitActionLabel('Coba lagi')
             ->action(function (Submission $record): void {
                 $recovered = app(SubmissionRecovery::class)->retry($record);
@@ -50,6 +53,7 @@ final class RetrySubmissionAction
                 // to show the new status without a manual reload.
                 $record->refresh();
                 self::recordAudit([$record->getKey()]);
+                DashboardMetrics::forget(['needs-action', 'kpis', 'breakdown']);
 
                 Notification::make()
                     ->title('Pemeriksaan dimasukkan kembali ke antrean')
@@ -72,7 +76,7 @@ final class RetrySubmissionAction
             ->deselectRecordsAfterCompletion()
             ->requiresConfirmation()
             ->modalHeading('Coba lagi pemeriksaan terpilih?')
-            ->modalDescription('Hanya pemeriksaan berstatus gagal atau tertahan yang akan dimasukkan kembali ke antrean. Pemeriksaan yang sudah selesai atau masih berjalan normal dilewati.')
+            ->modalDescription('Hanya pemeriksaan berstatus gagal atau tertahan yang akan dimasukkan kembali ke antrean. Yang gagal diulang dari awal antrean; yang tertahan dilanjutkan dari tahap terakhir yang tercatat. Pemeriksaan yang sudah selesai atau masih berjalan normal dilewati.')
             ->modalSubmitActionLabel('Coba lagi yang dipilih')
             ->action(function (Collection $records): void {
                 $recovery = app(SubmissionRecovery::class);
@@ -89,6 +93,7 @@ final class RetrySubmissionAction
 
                 if ($recovered !== []) {
                     self::recordAudit($recovered);
+                    DashboardMetrics::forget(['needs-action', 'kpis', 'breakdown']);
                 }
 
                 Notification::make()

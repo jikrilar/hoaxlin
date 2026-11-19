@@ -45,18 +45,21 @@ final class DashboardMetrics
         return $this->remember('trend:'.$days, function () use ($days): array {
             $end = CarbonImmutable::today(config('app.timezone'));
             $start = $end->subDays($days - 1);
+            // Bound with timestamps, not DATE(created_at) predicates: a function on the
+            // column disables the index. GROUP BY keeps DATE() because it only shapes
+            // the already-filtered rows.
+            $from = $start->startOfDay();
+            $until = $end->endOfDay();
 
             $totals = Submission::query()
-                ->whereDate('created_at', '>=', $start->toDateString())
-                ->whereDate('created_at', '<=', $end->toDateString())
+                ->whereBetween('created_at', [$from, $until])
                 ->selectRaw('DATE(created_at) as day, COUNT(*) as total')
                 ->groupByRaw('DATE(created_at)')
                 ->pluck('total', 'day');
 
             $labels = DetectionResult::query()
                 ->join('submissions', 'submissions.id', '=', 'detection_results.submission_id')
-                ->whereDate('submissions.created_at', '>=', $start->toDateString())
-                ->whereDate('submissions.created_at', '<=', $end->toDateString())
+                ->whereBetween('submissions.created_at', [$from, $until])
                 ->selectRaw('DATE(submissions.created_at) as day, detection_results.label as label, COUNT(*) as total')
                 ->groupByRaw('DATE(submissions.created_at), detection_results.label')
                 ->get()
@@ -97,20 +100,21 @@ final class DashboardMetrics
             $weekStart = $today->subDays(6);
             $rangeStart = $today->subDays($days - 1);
 
+            $rangeFrom = $rangeStart->startOfDay();
+            $rangeUntil = $today->endOfDay();
+            $weekFrom = $weekStart->startOfDay();
+
             $total = Submission::query()
-                ->whereDate('created_at', '>=', $rangeStart->toDateString())
-                ->whereDate('created_at', '<=', $today->toDateString())
+                ->whereBetween('created_at', [$rangeFrom, $rangeUntil])
                 ->count();
             $completed = Submission::query()
-                ->whereDate('created_at', '>=', $rangeStart->toDateString())
-                ->whereDate('created_at', '<=', $today->toDateString())
+                ->whereBetween('created_at', [$rangeFrom, $rangeUntil])
                 ->where('status', 'completed')
                 ->count();
 
             $sparkline = [];
             $perDay = Submission::query()
-                ->whereDate('created_at', '>=', $weekStart->toDateString())
-                ->whereDate('created_at', '<=', $today->toDateString())
+                ->whereBetween('created_at', [$weekFrom, $rangeUntil])
                 ->selectRaw('DATE(created_at) as day, COUNT(*) as total')
                 ->groupByRaw('DATE(created_at)')
                 ->pluck('total', 'day');
@@ -120,16 +124,12 @@ final class DashboardMetrics
 
             return [
                 'available' => true,
-                'today' => Submission::query()->whereDate('created_at', $today->toDateString())->count(),
-                'week' => Submission::query()
-                    ->whereDate('created_at', '>=', $weekStart->toDateString())
-                    ->whereDate('created_at', '<=', $today->toDateString())
-                    ->count(),
+                'today' => Submission::query()->whereBetween('created_at', [$today->startOfDay(), $rangeUntil])->count(),
+                'week' => Submission::query()->whereBetween('created_at', [$weekFrom, $rangeUntil])->count(),
                 'completion_rate' => $total > 0 ? $completed / $total : null,
                 'completion_base' => $total,
                 'failed' => Submission::query()
-                    ->whereDate('created_at', '>=', $rangeStart->toDateString())
-                    ->whereDate('created_at', '<=', $today->toDateString())
+                    ->whereBetween('created_at', [$rangeFrom, $rangeUntil])
                     ->where('status', 'failed')
                     ->count(),
                 'sparkline' => $sparkline,
@@ -181,10 +181,12 @@ final class DashboardMetrics
     {
         return $this->remember('breakdown:'.$days, function () use ($days): array {
             $start = CarbonImmutable::today(config('app.timezone'))->subDays($days - 1);
+            $from = $start->startOfDay();
+            $until = CarbonImmutable::today(config('app.timezone'))->endOfDay();
 
             $labels = DetectionResult::query()
                 ->join('submissions', 'submissions.id', '=', 'detection_results.submission_id')
-                ->whereDate('submissions.created_at', '>=', $start->toDateString())
+                ->whereBetween('submissions.created_at', [$from, $until])
                 ->selectRaw('detection_results.label as label, COUNT(*) as total')
                 ->groupBy('detection_results.label')
                 ->pluck('total', 'label')
@@ -192,7 +194,7 @@ final class DashboardMetrics
                 ->all();
 
             $inputs = Submission::query()
-                ->whereDate('created_at', '>=', $start->toDateString())
+                ->whereBetween('created_at', [$from, $until])
                 ->selectRaw('input_type, COUNT(*) as total')
                 ->groupBy('input_type')
                 ->pluck('total', 'input_type')
@@ -201,21 +203,21 @@ final class DashboardMetrics
 
             $failures = SubmissionProcessingEvent::query()
                 ->where('outcome', EventOutcome::Failed->value)
-                ->whereDate('created_at', '>=', $start->toDateString())
+                ->whereBetween('created_at', [$from, $until])
                 ->selectRaw('stage, COUNT(*) as total')
                 ->groupBy('stage')
                 ->get()
                 ->mapWithKeys(fn ($row): array => [(string) ($row->stage?->value ?? 'unknown') => (int) $row->total])
                 ->all();
 
-            $correct = Feedback::query()->where('is_correct', true)->whereDate('created_at', '>=', $start->toDateString())->count();
-            $incorrect = Feedback::query()->where('is_correct', false)->whereDate('created_at', '>=', $start->toDateString())->count();
+            $correct = Feedback::query()->where('is_correct', true)->whereBetween('created_at', [$from, $until])->count();
+            $incorrect = Feedback::query()->where('is_correct', false)->whereBetween('created_at', [$from, $until])->count();
 
             $minimum = max(1, (int) config('pipeline.latency_minimum_sample', 20));
             $durations = DetectionResult::query()
                 ->whereNotNull('inference_ms')
                 ->where('inference_ms', '>=', 0)
-                ->whereDate('created_at', '>=', $start->toDateString())
+                ->whereBetween('created_at', [$from, $until])
                 ->orderBy('inference_ms')
                 ->pluck('inference_ms')
                 ->map(fn ($value): int => (int) $value)
@@ -288,6 +290,32 @@ final class DashboardMetrics
 
             return ['available' => true, 'curated' => $rows, 'curated_total' => array_sum($rows)];
         }, ['available' => false, 'curated' => [], 'curated_total' => 0]);
+    }
+
+    /**
+     * Drop the cached aggregates a mutation invalidates.
+     *
+     * Callers that change submission or feedback state (retry, review) use this so
+     * the dashboard reflects the change on the next request instead of waiting for
+     * the 60-second window. Range-keyed entries are removed by pattern because the
+     * caller does not know which ranges are cached.
+     *
+     * @param  list<string>  $keys  Logical keys: 'needs-action', 'kpis', 'breakdown'.
+     */
+    public static function forget(array $keys): void
+    {
+        foreach ($keys as $key) {
+            if (in_array($key, ['needs-action'], true)) {
+                Cache::forget('admin:dashboard:'.$key);
+
+                continue;
+            }
+
+            // kpis:7 / kpis:30 / breakdown:90 — every range must go.
+            foreach (array_keys(self::RANGES) as $days) {
+                Cache::forget('admin:dashboard:'.$key.':'.$days);
+            }
+        }
     }
 
     /**

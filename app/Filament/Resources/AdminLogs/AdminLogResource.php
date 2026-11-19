@@ -57,6 +57,7 @@ class AdminLogResource extends Resource
                     'create' => 'Buat', 'update' => 'Ubah', 'delete' => 'Hapus',
                     'submission_retried' => 'Pemeriksaan dicoba ulang',
                     'feedback_reviewed' => 'Umpan balik ditinjau',
+                    'table_exported' => 'Tabel diekspor',
                 ]),
             ])
             ->filtersLayout(FiltersLayout::AboveContent)
