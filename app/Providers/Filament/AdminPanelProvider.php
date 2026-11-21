@@ -6,16 +6,17 @@ use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\AdminLogs\Pages\ListAdminLogs;
 use App\Filament\Resources\Datasets\Pages\CreateDataset;
 use App\Filament\Resources\Datasets\Pages\EditDataset;
-use App\Filament\Resources\DetectionResults\Pages\ListDetectionResults;
 use App\Filament\Resources\Feedback\Pages\ListFeedback;
 use App\Filament\Resources\ModelVersions\Pages\CreateModelVersion;
-use App\Filament\Resources\SubmissionProcessingEvents\Pages\ListSubmissionProcessingEvents;
 use App\Filament\Resources\Submissions\Pages\ListSubmissions;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
+use App\Filament\Widgets\DashboardCharts;
+use App\Filament\Widgets\KpiOverview;
+use App\Filament\Widgets\LatencyWidget;
 use App\Filament\Widgets\ModelVersionWidget;
-use App\Filament\Widgets\StatsOverview;
-use App\Filament\Widgets\SubmissionTrendChart;
+use App\Filament\Widgets\NeedsActionWidget;
+use App\Filament\Widgets\OpenAiBudgetWidget;
 use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -46,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE, fn () => view('filament.admin.auth.runtime-notice'))
             ->renderHook(PanelsRenderHook::PAGE_START, fn () => view('filament.admin.resources.runtime-notice'), scopes: [CreateUser::class, EditUser::class, CreateDataset::class, EditDataset::class, CreateModelVersion::class])
-            ->renderHook(PanelsRenderHook::PAGE_START, fn () => view('filament.admin.resources.read-only-notice'), scopes: [ListSubmissions::class, ListDetectionResults::class, ListFeedback::class, ListSubmissionProcessingEvents::class, ListAdminLogs::class])
+            ->renderHook(PanelsRenderHook::PAGE_START, fn () => view('filament.admin.resources.read-only-notice'), scopes: [ListSubmissions::class, ListFeedback::class, ListAdminLogs::class])
             ->colors([
                 // Filament needs concrete colors to calculate component contrast.
                 // Keep these bridges aligned with design-tokens.css; generating a
@@ -85,10 +86,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                // Account/logout remain in the native user menu. Keep the
-                // dashboard focused on operations, trend, then model context.
-                StatsOverview::class,
-                SubmissionTrendChart::class,
+                // Order mirrors the T3.2 layout: action required, KPIs, charts,
+                // latency/budget, then model and data context.
+                NeedsActionWidget::class,
+                KpiOverview::class,
+                DashboardCharts::class,
+                LatencyWidget::class,
+                OpenAiBudgetWidget::class,
                 ModelVersionWidget::class,
             ])
             ->middleware([

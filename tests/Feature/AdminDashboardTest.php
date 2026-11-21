@@ -2,9 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Pages\Dashboard;
+use App\Filament\Widgets\DashboardCharts;
+use App\Filament\Widgets\KpiOverview;
+use App\Filament\Widgets\LatencyWidget;
 use App\Filament\Widgets\ModelVersionWidget;
-use App\Filament\Widgets\StatsOverview;
-use App\Filament\Widgets\SubmissionTrendChart;
+use App\Filament\Widgets\NeedsActionWidget;
+use App\Filament\Widgets\OpenAiBudgetWidget;
 use App\Models\DetectionResult;
 use App\Models\Submission;
 use App\Models\User;
@@ -12,14 +16,15 @@ use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use ReflectionMethod;
 use Tests\TestCase;
 
+/** T3.2: dashboard composition, provenance and degradation. */
 class AdminDashboardTest extends TestCase
 {
     use RefreshDatabase;
@@ -34,77 +39,42 @@ class AdminDashboardTest extends TestCase
         config(['app.timezone' => 'Asia/Jakarta', 'app.debug' => false, 'services.bert.url' => 'http://bert.test']);
         $this->travelTo(CarbonImmutable::parse('2026-03-31 12:00:00', 'Asia/Jakarta'));
         Filament::setCurrentPanel(Filament::getPanel('admin'));
+        Cache::flush();
         Http::preventStrayRequests();
         Http::fake(['http://bert.test/version' => fn () => Http::response($this->runtimePayload, $this->runtimeStatus)]);
     }
 
-    public function test_dashboard_orders_operational_widgets_and_keeps_native_panel_access(): void
+    public function test_dashboard_orders_widgets_by_action_kpi_chart_then_model_context(): void
     {
         $panel = Filament::getPanel('admin');
-        $this->assertSame([StatsOverview::class, SubmissionTrendChart::class, ModelVersionWidget::class], array_values($panel->getWidgets()));
+        $this->assertSame([
+            NeedsActionWidget::class,
+            KpiOverview::class,
+            DashboardCharts::class,
+            LatencyWidget::class,
+            OpenAiBudgetWidget::class,
+            ModelVersionWidget::class,
+        ], array_values($panel->getWidgets()));
+
         $this->get($panel->getUrl())->assertRedirect($panel->getLoginUrl());
         $this->actingAs(User::factory()->create(['is_admin' => false]))->get($panel->getUrl())->assertForbidden();
-        $this->admin();
-        $response = $this->get($panel->getUrl())->assertOk()->assertSee('Ringkasan operasi')->assertSee('Tren submission')->assertSee('Model dan evaluasi');
-        $html = $response->getContent();
-        $this->assertLessThan(strpos($html, 'Tren submission'), strpos($html, 'Ringkasan operasi'));
-        $this->assertLessThan(strpos($html, 'Model dan evaluasi'), strpos($html, 'Tren submission'));
-        $response->assertDontSee('fi-account-widget')->assertDontSee('fi-wi-stats-overview-stat');
-    }
 
-    public function test_counts_preserve_all_time_nonfinal_labels_and_exclude_private_records(): void
-    {
         $this->admin();
-        $owner = User::factory()->create(['name' => 'PRIVATE_ADMIN_OWNER', 'email' => 'private-owner@example.test']);
-        foreach ([['2024-01-01', 'completed', 'hoax'], ['2026-03-31', 'pending', null], ['2026-03-31', 'processing', 'valid'], ['2026-03-15', 'failed', 'meragukan'], ['2026-03-05', 'completed', 'hoax']] as [$date, $status, $label]) {
-            $submission = Submission::factory()->for($owner)->create(['created_at' => $date.' 12:00:00', 'status' => $status, 'raw_input' => 'PRIVATE_ADMIN_INPUT', 'failure_reason' => 'PRIVATE_ADMIN_ERROR']);
-            if ($label) {
-                DetectionResult::factory()->for($submission)->create(['label' => $label, 'explanation' => 'PRIVATE_ADMIN_EXPLANATION']);
-            }
-        }
-        DB::table('failed_jobs')->insert(['uuid' => 'fixture-job', 'connection' => 'fixture', 'queue' => 'default', 'payload' => 'PRIVATE_ADMIN_PAYLOAD', 'exception' => 'PRIVATE_ADMIN_TRACE', 'failed_at' => now()]);
-        $stats = Livewire::test(StatsOverview::class);
-        $data = $stats->instance()->render()->getData();
-        $this->assertSame(['5', '2', '2', '1', '1'], array_map(fn ($stat) => $stat->getValue(), $data['stats']));
-        $this->assertSame([1, 2, 1], array_column($data['labels'], 'count'));
-        $stats->assertSee('semua versi model')->assertSee('termasuk hasil pada submission nonfinal')->assertSee('Informasi belum terverifikasi oleh sumber terpercaya')->assertSee('bukan bukti informasi benar atau palsu');
-        $this->get(Filament::getPanel('admin')->getUrl())->assertOk()->assertDontSee('PRIVATE_ADMIN_')->assertDontSee('private-owner@example.test');
-    }
+        $html = $this->get($panel->getUrl())->assertOk()
+            ->assertSee('Perlu tindakan')
+            ->assertSee('Kinerja pemeriksaan')
+            ->assertSee('Tren pemeriksaan per hari')
+            ->assertSee('Latensi analisis')
+            ->assertSee('Biaya OpenAI bulan ini')
+            ->assertSee('Model dan data')
+            ->getContent();
 
-    public function test_trend_uses_exact_thirty_dates_and_two_grouped_queries_without_changing_populations(): void
-    {
-        foreach ([['2026-03-01 23:59:59', 'hoax'], ['2026-03-02 00:00:00', 'hoax'], ['2026-03-31 23:59:59', 'hoax'], ['2026-04-01 00:00:00', 'hoax']] as [$date, $label]) {
-            $submission = Submission::factory()->create(['created_at' => $date, 'status' => 'processing']);
-            DetectionResult::factory()->for($submission)->create(['label' => $label]);
-        }
-        Submission::factory()->create(['created_at' => '2026-03-31 00:00:00', 'status' => 'pending']);
-        DB::connection()->enableQueryLog();
-        DB::connection()->flushQueryLog();
-        $widget = new SubmissionTrendChart;
-        $trend = $widget->getTrend();
-        $this->assertCount(2, DB::connection()->getQueryLog());
-        $this->assertCount(30, $trend['rows']);
-        $this->assertSame('2026-03-02', $trend['rows'][0]['date']);
-        $this->assertSame('2026-03-31', $trend['rows'][29]['date']);
-        $this->assertSame([1, 1], [$trend['rows'][0]['total'], $trend['rows'][0]['hoax']]);
-        $this->assertSame([2, 1], [$trend['rows'][29]['total'], $trend['rows'][29]['hoax']]);
-        $this->assertSame('Asia/Jakarta', $trend['timezone']);
-        $chart = (new ReflectionMethod($widget, 'getData'))->invoke($widget);
-        $this->assertSame(array_column($trend['rows'], 'total'), $chart['datasets'][0]['data']);
-        $this->assertSame(array_column($trend['rows'], 'hoax'), $chart['datasets'][1]['data']);
-        $this->assertSame([6, 4], $chart['datasets'][1]['borderDash']);
-        $this->assertCount(2, DB::connection()->getQueryLog());
-    }
-
-    public function test_empty_data_is_real_zero_and_empty_chart_is_distinct_from_unavailable(): void
-    {
-        $this->admin();
-        Livewire::test(StatsOverview::class)->assertSee('Belum ada hasil dengan label tersimpan.');
-        $widget = Livewire::test(SubmissionTrendChart::class)->assertSee('Belum ada submission dalam periode ini');
-        $this->assertCount(30, $widget->instance()->getTrend()['rows']);
-        $this->assertSame(0, array_sum(array_column($widget->instance()->getTrend()['rows'], 'total')));
-        $this->assertSame([], (new ReflectionMethod($widget->instance(), 'getData'))->invoke($widget->instance()));
-        Livewire::test(ModelVersionWidget::class)->assertSee('Belum tersedia')->assertDontSee('n/a')->assertSee('Layanan model tidak tersedia')->assertSee('Belum ada riwayat versi.');
+        $order = ['Perlu tindakan', 'Kinerja pemeriksaan', 'Tren pemeriksaan per hari', 'Latensi analisis', 'Biaya OpenAI bulan ini', 'Model dan data'];
+        $positions = array_map(fn (string $needle): int => (int) strpos($html, $needle), $order);
+        $sorted = $positions;
+        sort($sorted);
+        $this->assertSame($sorted, $positions, 'widgets render in the documented order');
+        $this->assertStringNotContainsString('fi-account-widget', $html);
     }
 
     public function test_runtime_provenance_and_top_three_groups_are_escaped_without_promoting_history_to_active(): void
@@ -148,13 +118,30 @@ class AdminDashboardTest extends TestCase
             }
         });
         try {
-            $ops = Livewire::test(StatsOverview::class)->assertSee('Ringkasan operasi belum tersedia')->assertDontSee('PRIVATE_ADMIN_TRACE')->assertDontSee('Belum ada hasil');
-            $this->assertSame([null, null, null], array_column($ops->instance()->render()->getData()['labels'], 'count'));
-            Livewire::test(SubmissionTrendChart::class)->assertSee('Data tren belum tersedia')->assertDontSee('PRIVATE_ADMIN_TRACE')->assertDontSee('Belum ada submission');
+            Livewire::test(NeedsActionWidget::class)->assertSee('Data tindakan belum tersedia')->assertDontSee('PRIVATE_ADMIN_TRACE');
+            Livewire::test(KpiOverview::class)->assertSee('Data kinerja belum tersedia')->assertDontSee('PRIVATE_ADMIN_TRACE')->assertDontSee('data-admin-kpis', false);
+            Livewire::test(DashboardCharts::class)->assertSee('Lihat data tabel')->assertDontSee('PRIVATE_ADMIN_TRACE');
+            Livewire::test(LatencyWidget::class)->assertSee('Sampel belum cukup')->assertDontSee('PRIVATE_ADMIN_TRACE');
             Livewire::test(ModelVersionWidget::class)->assertSee('Riwayat versi belum tersedia')->assertDontSee('PRIVATE_ADMIN_TRACE');
         } finally {
             $fail = false;
         }
+    }
+
+    public function test_private_submission_content_never_reaches_the_dashboard(): void
+    {
+        $owner = User::factory()->create(['name' => 'PRIVATE_ADMIN_OWNER', 'email' => 'private-owner@example.test']);
+        $submission = Submission::factory()->for($owner)->create([
+            'status' => 'failed', 'raw_input' => 'PRIVATE_ADMIN_INPUT', 'failure_reason' => 'PRIVATE_ADMIN_ERROR',
+        ]);
+        DetectionResult::factory()->for($submission)->create(['label' => 'hoax', 'explanation' => 'PRIVATE_ADMIN_EXPLANATION']);
+        DB::table('failed_jobs')->insert(['uuid' => 'fixture-job', 'connection' => 'fixture', 'queue' => 'default', 'payload' => 'PRIVATE_ADMIN_PAYLOAD', 'exception' => 'PRIVATE_ADMIN_TRACE', 'failed_at' => now()]);
+        $this->admin();
+
+        $this->get(Filament::getPanel('admin')->getUrl())->assertOk()
+            ->assertSee('#'.$submission->id)
+            ->assertDontSee('PRIVATE_ADMIN_')
+            ->assertDontSee('private-owner@example.test');
     }
 
     #[DataProvider('widgets')]
@@ -172,7 +159,10 @@ class AdminDashboardTest extends TestCase
 
     public static function widgets(): array
     {
-        return [[StatsOverview::class], [SubmissionTrendChart::class], [ModelVersionWidget::class]];
+        return [
+            [NeedsActionWidget::class], [KpiOverview::class], [DashboardCharts::class],
+            [LatencyWidget::class], [OpenAiBudgetWidget::class], [ModelVersionWidget::class],
+        ];
     }
 
     private function admin(): User

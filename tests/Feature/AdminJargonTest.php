@@ -5,11 +5,10 @@ namespace Tests\Feature;
 use App\Filament\Resources\Datasets\DatasetResource;
 use App\Filament\Resources\ModelVersions\ModelVersionResource;
 use App\Filament\Resources\ModelVersions\Pages\ListModelVersions;
-use App\Filament\Resources\SubmissionProcessingEvents\SubmissionProcessingEventResource;
 use App\Filament\Resources\Submissions\SubmissionResource;
 use App\Filament\Support\AdminGlossary;
 use App\Filament\Widgets\ModelVersionWidget;
-use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\NeedsActionWidget;
 use App\Models\Submission;
 use App\Models\User;
 use App\Services\Bert\BertRuntimeMetadata;
@@ -73,16 +72,16 @@ class AdminJargonTest extends TestCase
         $this->assertStringContainsString(AdminGlossary::explain('active_inference_status'), $html);
     }
 
-    public function test_processing_event_screens_explain_stage_attempts_and_error_code(): void
+    public function test_submission_timeline_explains_stage_attempts_and_error_code(): void
     {
         $this->admin();
         $submission = Submission::factory()->create(['status' => 'processing']);
-        $event = $submission->processingEvents()->create([
+        $submission->processingEvents()->create([
             'stage' => 'classifying', 'outcome' => 'failed', 'service' => 'bert',
             'attempt' => 2, 'duration_ms' => 1200, 'error_code' => 'timeout',
         ]);
 
-        $this->get(SubmissionProcessingEventResource::getUrl('view', ['record' => $event]))
+        $this->get(SubmissionResource::getUrl('view', ['record' => $submission]))
             ->assertOk()
             ->assertSee(AdminGlossary::explain('pipeline_stage'))
             ->assertSee(AdminGlossary::explain('attempts'))
@@ -108,7 +107,7 @@ class AdminJargonTest extends TestCase
     public function test_failed_jobs_stat_is_renamed_and_explained(): void
     {
         $this->admin();
-        $html = Livewire::test(StatsOverview::class)->html();
+        $html = Livewire::test(NeedsActionWidget::class)->html();
 
         $this->assertStringNotContainsString('Entri failed jobs', $html);
         $this->assertStringContainsString('Tugas latar belakang gagal', $html);

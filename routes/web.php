@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\DeteksiController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ModelVersionCsvTemplateController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\StatistikController;
@@ -53,6 +54,12 @@ Route::middleware('guest')->group(function () {
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
     Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store');
 });
+
+// Not under /admin/model-versions/{record}: Filament registers that wildcard
+// first, so a sibling path there would be swallowed by the record route.
+Route::get('/admin/model-version-template.csv', ModelVersionCsvTemplateController::class)
+    ->middleware(['auth', 'throttle:30,1'])
+    ->name('admin.model-versions.template');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');

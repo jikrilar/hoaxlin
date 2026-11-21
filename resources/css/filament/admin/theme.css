@@ -22,9 +22,162 @@
         font-weight: var(--ds-font-weight-semibold);
     }
 
+    /* Stage-2 type roles apply to admin chrome: UI face, h2 step for page titles. */
     .fi-panel-admin :is(.fi-header-heading, .fi-simple-header-heading) {
         color: var(--ds-text-primary);
+        font-family: var(--ds-font-ui);
+        font-size: var(--ds-type-h2-size);
         font-weight: var(--ds-font-weight-semibold);
+        line-height: var(--ds-type-h2-leading);
+        letter-spacing: var(--ds-type-h2-tracking);
+    }
+
+    .fi-panel-admin :is(.fi-section-header-heading, .fi-ta-header-heading) {
+        font-family: var(--ds-font-ui);
+        font-size: var(--ds-type-h3-size);
+        font-weight: var(--ds-font-weight-semibold);
+        line-height: var(--ds-type-h3-leading);
+        letter-spacing: var(--ds-type-h3-tracking);
+    }
+
+    .fi-panel-admin :is(.fi-sidebar-group-label, .fi-ta-header-cell, .fi-fo-field-label) {
+        font-size: var(--ds-type-label-size);
+        font-weight: var(--ds-font-weight-medium);
+        line-height: var(--ds-type-label-leading);
+        letter-spacing: var(--ds-type-label-tracking);
+    }
+
+    /* Tables: same rhythm and numerals as the public data tables. */
+    .fi-panel-admin .fi-ta {
+        font-size: var(--ds-type-body-sm-size);
+        line-height: var(--ds-type-body-sm-leading);
+    }
+
+    .fi-panel-admin .fi-ta-table :is(th, td) {
+        padding-block: var(--ds-space-3);
+    }
+
+    .fi-panel-admin .fi-ta-cell {
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Cells must never be squeezed below their own content: with seven columns
+       plus a selection checkbox the table is wider than the card, and shrinking
+       cells clips the date and the row actions. Overflow stays inside the card. */
+    .fi-panel-admin .fi-ta-table {
+        table-layout: auto;
+    }
+
+    .fi-panel-admin .fi-ta-table :is(th, td) {
+        min-inline-size: max-content;
+    }
+
+    /* Actions wrap onto a second line rather than forcing the table wider than
+       its container (which would need an inner horizontal scrollbar at 1280px). */
+    .fi-panel-admin .fi-ta-cell:has(.fi-ta-actions) {
+        white-space: normal;
+        overflow-wrap: normal;
+    }
+
+    .fi-panel-admin .fi-ta-cell:has(.fi-ta-actions) > .fi-ta-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: flex-end;
+    }
+
+    .fi-panel-admin .fi-ta-cell:has(.fi-ta-actions) > .fi-ta-actions > * {
+        margin-inline-start: 0;
+    }
+
+    .fi-panel-admin .fi-ta-row {
+        transition: background-color var(--ds-motion-fast) var(--ds-ease-standard);
+    }
+
+    /* Badges: token tones, icon+text is enforced in PHP; colour never alone.
+       Filament paints `.fi-color` badges from its `--color-*` scale, so the
+       success/danger/warning/info tones are remapped to the shared tokens. */
+    .fi-panel-admin .fi-badge {
+        border-radius: var(--ds-radius-sm);
+        font-size: var(--ds-type-meta-size);
+        font-weight: var(--ds-font-weight-medium);
+        line-height: var(--ds-type-meta-leading);
+    }
+
+    .fi-panel-admin .fi-badge.fi-color-success {
+        background: var(--ds-success-bg);
+        color: var(--ds-success-fg);
+        --tw-ring-color: var(--ds-success-fg);
+    }
+
+    .fi-panel-admin .fi-badge.fi-color-danger {
+        background: var(--ds-danger-bg);
+        color: var(--ds-danger-fg);
+        --tw-ring-color: var(--ds-danger-fg);
+    }
+
+    .fi-panel-admin .fi-badge.fi-color-warning {
+        background: var(--ds-warning-bg);
+        color: var(--ds-warning-fg);
+        --tw-ring-color: var(--ds-warning-fg);
+    }
+
+    .fi-panel-admin .fi-badge.fi-color-info {
+        background: var(--ds-info-bg);
+        color: var(--ds-info-fg);
+        --tw-ring-color: var(--ds-info-fg);
+    }
+
+    /* Notifications share the alert surface of the public app. */
+    .fi-panel-admin .fi-no-notification {
+        border: var(--ds-border-width) solid var(--ds-border-subtle);
+        border-radius: var(--ds-radius-md);
+        box-shadow: none;
+        font-size: var(--ds-type-body-sm-size);
+        line-height: var(--ds-type-body-sm-leading);
+    }
+
+    .fi-panel-admin .fi-no-notification .fi-no-notification-title {
+        font-weight: var(--ds-font-weight-semibold);
+    }
+
+    .fi-panel-admin :is(.fi-btn, .fi-link, .fi-ta-col, .fi-dropdown-list-item) {
+        transition:
+            background-color var(--ds-motion-fast) var(--ds-ease-standard),
+            border-color var(--ds-motion-fast) var(--ds-ease-standard),
+            color var(--ds-motion-fast) var(--ds-ease-standard);
+    }
+
+    /* WCAG 2.5.5 / plan DoD: interactive controls stay at least 44px tall.
+       Filament's default button and filter-control heights are 36px, and its
+       tab, sort-header and row-action affordances are 20-40px. */
+    .fi-panel-admin :is(.fi-btn, .fi-icon-btn, .fi-input-wrp, .fi-select-input, .fi-tabs-item) {
+        min-block-size: 2.75rem;
+    }
+
+    /* Column sort headers, inline row actions, breadcrumbs and the filter reset are
+       text affordances; give them a full-height hit area without changing how they look. */
+    .fi-panel-admin :is(
+        .fi-ta-header-cell-sort-btn,
+        .fi-ta-col-btn,
+        .fi-ta-actions .fi-btn,
+        .fi-ta-actions .fi-link,
+        a.fi-ta-col,
+        .fi-breadcrumbs-item-label,
+        .fi-ta-filters .fi-link,
+        .fi-ta-filters button.fi-link,
+        .fi-topbar-start a,
+        .fi-select-input-btn,
+        .fi-user-menu-trigger,
+        .fi-sidebar-item-btn
+    ) {
+        min-block-size: 2.75rem;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .fi-panel-admin .fi-sidebar-item-btn {
+        display: flex;
+        inline-size: 100%;
     }
 
     .fi-panel-admin .fi-simple-main {
@@ -119,5 +272,53 @@
     .fi-panel-admin .hl-admin-data-disclosure summary:focus-visible { outline: var(--ds-focus-width) solid var(--ds-focus); outline-offset: var(--ds-focus-offset); }
     @media (min-width: 48rem) {
         .fi-panel-admin .hl-admin-facts > div { grid-template-columns: minmax(10rem, 1fr) minmax(0, 3fr); gap: var(--ds-space-4); }
+    }
+}
+
+@layer components {
+    /* T3.2 dashboard widgets: shared rhythm, token surfaces, no ad-hoc colours. */
+    .fi-panel-admin .hl-admin-subheading { margin-block: var(--ds-space-6) var(--ds-space-2); font-size: var(--ds-type-h4-size); font-weight: var(--ds-font-weight-semibold); line-height: var(--ds-type-h4-leading); }
+    .fi-panel-admin .hl-admin-kpi-grid { display: grid; gap: var(--ds-space-4); margin: 0; }
+    .fi-panel-admin .hl-admin-kpi-grid > div { padding: var(--ds-space-4); border: var(--ds-border-width) solid var(--ds-border-subtle); border-radius: var(--ds-radius-md); background: var(--ds-bg-surface); }
+    .fi-panel-admin .hl-admin-kpi-grid dt { color: var(--ds-text-muted); font-size: var(--ds-type-label-size); }
+    .fi-panel-admin .hl-admin-kpi-grid dd { margin-block-start: var(--ds-space-1); color: var(--ds-text-primary); font-size: var(--ds-type-h3-size); font-weight: var(--ds-font-weight-semibold); font-variant-numeric: tabular-nums; }
+    .fi-panel-admin .hl-admin-kpi-grid span { display: block; margin-block-start: var(--ds-space-1); color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .fi-panel-admin .hl-admin-sparkline { margin-block-start: var(--ds-space-4); }
+    .fi-panel-admin .hl-admin-sparkline figcaption { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .fi-panel-admin .hl-admin-sparkline__bars { display: flex; align-items: flex-end; gap: var(--ds-space-2); block-size: 4rem; margin-block-start: var(--ds-space-2); padding: 0; list-style: none; }
+    .fi-panel-admin .hl-admin-sparkline__bars li { display: flex; align-items: flex-end; inline-size: 1.5rem; block-size: 100%; }
+    .fi-panel-admin .hl-admin-sparkline__bars li > span:first-child { inline-size: 100%; border-radius: var(--ds-radius-sm); background: var(--ds-action-primary); }
+    /* The admin theme does not import components.css, so the shared screen-reader
+       utility must exist here too; without it the sparkline values render as text. */
+    .fi-panel-admin .hl-visually-hidden { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+    .fi-panel-admin .hl-admin-service-list { display: grid; gap: var(--ds-space-3); margin-block-start: var(--ds-space-3); padding: 0; list-style: none; }
+    .fi-panel-admin .hl-admin-service-list li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2) var(--ds-space-3); }
+    .fi-panel-admin .hl-admin-service-name { min-inline-size: 4rem; font-weight: var(--ds-font-weight-medium); }
+    .fi-panel-admin .hl-admin-view-switch { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); margin-block-end: var(--ds-space-3); }
+    .fi-panel-admin .hl-admin-view-switch__item { min-block-size: 2.75rem; padding: var(--ds-space-1) var(--ds-space-3); border: var(--ds-border-width) solid var(--ds-border-control); border-radius: var(--ds-radius-md); background: var(--ds-bg-surface); color: var(--ds-text-body); font-size: var(--ds-type-label-size); cursor: pointer; transition: background-color var(--ds-motion-fast) var(--ds-ease-standard), border-color var(--ds-motion-fast) var(--ds-ease-standard); }
+    .fi-panel-admin .hl-admin-view-switch__item:focus-visible { outline: var(--ds-focus-width) solid var(--ds-focus); outline-offset: var(--ds-focus-offset); }
+    .fi-panel-admin .hl-admin-view-switch__item[aria-pressed="true"] { border-color: var(--ds-action-primary); background: var(--ds-bg-selected); color: var(--ds-action-primary); font-weight: var(--ds-font-weight-semibold); }
+    .fi-panel-admin .hl-admin-budget__amount { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ds-space-2); margin: 0; }
+    .fi-panel-admin .hl-admin-budget__amount strong { color: var(--ds-text-primary); font-size: var(--ds-type-h2-size); font-variant-numeric: tabular-nums; }
+    .fi-panel-admin .hl-admin-budget__amount span { color: var(--ds-text-muted); font-size: var(--ds-type-body-sm-size); }
+    .fi-panel-admin .hl-admin-budget__bar { block-size: var(--ds-space-2); margin-block-start: var(--ds-space-3); border-radius: var(--ds-radius-sm); background: var(--ds-bg-subtle); overflow: hidden; }
+    .fi-panel-admin .hl-admin-budget__bar > span { display: block; block-size: 100%; background: var(--ds-action-primary); }
+    @media (min-width: 48rem) {
+        .fi-panel-admin .hl-admin-kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+}
+
+@layer components {
+    /* T3.5 submission detail: evidence list and processing timeline. */
+    .fi-panel-admin .hl-admin-evidence, .fi-panel-admin .hl-admin-timeline { display: grid; gap: var(--ds-space-3); margin: 0; padding: 0; list-style: none; }
+    .fi-panel-admin .hl-admin-evidence__item, .fi-panel-admin .hl-admin-timeline__item { padding: var(--ds-space-4); border: var(--ds-border-width) solid var(--ds-border-subtle); border-radius: var(--ds-radius-md); background: var(--ds-bg-surface); }
+    .fi-panel-admin .hl-admin-evidence__title, .fi-panel-admin .hl-admin-timeline__heading { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2); margin: 0; color: var(--ds-text-primary); }
+    .fi-panel-admin .hl-admin-evidence__facts, .fi-panel-admin .hl-admin-timeline__facts { display: grid; gap: var(--ds-space-2); margin-block: var(--ds-space-3); }
+    .fi-panel-admin .hl-admin-evidence__facts dt, .fi-panel-admin .hl-admin-timeline__facts dt { color: var(--ds-text-muted); font-size: var(--ds-type-label-size); }
+    .fi-panel-admin .hl-admin-evidence__facts dd, .fi-panel-admin .hl-admin-timeline__facts dd { margin: 0; color: var(--ds-text-body); font-size: var(--ds-type-body-sm-size); overflow-wrap: anywhere; }
+    .fi-panel-admin .hl-admin-evidence__snippet { margin: 0; padding-inline-start: var(--ds-space-3); border-inline-start: var(--ds-border-width) solid var(--ds-border-subtle); color: var(--ds-text-body); font-size: var(--ds-type-body-sm-size); }
+    .fi-panel-admin .hl-admin-timeline__metadata { margin-block-start: var(--ds-space-2); max-inline-size: 100%; overflow-x: auto; color: var(--ds-text-muted); font-family: var(--ds-font-mono); font-size: var(--ds-type-body-sm-size); white-space: pre-wrap; overflow-wrap: anywhere; }
+    @media (min-width: 48rem) {
+        .fi-panel-admin .hl-admin-evidence__facts, .fi-panel-admin .hl-admin-timeline__facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 }

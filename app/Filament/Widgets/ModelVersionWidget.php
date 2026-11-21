@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Filament\Support\AdminGlossary;
 use App\Filament\Widgets\Concerns\RequiresAdminPanel;
 use App\Models\DetectionResult;
+use App\Services\Admin\DashboardMetrics;
 use App\Services\Bert\BertRuntimeMetadata;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -15,7 +16,7 @@ class ModelVersionWidget extends BaseWidget
 {
     use RequiresAdminPanel;
 
-    protected static ?int $sort = 30;
+    protected static ?int $sort = 40;
 
     protected static bool $isLazy = false;
 
@@ -73,7 +74,12 @@ class ModelVersionWidget extends BaseWidget
 
     protected function getViewData(): array
     {
-        return ['stats' => $this->getCachedStats(), 'history' => $this->getHistory(), 'pollingInterval' => $this->getPollingInterval()];
+        return [
+            'stats' => $this->getCachedStats(),
+            'history' => $this->getHistory(),
+            'curation' => app(DashboardMetrics::class)->curation(),
+            'pollingInterval' => $this->getPollingInterval(),
+        ];
     }
 
     private function evaluationDescription(array $evaluation, string $runtimeVersion, bool $available): string

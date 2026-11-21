@@ -19,6 +19,7 @@ Direktori ini menyimpan hasil baseline, pemetaan test, dan tangkapan layar untuk
 - [Bukti Cara kerja & Tentang T2.10 (`after-s2/t210/`)](after-s2/t210/) — stepper 5 langkah, glosarium publik, bagian Tentang + FAQ, screenshot 375/768/1280.
 - [Bukti Auth/Profil/Error T2.11 (`after-s2/t211/`)](after-s2/t211/) — heading auth UI-face, copy ramah, halaman error dengan kode sebagai catatan, screenshot 375/768/1280.
 - [QA visual & aksesibilitas T2.12 (`after-s2/qa/`)](after-s2/qa/) — 27 screenshot 375/768/1280, audit keyboard/zoom/reduced-motion/kontras/konsol.
+- [Bukti Tema Admin T3.1 (`after-s3/`)](after-s3/) — tipografi/tabel/badge bertoken, palet selaras, screenshot 375/768/1280.
 - [Screenshot Baseline (`before/`)](before/) — 60 tangkapan layar *full-page* kondisi awal pada viewport `375px`, `768px`, dan `1280px`:
   - Publik & autentikasi: [`home`](before/home-1280.png), [`cara-kerja`](before/cara-kerja-1280.png), [`tentang`](before/tentang-1280.png), [`statistik`](before/statistik-1280.png), [`login`](before/login-1280.png), [`register`](before/register-1280.png)
   - Hasil pemeriksaan: [`hasil-selesai`](before/hasil-selesai-1280.png), [`hasil-gagal`](before/hasil-gagal-1280.png), [`hasil-meragukan`](before/hasil-meragukan-1280.png)

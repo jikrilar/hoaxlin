@@ -15,6 +15,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -44,18 +45,23 @@ class AdminLogResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->label('ID catatan')->sortable(),
+                TextColumn::make('id')->label('ID catatan')->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('admin.name')->label('Admin')->sortable()->placeholder('Admin tidak tersedia')->wrap(),
-                TextColumn::make('action')->label('Tindakan')->formatStateUsing(MonitoringPresentation::action(...))->sortable()->wrap(),
+                TextColumn::make('action')->label('Tindakan')->badge()->icon(fn (?string $state) => MonitoringPresentation::actionIcon($state))->color(fn (?string $state): string => MonitoringPresentation::actionColor($state))->formatStateUsing(MonitoringPresentation::action(...))->sortable()->wrap(),
                 TextColumn::make('target_table')->label('Tabel target')->formatStateUsing(MonitoringPresentation::target(...))->sortable(),
-                TextColumn::make('target_id')->label('ID target')->placeholder('ID target tidak tercatat')->sortable(),
+                TextColumn::make('target_id')->label('ID target')->placeholder('ID target tidak tercatat')->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')->label('Dicatat')->dateTime('d/m/Y H:i:s')->sortable(),
             ])
             ->filters([
                 SelectFilter::make('action')->label('Tindakan')->options([
                     'create' => 'Buat', 'update' => 'Ubah', 'delete' => 'Hapus',
+                    'submission_retried' => 'Pemeriksaan dicoba ulang',
+                    'feedback_reviewed' => 'Umpan balik ditinjau',
+                    'table_exported' => 'Tabel diekspor',
                 ]),
             ])
+            ->filtersLayout(FiltersLayout::AboveContent)
+            ->persistFiltersInSession()
             ->recordActions([
                 ViewAction::make()->label('Lihat detail'),
             ])

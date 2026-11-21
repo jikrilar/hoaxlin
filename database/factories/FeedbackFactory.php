@@ -19,6 +19,17 @@ class FeedbackFactory extends Factory
             'user_id' => User::factory(),
             'is_correct' => fake()->boolean(70),
             'comment' => fake()->optional(0.7)->sentence(),
+            // New feedback starts unreviewed; tests opt in with ->reviewed().
+            'reviewed_at' => null,
+            'reviewed_by' => null,
         ];
+    }
+
+    public function reviewed(?User $reviewer = null): static
+    {
+        return $this->state(fn (): array => [
+            'reviewed_at' => now(),
+            'reviewed_by' => $reviewer?->getKey() ?? User::factory()->state(['is_admin' => true]),
+        ]);
     }
 }

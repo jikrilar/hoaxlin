@@ -11,6 +11,8 @@ final class AdminGlossary
     public const TERMS = [
         'threshold' => 'Batas skor keyakinan agar model berani memberi label valid atau hoaks; bukan persentase kebenaran informasi.',
         'f1_score' => 'Ukuran keseimbangan ketepatan dan kelengkapan model pada data evaluasi.',
+        'accuracy' => 'Persentase prediksi benar pada data validasi internal saat model dilatih; bukan jaminan performa pada informasi baru.',
+        'model_status' => 'Tahap pelatihan versi ini: menunggu antrean, sedang dilatih, selesai, atau gagal. Selesai tidak berarti model sudah aktif.',
         'baseline' => 'Versi model acuan v1.0.0 yang tidak ditimpa oleh pelatihan bertahap.',
         'baseline_comparison' => 'Selisih akurasi dan F1 versi ini dibanding model acuan v1.0.0 pada split validasi yang sama.',
         'hot_swap' => 'Mengganti model yang melayani pengguna tanpa memulai ulang layanan; berlaku hanya setelah layanan konfirmasi berhasil.',

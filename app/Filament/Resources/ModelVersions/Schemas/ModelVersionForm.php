@@ -5,10 +5,12 @@ namespace App\Filament\Resources\ModelVersions\Schemas;
 use App\Models\ModelVersion;
 use App\Services\Bert\BertCsvValidator;
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use InvalidArgumentException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -128,6 +130,14 @@ class ModelVersionForm
                                 };
                             })
                             ->helperText("Berkas CSV UTF-8 wajib memiliki kolom header `text` dan `label`, minimal 1 baris data valid/hoax, dan maksimal {$maxMbLabel}.")
+                            ->hintAction(
+                                Action::make('downloadTemplate')
+                                    ->label('Unduh templat CSV')
+                                    ->icon(Heroicon::OutlinedArrowDownTray)
+                                    ->color('gray')
+                                    ->url(route('admin.model-versions.template'))
+                                    ->openUrlInNewTab(),
+                            )
                             ->validationMessages([
                                 'required' => 'Unggah berkas CSV pelatihan.',
                                 'mimetypes' => 'Berkas harus bertipe CSV yang valid.',

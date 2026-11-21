@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ProcessSubmission;
-use App\Models\Submission;
+use App\Services\Pipeline\SubmissionRecovery;
 use Illuminate\Console\Command;
 
 class RecoverFailedSubmissions extends Command
@@ -15,18 +14,15 @@ class RecoverFailedSubmissions extends Command
 
     protected $description = 'Re-dispatch failed submissions for retry (D8)';
 
-    public function handle(): int
+    public function handle(SubmissionRecovery $recovery): int
     {
-        $query = Submission::where('status', 'failed');
+        $id = $this->option('id');
+        $query = $recovery->failedQuery(
+            $id !== null ? (int) $id : null,
+            (int) $this->option('days'),
+        );
 
-        if ($id = $this->option('id')) {
-            $query->whereKey($id);
-        } else {
-            $days = (int) $this->option('days');
-            $query->where('processing_completed_at', '>=', now()->subDays($days));
-        }
-
-        $count = $query->count();
+        $count = (clone $query)->count();
         $this->info("Found {$count} failed submissions to recover.");
 
         if ($this->option('dry-run')) {
@@ -35,23 +31,8 @@ class RecoverFailedSubmissions extends Command
             return self::SUCCESS;
         }
 
-        $recovered = 0;
-        $query->chunkById(100, function ($submissions) use (&$recovered) {
-            foreach ($submissions as $submission) {
-                $submission->update([
-                    'status' => 'pending',
-                    'processing_stage' => 'queued',
-                    'failure_reason' => null,
-                    'last_error_service' => null,
-                    'last_error_code' => null,
-                    'processing_completed_at' => null,
-                ]);
-                ProcessSubmission::dispatch($submission);
-                $recovered++;
-            }
-        });
-
-        $this->info("Recovered {$recovered} submissions (re-dispatched).");
+        $result = $recovery->retryQuery($query);
+        $this->info("Recovered {$result['recovered']} submissions (re-dispatched).");
 
         return self::SUCCESS;
     }

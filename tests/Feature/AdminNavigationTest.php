@@ -65,21 +65,18 @@ class AdminNavigationTest extends TestCase
         $this->assertSame($icons, array_values(array_unique($icons)), 'Navigation icons must be unique per menu.');
     }
 
-    public function test_duplicate_detection_and_processing_event_resources_stay_out_of_navigation(): void
+    public function test_duplicate_detection_and_processing_event_resources_are_gone(): void
     {
-        $items = $this->navigationItems()->keyBy('resource');
+        // T3.6 removed the two duplicate resources entirely; only their models remain.
+        $this->assertFalse(class_exists(DetectionResultResource::class));
+        $this->assertFalse(class_exists(SubmissionProcessingEventResource::class));
+        $this->assertTrue(class_exists(DetectionResult::class));
+        $this->assertTrue(class_exists(SubmissionProcessingEvent::class));
 
-        foreach ([DetectionResultResource::class, SubmissionProcessingEventResource::class] as $resource) {
-            $this->assertFalse($resource::shouldRegisterNavigation(), $resource.' should stay hidden from navigation until T3.6.');
-            $this->assertFalse($items[$resource]['visible']);
-            $this->assertSame(0, count(Filament::getNavigationItems()['resources'][$resource] ?? []));
-        }
-
-        // Hiding navigation must not remove access or routes.
         $admin = User::factory()->create(['is_admin' => true]);
         $this->actingAs($admin);
-        $this->get(DetectionResultResource::getUrl('index'))->assertOk();
-        $this->get(SubmissionProcessingEventResource::getUrl('index'))->assertOk();
+        $this->get('/admin/detection-results')->assertNotFound();
+        $this->get('/admin/submission-processing-events')->assertNotFound();
     }
 
     public function test_official_labels_replace_english_resource_names(): void
@@ -158,10 +155,8 @@ class AdminNavigationTest extends TestCase
         $resources = [
             AdminLogResource::class => AdminLog::class,
             DatasetResource::class => Dataset::class,
-            DetectionResultResource::class => DetectionResult::class,
             FeedbackResource::class => Feedback::class,
             ModelVersionResource::class => ModelVersion::class,
-            SubmissionProcessingEventResource::class => SubmissionProcessingEvent::class,
             SubmissionResource::class => Submission::class,
             UserResource::class => User::class,
         ];

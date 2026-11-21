@@ -24,7 +24,7 @@ use UnitEnum;
 
 class ModelVersionResource extends Resource
 {
-    public const TRAINING_NOTICE = 'Pelatihan lanjutan berjalan di latar belakang dan tidak otomatis menggantikan model aktif v1.0.0. Versi baru hanya dipakai setelah administrator mengaktifkannya secara manual.';
+    public const TRAINING_NOTICE = 'Pelatihan versi baru berjalan di latar belakang dan tidak otomatis menggantikan model aktif v1.0.0. Versi lain tidak dihapus; model baru hanya dipakai setelah administrator mengaktifkannya secara manual.';
 
     protected static ?string $model = ModelVersion::class;
 
@@ -60,6 +60,16 @@ class ModelVersionResource extends Resource
         }
 
         return static::statusOptions()[$state] ?? $state;
+    }
+
+    public static function statusIcon(?string $state): BackedEnum
+    {
+        return match ($state) {
+            ModelVersion::STATUS_COMPLETED => Heroicon::OutlinedCheckCircle,
+            ModelVersion::STATUS_TRAINING => Heroicon::OutlinedArrowPath,
+            ModelVersion::STATUS_FAILED => Heroicon::OutlinedXCircle,
+            default => Heroicon::OutlinedClock,
+        };
     }
 
     public static function statusColor(?string $state): string
@@ -150,7 +160,7 @@ class ModelVersionResource extends Resource
      */
     public static function activationDescription(string $versionName, ?string $comparison): string
     {
-        $baseText = "Layanan model akan beralih ke {$versionName} tanpa memulai ulang layanan. Status aktif diperbarui hanya bila layanan mengonfirmasi pemuatan model berhasil. Metrik berasal dari data validasi internal dan tidak menjamin kualitas pada data baru.";
+        $baseText = "Layanan model akan beralih ke {$versionName} tanpa memulai ulang layanan. Status aktif diperbarui hanya bila layanan mengonfirmasi pemuatan model berhasil. Metrik berasal dari data validasi internal dan tidak menjamin kualitas pada data baru; lakukan evaluasi eksternal sebelum mengaktifkan model ini untuk pengguna.";
 
         return $comparison !== null && $comparison !== 'Acuan baseline v1.0.0'
             ? "{$baseText} Perbandingan validasi: {$comparison}."

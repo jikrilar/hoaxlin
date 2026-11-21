@@ -325,8 +325,10 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
 **Tujuan:** admin melihat kondisi sistem sekilas, menemukan yang perlu ditindak, dan menindaklanjutinya tanpa terminal. Konten pengguna tidak diekspos lebih dari yang sudah ada.
 
 ### T3.1 (M) Tema admin
-- [ ] `resources/css/filament/admin/theme.css`: terapkan token tipografi/gerak Tahap 2 (palet tetap; peta `colors()` di `AdminPanelProvider` harus tetap selaras dengan `design-tokens.css`). Jangan menyentuh aset vendor Filament.
-- [ ] Standar tabel/form/badge/notification admin; reduced-motion dihormati.
+- [x] `resources/css/filament/admin/theme.css`: terapkan token tipografi/gerak Tahap 2 (palet tetap; peta `colors()` di `AdminPanelProvider` harus tetap selaras dengan `design-tokens.css`). Jangan menyentuh aset vendor Filament.
+- [x] Standar tabel/form/badge/notification admin; reduced-motion dihormati.
+- **Bukti:** `tests/Frontend/admin-theme.test.mjs` (import token, skala tipografi, motion, palet selaras, tone badge), `AdminThemeTokensTest` (colors() = token, font lokal, mode terang, entry Vite), `reports/frontend-revamp/after-s3/`.
+- **Catatan:** selektor mengikuti kelas Filament yang nyata (`fi-ta-header-cell`, `fi-fo-field-label`, `fi-badge.fi-color-*`); aset vendor tidak diubah.
 
 ### T3.2 (L) Dashboard
 **Tata letak (urut):**
@@ -341,59 +343,114 @@ Bangun/rapikan di `resources/views/components/ui/` + `resources/css/components.c
    - Umpan balik: rasio Sesuai vs Tidak sesuai (stacked bar), dengan catatan ini penilaian pengguna, bukan akurasi model.
    - **Biaya OpenAI bulan ini vs kuota** (gauge/progress) dari `openai_usage_periods` dan `config('services.openai.monthly_quota_usd')`.
 4. **Model & data** (ringkas): model aktif, ambang keyakinan (dengan tooltip), hasil evaluasi artefak dengan keterangan dataset/split dan catatan bahwa itu bukan jaminan akurasi produk; jumlah Data Kurasi terverifikasi per label (setelah Tahap 4).
-- [ ] **Filter rentang waktu** bersama (7/30/90 hari) untuk widget bertanggal (⚠ VERIFIKASI API filter widget/dashboard Filament 5, mis. `HasFiltersSchema`/`InteractsWithPageFilters`).
-- [ ] Query diagregasi & di-cache singkat (≤ 60 dtk) dengan penanganan `PDOException` seperti widget sekarang (tampilkan "Belum tersedia" bukan error). Periksa indeks yang dibutuhkan; tambah migrasi indeks bila perlu (additive, reversible).
-- [ ] Pertahankan tabel data sebagai `disclosure` "Lihat data tabel" untuk aksesibilitas (atribut `data-admin-*` yang diuji dipertahankan atau test diperbarui).
-- [ ] Semua definisi hitung dijelaskan lewat tooltip; sertakan teks "bukan prevalensi hoaks, bukan akurasi model".
+- [x] **Filter rentang waktu** bersama (7/30/90 hari) untuk widget bertanggal (⚠ VERIFIKASI API filter widget/dashboard Filament 5, mis. `HasFiltersSchema`/`InteractsWithPageFilters`).
+  - Verifikasi: Filament 5.8.3 memakai `Filament\Pages\Dashboard\Concerns\HasFiltersForm` di halaman + `Filament\Widgets\Concerns\InteractsWithPageFilters` (`#[Reactive] public ?array $pageFilters`) di widget. `Panel::getPageClass()` **tidak ada**; filter dibaca dari `$this->pageFilters['range']` lewat `DashboardMetrics::rangeDays()` (fallback 30).
+- [x] Query diagregasi & di-cache singkat (≤ 60 dtk) dengan penanganan `PDOException` seperti widget sekarang (tampilkan "Belum tersedia" bukan error). Periksa indeks yang dibutuhkan; tambah migrasi indeks bila perlu (additive, reversible).
+  - `App\Services\Admin\DashboardMetrics` (cache 60 dtk per rentang, fallback `available=false`) dan `App\Services\Admin\ServiceHealth`; migrasi `2026_11_13_000001_add_admin_dashboard_indexes` (additive, reversible).
+- [x] Pertahankan tabel data sebagai `disclosure` "Lihat data tabel" untuk aksesibilitas (atribut `data-admin-*` yang diuji dipertahankan atau test diperbarui).
+  - `data-admin-kpis`, `data-admin-needs-action`, `data-admin-service-health`, `data-admin-latency`, `data-admin-openai-spend`, `data-admin-curation`, `data-admin-trend`, `data-admin-breakdown`. Widget lama `StatsOverview`/`SubmissionTrendChart` dihapus; `AdminDashboardTest` dan `AdminJargonTest` diperbarui ke widget pengganti.
+- [x] Semua definisi hitung dijelaskan lewat tooltip; sertakan teks "bukan prevalensi hoaks, bukan akurasi model".
+  - Komponen `resources/views/components/admin/definition.blade.php` (icon-button + tooltip Filament, `aria-label` "Penjelasan: …"); 10 definisi dirender dan diuji jumlahnya.
 - **Penerimaan:** setiap data di dashboard punya visual yang jelas; tidak ada widget kosong tanpa empty state; `AdminMonitoringResourcesTest`, `FilamentAuditObserverTest` tetap hijau; dashboard < 2 dtk pada data fixture ≥ 10k pemeriksaan (⚠ VERIFIKASI dengan seed sementara di env terpisah).
+  - Terverifikasi: 12.000 submission + 2.000 hasil di env sementara (SQLite, `APP_DEBUG=false`): TTFB 86–140 ms, halaman siap 325–516 ms per rentang 7/30/90 (Chromium, 375/768/1280). Tidak ada overflow horizontal. `AdminMonitoringResourcesTest`, `FilamentAuditObserverTest`, suite penuh hijau. Bukti: `reports/frontend-revamp/after-s3/`.
+  - **Ditunda sesuai ketergantungan plan:** tombol/aksi **Coba lagi** (T3.4) dan daftar umpan balik "tidak sesuai" belum ditinjau (T3.5). Widget hanya menautkan ke daftar Pemeriksaan dan tidak mengubah data.
 
 ### T3.3 (M) Standarisasi tabel admin
 Berlaku untuk Pemeriksaan, Umpan Balik, Pengguna, Log Admin, Versi Model, Data Kurasi:
-- [ ] ≤ 6 kolom default terlihat; kolom lain `toggleable(isToggledHiddenByDefault: true)`. ID teknis disembunyikan default.
-- [ ] Badge berwarna + ikon untuk status/label; urutan default `created_at desc`.
-- [ ] Filter di atas tabel, simpan di session (`persistFiltersInSession`); pencarian global tetap.
-- [ ] **Ekspor CSV** pada tabel yang relevan (Pemeriksaan: tanpa isi pengguna — hanya metadata; Umpan Balik; Pengguna: tanpa data sensitif). Reuse helper escape CSV yang ada (⚠ VERIFIKASI helper di `CsvExportTest` path) dan **escape formula** (`=`, `+`, `-`, `@`) untuk sel berasal dari pengguna.
-- [ ] Empty state informatif; notifikasi konsisten.
+- [x] ≤ 6 kolom default terlihat; kolom lain `toggleable(isToggledHiddenByDefault: true)`. ID teknis disembunyikan default.
+  - Pemeriksaan 5 kolom (ID, Pengguna, Tahap akhir, Kode kendala tersembunyi), Umpan Balik 4 (ID pemeriksaan), Pengguna 5, Log Admin 4 (ID catatan, ID target), Data Kurasi 4 (Sumber), Versi Model 5 (Perbandingan vs Baseline, Baris dataset, F1-score, Durasi). Email pengguna **tetap** default: itu identitas akun, bukan kolom teknis, dan `AdminPanelThemeTest` memakainya untuk mengenali akun.
+- [x] Badge berwarna + ikon untuk status/label; urutan default `created_at desc`.
+  - `ReadOnlyPresentation::statusColor/statusIcon/labelColor/labelIcon/assessmentColor/assessmentIcon/submissionResultColor/submissionResultIcon`, `MonitoringPresentation::actionColor/actionIcon`, `ModelVersionResource::statusIcon`. Record classifier parsial tetap `gray` + ikon jam.
+- [x] Filter di atas tabel, simpan di session (`persistFiltersInSession`); pencarian global tetap.
+  - `FiltersLayout::AboveContent` + `persistFiltersInSession()` pada keenam tabel; test lama yang mem-assert populasi independen kini memanggil `removeTableFilters()` lebih dulu (assertion tidak dilonggarkan).
+- [x] **Ekspor CSV** pada tabel yang relevan (Pemeriksaan: tanpa isi pengguna — hanya metadata; Umpan Balik; Pengguna: tanpa data sensitif). Reuse helper escape CSV yang ada (⚠ VERIFIKASI helper di `CsvExportTest` path) dan **escape formula** (`=`, `+`, `-`, `@`) untuk sel berasal dari pengguna.
+  - Verifikasi: helper adalah `App\Support\CsvCellSanitizer` (dipakai `SubmissionCsvExporter`, diuji `CsvExportTest`). `Filament\Actions\ExportAction` **tidak dipakai**: butuh class `Exporter` + tabel `exports` yang tidak ada di repo. Pengganti: `App\Filament\Support\TableCsvExport` (streamed, BOM + CRLF, sanitizer sama, mengikuti filter/pencarian tabel). Pemeriksaan hanya metadata; Pengguna tanpa hash/remember token; Umpan Balik memuat komentar yang memang sudah tampil ke admin.
+- [x] Empty state informatif; notifikasi konsisten.
+  - Heading/description dipertahankan dan diuji non-kosong untuk keenam tabel; ekspor yang gagal disiapkan memakai notifikasi danger yang sama dengan aksi admin lain.
+- **Bukti:** `tests/Feature/AdminTableStandardTest.php` (32 test: kolom default, toggleable, layout filter, persistensi session, badge+ikon, ekspor, empty state), `reports/frontend-revamp/after-s3/tables.md` + `table-*-{375,768,1280}.png`.
+- **Catatan agent:** ekspor Pemeriksaan sengaja tidak memuat `raw_input`/`source_url`/media, jadi tidak ada sel pengguna yang perlu disanitasi di tabel itu; sanitasi formula diverifikasi pada ekspor Pengguna dan Umpan Balik.
 
 ### T3.4 (M) Aksi "Coba lagi" tanpa terminal
-- [ ] Ekstrak logika dari `RecoverFailedSubmissions` / `RecoverStaleSubmissions` ke service bersama (mis. `App\Services\Pipeline\SubmissionRecovery`) yang dipakai **command dan UI** (perilaku command tidak berubah; test command tetap hijau).
-- [ ] Aksi Filament di daftar & detail Pemeriksaan: **Coba lagi** (hanya status `failed`/tertahan), konfirmasi modal dengan penjelasan, **bulk action**, hanya admin (policy), idempoten (pemanggilan ganda tidak membuat job ganda), menghormati state machine.
-- [ ] Catat ke Log Admin dengan **allowlist** (aksi, target id, jumlah) — tanpa isi pengguna. Perbarui `MonitoringPresentation` dan `FilamentAuditObserver`/log untuk aksi baru.
-- [ ] Test: otorisasi, idempotensi, audit tanpa payload pengguna, status akhir.
+- [x] Ekstrak logika dari `RecoverFailedSubmissions` / `RecoverStaleSubmissions` ke service bersama (mis. `App\Services\Pipeline\SubmissionRecovery`) yang dipakai **command dan UI** (perilaku command tidak berubah; test command tetap hijau).
+  - `App\Services\Pipeline\SubmissionRecovery`: `failedQuery()`, `retry()`, `retryQuery()`, `isRetryable()`, `isStalled()`. `RecoverFailedSubmissions` kini hanya memanggil service (signature, output, dan `--dry-run` tidak berubah). Jalur tertahan tetap didelegasikan ke `StaleSubmissionRecovery::recover()` supaya tahap pipeline yang dilanjutkan sama dengan watchdog — perilaku `submissions:recover-stale` tidak disentuh.
+- [x] Aksi Filament di daftar & detail Pemeriksaan: **Coba lagi** (hanya status `failed`/tertahan), konfirmasi modal dengan penjelasan, **bulk action**, hanya admin (policy), idempoten (pemanggilan ganda tidak membuat job ganda), menghormati state machine.
+  - `App\Filament\Actions\RetrySubmissionAction` (`make()` + `bulk()`), dipakai di `SubmissionsTable` (record + toolbar) dan `ViewSubmission` (header). Otorisasi: `App\Policies\SubmissionPolicy::retry` (admin) + `authorizeIndividualRecords('retry')` untuk bulk. Idempotensi: conditional `UPDATE ... WHERE status='failed' AND updated_at=<snapshot>` sehingga hanya satu pemanggil yang menang; baris tertahan memakai klaim atomik watchdog.
+- [x] Catat ke Log Admin dengan **allowlist** (aksi, target id, jumlah) — tanpa isi pengguna. Perbarui `MonitoringPresentation` dan `FilamentAuditObserver`/log untuk aksi baru.
+  - `AdminLog` ditulis eksplisit (`FilamentAuditObserver` hanya mencatat request `/admin*`, sedangkan aksi Livewire berjalan di `/livewire/update`). Metadata hanya `count` + `submission_ids`; `MonitoringPresentation::action/actionColor/actionIcon` dan filter Log Admin mengenali `submission_retried`.
+- [x] Test: otorisasi, idempotensi, audit tanpa payload pengguna, status akhir.
+  - `tests/Feature/AdminSubmissionRetryTest.php` (12 test), termasuk perilaku command `submissions:recover` (`--days`, `--id`, `--dry-run`) setelah ekstraksi.
+- **Bukti:** `reports/frontend-revamp/after-s3/tables.md` bagian T3.4 + `retry-*.png`.
+- **Catatan agent:** cacat visual ditemukan saat verifikasi browser dan diperbaiki — sel tabel menyusut di bawah kontennya sehingga tanggal/aksi terpotong ("13:4"); kini `min-inline-size: max-content` dan overflow tetap di dalam kartu.
 
 ### T3.5 (L) Pemeriksaan: tab & detail (menggantikan Hasil Deteksi + Processing Events)
-- [ ] Daftar Pemeriksaan: tab **Perlu tindakan** (gagal/tertahan) · Diproses · Selesai · Semua, dengan badge jumlah.
-- [ ] Halaman detail (infolist): Ringkasan (pengguna/tamu, jenis, waktu, status) · **Hasil** (label, skor, versi model, waktu inferensi, cache — data yang dipindah dari publik di T1.4) · **Rujukan** (daftar evidence) · **Timeline pemrosesan** (relation manager/infolist dari `SubmissionProcessingEvent`: tahap, hasil operasi, layanan, percobaan, durasi, kode kendala) · **Terjemahan** (provider/model/cache) · tindakan (Coba lagi).
-- [ ] **Tidak menambah eksposur** isi pengguna melebihi yang sudah diizinkan sekarang (AGENTS §3: jangan membaca/mengekspor payload pengguna untuk laporan). Pertahankan `read-only`.
-- [ ] Tautan "Buka tampilan pengguna" (hasil publik) hanya untuk admin sesuai `SubmissionAccess`.
+- [x] Daftar Pemeriksaan: tab **Perlu tindakan** (gagal/tertahan) · Diproses · Selesai · Semua, dengan badge jumlah.
+  - `ListSubmissions::getTabs()` memakai `HasTabs` bawaan Filament 5 (`#[Url(as: 'tab')]`). "Perlu tindakan" memakai `SubmissionRecovery::actionableQuery()` — definisi yang sama dengan aksi "Coba lagi" (T3.4) dan widget dashboard. Default tetap **Semua** agar populasi yang sudah diuji tidak berubah; "Diproses" sengaja memuat baris tertahan juga.
+- [x] Halaman detail (infolist): Ringkasan (pengguna/tamu, jenis, waktu, status) · **Hasil** (label, skor, versi model, waktu inferensi, cache — data yang dipindah dari publik di T1.4) · **Rujukan** (daftar evidence) · **Timeline pemrosesan** (relation manager/infolist dari `SubmissionProcessingEvent`: tahap, hasil operasi, layanan, percobaan, durasi, kode kendala) · **Terjemahan** (provider/model/cache) · tindakan (Coba lagi).
+  - `SubmissionInfolist` kini berisi enam bagian itu; Rujukan dan Timeline memakai `ViewEntry` + view khusus (`submission-evidence`, `submission-timeline`). Aksi "Coba lagi" sudah ada di header sejak T3.4. Field `DetectionResult` yang dulu hanya ada di resource Hasil Deteksi (konteks record, status & isi penjelasan, model penjelasan, cache) dan kolom Processing Events (tahap, hasil, layanan, percobaan, durasi, kode kendala, metadata allowlist) kini tersedia di halaman ini.
+- [x] **Tidak menambah eksposur** isi pengguna melebihi yang sudah diizinkan sekarang (AGENTS §3: jangan membaca/mengekspor payload pengguna untuk laporan). Pertahankan `read-only`.
+  - Halaman tetap read-only (tanpa aksi edit/hapus); `guest_access_token_hash` tidak pernah dipilih, media tetap teks path privat tanpa URL publik, dan timeline memakai `MonitoringPresentation::eventMetadata()` yang sudah meredaksi nilai tak dikenal.
+- [x] Tautan "Buka tampilan pengguna" (hasil publik) hanya untuk admin sesuai `SubmissionAccess`.
+  - Hanya dirender untuk submission dengan `user_id` (admin diizinkan membuka submission terdaftar). Submission tamu tidak diberi tautan karena admin tidak memegang capability tamu — tautan itu akan selalu 404 (`ResultEndpointAuthorizationTest`).
 - **Penerimaan:** semua data yang sebelumnya hanya tersedia di Hasil Deteksi/Processing Events dapat diakses dari detail Pemeriksaan.
+  - Terverifikasi di browser: tab badge 2/1/2/4 dan populasi tiap tab cocok; detail menampilkan 6 bagian, 3 rujukan urut peringkat 1-2-3, 4 event timeline urut waktu, tanpa overflow di 375/768/1280.
+- **Bukti:** `tests/Feature/AdminSubmissionDetailTest.php` (15 test), `reports/frontend-revamp/after-s3/submission-detail.md` + `detail-*.png`.
+- **Catatan agent:** `MonitoringPresentation::eventMetadata()` memang meredaksi `model_version` dan `input_trace` (allowlist lama, diuji `AdminMonitoringResourcesTest`); detail tidak melonggarkannya.
 
 ### T3.6 (M) Hapus resource duplikat
-- [ ] Setelah T3.5 lulus: hapus `DetectionResultResource` dan `SubmissionProcessingEventResource` beserta halaman/tabel/policy-nya, serta entri di `AdminPanelProvider` (scopes `read-only-notice`). Migrasikan test yang relevan ke Pemeriksaan (jangan menghapus assertion keamanan/otorisasi — pindahkan).
-- [ ] **Jangan** menghapus model/tabel (`DetectionResult`, `SubmissionProcessingEvent`) — hanya UI-nya.
+- [x] Setelah T3.5 lulus: hapus `DetectionResultResource` dan `SubmissionProcessingEventResource` beserta halaman/tabel/policy-nya, serta entri di `AdminPanelProvider` (scopes `read-only-notice`). Migrasikan test yang relevan ke Pemeriksaan (jangan menghapus assertion keamanan/otorisasi — pindahkan).
+  - 11 file dihapus (2 resource, 4 page, 3 schema/table). Tidak ada policy khusus untuk keduanya; otorisasi tetap lewat `SubmissionPolicy`. Scope `read-only-notice` tinggal Pemeriksaan, Umpan Balik, Log Admin.
+- [x] **Jangan** menghapus model/tabel (`DetectionResult`, `SubmissionProcessingEvent`) — hanya UI-nya.
+  - Model, tabel, relasi, dan `MonitoringPresentation` tidak disentuh; timeline detail memakai proyeksi yang sama.
 - **Penerimaan:** suite Laravel hijau; tidak ada rute/menu yang mengarah ke resource yang dihapus.
+  - `route:list --path=admin` tanpa `detection-results`/`submission-processing-events`; kedua URL 404; navigasi tetap 7 item; suite 1007 lulus.
+- **Bukti:** `tests/Feature/AdminSubmissionSecurityTest.php` (7 test, termasuk kelas/rute hilang dan proyeksi metadata), `reports/frontend-revamp/after-s3/resource-removal.md` + `t36-detail-*.png`.
+- **Catatan agent:** dua kapabilitas hilang bersama resource dan **dipulihkan di UI**, bukan dengan melonggarkan test — pencarian berdasarkan versi model classifier kini ada di kolom "Hasil classifier" daftar Pemeriksaan, dan tooltip glossary tahap/percobaan/kode kendala ditambahkan ke timeline detail. Tabel assertion yang dipindahkan didaftar di laporan bukti.
 
 ### T3.7 (M) Umpan Balik: alur tinjau
-- [ ] Migrasi **additive & reversible**: `feedback.reviewed_at` (nullable timestamp), `feedback.reviewed_by` (nullable FK `users`, `nullOnDelete`). Update model/factory.
-- [ ] Daftar: tab **Perlu ditinjau** (belum `reviewed_at`) · Tidak sesuai · Semua. Aksi: **Tandai sudah ditinjau** (single & bulk), lihat Pemeriksaan terkait, ekspor CSV.
-- [ ] Aksi **Tambahkan ke Data Kurasi** disiapkan sebagai tombol (diimplementasikan penuh di T4.3); sampai T4.3 selesai, tombol tidak ditampilkan.
-- [ ] Audit log untuk "Tandai ditinjau" (allowlist).
+- [x] Migrasi **additive & reversible**: `feedback.reviewed_at` (nullable timestamp), `feedback.reviewed_by` (nullable FK `users`, `nullOnDelete`). Update model/factory.
+  - `2026_11_13_000002_add_review_columns_to_feedback_table.php` (`dropConstrainedForeignId` + `dropColumn` di `down`, data lama tidak disentuh). Model: `reviewed_at` cast datetime, scope `pendingReview()`/`reviewed()`, relasi `reviewer()`. Factory: default `null` + state `reviewed()`.
+- [x] Daftar: tab **Perlu ditinjau** (belum `reviewed_at`) · Tidak sesuai · Semua. Aksi: **Tandai sudah ditinjau** (single & bulk), lihat Pemeriksaan terkait, ekspor CSV.
+  - `ListFeedback::getTabs()` (Perlu ditinjau default, badge jumlah), `MarkFeedbackReviewedAction` di record + toolbar + header detail, kolom "Status tinjau" (badge+ikon+tooltip peninjau). Tautan Pemeriksaan dan ekspor CSV dari T3.3 dipertahankan.
+- [x] Aksi **Tambahkan ke Data Kurasi** disiapkan sebagai tombol (diimplementasikan penuh di T4.3); sampai T4.3 selesai, tombol tidak ditampilkan.
+  - Tidak dirender sama sekali; diuji `assertTableActionDoesNotExist('addToCuration')` pada daftar dan detail.
+- [x] Audit log untuk "Tandai ditinjau" (allowlist).
+  - `App\Services\Admin\FeedbackReview` menulis `feedback_reviewed` dengan metadata hanya `count` + `feedback_ids`; komentar pengguna tidak pernah disalin. `MonitoringPresentation` (label/warna/ikon/target/metadata) dan filter Log Admin diperbarui.
 - **Penerimaan:** `FeedbackTest`/test terkait + test baru hijau.
+  - `tests/Feature/AdminFeedbackReviewTest.php` (16 test) + `FeedbackTest`, `AdminReadOnlyResourcesTest`, `AdminMonitoringResourcesTest`, `AdminTableStandardTest` hijau; suite penuh 1023 lulus.
+- **Bukti:** `reports/frontend-revamp/after-s3/feedback-review.md` + `t37-*.png`.
+- **Catatan agent:** cacat ditemukan saat verifikasi browser dan diperbaiki — badge "Status tinjau" tidak merender teks karena closure `?string` tidak cocok dengan state `Carbon` dari cast `reviewed_at`; kini memakai `mixed`.
 
 ### T3.8 (M) Versi Model: ringkas & jelas
-- [ ] Kolom default: Versi · Status (badge) · Akurasi · Dibanding baseline · Aktif · Dibuat. Kolom lain (Baris dataset, F1, Durasi) toggleable-hidden.
-- [ ] Tooltip untuk semua istilah (Akurasi, F1, Baseline, Aktif). Notice pelatihan diganti bahasa awam tetapi akurat (tidak otomatis menggantikan model aktif; aktivasi manual).
-- [ ] Aksi "Aktifkan Baseline v1.0.0" dipindah ke menu overflow (`ActionGroup`) agar tidak bersaing dengan "Latih Versi Baru".
-- [ ] Tambahkan tautan **unduh templat CSV** (`text,label`, 3 baris contoh fiktif) di form unggah.
-- [ ] Modal aktivasi: tambahkan peringatan bahwa metrik berasal dari data validasi internal dan tidak menjamin kualitas pada data baru; sarankan evaluasi eksternal sebelum aktivasi (teks saja; tanpa mengubah logika aktivasi).
-- [ ] **Jangan** mengubah `BertTrainingService::activateModelVersion/activateBaseline` atau kontrak ke layanan BERT.
+- [x] Kolom default: Versi · Status (badge) · Akurasi · Dibanding baseline · Aktif · Dibuat. Kolom lain (Baris dataset, F1, Durasi) toggleable-hidden.
+  - Urutan nyata: `version_name`, `status`, `accuracy`, `baseline_accuracy`, `is_active`, `created_at`; `total_rows`, `f1_score`, `training_duration` tetap toggleable-hidden. Test T3.3 yang menegaskan `baseline_accuracy` tersembunyi diperbarui karena T3.8 menetapkannya sebagai kolom default.
+- [x] Tooltip untuk semua istilah (Akurasi, F1, Baseline, Aktif). Notice pelatihan diganti bahasa awam tetapi akurat (tidak otomatis menggantikan model aktif; aktivasi manual).
+  - Tooltip memakai `AdminGlossary`; dua istilah baru ditambahkan (`accuracy`, `model_status`). `TRAINING_NOTICE` menyebut "tidak otomatis", "model aktif", "manual", dan "tidak dihapus".
+- [x] Aksi "Aktifkan Baseline v1.0.0" dipindah ke menu overflow (`ActionGroup`) agar tidak bersaing dengan "Latih Versi Baru".
+  - `ActionGroup` berlabel "Aksi lain"; aksi tetap dapat dipanggil lewat `getFlatActions()` sehingga test perilaku lama tetap hijau.
+- [x] Tambahkan tautan **unduh templat CSV** (`text,label`, 3 baris contoh fiktif) di form unggah.
+  - `ModelVersionCsvTemplateController` + route `admin.model-versions.template` (auth + throttle, hanya admin), dipasang sebagai `hintAction` "Unduh templat CSV" pada `FileUpload`. Templat lolos `BertCsvValidator` (3 baris, label `valid`/`hoax`).
+- [x] Modal aktivasi: tambahkan peringatan bahwa metrik berasal dari data validasi internal dan tidak menjamin kualitas pada data baru; sarankan evaluasi eksternal sebelum aktivasi (teks saja; tanpa mengubah logika aktivasi).
+  - `ModelVersionResource::activationDescription()` kini memuat ketiga kalimat itu; modal baseline tetap menjelaskan versi tidak dihapus.
+- [x] **Jangan** mengubah `BertTrainingService::activateModelVersion/activateBaseline` atau kontrak ke layanan BERT.
+  - Service tidak disentuh; test memastikan kedua method masih ada dan aksi aktivasi tetap muncul untuk versi selesai.
+- **Bukti:** `tests/Feature/AdminModelVersionClarityTest.php` (11 test), `reports/frontend-revamp/after-s3/model-versions.md` + `t38-*.png`.
+- **Catatan agent:** route templat tidak boleh berada di bawah `/admin/model-versions/` — Filament mendaftarkan wildcard `{record}` lebih dulu sehingga path saudara tertangkap route detail (ditemukan lewat 404 di test).
 
 ### T3.9 (S) Pengguna
-- [ ] Perbaiki kolom verifikasi email (T1.7), tambah filter Peran/Verifikasi, ekspor opsional. Aturan "admin verifier tidak bisa di-demote" tetap berlaku (disesuaikan ke alur Data Kurasi pada Tahap 4 bila relasi berubah).
+- [x] Perbaiki kolom verifikasi email (T1.7), tambah filter Peran/Verifikasi, ekspor opsional. Aturan "admin verifier tidak bisa di-demote" tetap berlaku (disesuaikan ke alur Data Kurasi pada Tahap 4 bila relasi berubah).
+  - Kolom kini memakai `state()` eksplisit (badge + ikon + tooltip tanggal) karena Filament melewati formatting untuk state `null` dan model meng-cast timestamp ke Carbon; sebelumnya badge "Belum" tidak pernah dirender. Filter `is_admin` dan `email_verified_at` (Ternary) sudah ada sejak T3.3 dan diuji ulang di sini; ekspor CSV (nama, email, peran, verifikasi, terdaftar — tanpa hash/remember token) juga dari T3.3.
+  - Aturan demote tetap di `User::booted()`; test baru memastikan `update(['is_admin' => false])` untuk verifier tetap ditolak dengan pesan yang sama, sehingga perubahan tabel tidak memindahkan guard.
+- **Bukti:** `tests/Feature/AdminUsersResourceTest.php` (17 test), `reports/frontend-revamp/after-s3/users.md` + `t39-users-*.png`.
+- **Catatan agent:** dua cacat ditemukan lewat test/browser dan diperbaiki di UI: formatter `?string` vs state Carbon, lalu state `null` yang tidak diformat Filament.
 
 ### T3.10 (M) QA tahap 3
-- [ ] Screenshot "after-s3" (375/768/1280 untuk dashboard & tiap resource). Uji keyboard, kontras, dan empty/error state (BERT mati, DB lambat).
-- [ ] Suite Laravel penuh + Pint + `npm run build` hijau.
+- [x] Screenshot "after-s3" (375/768/1280 untuk dashboard & tiap resource). Uji keyboard, kontras, dan empty/error state (BERT mati, DB lambat).
+  - 49 screenshot di `reports/frontend-revamp/after-s3/qa/` (21 publik, 24 admin, 4 state). Semua 200/404-sesuai-uji, satu `h1`, overflow horizontal 0 pada 375/768/1280. Keyboard: outline 3px, 0 tombol tanpa nama, 0 `img` tanpa `alt`, grafik `canvas[role=img]` berlabel. Kontras ter-render 5.73–13.52:1. BERT/RAG/OpenAI mati → badge "Belum tersedia" tanpa stack trace; daftar kosong → empty state informatif.
+  - **Temuan yang diperbaiki:** 10 jenis kontrol admin di bawah 44px (tab 40, header sort 20, aksi baris 20, tautan sel 32, breadcrumb 20, "Atur ulang filter" 20, wordmark 20, menu pengguna 32, select non-native 36, item sidebar 40). Semua dinaikkan ke 44px di `theme.css`; audit ulang menghasilkan daftar kosong.
+- [x] Suite Laravel penuh + Pint + `npm run build` hijau.
+  - 1037 lulus / 4 skip / 25 warning; Pint PASS; `node --test` 124 lulus; `npm run build` lulus.
+- **Bukti:** `reports/frontend-revamp/after-s3/qa/README.md` + 49 PNG.
+- **Catatan agent:** "DB lambat" tidak dapat disimulasikan lewat lock SQLite (lock total memblokir login dan semua request, sehingga bukan state UI yang sah); penanganan `PDOException` per widget sudah tercakup `AdminDashboardTest`/`AdminDashboardMetricsTest`. Pembaca layar diuji lewat struktur DOM, bukan NVDA/VoiceOver.
 
 **Selesai Tahap 3 bila:** T3.1–T3.10 centang.
 
